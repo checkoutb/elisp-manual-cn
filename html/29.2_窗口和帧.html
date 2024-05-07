@@ -1,0 +1,137 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>29.2 窗口和帧</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">29.2 窗口和帧</h2>
+<div class="nav-panel"><p>Next: <a href="29.3_选择窗口.html">选择窗口</a>, Previous: <a href="29.1_Emacs_Windows的基本概念.html">Emacs_Windows的基本概念</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>每个窗口恰好属于一个 <code>帧</code> ( <code>frame</code> )（请参阅 <code>帧</code> ( <code>frame</code> )）。对于属于特定 <code>帧</code> ( <code>frame</code> )的所有窗口，我们有时也说这些窗口归该 <code>帧</code> ( <code>frame</code> )所有，或者简单地说它们在该 <code>帧</code> ( <code>frame</code> )上。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-frame &amp;optional window ¶
+</pre></div>
+<p>该函数返回指定窗口的 <code>帧</code> ( <code>frame</code> )——窗口所属的 <code>帧</code> ( <code>frame</code> )。如果 window 被省略或为零，则默认为选定的窗口（请参阅选择窗口）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-list &amp;optional frame minibuffer window ¶
+</pre></div>
+<p>此函数返回指定 <code>帧</code> ( <code>frame</code> )拥有的所有活动窗口的列表。如果 frame 被省略或为零，则默认为选定的帧（请参阅输入焦点）。
+</p>
+<p>可选参数 minibuffer 指定是否在该列表中包含 minibuffer 窗口（请参阅 Minibuffer Windows）。如果 minibuffer 为 t，则包含 minibuffer 窗口。如果为 nil 或省略，则仅当 minibuffer 窗口处于活动状态时才包含它。如果 minibuffer 既不是 nil 也不是 t，则永远不会包含 minibuffer 窗口。
+</p>
+<p>可选参数窗口，如果非零，则必须是指定帧上的活动窗口；  那么 window 将是返回列表中的第一个元素。如果 window 被省略或为零，则在 <code>帧</code> ( <code>frame</code> )内选择的窗口（请参阅选择窗口）是第一个元素。
+</p>
+<p>同一帧上的窗口被组织成一个窗口树，其叶子节点是活动窗口。窗口树的内部节点不是活的；  它们的存在是为了组织活动窗口之间的关系。窗口树的根节点称为根窗口。它是实时窗口或内部窗口。如果它是一个活动窗口，那么该帧除了 minibuffer 窗口之外只有一个窗口，或者该帧是一个 minibuffer-only 帧，请参阅帧布局。
+</p>
+<p>一个不在其 <code>帧</code> ( <code>frame</code> )上的 minibuffer 窗口（参见 Minibuffer Windows）没有父窗口，因此严格来说它不是其 <code>帧</code> ( <code>frame</code> )窗口树的一部分。尽管如此，它是 <code>帧</code> ( <code>frame</code> )根窗口的兄弟窗口，因此可以通过 window-next-sibling 从根窗口访问，见下文。此外，本节末尾描述的函数 window-tree 在实际窗口树旁边列出了 minibuffer 窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: frame-root-window &amp;optional frame-or-window ¶
+</pre></div>
+<p>此函数返回 <code>帧</code> ( <code>frame</code> )或窗口的根窗口。参数 frame-or-window 应该是窗口或 <code>帧</code> ( <code>frame</code> )；  如果省略或为零，则默认为选定的帧。如果 frame-or-window 是一个窗口，则返回值是该窗口 <code>帧</code> ( <code>frame</code> )的根窗口。
+</p>
+<p>当一个实时窗口被拆分时（请参阅拆分窗口），有两个实时窗口，而之前是一个。其中一个由与原始窗口相同的 Lisp 窗口对象表示，另一个由新创建的 Lisp 窗口对象表示。这两个活动窗口都成为窗口树的叶节点，作为单个内部窗口的子窗口。如有必要，Emacs 会自动创建这个内部窗口，也称为父窗口，并将其分配到窗口树中的适当位置。共享同一个父窗口的一组窗口称为兄弟窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-parent &amp;optional window ¶
+</pre></div>
+<p>该函数返回窗口的父窗口。如果 window 被省略或为零，则默认为选定的窗口。如果窗口没有父窗口，则返回值为 nil（即，它是一个 minibuffer 窗口或其 <code>帧</code> ( <code>frame</code> )的根窗口）。
+</p>
+<p>一个父窗口总是至少有两个子窗口。如果这个数字由于窗口删除而下降到 1（请参阅删除窗口），Emacs 也会自动删除父窗口，并且其唯一剩余的子窗口将在窗口树中占据它的位置。
+</p>
+<p>子窗口可以是活动窗口，也可以是内部窗口（而内部窗口又会有自己的子窗口）。因此，每个内部窗口都可以被认为占据了某个矩形屏幕区域——最终从它下降的活动窗口所占据的区域的并集。
+</p>
+<p>对于每个内部窗口，直接子级的屏幕区域垂直或水平排列（从不同时排列）。如果子窗口上下排列，则称它们形成垂直组合；  如果它们并排排列，则称它们形成水平组合。考虑以下示例：
+</p>
+<div class="lisp">
+<pre class="lisp"> ______________________________________
+| ______  ____________________________ |
+||      || __________________________ ||
+||      |||                          |||
+||      |||                          |||
+||      |||                          |||
+||      |||____________W4____________|||
+||      || __________________________ ||
+||      |||                          |||
+||      |||                          |||
+||      |||____________W5____________|||
+||__W2__||_____________W3_____________ |
+|__________________W1__________________|
+</pre></div>
+<p>这个 <code>帧</code> ( <code>frame</code> )的根窗口是一个内部窗口，W1。它的子窗口形成一个横向组合，由活动窗口W2和内部窗口W3组成。W3 的子窗口形成一个垂直组合，由活动窗口 W4 和 W5 组成。因此，此窗口树中的活动窗口是 W2、W4 和 W5。
+</p>
+<p>以下函数可用于检索内部窗口的子窗口以及子窗口的兄弟窗口。它们的窗口参数始终默认为选定的窗口（请参阅选择窗口）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-top-child &amp;optional window ¶
+</pre></div>
+<p>如果 window 是内部窗口，其子窗口形成垂直组合，则此函数返回 window 的最顶层子窗口。对于任何其他类型的窗口，返回值为 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-left-child &amp;optional window ¶
+</pre></div>
+<p>该函数返回window最左边的子窗口，如果window是一个内部窗口，它的子窗口形成一个水平组合。对于任何其他类型的窗口，返回值为 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-child window ¶
+</pre></div>
+<p>这个函数返回内部窗口窗口的第一个子窗口——垂直组合的最上面的子窗口，或者水平组合的最左边的子窗口。如果 window 是活动窗口，则返回值为 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-combined-p &amp;optional window horizontal ¶
+</pre></div>
+<p>当且仅当 window 是垂直组合的一部分时，此函数才返回非 nil 值。
+</p>
+<p>如果可选参数水平是非零，这意味着当且仅当窗口是水平组合的一部分时才返回非零。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-next-sibling &amp;optional window ¶
+</pre></div>
+<p>此函数返回指定窗口的下一个兄弟。如果 window 是其父级的最后一个子级，则返回值为 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-prev-sibling &amp;optional window ¶
+</pre></div>
+<p>此函数返回指定窗口的前一个兄弟。如果 window 是其父级的第一个子级，则返回值为 nil。
+</p>
+<p>函数 window-next-sibling 和 window-prev-sibling 不应与函数 next-window 和 previous-window 混淆，后者以窗口的循环顺序返回下一个和上一个窗口（请参阅 Windows 的循环排序）。
+</p>
+<p>以下函数可用于在其 <code>帧</code> ( <code>frame</code> )内定位窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: frame-first-window &amp;optional frame-or-window ¶
+</pre></div>
+<p>此函数返回由 frame-or-window 指定的帧左上角的实时窗口。参数 frame-or-window 必须表示一个窗口或一个活动 <code>帧</code> ( <code>frame</code> )，并且默认为选定的 <code>帧</code> ( <code>frame</code> )。如果 frame-or-window 指定了一个窗口，则此函数返回该窗口 <code>帧</code> ( <code>frame</code> )上的第一个窗口。假设选择了我们规范示例中的帧（帧优先窗口），则返回 W2。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-at-side-p &amp;optional window side ¶
+</pre></div>
+<p>如果窗口位于其包含 <code>帧</code> ( <code>frame</code> )的一侧，则此函数返回 t。参数窗口必须是有效的窗口，并且默认为选定的窗口。参数侧可以是左、上、右或下的任何符号。默认值 nil 像底部一样处理。
+</p>
+<p>请注意，此函数忽略了 minibuffer 窗口（请参阅 Minibuffer Windows）。因此，当小缓冲区窗口出现在窗口的正下方时，当边等于底部时，它也可能返回 t。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-in-direction direction &amp;optional window ignore sign wrap minibuf ¶
+</pre></div>
+<p>此函数返回从窗口窗口中窗口点位置看的方向上最近的实时窗口。参数方向必须是上、下、左或右之一。可选参数 window 必须表示一个活动窗口，并且默认为选定的窗口。
+</p>
+<p>此函数不返回 no-other-window 参数为非 nil 的窗口（请参阅窗口参数）。如果最近窗口的 no-other-window 参数为非 nil，则此函数尝试在指定方向上查找 no-other-window 参数为 nil 的另一个窗口。如果可选参数 ignore 不为 nil，则即使其 no-other-window 参数为非 nil，也可能返回一个窗口。
+</p>
+<p>如果可选参数符号为负数，则表示使用窗口的右边缘或下边缘作为参考位置，而不是窗口点。如果符号为正数，则表示以窗口的左边缘或上边缘作为参考位置。
+</p>
+<p>如果可选参数 wrap 不为零，这意味着将方向环绕在 <code>帧</code> ( <code>frame</code> )边框周围。例如，如果窗口位于 <code>帧</code> ( <code>frame</code> )的顶部并且方向在上方，则此函数通常在它处于活动状态时返回该 <code>帧</code> ( <code>frame</code> )的 minibuffer 窗口，否则返回一个位于 <code>帧</code> ( <code>frame</code> )底部的窗口。
+</p>
+<p>如果可选参数 minibuf 为 t，则此函数可能会返回 minibuffer 窗口，即使它未处于活动状态。如果可选参数 minibuf 为 nil，这意味着当且仅当它当前处于活动状态时才返回 minibuffer 窗口。如果 minibuf 既不是 nil 也不是 t，这个函数永远不会返回 minibuffer 窗口。然而，如果 wrap 不是 nil，它总是表现得好像 minibuf 是 nil。
+</p>
+<p>如果没有找到合适的窗口，这个函数返回 nil。
+</p>
+<p>请勿使用此功能检查方向是否有窗口。调用上面描述的 window-at-side-p 是一种更有效的方法。
+</p>
+<p>以下函数检索 <code>帧</code> ( <code>frame</code> )的整个窗口树：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-tree &amp;optional frame ¶
+</pre></div>
+<p>此函数返回一个表示 <code>帧</code> ( <code>frame</code> ) <code>帧</code> ( <code>frame</code> )的窗口树的列表。如果 frame 被省略或为零，则默认为选定的 <code>帧</code> ( <code>frame</code> )。
+</p>
+<p>返回值是一个形式为（root mini）的列表，其中root代表frame的根窗口的窗口树，mini是frame的minibuffer窗口。
+</p>
+<p>如果根窗口是活动的，那么根就是那个窗口本身。否则，root 是一个列表 (dir edges w1 w2 …)，其中 dir 表示水平组合，t 表示垂直组合，edges 给出组合的大小和位置，其余元素是子窗口。每个子窗口可能又是一个窗口对象（对于活动窗口）或具有与上述相同格式的列表（对于内部窗口）。边缘元素是一个列表（左上右下），类似于 window-edges 返回的值（参见坐标和窗口）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="29.3_选择窗口.html">选择窗口</a>, Previous: <a href="29.1_Emacs_Windows的基本概念.html">Emacs_Windows的基本概念</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,21 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>30.15 鼠标跟踪</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">30.15 鼠标跟踪</h2>
+<div class="nav-panel"><p>Next: <a href="30.16_鼠标位置.html">鼠标位置</a>, Previous: <a href="30.14_子帧.html">子帧</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>有时跟踪鼠标很有用，这意味着显示一些东西来指示鼠标在哪里，并在鼠标移动时移动指示器。为了有效地跟踪鼠标，您需要一种等待鼠标实际移动的方法。
+</p>
+<p>跟踪鼠标的便捷方法是请求事件来表示鼠标运动。然后，您可以通过等待事件来等待动作。此外，您可以轻松处理可能发生的任何其他类型的事件。这很有用，因为通常您不希望永远跟踪鼠标——只在其他一些事件之前，例如释放按钮。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: track-mouse body… ¶
+</pre></div>
+<p>此宏执行主体，并启用鼠标运动事件的生成。通常，body 会使用 read-event 来读取运动事件并相应地修改显示。有关鼠标运动事件的格式，请参阅运动事件。
+</p>
+<p>track-mouse 的值是 body 中最后一个形式的值。您应该将 body 设计为在看到指示按钮释放的向上事件时返回，或者任何类型的事件意味着是时候停止跟踪了。
+</p>
+<p>track-mouse 形式使 Emacs 通过将变量 track-mouse 绑定到一个非 nil 值来生成鼠标运动事件。如果该变量具有特殊值 dragging，它还指示显示引擎不要更改鼠标指针的形状。这在需要鼠标在 Emacs 显示的大部分区域上拖动的 Lisp 程序中是可取的，否则可能会导致鼠标指针根据其悬停的显示部分改变其形状（请参阅指针形状）。因此，在拖动过程中需要鼠标指针保持其原始形状的 Lisp 程序应该将 track-mouse 绑定到其主体开始处拖动的值。
+</p>
+<p>跟踪鼠标运动的通常目的是在屏幕上指示在当前位置按下或释放按钮的结果。
+</p>
+<p>在许多情况下，您可以通过使用 mouse-face 文本属性来避免跟踪鼠标的需要（请参阅具有特殊含义的属性）。与 Lisp 级别的鼠标跟踪相比，它的工作水平要低得多，运行起来更流畅。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="30.16_鼠标位置.html">鼠标位置</a>, Previous: <a href="30.14_子帧.html">子帧</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

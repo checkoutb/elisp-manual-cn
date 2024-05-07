@@ -1,0 +1,64 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>3.9 标准数学函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">3.9 标准数学函数</h2>
+<div class="nav-panel"><p>Next: <a href="03.10_随机数.html">随机数</a>, Previous: <a href="03.8_整数的按位运算.html">整数的按位运算</a>, Up: <a href="03_数字.html">数字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这些数学函数允许整数和浮点数作为参数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: sin arg
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: cos arg
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: tan arg
+</pre></div>
+<p>这些是基本的三角函数，参数 arg 以弧度为单位。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: asin arg
+</pre></div>
+<p>(asin arg) 的值是介于 -pi/2 和 pi/2（含）之间的数字，其正弦为 arg。如果 arg 超出范围（在 [-1, 1] 之外），则 asin 返回 NaN。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: acos arg
+</pre></div>
+<p>(acos arg) 的值是一个介于 0 和 pi（含）之间的数字，其余弦为 arg。如果 arg 超出范围（在 [-1, 1] 之外），acos 返回一个 NaN。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: atan y &amp;optional x
+</pre></div>
+<p>(atan y) 的值是介于 -pi/2 和 pi/2（不包括）之间的数字，其正切为 y。如果给定了可选的第二个参数 x，则 (atan yx) 的值是向量 [x, y] 和 X 轴之间的弧度角。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: exp arg
+</pre></div>
+<p>这是指数函数；  它将 e 返回到幂 arg。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: log arg &amp;optional base
+</pre></div>
+<p>此函数返回 arg 的对数，以底为底。如果不指定基数，则使用自然基数 e。如果 arg 或 base 为负数，则 log 返回 NaN。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: expt x y
+</pre></div>
+<p>此函数返回 x 的 y 次幂。如果两个参数都是整数且 y 为非负数，则结果为整数；  在这种情况下，溢出表示错误，所以要小心。如果 x 是有限负数且 y 是有限非整数，则 expt 返回 NaN。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: sqrt arg
+</pre></div>
+<p>这将返回 arg 的平方根。如果 arg 是有限的且小于零，则 sqrt 返回 NaN。
+</p>
+<p>此外，Emacs 还定义了以下常见的数学常数：
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: float-e
+</pre></div>
+<p>数学常数 e (2.71828…)。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: float-pi
+</pre></div>
+<p>数学常数 pi (3.14159…)。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="03.10_随机数.html">随机数</a>, Previous: <a href="03.8_整数的按位运算.html">整数的按位运算</a>, Up: <a href="03_数字.html">数字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

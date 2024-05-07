@@ -1,0 +1,59 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>19.1.8 调试器命令</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">19.1.8 调试器命令</h3>
+<div class="nav-panel"><p>Next: <a href="19.1.9_调用调试器.html">调用调试器</a>, Previous: <a href="19.1.7_回溯.html">回溯</a>, Up: <a href="19.1_Lisp_调试器.html">Lisp_调试器.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>除了通常的 Emacs 命令和上一节中描述的 Backtrace 模式命令之外，调试器缓冲区（在 Debugger 模式下）还提供特殊命令。调试器命令最重要的用途是单步执行代码，这样您就可以看到控制是如何流动的。调试器可以单步执行解释函数的控制结构，但不能在字节编译函数中这样做。如果您想单步执行字节编译的函数，请将其替换为同一函数的解释定义。（为此，请访问函数的源代码并在其定义中键入 CMx。）您不能使用 Lisp 调试器单步执行原始函数。
+</p>
+<p>一些调试器命令在当前帧上运行。如果一个框架以星号开头，这意味着退出该框架将再次调用调试器。这对于检查函数的返回值很有用。
+</p>
+<p>以下是调试器模式命令的列表：
+</p>
+<div class="lisp">
+<pre class="lisp">c
+</pre></div>
+<p>退出调试器并继续执行。这将恢复程序的执行，就好像从未进入调试器一样（除了您在调试器内部更改变量值或数据结构引起的任何副作用）。
+</p><div class="lisp">
+<pre class="lisp">d
+</pre></div>
+<p>继续执行，但在下次调用任何 Lisp 函数时进入调试器。这允许您单步执行表达式的子表达式，查看子表达式计算的值以及它们还做了什么。
+</p>
+<p>以这种方式进入调试器的函数调用的堆栈帧将被自动标记，以便在退出帧时再次调用调试器。您可以使用 u 命令取消此标志。
+</p><div class="lisp">
+<pre class="lisp">b
+</pre></div>
+<p>标记当前帧，以便在退出该帧时进入调试器。以这种方式标记的帧在回溯缓冲区中用星号标记。
+</p><div class="lisp">
+<pre class="lisp">u
+</pre></div>
+<p>退出当前帧时不要进入调试器。这会取消该帧上的 ab 命令。可见效果是从回溯缓冲区中的行中删除星号。
+</p><div class="lisp">
+<pre class="lisp">j
+</pre></div>
+<p>像 b 一样标记当前帧。然后像 c 一样继续执行，但暂时禁用所有由 debug-on-entry 设置的函数的break-on-entry。
+</p><div class="lisp">
+<pre class="lisp">e
+</pre></div>
+<p>读取 minibuffer 中的 Lisp 表达式，评估它（使用相关的词法环境，如果适用），并在 echo 区域打印值。调试器会更改某些重要变量和当前缓冲区，作为其操作的一部分；  e 临时从调试器外部恢复它们的值，因此您可以检查和更改它们。这使调试器更加透明。相比之下， M-: 在调试器中没有什么特别之处；  它向您显示调试器中的变量值。
+</p><div class="lisp">
+<pre class="lisp">R
+</pre></div>
+<p>与 e 一样，也将评估结果保存在缓冲区 <strong>Debugger-record</strong> 中。
+</p><div class="lisp">
+<pre class="lisp">q
+</pre></div>
+<p>终止正在调试的程序；  返回顶层 Emacs 命令执行。
+</p>
+<p>如果由于 Cg 而进入调试器，但您真的想退出而不是调试，请使用 q 命令。
+</p><div class="lisp">
+<pre class="lisp">r
+</pre></div>
+<p>从调试器返回一个值。该值是通过读取带有微型缓冲区的表达式并对其进行评估来计算的。
+</p>
+<p>当调试器由于退出 Lisp 调用框架而被调用时，r 命令很有用（根据 b 请求或通过 d 进入框架）；  然后将 r 命令中指定的值用作该帧的值。如果您调用 debug 并使用它的返回值，它也很有用。否则，r 和 c 效果一样，指定的返回值无关紧要。
+</p>
+<p>由于错误而进入调试器时，您不能使用 r。
+</p><div class="lisp">
+<pre class="lisp">l
+</pre></div>
+<p>显示调用时将调用调试器的函数列表。这是一个通过 debug-on-entry 设置为在入口时中断的函数列表。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="19.1.9_调用调试器.html">调用调试器</a>, Previous: <a href="19.1.7_回溯.html">回溯</a>, Up: <a href="19.1_Lisp_调试器.html">Lisp_调试器.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

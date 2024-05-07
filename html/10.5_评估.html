@@ -1,0 +1,100 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>10.5 评估</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">10.5 评估</h2>
+<div class="nav-panel"><p>Next: <a href="10.6_延迟和惰性评估.html">延迟和惰性评估</a>, Previous: <a href="10.4_反引号.html">反引号</a>, Up: <a href="10_评估.html">评估.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>大多数情况下，表单会自动评估，因为它们出现在正在运行的程序中。在极少数情况下，您可能需要编写代码来评估在运行时计算的表单，例如在从正在编辑的文本中读取表单或从属性列表中获取表单之后。在这些情况下，请使用 eval 函数。通常不需要 eval 而应该使用其他东西。例如，要获取变量的值，虽然 eval 有效，但更可取的是符号值；  或者与其将表达式存储在需要通过 eval 的属性列表中，不如存储函数而不是然后传递给 funcall。
+</p>
+<p>本节中描述的函数和变量评估表单，指定评估过程的限制，或记录最近返回的值。加载文件也会进行评估（请参阅加载）。
+</p>
+<p>将函数存储在数据结构中并使用 funcall 或 apply 调用它通常比将表达式存储在数据结构中并对其评估更简洁和灵活。使用函数提供了将信息作为参数传递给它们的能力。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: eval form &amp;optional lexical ¶
+</pre></div>
+<p>这是评估表达式的基本函数。它在当前环境中评估表单，并返回结果。表单对象的类型决定了它的评估方式。请参阅表格种类。
+</p>
+<p>参数 lexical 指定局部变量的范围规则（请参阅变量绑定的范围规则）。如果省略或为零，则意味着使用默认的动态范围规则评估表单。如果是 t，则意味着使用词法作用域规则。lexical 的值也可以是一个非空列表，为词法绑定指定一个特定的词法环境；  但是，此功能仅对特定用途有用，例如在 Emacs Lisp 调试器中。请参阅词法绑定。
+</p>
+<p>由于 eval 是一个函数，出现在 eval 调用中的参数表达式会被计算两次：一次是在调用 eval 之前的准备，另一次是由 eval 函数本身。这是一个例子：
+</p><div class="lisp">
+<pre class="lisp">(setq foo 'bar)
+     ⇒ bar
+
+(setq bar 'baz)
+     ⇒ baz
+;; Here eval receives argument foo
+(eval 'foo)
+     ⇒ bar
+;; Here eval receives argument bar, which is the value of foo
+(eval foo)
+     ⇒ baz
+</pre></div>
+<p>当前对 eval 的活动调用数限制为 max-lisp-eval-depth（见下文）。 
+</p>
+<div class="lisp">
+<pre class="lisp">Command: eval-region start end &amp;optional stream read-function ¶
+</pre></div>
+<p>此函数在由位置 start 和 end 定义的区域中评估当前缓冲区中的表单。它从区域中读取表单并在它们上调用 eval 直到到达区域的末尾，或者直到发出错误信号并且未处理。
+</p>
+<p>默认情况下， eval-region 不产生任何输出。但是，如果 stream 不为 nil，则输出函数产生的任何输出（请参阅输出函数）以及计算区域中的表达式所产生的值都将使用 stream 打印。请参阅输出流。
+</p>
+<p>如果 read-function 不为 nil，它应该是一个函数，用来代替 read 来逐个读取表达式。使用一个参数调用此函数，即用于读取输入的流。您还可以使用变量 load-read-function（请参阅程序如何加载）来指定此函数，但使用 read-function 参数更健壮。
+</p>
+<p>eval-region 不移动点。它总是返回零。 
+</p>
+<div class="lisp">
+<pre class="lisp">Command: eval-buffer &amp;optional buffer-or-name stream filename unibyte print ¶
+</pre></div>
+<p>这类似于 eval-region，但参数提供了不同的可选特性。eval-buffer 对缓冲区 buffer-or-name 的整个可访问部分进行操作（参见 GNU Emacs 手册中的 Narrowing）。buffer-or-name 可以是缓冲区、缓冲区名称（字符串）或 nil（或省略），表示使用当前缓冲区。流在 eval-region 中使用，除非流为 nil 并且打印非 nil。在这种情况下，计算表达式产生的值仍然会被丢弃，但输出函数的输出会打印在回显区域中。filename 是用于加载历史的文件名（请参阅卸载），默认为缓冲区文件名（请参阅缓冲区文件名）。如果 unibyte 不是 nil，read 会尽可能将字符串转换为 unibyte。
+</p>
+<p>eval-current-buffer 是此命令的别名。 
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: max-lisp-eval-depth ¶
+</pre></div>
+<p>此变量定义在发出错误信号之前调用 eval、apply 和 funcall 允许的最大深度（错误消息 <code>Lisp 嵌套超过 max-lisp-eval-depth</code> ）。
+</p>
+<p>这个限制，以及当它被超过时的相关错误，是 Emacs Lisp 避免对定义不明确的函数进行无限递归的一种方式。如果将 max-lisp-eval-depth 的值增加太多，这样的代码反而会导致堆栈溢出。在某些系统上，可以处理此溢出。在这种情况下，正常的 Lisp 评估被中断，控制权被转移回顶层命令循环（顶层）。请注意，在这种情况下无法进入 Emacs Lisp 调试器。请参阅出现错误时进入调试器。
+</p>
+<p>深度限制计算 eval、apply 和 funcall 的内部使用，例如调用 Lisp 表达式中提到的函数、函数调用参数和函数体形式的递归评估，以及 Lisp 代码中的显式调用。
+</p>
+<p>此变量的默认值为 800。如果将其设置为小于 100 的值，如果达到给定值，Lisp 会将其重置为 100。如果剩余空间很小，进入 Lisp 调试器会增加该值，以确保调试器本身有执行空间。
+</p>
+<p>max-specpdl-size 为嵌套提供了另一个限制。请参阅局部变量。 
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: values ¶
+</pre></div>
+<p>该变量的值是由执行此操作的标准 Emacs 命令从缓冲区（包括迷你缓冲区）读取、评估和打印的所有表达式返回的值的列表。（请注意，这不包括在 <strong>ielm</strong> 缓冲区中的评估，也不包括在 lisp-interaction-mode 中使用 Cj、Cx Ce 和类似评估命令的评估。）
+</p>
+<p>此变量已过时，将在未来版本中删除，因为它不断扩大 Emacs 进程的内存占用。因此，我们建议不要使用它。
+</p>
+<p>values 的元素按最近的顺序排列。
+</p>
+<div class="lisp">
+<pre class="lisp">(setq x 1)
+     ⇒ 1
+
+(list 'A (1+ 2) auto-save-default)
+     ⇒ (A 3 t)
+
+values
+     ⇒ ((A 3 t) 1 …)
+</pre></div>
+<p>此变量可用于引用最近评估的表单的值。打印 values 本身的值通常是一个坏主意，因为这可能很长。相反，检查特定元素，如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">;; Refer to the most recent evaluation result.
+(nth 0 values)
+     ⇒ (A 3 t)
+
+;; That put a new element on,
+;;   so all elements move back one.
+(nth 1 values)
+     ⇒ (A 3 t)
+
+;; This gets the element that was next-to-most-recent
+;;   before this example.
+(nth 3 values)
+     ⇒ 1
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="10.6_延迟和惰性评估.html">延迟和惰性评估</a>, Previous: <a href="10.4_反引号.html">反引号</a>, Up: <a href="10_评估.html">评估.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

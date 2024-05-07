@@ -1,0 +1,134 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>29.13.2 缓冲区显示的动作函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">29.13.2 缓冲区显示的动作函数</h3>
+<div class="nav-panel"><p>Next: <a href="29.13.3_缓冲区显示的动作列表.html">缓冲区显示的动作列表</a>, Previous: <a href="29.13.1_选择显示缓冲区的窗口.html">选择显示缓冲区的窗口</a>, Up: <a href="29.13_在合适的窗口中显示缓冲区.html">在合适的窗口中显示缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>动作函数是一个函数显示缓冲区调用，用于选择一个窗口来显示缓冲区。动作函数有两个参数：缓冲区，要显示的缓冲区，和 alist，一个动作列表（请参阅用于缓冲区显示的动作列表）。如果它们成功，它们应该返回一个显示缓冲区的窗口，如果它们失败，则返回 nil。
+</p>
+<p>Emacs 中定义了以下基本操作函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-buffer-same-window buffer alist ¶
+</pre></div>
+<p>此函数尝试在所选窗口中显示缓冲区。如果所选窗口是一个 minibuffer 窗口或专用于另一个缓冲区，则它会失败（请参阅专用窗口）。如果 alist 有一个非零禁止相同窗口条目，它也会失败。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-buffer-reuse-window buffer alist ¶
+</pre></div>
+<p>此函数尝试通过查找已显示缓冲区的窗口来显示缓冲区。所选 <code>帧</code> ( <code>frame</code> )上的窗口优先于其他 <code>帧</code> ( <code>frame</code> )上的窗口。
+</p>
+<p>如果 alist 有一个非 nil 禁止相同窗口条目，则所选窗口不符合重用条件。可以在 reusable-frames action alist 条目的帮助下指定用于搜索已显示缓冲区的窗口的帧集。如果 alist 不包含可重用帧条目，则此函数仅搜索选定的帧。
+</p>
+<p>如果此函数在另一个 <code>帧</code> ( <code>frame</code> )上选择一个窗口，它将使该 <code>帧</code> ( <code>frame</code> )可见，并且除非 alist 包含禁止切换 <code>帧</code> ( <code>frame</code> )条目，否则在必要时提升该 <code>帧</code> ( <code>frame</code> )。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-buffer-reuse-mode-window buffer alist ¶
+</pre></div>
+<p>此函数尝试通过查找以给定模式显示缓冲区的窗口来显示缓冲区。
+</p>
+<p>如果 alist 包含模式条目，则其值指定主要模式（符号）或主要模式列表。如果 alist 不包含模式条目，则使用缓冲区的当前主要模式。如果一个窗口显示一个缓冲区，其模式派生自这样指定的模式之一，则该窗口是候选窗口。
+</p>
+<p>该行为还由禁止相同窗口、可重用帧和禁止切换帧的列表条目控制，就像 display-buffer-reuse-window 一样。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-buffer-pop-up-window buffer alist ¶
+</pre></div>
+<p>此函数尝试通过拆分最大或最近最少使用的窗口（通常位于所选 <code>帧</code> ( <code>frame</code> )上）来显示缓冲区。它实际上通过调用 split-window-preferred-function 指定的函数来执行拆分（请参阅显示缓冲区的附加选项）。
+</p>
+<p>可以通过在 alist 中提供 window-height 和 window-width 条目来调整新窗口的大小。如果 alist 包含一个保留大小条目，Emacs 还将尝试在以后的调整大小操作期间保留新窗口的大小（请参阅保留窗口大小）。
+</p>
+<p>如果没有窗口可以分割，则此功能失败。通常情况下，发生这种情况是因为没有足够大的窗口允许拆分。在这方面，将 split-height-threshold 或 split-width-threshold 设置为较低的值可能会有所帮助。当所选帧具有不可拆分的帧参数时，拆分也会失败；  请参阅缓冲区参数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-buffer-in-previous-window buffer alist ¶
+</pre></div>
+<p>此函数尝试在先前显示缓冲区的窗口中显示缓冲区。
+</p>
+<p>如果 alist 包含非 nil 禁止相同窗口条目，则所选窗口不符合使用条件。只有当它已经显示缓冲区时，专用窗口才可用。如果 alist 包含前一个窗口条目，则该条目指定的窗口是可用的，即使它之前从未显示过缓冲区。
+</p>
+<p>如果 alist 包含可重用帧条目（请参阅缓冲区显示的动作列表），则其值确定要搜索合适窗口的帧。如果 alist 不包含 reusable-frames 条目，如果 display-buffer-reuse-frames 和 pop-up-frames 都为 nil，则此函数仅搜索选定的帧；  如果这些变量中的任何一个不为零，它就会搜索当前终端上的所有帧。
+</p>
+<p>如果根据这些规则有多个窗口符合可用条件，则此函数按以下优先顺序进行选择：
+</p>
+<p>由任何先前窗口列表条目指定的窗口，前提是它不是选定的窗口。
+以前显示缓冲区的窗口，前提是它不是选定的窗口。
+选定的窗口，如果它由先前窗口列表条目指定或之前显示缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-buffer-use-some-window buffer alist ¶
+</pre></div>
+<p>此函数尝试通过选择现有窗口并在该窗口中显示缓冲区来显示缓冲区。如果所有窗口都专用于其他缓冲区，则它可能会失败（请参阅专用窗口）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-buffer-use-least-recent-window buffer alist ¶
+</pre></div>
+<p>此功能类似于 display-buffer-use-some-window，但不会重用当前窗口，而是使用最近最少切换到的窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-buffer-in-direction buffer alist ¶
+</pre></div>
+<p>此函数尝试在 alist 指定的位置显示缓冲区。为此，alist 应包含一个方向条目，其值为左、上（或上）、右和下（或下）之一。其他值通常解释如下。
+</p>
+<p>如果 alist 还包含一个窗口条目，则它的值指定一个引用窗口。该值可以是一个特殊符号，例如 main 代表所选 <code>帧</code> ( <code>frame</code> )的主窗口（请参阅侧窗口选项和功能）或 root 代表所选 <code>帧</code> ( <code>frame</code> )的根窗口（请参阅 Windows 和 <code>帧</code> ( <code>frame</code> )）。它还可以指定任意有效窗口。任何其他值（或完全省略窗口条目）意味着将所选窗口用作参考窗口。
+</p>
+<p>该函数首先尝试在指定方向重用一个已经显示缓冲区的窗口。如果不存在这样的窗口，它会尝试拆分参考窗口，以便在指定方向上生成一个新窗口。如果这也失败了，它将尝试在指定方向的现有窗口中显示缓冲区。在任何一种情况下，选择的窗口都将出现在方向条目指定的参考窗口的一侧，与参考窗口共享至少一条边。
+</p>
+<p>如果参考窗口是活动的，则所选窗口将与其共享的边缘始终与方向条目指定的边缘相反。例如，如果方向条目的值为左，则所选窗口的右边缘坐标（请参阅坐标和窗口）将等于参考窗口的左边缘坐标。
+</p>
+<p>如果参考窗口是内部的，则重用窗口必须与其共享方向条目指定的边。因此，例如，如果参考窗口是 <code>帧</code> ( <code>frame</code> )的根窗口并且方向条目的值是左，则重用窗口必须在 <code>帧</code> ( <code>frame</code> )的左侧。这意味着所选窗口的左边缘坐标与参考窗口的左边缘坐标相同。
+</p>
+<p>但是，将通过拆分参考窗口来创建一个新窗口，这样所选窗口将与参考窗口共享相反的边缘。在我们的示例中，将创建一个新的根窗口，其中一个新的实时窗口和参考窗口作为其子窗口。所选窗口的右边缘坐标将等于参考窗口的左边缘坐标。它的左边缘坐标将等于 <code>帧</code> ( <code>frame</code> )的新根窗口的左边缘坐标。
+</p>
+<p>方向条目的四个特殊值允许隐式指定选定 <code>帧</code> ( <code>frame</code> )的主窗口作为参考窗口：最左、最上、最右和最下。这意味着，例如，可以只指定 (direction .leftmost) 而不是 (direction .left) (window .main)。在这种情况下，将忽略现有的窗口列表条目。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-buffer-below-selected buffer alist ¶
+</pre></div>
+<p>此函数尝试在所选窗口下方的窗口中显示缓冲区。如果所选窗口下方有一个窗口并且该窗口已显示缓冲区，则它会重用该窗口。
+</p>
+<p>如果没有这样的窗口，该函数会尝试通过拆分选定的窗口来创建一个新窗口，并在那里显示缓冲区。如果 alist 包含合适的窗口高度或窗口宽度条目，它还将尝试调整该窗口的大小，请参见上文。
+</p>
+<p>如果拆分所选窗口失败并且所选窗口下方有一个非专用窗口显示其他缓冲区，则此函数尝试使用该窗口显示缓冲区。
+</p>
+<p>如果 alist 包含 window-min-height 条目，则此函数确保使用的窗口至少与该条目的值指定的一样高。请注意，这只是保证。为了实际调整所用窗口的大小，alist 还必须提供适当的窗口高度条目。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-buffer-at-bottom buffer alist ¶
+</pre></div>
+<p>此函数尝试在所选帧底部的窗口中显示缓冲区。
+</p>
+<p>这要么尝试拆分 <code>帧</code> ( <code>frame</code> )底部的窗口或 <code>帧</code> ( <code>frame</code> )的根窗口，要么重用所选 <code>帧</code> ( <code>frame</code> )底部的现有窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-buffer-pop-up-frame buffer alist ¶
+</pre></div>
+<p>此函数创建一个新 <code>帧</code> ( <code>frame</code> )，并在该 <code>帧</code> ( <code>frame</code> )的窗口中显示缓冲区。它实际上是通过调用 pop-up-frame-function 中指定的函数来执行 <code>帧</code> ( <code>frame</code> )创建（请参阅显示缓冲区的附加选项）。如果 alist 包含一个 pop-up-frame-parameters 条目，则将关联的值添加到新创建的 <code>帧</code> ( <code>frame</code> )的参数中。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-buffer-in-child-frame buffer alist ¶
+</pre></div>
+<p>此函数尝试在所选 <code>帧</code> ( <code>frame</code> )的子 <code>帧</code> ( <code>frame</code> )（请参阅子 <code>帧</code> ( <code>frame</code> )）中显示缓冲区，重用现有子 <code>帧</code> ( <code>frame</code> )或创建新子 <code>帧</code> ( <code>frame</code> )。如果 alist 有一个非 nil child-frame-parameters 条目，则对应的值是一个帧参数列表，用于给出新的帧。默认提供指定所选 <code>帧</code> ( <code>frame</code> )的父 <code>帧</code> ( <code>frame</code> )参数。如果子 <code>帧</code> ( <code>frame</code> )应该成为另一个 <code>帧</code> ( <code>frame</code> )的子 <code>帧</code> ( <code>frame</code> )，则必须将相应的条目添加到 alist。
+</p>
+<p>子 <code>帧</code> ( <code>frame</code> )的外观很大程度上取决于通过 alist 提供的参数。建议至少使用比率来指定子 <code>帧</code> ( <code>frame</code> )的大小（请参阅大小参数）和位置（请参阅位置参数），并添加保持比率参数（请参阅帧交互参数），以确保子 <code>帧</code> ( <code>frame</code> )保持可见。有关应考虑的其他参数，请参阅子 <code>帧</code> ( <code>frame</code> )。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-buffer-use-some-frame buffer alist ¶
+</pre></div>
+<p>此函数尝试通过查找满足谓词的帧（默认情况下为选定帧以外的任何帧）来显示缓冲区。
+</p>
+<p>如果此函数在另一个 <code>帧</code> ( <code>frame</code> )上选择一个窗口，它将使该 <code>帧</code> ( <code>frame</code> )可见，并且除非 alist 包含禁止切换 <code>帧</code> ( <code>frame</code> )条目，否则在必要时提升该 <code>帧</code> ( <code>frame</code> )。
+</p>
+<p>如果 alist 有一个非 nil 帧谓词条目，它的值是一个接受一个参数（一个帧）的函数，如果该帧是候选帧，则返回非 nil；  此函数替换默认谓词。
+</p>
+<p>如果 alist 有一个非 nil 禁止相同窗口条目，则不使用选定的窗口；  因此，如果所选 <code>帧</code> ( <code>frame</code> )只有一个窗口，则不使用它。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-buffer-no-window buffer alist ¶
+</pre></div>
+<p>如果 alist 有一个非零的 allow-no-window 条目，则此函数不显示缓冲区并返回符号失败。这构成了操作函数返回 nil 或显示缓冲区的窗口的约定的唯一例外。如果 alist 没有这样的 allow-no-window 条目，则此函数返回 nil。
+</p>
+<p>如果此函数返回失败，则显示缓冲区将跳过任何进一步的显示操作并立即返回 nil。如果此函数返回 nil，则显示缓冲区将继续执行下一个显示操作（如果有）。
+</p>
+<p>假设当 display-buffer 的调用者指定一个非 nil 的 allow-no-window 条目时，它也能够处理一个 nil 返回值。
+</p>
+<p>其他两个动作函数在其适当的部分中描述 - display-buffer-in-side-window（请参阅在侧窗口中显示缓冲区）和 display-buffer-in-atom-window（请参阅原子窗口）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="29.13.3_缓冲区显示的动作列表.html">缓冲区显示的动作列表</a>, Previous: <a href="29.13.1_选择显示缓冲区的窗口.html">选择显示缓冲区的窗口</a>, Up: <a href="29.13_在合适的窗口中显示缓冲区.html">在合适的窗口中显示缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>3.6 算术运算</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">3.6 算术运算</h2>
+<div class="nav-panel"><p>Next: <a href="03.7_舍入操作.html">舍入操作</a>, Previous: <a href="03.5_数值转换.html">数值转换</a>, Up: <a href="03_数字.html">数字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs Lisp 提供了传统的四种算术运算（加法、减法、乘法和除法），以及余数和模数函数，以及加减 1 的函数。除了 %，这些函数中的每一个都接受整数和浮点数参数，如果任何参数是浮点数，则返回一个浮点数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: 1+ number-or-marker
+</pre></div>
+<p>此函数返回数字或标记加 1。例如，
+</p>
+<div class="lisp">
+<pre class="lisp">(setq foo 4)
+     ⇒ 4
+(1+ foo)
+     ⇒ 5
+</pre></div>
+<p>此函数与 C 运算符 ++ 不同——它不会增加变量。它只是计算一个总和。因此，如果我们继续，
+</p>
+<div class="lisp">
+<pre class="lisp">foo
+     ⇒ 4
+
+</pre></div>
+<p>如果要增加变量，则必须使用 setq，如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(setq foo (1+ foo))
+     ⇒ 5
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: 1- number-or-marker
+</pre></div>
+<p>此函数返回数字或标记减 1。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: + &amp;rest numbers-or-markers
+</pre></div>
+<p>该函数将其参数相加。当不给定参数时，+ 返回 0。
+</p>
+<div class="lisp">
+<pre class="lisp">(+)
+     ⇒ 0
+(+ 1)
+     ⇒ 1
+(+ 1 2 3 4)
+     ⇒ 10
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: - &amp;optional number-or-marker &amp;rest more-numbers-or-markers
+</pre></div>
+<ul>
+<li>
+函数有两个用途：否定和减法。当 - 有一个参数时，该值是参数的负数。当有多个参数时， - 从 number-or-marker 中累积减去每个 more-numbers-or-markers。如果没有参数，则结果为 0。
+
+<div class="lisp">
+<pre class="lisp">(- 10 1 2 3 4)
+     ⇒ 0
+(- 10)
+     ⇒ -10
+(-)
+     ⇒ 0
+</pre></div>
+</li></ul>
+<div class="lisp">
+<pre class="lisp">Function: * &amp;rest numbers-or-markers
+</pre></div>
+<p>此函数将其参数相乘，并返回乘积。如果不给定参数，* 返回 1。
+</p><div class="lisp">
+<pre class="lisp">(*)
+     ⇒ 1
+(* 1)
+     ⇒ 1
+(* 1 2 3 4)
+     ⇒ 24
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: / number &amp;rest divisors
+</pre></div>
+<p>对于一个或多个除数，此函数依次将数字除以除数中的每个除数，并返回商。在没有除数的情况下，此函数返回 1/number，即 number 的乘法倒数。每个参数可以是一个数字或一个标记。
+</p>
+<p>如果所有参数都是整数，则结果是整数，通过在每次除法后将商向零舍入获得。
+</p>
+<div class="lisp">
+<pre class="lisp">(/ 6 2)
+     ⇒ 3
+
+(/ 5 2)
+     ⇒ 2
+
+(/ 5.0 2)
+     ⇒ 2.5
+
+(/ 5 2.0)
+     ⇒ 2.5
+
+(/ 5.0 2.0)
+     ⇒ 2.5
+
+(/ 4.0)
+     ⇒ 0.25
+
+(/ 4)
+     ⇒ 0
+
+(/ 25 3 2)
+     ⇒ 4
+
+(/ -17 6)
+     ⇒ -2
+
+</pre></div>
+<p>如果你将一个整数除以整数 0，Emacs 会发出一个 arith-error 错误信号（请参阅错误）。非零数除以零的浮点除法产生正无穷或负无穷（请参阅浮点基础）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: % dividend divisor
+</pre></div>
+<p>此函数返回除数除以除数后的整数余数。参数必须是整数或标记。
+</p>
+<p>对于任何两个整数被除数和除数，
+</p>
+<div class="lisp">
+<pre class="lisp">(+ (% dividend divisor)
+   (* (/ dividend divisor) divisor))
+</pre></div>
+<p>如果除数不为零，则始终等于被除数。
+</p><div class="lisp">
+<pre class="lisp">(% 9 4)
+     ⇒ 1
+(% -9 4)
+     ⇒ -1
+(% 9 -4)
+     ⇒ 1
+(% -9 -4)
+     ⇒ -1
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: mod dividend divisor
+</pre></div>
+<p>该函数返回被除数模除数的值；  换句话说，被除数除以除数后的余数，但符号与除数相同。参数必须是数字或标记。
+</p>
+<p>与 % 不同，mod 允许浮点参数；  它将商向下（朝向负无穷大）四舍五入为整数，并使用该商来计算余数。
+</p>
+<p>如果除数为零，如果两个参数都是整数，则 mod 发出算术错误错误信号，否则返回 NaN。
+</p>
+<div class="lisp">
+<pre class="lisp">(mod 9 4)
+     ⇒ 1
+
+(mod -9 4)
+     ⇒ 3
+
+(mod 9 -4)
+     ⇒ -3
+
+(mod -9 -4)
+     ⇒ -1
+
+(mod 5.5 2.5)
+     ⇒ .5
+</pre></div>
+<p>对于任何两个数字的除数和除数，
+</p>
+<div class="lisp">
+<pre class="lisp">(+ (mod dividend divisor)
+   (* (floor dividend divisor) divisor))
+</pre></div>
+<p>总是等于被除数，如果任一参数是浮点数，则会出现舍入错误；如果被除数是整数且除数为 0，则会出现算术错误。关于下限，请参阅数值转换。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="03.7_舍入操作.html">舍入操作</a>, Previous: <a href="03.5_数值转换.html">数值转换</a>, Up: <a href="03_数字.html">数字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,15 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>21.9 读取密码</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">21.9 读取密码</h2>
+<div class="nav-panel"><p>Next: <a href="21.10_小缓冲区命令.html">小缓冲区命令</a>, Previous: <a href="21.8_提出多项选择题.html">提出多项选择题</a>, Up: <a href="21_小缓冲区.html">小缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>要读取密码以传递给另一个程序，可以使用函数 read-passwd。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: read-passwd prompt &amp;optional confirm default ¶
+</pre></div>
+<p>该函数读取密码，以提示符提示。它不会在用户键入密码时回显密码；  相反，它会为密码中的每个字符回显 <code>*</code> 。如果要应用另一个字符来隐藏密码，请将变量 read-hide-char 与该字符绑定。
+</p>
+<p>可选参数确认，如果非零，表示读取两次密码并坚持两次必须相同。如果不一样，用户必须一遍又一遍地输入，直到最后两次匹配。
+</p>
+<p>可选参数 default 指定用户输入空输入时要返回的默认密码。如果 default 为 nil，则 read-passwd 在这种情况下返回空字符串。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="21.10_小缓冲区命令.html">小缓冲区命令</a>, Previous: <a href="21.8_提出多项选择题.html">提出多项选择题</a>, Up: <a href="21_小缓冲区.html">小缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

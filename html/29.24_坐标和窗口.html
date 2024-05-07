@@ -1,0 +1,164 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>29.24 坐标和窗口</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">29.24 坐标和窗口</h2>
+<div class="nav-panel"><p>Next: <a href="29.25_鼠标窗口自动选择.html">鼠标窗口自动选择</a>, Previous: <a href="29.23_水平滚动.html">水平滚动</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍报告窗口位置和窗口内的函数。大多数这些函数报告相对于窗口 <code>帧</code> ( <code>frame</code> )的原始位置的原点的位置（请参阅 <code>帧</code> ( <code>frame</code> )几何）。一些函数报告相对于窗口 <code>帧</code> ( <code>frame</code> )显示原点的位置。在任何情况下，原点都有坐标 (0, 0)，X 和 Y 坐标分别向右和向下增加。
+</p>
+<p>对于以下函数，X 和 Y 坐标以整数字符单位报告，即分别为行数和列数。在图形显示上，每个 <code>行</code> 和 <code>列</code> 对应于由 <code>帧</code> ( <code>frame</code> )的默认字体指定的默认字符的高度和宽度（请参阅 <code>帧</code> ( <code>frame</code> )字体）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-edges &amp;optional window body absolute pixelwise ¶
+</pre></div>
+<p>此函数返回窗口边缘坐标的列表。如果 window 被省略或为零，则默认为选定的窗口。
+</p>
+<p>返回值的形式为（左上右下）。这些列表元素分别是窗口占据的最左边一列的X坐标、最顶行的Y坐标、最右边一列的X坐标、最底下一行的Y坐标排。
+</p>
+<p>请注意，这些是窗口的实际外边缘，包括它的任何装饰。在文本终端上，如果窗口右侧有邻居，则其右边缘包括窗口与其邻居之间的分隔线。
+</p>
+<p>如果可选参数 body 为 nil，这意味着返回对应于窗口总大小的边。body non-nil 表示返回窗口主体的边缘。如果 body 不为零，则 window 必须指定一个活动窗口。
+</p>
+<p>如果可选参数 absolute 为 nil，这意味着返回相对于窗口 <code>帧</code> ( <code>frame</code> )的原始位置的边。absolute 非 nil 表示返回相对于窗口显示原点 (0, 0) 的坐标。在非图形系统上，此参数无效。
+</p>
+<p>如果可选参数 pixelwise 为 nil，这意味着根据窗口 <code>帧</code> ( <code>frame</code> )的默认字符宽度和高度（请参阅 <code>帧</code> ( <code>frame</code> )字体）返回坐标，必要时进行四舍五入。pixelwise non-nil 表示以像素为单位返回坐标。请注意，由 right 和 bottom 指定的像素就在这些边缘之外。如果 absolute 为非 nil，则 pixelwise 也隐式为非 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-body-edges &amp;optional window ¶
+</pre></div>
+<p>此函数返回窗口主体的边缘（请参阅窗口大小）。调用 (window-body-edges window) 等价于调用 (window-edges window t)，见上文。
+</p>
+<p>以下函数可用于将一组相对于 <code>帧</code> ( <code>frame</code> )的坐标与窗口相关联：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-at x y &amp;optional frame ¶
+</pre></div>
+<p>此函数返回坐标 x 和 y 处的实时窗口，坐标为默认字符大小（请参阅帧字体）相对于帧的原始位置（请参阅帧几何）。
+</p>
+<p>如果该位置没有窗口，则返回值为 nil。如果 frame 被省略或为零，则默认为选定的 <code>帧</code> ( <code>frame</code> )。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: coordinates-in-window-p coordinates window ¶
+</pre></div>
+<p>该函数检查一个窗口窗口是否占据了 <code>帧</code> ( <code>frame</code> )的相对坐标坐标，如果是，则占据了窗口的哪一部分。窗口应该是一个活动窗口。
+</p>
+<p>坐标应该是 (x . y) 形式的 cons 单元格，其中 x 和 y 以相对于窗口 <code>帧</code> ( <code>frame</code> )的原始位置（参见 <code>帧</code> ( <code>frame</code> )几何）的默认字符大小（参见 <code>帧</code> ( <code>frame</code> )字体）给出。
+</p>
+<p>如果指定位置没有窗口，则返回值为 nil 。否则，返回值为以下之一：
+</p>
+<div class="lisp">
+<pre class="lisp">(relx . rely)
+</pre></div>
+<p>坐标在窗口内。数字 relx 和 trust 是指定位置的等效窗口相对坐标，从窗口左上角的 0 开始计数。
+</p><div class="lisp">
+<pre class="lisp">mode-line
+</pre></div>
+<p>坐标在窗口的模式行中。
+</p><div class="lisp">
+<pre class="lisp">header-line
+</pre></div>
+<p>坐标在窗口的标题行中。
+</p><div class="lisp">
+<pre class="lisp">tab-line
+</pre></div>
+<p>坐标在窗口的标签行中。
+</p><div class="lisp">
+<pre class="lisp">right-divider
+</pre></div>
+<p>坐标位于分隔窗口与右侧窗口的分隔符中。
+</p><div class="lisp">
+<pre class="lisp">bottom-divider
+</pre></div>
+<p>坐标位于分隔窗口和下方窗口的分隔线中。
+</p><div class="lisp">
+<pre class="lisp">vertical-line
+</pre></div>
+<p>坐标位于窗口与其右侧邻居之间的垂直线上。仅当窗口没有滚动条时才会出现此值；  出于这些目的，滚动条中的位置被考虑在窗口之外。
+</p><div class="lisp">
+<pre class="lisp">left-fringe
+</pre></div>
+<div class="lisp">
+<pre class="lisp">right-fringe
+</pre></div>
+<p>坐标位于窗口的左边缘或右边缘。
+</p><div class="lisp">
+<pre class="lisp">left-margin
+</pre></div>
+<div class="lisp">
+<pre class="lisp">right-margin
+</pre></div>
+<p>坐标位于窗口的左边距或右边距。
+</p><div class="lisp">
+<pre class="lisp">nil
+</pre></div>
+<p>坐标不在窗口的任何部分。
+</p>
+<p>函数 coordinate-in-window-p 不需要 <code>帧</code> ( <code>frame</code> )作为参数，因为它总是使用窗口所在的 <code>帧</code> ( <code>frame</code> )。
+</p>
+<p>以下函数以像素而不是字符单位返回窗口位置。虽然在图形显示上最有用，但它们也可以在文本终端上调用，其中每个文本字符的屏幕区域被视为一个像素。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-pixel-edges &amp;optional window ¶
+</pre></div>
+<p>此函数返回窗口边缘的像素坐标列表。调用 (window-pixel-edges window) 等价于调用 (window-edges window nil nil t)，见上文。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-body-pixel-edges &amp;optional window ¶
+</pre></div>
+<p>此函数返回窗口主体的像素边缘。调用 (window-body-pixel-edges window) 等价于调用 (window-edges window t nil t)，见上文。
+</p>
+<p>以下函数以像素为单位返回窗口位置，相对于显示屏的原点而不是 <code>帧</code> ( <code>frame</code> )的原点：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-absolute-pixel-edges &amp;optional window ¶
+</pre></div>
+<p>此函数返回窗口相对于窗口 <code>帧</code> ( <code>frame</code> )显示的原点 (0, 0) 的像素坐标。调用 (window-absolute-pixel-edges) 等效于调用 (window-edges window nil tt)，见上文。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-absolute-body-pixel-edges &amp;optional window ¶
+</pre></div>
+<p>此函数返回窗口主体相对于窗口 <code>帧</code> ( <code>frame</code> )显示的原点 (0, 0) 的像素坐标。调用 (window-absolute-body-pixel-edges window) 等价于调用 (window-edges window ttt)，见上文。
+</p>
+<p>结合 set-mouse-absolute-pixel-position，该函数可用于将鼠标指针移动到某个窗口中可见的任意缓冲区位置：
+</p>
+<div class="lisp">
+<pre class="lisp">(let ((edges (window-absolute-body-pixel-edges))
+      (position (pos-visible-in-window-p nil nil t)))
+  (set-mouse-absolute-pixel-position
+   (+ (nth 0 edges) (nth 0 position))
+   (+ (nth 1 edges) (nth 1 position))))
+</pre></div>
+<p>在图形终端上，此表单将鼠标光标 <code>扭曲</code> 到所选窗口点处字形的左上角。以这种方式计算的位置也可用于在此处显示工具提示窗口。
+</p>
+<p>以下函数返回窗口中可见的缓冲区位置的屏幕坐标：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-absolute-pixel-position &amp;optional position window ¶
+</pre></div>
+<p>如果缓冲区位置位置在窗口窗口中可见，则此函数返回字形在位置的上/左角的显示坐标。返回值是该角的 X 坐标和 Y 坐标的 cons，相对于窗口显示的 (0, 0) 处的原点。如果位置在窗口中不可见，则返回 nil。
+</p>
+<p>window 必须是活动窗口，并且默认为选定的窗口。position 默认为 window 的 window-point 的值。
+</p>
+<p>这意味着为了将鼠标指针移动到所选窗口中点的位置，编写以下内容就足够了：
+</p><div class="lisp">
+<pre class="lisp">(let ((position (window-absolute-pixel-position)))
+  (set-mouse-absolute-pixel-position
+   (car position) (cdr position)))
+</pre></div>
+<p>以下函数返回可以在窗口中内接而不覆盖该窗口中显示的文本的最大矩形。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-largest-empty-rectangle &amp;optional window count min-width min-height positions left ¶
+</pre></div>
+<p>此函数计算可以在指定窗口的文本区域中内接的最大空矩形的尺寸。window 必须是活动窗口，并且默认为选定的窗口。
+</p>
+<p>返回值是窗口文本区域的空白空间（不显示任何文本的空间）中最大矩形的宽度和开始和结束 y 坐标的三倍。此函数不返回 x 坐标——任何此类矩形都假定在窗口文本区域的右边缘结束。如果找不到空格，则返回值为 nil。
+</p>
+<p>可选参数计数，如果非零，则指定要返回的最大矩形数。这意味着返回值是一个三元组列表，指定矩形的最大矩形在前。count 也可以是一个 cons 单元格，其 car 指定要返回的矩形数量，并且其 CDR（如果非零）表示返回的所有矩形必须是不相交的。
+</p>
+<p>可选参数 min-width 和 min-height，如果非零，则指定返回的任何矩形的最小宽度和高度。
+</p>
+<p>可选参数位置，如果非零，是一个 cons 单元格，其 CAR 指定最上方，其 CDR 指定必须由返回的任何矩形覆盖的最低像素位置。这些位置从窗口的文本区域开始测量。
+</p>
+<p>可选参数 left，如果非 nil，则表示返回适用于从右到左显示文本的缓冲区的值。在这种情况下，假定返回的任何矩形都从窗口文本区域的左边缘开始。
+</p>
+<p>请注意，此函数必须通过 window-lines-pixel-dimensions 检索窗口字形矩阵的每一行的尺寸（请参阅显示文本的大小）。因此，当窗口的当前字形矩阵不是最新的时，此函数也可能返回 nil。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="29.25_鼠标窗口自动选择.html">鼠标窗口自动选择</a>, Previous: <a href="29.23_水平滚动.html">水平滚动</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

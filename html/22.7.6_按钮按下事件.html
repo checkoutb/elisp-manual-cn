@@ -1,0 +1,14 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.7.6 按钮按下事件</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">22.7.6 按钮按下事件</h3>
+<div class="nav-panel"><p>Next: <a href="22.7.7_重复事件.html">重复事件</a>, Previous: <a href="22.7.5_拖动事件.html">拖动事件</a>, Up: <a href="22.7_输入事件.html">输入事件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当用户释放鼠标按钮时，会发生单击和拖动事件。它们不能更早发生，因为在释放按钮之前无法区分单击和拖动。
+</p>
+<p>如果您想在按下按钮后立即采取行动，则需要处理按钮按下事件。15 这些事件会在按下按钮后立即发生。它们由看起来与点击事件完全相同的列表表示（请参阅点击事件），只是事件类型符号名称包含前缀 <code>down-</code> 。 <code>down-</code> 前缀跟在 <code>C-</code> 和 <code>M-</code> 等修饰键前缀之后。
+</p>
+<p>函数 read-key-sequence 忽略任何没有命令绑定的按钮按下事件；  因此，Emacs 命令循环也会忽略它们。这意味着您不必担心定义按钮按下事件，除非您希望它们执行某些操作。定义按钮按下事件的通常原因是您可以跟踪鼠标运动（通过读取运动事件），直到按钮被释放。请参阅运动事件。
+脚注
+(15)
+</p>
+<p>Button-down 是阻力的保守对立面。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.7.7_重复事件.html">重复事件</a>, Previous: <a href="22.7.5_拖动事件.html">拖动事件</a>, Up: <a href="22.7_输入事件.html">输入事件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>36.2.2 语法标志</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">36.2.2 语法标志</h3>
+<div class="nav-panel"><p>Next: <a href="36.3_语法表函数.html">语法表函数</a>, Previous: <a href="36.2.1_语法类表.html">语法类表</a>, Up: <a href="36.2_语法描述符.html">语法描述符.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>除了类之外，语法表中的字符条目还可以指定标志。有八种可能的标志，由字符 <code>1</code> 、 <code>2</code> 、 <code>3</code> 、 <code>4</code> 、 <code>b</code> 、 <code>c</code> 、 <code>n</code> 和 <code>p</code> 表示。
+</p>
+<p>除了 ’p’ 之外的所有标志都用于描述注释分隔符。数字标志用于由 2 个字符组成的注释分隔符。它们表明除了与其字符类相关的句法属性之外，字符也可以是注释序列的一部分。标志是独立于类和彼此的，因为 C 模式中的 ’<strong>’ 是标点符号，以及注释开始序列的第二个字符 (’/</strong>’)，以及注释结束序列的第一个字符 (’*/’)。标志 <code>b</code> 、 <code>c</code> 和 <code>n</code> 用于限定相应的注释分隔符。
+</p>
+<p>以下是字符 c 的可能标志表及其含义：
+</p>
+<ul>
+<li>
+’1’ 表示 c 是两个字符的注释开始序列的开始。
+</li><li>
+’2’ 表示 c 是此类序列的第二个字符。
+</li><li>
+’3’ 表示 c 是两个字符的注释结束序列的开始。
+</li><li>
+’4’ 表示 c 是此类序列的第二个字符。
+</li><li>
+’b’ 表示作为注释分隔符的 c 属于替代的 <code>b</code> 注释样式。对于一个双字符的评论开始，这个标志只在第二个字符上有效，而对于一个两字符的评论结束，它只在第一个字符上有效。
+</li><li>
+’c’ 表示作为注释分隔符的 c 属于替代的 <code>c</code> 注释样式。对于两个字符的注释定界符，任何一个字符上的 <code>c</code> 都使其成为样式 <code>c</code> 。
+</li><li>
+注释分隔符字符上的 <code>n</code> 指定可以嵌套这种类型的注释。在这样的评论中，只会识别相同风格的评论。对于两个字符的注释分隔符，任一字符上的 <code>n</code> 都使其可嵌套。
+</li></ul>
+<p>Emacs 在任何一个语法表中同时支持多种注释样式。注释样式是一组标志 ’b’、’c’ 和 ’n’，因此最多可以有 8 种不同的注释样式，每种都由其标志集命名。每个注释分隔符都有一个样式，并且只匹配相同样式的注释分隔符。因此，如果注释以样式 <code>bn</code> 的注释开始序列开始，它将延伸到下一个匹配的样式 <code>bn</code> 的注释结束序列。当标志集既没有设置标志 ’b’ 也没有设置标志 ’c’ 时，生成的样式称为 <code>a</code> 样式。
+</p>
+<p>C++ 的适当注释语法设置如下：
+</p>
+<div class="lisp">
+<pre class="lisp">‘/’
+</pre></div>
+<p>’124’
+</p><div class="lisp">
+<pre class="lisp">‘*’
+</pre></div>
+<p>’23b’
+</p><div class="lisp">
+<pre class="lisp">newline
+</pre></div>
+<p>’&gt;’
+</p>
+<p>这定义了四个注释分隔序列：
+</p>
+<div class="lisp">
+<pre class="lisp">‘/*’
+</pre></div>
+<p>这是 <code>b</code> 样式的注释开始序列，因为第二个字符 <code>*</code> 具有 <code>b</code> 标志。
+</p><div class="lisp">
+<pre class="lisp">‘//’
+</pre></div>
+<p>这是 <code>a</code> 样式的注释开始序列，因为第二个字符 <code>/</code> 没有 <code>b</code> 标志。
+</p><div class="lisp">
+<pre class="lisp">‘*/’
+</pre></div>
+<p>这是 <code>b</code> 样式的注释结束序列，因为第一个字符 <code>*</code> 具有 <code>b</code> 标志。
+</p><div class="lisp">
+<pre class="lisp">newline
+</pre></div>
+<p>这是 <code>a</code> 样式的注释结束序列，因为换行符没有 <code>b</code> 标志。
+</p>
+<p>’p’ 标识 Lisp 语法的附加前缀字符。当这些字符出现在表达式之间时，它们将被视为空格。当它们出现在表达式中时，将根据它们通常的语法类进行处理。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="36.3_语法表函数.html">语法表函数</a>, Previous: <a href="36.2.1_语法类表.html">语法类表</a>, Up: <a href="36.2_语法描述符.html">语法描述符.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

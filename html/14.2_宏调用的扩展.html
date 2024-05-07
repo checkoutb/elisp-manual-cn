@@ -1,0 +1,61 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>14.2 宏调用的扩展</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">14.2 宏调用的扩展</h2>
+<div class="nav-panel"><p>Next: <a href="14.3_宏和字节编译.html">宏和字节编译</a>, Previous: <a href="14.1_一个简单的宏例子.html">一个简单的宏例子</a>, Up: <a href="14_宏.html">宏.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>宏调用看起来就像函数调用，因为它是一个以宏名称开头的列表。列表的其余元素是宏的参数。
+</p>
+<p>宏调用的求值就像函数调用的求值一样开始，除了一个关键的区别：宏参数是出现在宏调用中的实际表达式。在将它们提供给宏定义之前，它们不会被评估。相比之下，函数的参数是评估函数调用列表元素的结果。
+</p>
+<p>获得参数后，Lisp 调用宏定义就像调用函数一样。宏的参数变量绑定到来自宏调用的参数值，或者在 &amp;rest 参数的情况下绑定到它们的列表。宏体像函数体一样执行并返回其值。
+</p>
+<p>宏和函数之间的第二个关键区别是宏体返回的值是一个替代的 Lisp 表达式，也称为宏的扩展。Lisp 解释器在扩展从宏返回后立即对其进行评估。
+</p>
+<p>由于扩展是以正常方式评估的，它可能包含对其他宏的调用。它甚至可能是对同一个宏的调用，尽管这是不寻常的。
+</p>
+<p>请注意，Emacs 在加载未编译的 Lisp 文件时会尝试扩展宏。这并不总是可能的，但如果是的话，它会加快后续执行的速度。请参阅程序如何加载。
+</p>
+<p>您可以通过调用 macroexpand 查看给定宏调用的扩展。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: macroexpand form &amp;optional environment ¶
+</pre></div>
+<p>如果它是宏调用，则此函数扩展形式。如果结果是另一个宏调用，则依次展开，直到结果不是宏调用。那是宏扩展返回的值。如果 form 开始时不是宏调用，则按给定返回。
+</p>
+<p>请注意，macroexpand 不查看 form 的子表达式（尽管某些宏定义可能会这样做）。即使它们本身是宏调用，macroexpand 也不会扩展它们。
+</p>
+<p>函数 macroexpand 不会扩展对内联函数的调用。通常不需要这样做，因为调用内联函数并不比调用普通函数更难理解。
+</p>
+<p>如果提供了环境，它指定了一个隐藏当前定义的宏的宏定义列表。字节编译使用此功能。
+</p>
+<div class="lisp">
+<pre class="lisp">(defmacro inc (var)
+    (list 'setq var (list '1+ var)))
+
+
+(macroexpand '(inc r))
+     ⇒ (setq r (1+ r))
+
+
+(defmacro inc2 (var1 var2)
+    (list 'progn (list 'inc var1) (list 'inc var2)))
+
+
+(macroexpand '(inc2 r s))
+     ⇒ (progn (inc r) (inc s))  ; inc not expanded here.
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: macroexpand-all form &amp;optional environment ¶
+</pre></div>
+<p>macroexpand-all 扩展类似macroexpand 的宏，但会查找并扩展所有形式的宏，而不仅仅是在顶层。如果没有扩展宏，则返回值为 eq 以形成。
+</p>
+<p>用 macroexpand-all 重复上面用于 macroexpand 的示例，我们看到 macroexpand-all 确实扩展了对 inc 的嵌入式调用：
+</p>
+<div class="lisp">
+<pre class="lisp">(macroexpand-all '(inc2 r s))
+     ⇒ (progn (setq r (1+ r)) (setq s (1+ s)))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: macroexpand-1 form &amp;optional environment ¶
+</pre></div>
+<p>这个函数像macroexpand一样扩展宏，但它只执行一个扩展步骤：如果结果是另一个宏调用，macroexpand-1不会扩展它。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="14.3_宏和字节编译.html">宏和字节编译</a>, Previous: <a href="14.1_一个简单的宏例子.html">一个简单的宏例子</a>, Up: <a href="14_宏.html">宏.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

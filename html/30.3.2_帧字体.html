@@ -1,0 +1,27 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>30.3.2 帧字体</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">30.3.2 帧字体</h3>
+<div class="nav-panel"><p>Next: <a href="30.3.3_帧位置.html">帧位置</a>, Previous: <a href="30.3.1_帧布局.html">帧布局</a>, Up: <a href="30.3_帧几何.html">帧几何.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>每个帧都有一个默认字体，它指定该帧的默认字符大小。此大小是指在检索或更改以列或行为单位的帧大小时（请参阅大小参数）。它也用于调整窗口大小（请参阅窗口大小）或拆分（请参阅拆分窗口）窗口。
+</p>
+<p>有时使用术语行高和规范字符高度来代替 <code>默认字符高度</code> 。同样，使用术语列宽和规范字符宽度代替 <code>默认字符宽度</code> 。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: frame-char-height &amp;optional frame ¶
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: frame-char-width &amp;optional frame ¶
+</pre></div>
+<p>这些函数返回帧中字符的默认高度和宽度，以像素为单位。这些值一起确定了帧上默认字体的大小。这些值取决于帧字体的选择，请参阅字体和颜色参数。
+</p>
+<p>也可以直接使用以下函数设置默认字体：
+</p>
+<div class="lisp">
+<pre class="lisp">Command: set-frame-font font &amp;optional keep-size frames ¶
+</pre></div>
+<p>这会将默认字体设置为字体。当以交互方式调用时，它会提示输入字体的名称，并在所选帧上使用该字体。从 Lisp 调用时，字体应该是字体名称（字符串）、字体对象、字体实体或字体规范。
+</p>
+<p>如果可选参数 keep-size 为 nil，这将保持帧行数和列数固定。（如果非零，下一节中描述的选项 frame-inhibit-implied-resize 将覆盖它。）如果 keep-size 非零（或带有前缀参数），它会尝试保持显示的大小通过调整行数和列数来固定当前帧的区域。
+</p>
+<p>如果可选参数 frames 为 nil，则仅将字体应用于选定的帧。如果 frames 不为零，则它应该是要作用的帧列表，或者 t 表示所有现有和所有未来的图形帧。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="30.3.3_帧位置.html">帧位置</a>, Previous: <a href="30.3.1_帧布局.html">帧布局</a>, Up: <a href="30.3_帧几何.html">帧几何.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

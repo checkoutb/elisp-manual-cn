@@ -1,0 +1,112 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>15.4.4 键入关键字</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">15.4.4 键入关键字</h3>
+<div class="nav-panel"><p>Next: <a href="15.4.5_定义新类型.html">定义新类型</a>, Previous: <a href="15.4.3_拼接成列表.html">拼接成列表</a>, Up: <a href="15.4_自定义类型.html">自定义类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>您可以在自定义类型中的类型名称符号之后指定关键字-参数对。以下是您可以使用的关键字及其含义：
+</p>
+<div class="lisp">
+<pre class="lisp">:value default
+</pre></div>
+<p>提供一个默认值。
+</p>
+<p>如果 nil 不是替代的有效值，则必须使用 :value 指定有效的默认值。
+</p>
+<p>如果您将其用于在选择中作为替代出现的类型；  它首先指定在用户使用自定义缓冲区中的菜单选择此选项时使用的默认值。
+</p>
+<p>当然，如果选项的实际值适合这个替代方案，它将显示实际值，而不是默认值。
+</p><div class="lisp">
+<pre class="lisp">:format format-string ¶
+</pre></div>
+<p>这个字符串将被插入到缓冲区中，以表示该类型对应的值。以下 ’%’ 转义可用于格式字符串：
+</p>
+<div class="lisp">
+<pre class="lisp">‘%[button%]’
+</pre></div>
+<p>显示标记为按钮的文本按钮。:action 属性指定按钮在用户调用时会做什么；  它的值是一个带有两个参数的函数——按钮出现的小部件和事件。
+</p>
+<p>无法指定具有不同操作的两个不同按钮。
+</p><div class="lisp">
+<pre class="lisp">‘%{sample%}’
+</pre></div>
+<p>在 :sample-face 指定的特殊面中显示样本。
+</p><div class="lisp">
+<pre class="lisp">‘%v’
+</pre></div>
+<p>替换项目的值。值的表示方式取决于项目的类型，以及（对于变量）自定义类型。
+</p><div class="lisp">
+<pre class="lisp">‘%d’
+</pre></div>
+<p>替换项目的文档字符串。
+</p><div class="lisp">
+<pre class="lisp">‘%h’
+</pre></div>
+<p>与 ’%d’ 类似，但如果文档字符串多于一行，则添加一个按钮来控制是显示全部还是仅显示第一行。
+</p><div class="lisp">
+<pre class="lisp">‘%t’
+</pre></div>
+<p>在这里替换标签。您使用 :tag 关键字指定标签。
+</p><div class="lisp">
+<pre class="lisp">‘%%’
+</pre></div>
+<p>显示文字 ’%’。
+</p>
+<div class="lisp">
+<pre class="lisp">:action action ¶
+</pre></div>
+<p>如果用户单击按钮，则执行操作。
+</p><div class="lisp">
+<pre class="lisp">:button-face face ¶
+</pre></div>
+<p>使用面（面名称或面名称列表）作为显示为 <code>%[…%]</code> 的按钮文本。
+</p><div class="lisp">
+<pre class="lisp">:button-prefix prefix ¶
+</pre></div>
+<div class="lisp">
+<pre class="lisp">:button-suffix suffix
+</pre></div>
+<p>这些指定要在按钮前后显示的文本。每个可以是：
+</p>
+<div class="lisp">
+<pre class="lisp">nil
+</pre></div>
+<p>没有插入文本。
+</p><div class="lisp">
+<pre class="lisp">a string
+</pre></div>
+<p>字符串按字面意思插入。
+</p><div class="lisp">
+<pre class="lisp">a symbol
+</pre></div>
+<p>使用符号的值。
+</p>
+<div class="lisp">
+<pre class="lisp">:tag tag
+</pre></div>
+<p>使用标签（字符串）作为与此类型对应的值（或值的一部分）的标签。
+</p><div class="lisp">
+<pre class="lisp">:doc doc ¶
+</pre></div>
+<p>使用 doc 作为与此类型对应的此值（或值的一部分）的文档字符串。为了使它起作用，您必须为 :format 指定一个值，并在该值中使用 ’%d’ 或 ’%h’。
+</p>
+<p>为类型指定文档字符串的通常原因是提供有关选择类型或某些其他复合类型的部分中的替代项含义的更多信息。
+</p><div class="lisp">
+<pre class="lisp">:help-echo motion-doc ¶
+</pre></div>
+<p>当您使用widget-forward或widget-backward移动到该项目时，它将在回显区域显示字符串motion-doc。此外，motion-doc 被用作鼠标帮助回显字符串，实际上可能是一个函数或表单，被评估以产生一个帮助字符串。如果它是一个函数，则使用一个参数调用它，即小部件。
+</p><div class="lisp">
+<pre class="lisp">:match function ¶
+</pre></div>
+<p>指定如何确定值是否与类型匹配。对应的值，函数，应该是一个接受两个参数的函数，一个小部件和一个值；  如果该值是可接受的，它应该返回非零。
+</p><div class="lisp">
+<pre class="lisp">:match-inline function ¶
+</pre></div>
+<p>指定如何确定内联值是否与类型匹配。对应的值，函数，应该是一个接受两个参数的函数，一个小部件和一个内联值；  如果该值是可接受的，它应该返回非零。有关内联值的更多信息，请参阅拼接到列表中。
+</p><div class="lisp">
+<pre class="lisp">:validate function
+</pre></div>
+<p>为输入指定验证函数。函数将小部件作为参数，如果小部件的当前值对小部件有效，则应返回 nil。否则，它应该返回包含无效数据的小部件，并将该小部件的 :error 属性设置为解释错误的字符串。
+</p><div class="lisp">
+<pre class="lisp">:type-error string ¶
+</pre></div>
+<p>string 应该是一个字符串，它描述了值与类型不匹配的原因，由 :match 函数确定。当 :match 函数返回 nil 时，小部件的 :error 属性将设置为字符串。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="15.4.5_定义新类型.html">定义新类型</a>, Previous: <a href="15.4.3_拼接成列表.html">拼接成列表</a>, Up: <a href="15.4_自定义类型.html">自定义类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,14 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.8.1 环概念</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">33.8.1 环概念</h3>
+<div class="nav-panel"><p>Next: <a href="33.8.2_杀死函数.html">杀死函数</a>, Previous: <a href="33.8_环.html">环</a>, Up: <a href="33.8_环.html">环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>kill ring 将已删除的文本记录为列表中的字符串，最近的在前。例如，一个短的杀戮环可能看起来像这样：
+</p><div class="lisp">
+<pre class="lisp">("some text" "a different piece of text" "even older text")
+</pre></div>
+<p>当列表的长度达到 kill-ring-max 条目时，添加新条目会自动删除最后一个条目。
+</p>
+<p>当 kill 命令与其他命令交织在一起时，每个 kill 命令都会在 kill ring 中创建一个新条目。多个杀戮命令连续建立一个杀戮环条目，将被作为一个单元猛拉；  第二个和随后的连续 kill 命令将文本添加到第一个创建的条目中。
+</p>
+<p>对于 yanking，kill ring 中的一个条目被指定为 ring 的前面。一些 yank 命令通过将不同的元素指定为前端来旋转环。但是这种虚拟轮换不会改变列表本身——最近的条目总是排在列表的首位。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.8.2_杀死函数.html">杀死函数</a>, Previous: <a href="33.8_环.html">环</a>, Up: <a href="33.8_环.html">环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

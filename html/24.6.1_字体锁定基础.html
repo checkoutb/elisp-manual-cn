@@ -1,0 +1,60 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.6.1 字体锁定基础</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">24.6.1 字体锁定基础</h3>
+<div class="nav-panel"><p>Next: <a href="24.6.2_基于搜索的字体.html">基于搜索的字体</a>, Previous: <a href="24.6_字体锁定模式.html">字体锁定模式</a>, Up: <a href="24.6_字体锁定模式.html">字体锁定模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>字体锁定功能基于几个基本功能。这些中的每一个都调用由相应变量指定的函数。这种间接允许主要和次要模式修改字体化在该模式的缓冲区中的工作方式，甚至对与字体化无关的功能使用字体锁定机制。（这就是为什么下面的描述在描述函数做什么时说 <code>应该</code> ：模式可以自定义相应变量的值来做完全不同的事情。）下面提到的变量在其他字体锁定变量中描述。
+</p>
+<div class="lisp">
+<pre class="lisp">font-lock-fontify-buffer ¶
+</pre></div>
+<p>这个函数应该通过调用由 font-lock-fontify-buffer-function 指定的函数来字体化当前缓冲区的可访问部分。
+</p><div class="lisp">
+<pre class="lisp">font-lock-unfontify-buffer ¶
+</pre></div>
+<p>在关闭字体锁定以删除字体化时使用。调用由 font-lock-unfontify-buffer-function 指定的函数。
+</p><div class="lisp">
+<pre class="lisp">font-lock-fontify-region beg end &amp;optional loudly ¶
+</pre></div>
+<p>应该字体化 beg 和 end 之间的区域。如果loudly 不为零，则应在字体化时显示状态消息。调用由 font-lock-fontify-region-function 指定的函数。
+</p><div class="lisp">
+<pre class="lisp">font-lock-unfontify-region beg end ¶
+</pre></div>
+<p>应该从 beg 和 end 之间的区域移除字体。调用由 font-lock-unfontify-region-function 指定的函数。
+</p><div class="lisp">
+<pre class="lisp">font-lock-flush &amp;optional beg end ¶
+</pre></div>
+<p>此函数应将 beg 和 end 之间区域的字体标记为过期。如果未指定或 nil，beg 和 end 默认为缓冲区可访问部分的开头和结尾。调用由 font-lock-flush-function 指定的函数。
+</p><div class="lisp">
+<pre class="lisp">font-lock-ensure &amp;optional beg end ¶
+</pre></div>
+<p>此函数应确保 beg 和 end 之间的区域已被字体化。可选参数 beg 和 end 默认为缓冲区可访问部分的开头和结尾。调用由 font-lock-ensure-function 指定的函数。
+</p><div class="lisp">
+<pre class="lisp">font-lock-debug-fontify ¶
+</pre></div>
+<p>这是一个方便的命令，旨在为模式开发字体锁定时使用，不应从 Lisp 代码中调用。它重新计算所有相关变量，然后在整个缓冲区上调用 font-lock-fontify-region。
+</p>
+<p>有几个变量可以控制字体锁定模式如何突出显示文本。但是主要模式不应该直接设置任何这些变量。相反，他们应该将 font-lock-defaults 设置为缓冲区局部变量。如果启用字体锁定模式，则使用分配给此变量的值来设置所有其他变量。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: font-lock-defaults ¶
+</pre></div>
+<p>此变量由模式设置以指定如何在该模式下字体化文本。设置后它会自动变为缓冲区本地。如果其值为 nil，则字体锁定模式不会突出显示，您可以使用 <code>面</code> 菜单（在 <code>编辑</code> 下，然后在菜单栏中的 <code>文本属性</code> 下）将面显式分配给缓冲区中的文本。
+</p>
+<p>如果非零，则该值应如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(keywords [keywords-only [case-fold
+ [syntax-alist other-vars…]]])
+</pre></div>
+<p>第一个元素，keywords，间接指定了 font-lock-keywords 的值，它指导基于搜索的字体化。它可以是一个符号、一个变量或一个函数，其值是用于字体锁定关键字的列表。它也可以是几个这样的符号的列表，每个可能的字体化级别一个。第一个符号指定字体化的 <code>模式默认</code> 级别，下一个符号级别 1 字体化，下一个级别 2，依此类推。’mode default’ 级别通常与级别 1 相同。当 font-lock-maximum-decoration 具有 nil 值时使用它。请参阅字体锁定级别。
+</p>
+<p>第二个元素，keywords-only，指定变量 font-lock-keywords-only 的值。如果省略或为零，则还执行（字符串和注释的）语法字体化。如果这是非零，则不执行句法字体化。请参阅语法字体锁定。
+</p>
+<p>第三个元素 case-fold 指定 font-lock-keywords-case-fold-search 的值。如果它不为 nil，则字体锁定模式在基于搜索的字体化过程中会忽略大小写。
+</p>
+<p>如果第四个元素 syntax-alist 不为 nil，则它应该是格式为 (char-or-string . string) 的 cons 单元的列表。这些用于建立句法字体化的句法表；  生成的语法表存储在 font-lock-syntax-table 中。如果 syntax-alist 被省略或为零，则语法字体化使用 syntax-table 函数返回的语法表。请参阅语法表函数。
+</p>
+<p>所有剩余的元素（如果有的话）统称为 other-vars。这些元素中的每一个都应具有 (variable . value) 形式——这意味着，将变量设置为缓冲区本地，然后将其设置为 value。除了可以使用前五个元素控制的变量之外，您可以使用这些 other-vars 设置影响字体化的其他变量。请参阅其他字体锁定变量。
+</p>
+<p>如果您的模式通过添加 font-lock-face 属性显式字体化文本，它可以为 font-lock-defaults 指定 (nil t) 以关闭所有自动字体化。但是，这不是必需的；  可以使用 font-lock-face 属性对某些内容进行字体化，并为文本的其他部分设置自动字体化。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="24.6.2_基于搜索的字体.html">基于搜索的字体</a>, Previous: <a href="24.6_字体锁定模式.html">字体锁定模式</a>, Up: <a href="24.6_字体锁定模式.html">字体锁定模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

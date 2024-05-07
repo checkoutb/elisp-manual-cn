@@ -1,0 +1,12 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>19.3.2 多余的右括号</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">19.3.2 多余的右括号</h3>
+<div class="nav-panel"><p>Next: <a href="19.4_测试覆盖率.html">测试覆盖率</a>, Previous: <a href="19.3.1_多余的开括号.html">多余的开括号</a>, Up: <a href="19.3_调试无效的_Lisp_语法.html">调试无效的_Lisp_语法.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>要处理多余的右括号，首先转到文件的开头，然后键入 Cu -1 CMu（参数为 -1 的向后列表）以查找第一个不平衡 defun 的结尾。
+</p>
+<p>然后在 defun 的开头键入 CMf（forward-sexp，参见 GNU Emacs 手册中的表达式）找到实际匹配的右括号。这会让你远离 defin 应该结束的地方。您可能会在该附近找到一个虚假的右括号。
+</p>
+<p>如果此时您没有发现问题，接下来要做的是在 defun 的开头键入 CMq (indent-pp-sexp)。一系列行可能会向左移动；  如果是这样，则缺少的左括号或虚假的右括号可能在这些行的第一行附近。（但是，不要假设这是真的；研究代码以确保。）一旦发现差异，使用 C-_ 撤消 CMq（撤消），因为旧缩进可能适合预期的括号。
+</p>
+<p>在你认为你已经解决了问题之后，再次使用 CMq。如果旧的缩进实际上适合括号的预期嵌套，并且您已放回这些括号，则 CMq 不应更改任何内容。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="19.4_测试覆盖率.html">测试覆盖率</a>, Previous: <a href="19.3.1_多余的开括号.html">多余的开括号</a>, Up: <a href="19.3_调试无效的_Lisp_语法.html">调试无效的_Lisp_语法.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.2 检查缓冲区内容</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">33.2 检查缓冲区内容</h2>
+<div class="nav-panel"><p>Next: <a href="33.3_比较文本.html">比较文本</a>, Previous: <a href="33.1_检查文本近点.html">检查文本近点</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍允许 Lisp 程序将缓冲区中的任何文本部分转换为字符串的函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: buffer-substring start end ¶
+</pre></div>
+<p>此函数返回一个字符串，其中包含由当前缓冲区中的位置 start 和 end 定义的区域文本的副本。如果参数不是缓冲区可访问部分中的位置，则缓冲区子字符串会发出 args-out-of-range 错误信号。
+</p>
+<p>这是一个假设字体锁定模式未启用的示例：
+</p><div class="lisp">
+<pre class="lisp">
+
+---------- Buffer: foo ----------
+This is the contents of buffer foo
+
+---------- Buffer: foo ----------
+
+
+(buffer-substring 1 10)
+     ⇒ "This is t"
+
+(buffer-substring (point-max) 10)
+     ⇒ "he contents of buffer foo\n"
+</pre></div>
+<p>如果被复制的文本具有任何文本属性，则这些属性将连同它们所属的字符一起被复制到字符串中。请参阅文本属性。但是，缓冲区中的叠加层（请参阅叠加层）及其属性将被忽略，而不是复制。
+</p>
+<p>例如，如果启用了字体锁定模式，您可能会得到如下结果：
+</p>
+<div class="lisp">
+<pre class="lisp">(buffer-substring 1 10)
+     ⇒ #("This is t" 0 1 (fontified t) 1 9 (fontified t))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: buffer-substring-no-properties start end ¶
+</pre></div>
+<p>这就像缓冲区子字符串，只是它不复制文本属性，只是复制字符本身。请参阅文本属性。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: buffer-string ¶
+</pre></div>
+<p>此函数以字符串形式返回当前缓冲区的整个可访问部分的内容。如果被复制的文本具有任何文本属性，则这些属性将连同它们所属的字符一起被复制到字符串中。
+</p>
+<p>如果您需要确保生成的字符串在复制到其他位置时不会由于双向文本的重新排序而改变其视觉外观，请使用 buffer-substring-with-bidi-context 函数（请参阅 buffer-substring-with-双向上下文）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: filter-buffer-substring start end &amp;optional delete ¶
+</pre></div>
+<p>此函数使用由变量 filter-buffer-substring-function 指定的函数过滤 start 和 end 之间的缓冲区文本，并返回结果。
+</p>
+<p>默认过滤器函数参考过时的包装器钩子 filter-buffer-substring-functions（有关此过时工具的详细信息，请参阅宏 with-wrapper-hook 的文档字符串）和过时的变量 buffer-substring-filters。如果这两个都是 nil，它从缓冲区返回未更改的文本，即缓冲区子字符串将返回什么。
+</p>
+<p>如果 delete 不为 nil，则该函数会在复制后删除 start 和 end 之间的文本，如 delete-and-extract-region。
+</p>
+<p>当复制到用户可访问的数据结构（如 kill-ring、X 剪贴板和寄存器）时，Lisp 代码应使用此函数而不是缓冲区子字符串、缓冲区子字符串无属性或删除和提取区域。主要和次要模式可以修改 filter-buffer-substring-function 以更改从缓冲区复制出来的文本。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: filter-buffer-substring-function ¶
+</pre></div>
+<p>此变量的值是 filter-buffer-substring 将调用以执行实际工作的函数。该函数接收三个参数，与 filter-buffer-substring 的参数相同，应按照该函数的文档处理。它应该返回过滤后的文本（并且可以选择删除源文本）。
+</p>
+<p>以下两个变量已被 filter-buffer-substring-function 淘汰，但仍支持向后兼容。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: filter-buffer-substring-functions ¶
+</pre></div>
+<p>这个过时的变量是一个包装钩子，它的成员应该是接受四个参数的函数：fun、start、end 和 delete。fun 是一个接受三个参数（开始、结束和删除）并返回一个字符串的函数。在这两种情况下，start、end 和 delete 参数与 filter-buffer-substring 的参数相同。
+</p>
+<p>第一个钩子函数传递了一个相当于filter-buffer-substring的默认操作的fun，即它返回start和end之间的buffer-substring（由任何buffer-substring-filters处理）并可选地删除原始文本从缓冲区。大多数情况下，hook 函数会调用一次 fun，然后对结果进行自己的处理。下一个钩子函数接收一个与此等效的乐趣，依此类推。实际返回值是所有钩子函数依次作用的结果。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: buffer-substring-filters ¶
+</pre></div>
+<p>这个过时变量的值应该是一个接受单个字符串参数并返回另一个字符串的函数列表。默认的 filter-buffer-substring 函数将缓冲区子字符串传递给此列表中的第一个函数，并将每个函数的返回值传递给下一个函数。最后一个函数的返回值被传递给 filter-buffer-substring-functions。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: current-word &amp;optional strict really-word ¶
+</pre></div>
+<p>此函数以字符串形式返回点或点附近的符号（或单词）。返回值不包括文本属性。
+</p>
+<p>如果可选参数 real-word 不为 nil，它会找到一个单词；  否则，它会找到一个符号（包括单词字符和符号组成字符）。
+</p>
+<p>如果可选参数 strict 不为 nil，则 point 必须在符号或单词中或旁边——如果不存在符号或单词，则函数返回 nil。否则，同一行上的附近符号或单词是可以接受的。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: thing-at-point thing &amp;optional no-properties ¶
+</pre></div>
+<p>将点周围或旁边的东西作为字符串返回。
+</p>
+<p>参数 thing 是指定一种句法实体的符号。可能性包括符号、列表、sexp、defun、文件名、现有文件名、url、单词、句子、空格、行、页面、字符串等。
+</p>
+<p>当可选参数 no-properties 为非 nil 时，此函数从返回值中去除文本属性。
+</p>
+<div class="lisp">
+<pre class="lisp">---------- Buffer: foo ----------
+Gentlemen may cry ``Pea∗ce! Peace!,''
+but there is no peace.
+---------- Buffer: foo ----------
+
+(thing-at-point 'word)
+     ⇒ "Peace"
+(thing-at-point 'line)
+     ⇒ "Gentlemen may cry ``Peace! Peace!,''\n"
+(thing-at-point 'whitespace)
+     ⇒ nil
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Variable: thing-at-point-provider-alist ¶
+</pre></div>
+<p>这个变量允许用户和模式调整事物的工作方式。它是事物和函数的关联列表（以零参数调用）以返回该事物。将依次评估事物的条目，直到返回非零结果。
+</p>
+<p>例如，一个主要模式可以说：
+</p><div class="lisp">
+<pre class="lisp">(setq-local thing-at-point-provider-alist
+            (append thing-at-point-provider-alist
+                    '((url . my-mode--url-at-point))))
+</pre></div>
+<p>如果没有提供者有非零返回，则该事物将按标准方式计算。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.3_比较文本.html">比较文本</a>, Previous: <a href="33.1_检查文本近点.html">检查文本近点</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,17 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.30.3 JSONRPC JSON对象格式</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">33.30.3 JSONRPC JSON对象格式</h3>
+<div class="nav-panel"><p>Next: <a href="33.30.4_延迟的_JSONRPC_请求.html">延迟的_JSONRPC_请求</a>, Previous: <a href="33.30.2_基于进程的_JSONRPC_连接.html">基于进程的_JSONRPC_连接</a>, Up: <a href="33.30_JSONRPC_通信.html">JSONRPC_通信.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>JSONRPC JSON 对象作为 Lisp plist 进行交换（请参阅属性列表）：与 JSON 兼容的 plist 被交给调度程序函数，同样，JSON 兼容的 plist 应该被提供给 jsonrpc-notify、jsonrpc-request 和 jsonrpc-async-request .
+</p>
+<p>为了便于处理 plist，这个库充分利用了 cl-lib 库（参见 GNU Emacs Lisp 的 Common Lisp Extensions 中的 cl-lib）并建议（但不强制）它的客户也这样做。宏 jsonrpc-lambda 可用于创建 lambda 以解构 JSON 对象，如下例所示：
+</p><div class="lisp">
+<pre class="lisp">(jsonrpc-async-request
+ myproc :frobnicate `(:foo "trix")
+ :success-fn (jsonrpc-lambda (&amp;key bar baz &amp;allow-other-keys)
+               (message "Server replied back with %s and %s!"
+                        bar baz))
+ :error-fn (jsonrpc-lambda (&amp;key code message _data)
+             (message "Sadly, server reports %s: %s"
+                      code message)))
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.30.4_延迟的_JSONRPC_请求.html">延迟的_JSONRPC_请求</a>, Previous: <a href="33.30.2_基于进程的_JSONRPC_连接.html">基于进程的_JSONRPC_连接</a>, Up: <a href="33.30_JSONRPC_通信.html">JSONRPC_通信.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

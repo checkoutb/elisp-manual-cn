@@ -1,0 +1,40 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>34.10.4 用户选择的编码系统</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">34.10.4 用户选择的编码系统</h3>
+<div class="nav-panel"><p>Next: <a href="34.10.5_默认编码系统.html">默认编码系统</a>, Previous: <a href="34.10.3_Lisp_中的编码系统.html">Lisp_中的编码系统</a>, Up: <a href="34.10_编码系统.html">编码系统.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><div class="lisp">
+<pre class="lisp">Function: select-safe-coding-system from to &amp;optional default-coding-system accept-default-p file ¶
+</pre></div>
+<p>这个函数选择一个编码系统来对指定的文本进行编码，如果需要的话要求用户选择。通常，指定的文本是当前缓冲区中 from 和 to 之间的文本。如果 from 是一个字符串，则该字符串指定要编码的文本，to 被忽略。
+</p>
+<p>如果指定的文本包含原始字节（请参阅文本表示），则 select-safe-coding-system 建议使用原始文本进行编码。
+</p>
+<p>如果 default-coding-system 是非零，那就是第一个尝试的编码系统；  如果可以处理文本，则 select-safe-coding-system 返回该编码系统。它也可以是编码系统的列表；  然后该函数一一尝试它们中的每一个。在尝试了所有这些之后，它接下来尝试当前缓冲区的缓冲区文件编码系统的值（如果它不是未决定的），然后是缓冲区文件编码系统的默认值，最后是用户最喜欢的编码系统，用户可以使用命令 prefer-coding-system 进行设置（参见 GNU Emacs 手册中的识别编码系统）。
+</p>
+<p>如果其中一个编码系统可以安全地编码所有指定的文本，则 select-safe-coding-system 选择它并返回它。否则，它会要求用户从可以对所有文本进行编码的编码系统列表中进行选择，并返回用户的选择。
+</p>
+<p>default-coding-system 也可以是一个列表，其第一个元素是 t，其他元素是编码系统。然后，如果列表中没有编码系统可以处理文本，则 select-safe-coding-system 会立即查询用户，而无需尝试上述三种替代方法中的任何一种。这对于仅检查列表中的编码系统很方便。
+</p>
+<p>可选参数 accept-default-p 确定在没有用户交互的情况下选择的编码系统是否可接受。如果它被省略或为零，那么这种静默选择总是可以接受的。如果它是非零，它应该是一个函数；  select-safe-coding-system 使用一个参数调用此函数，即所选编码系统的基本编码系统。如果函数返回 nil，则 select-safe-coding-system 拒绝静默选择的编码系统，并要求用户从可能的候选列表中选择一个编码系统。
+</p>
+<p>如果变量 select-safe-coding-system-accept-default-p 不为零，它应该是一个采用单个参数的函数。它用于代替accept-default-p，覆盖为此参数提供的任何值。
+</p>
+<p>作为最后一步，在返回所选编码系统之前，select-safe-coding-system 检查该编码系统是否与从文件中读取区域内容时将选择的编码系统一致。（如果不是，这可能会导致随后重新访问和编辑的文件中的数据损坏。）通常， select-safe-coding-system 为此目的使用缓冲区文件名作为文件，但如果文件是非零，它使用该文件代替（这可能与写入区域和类似功能相关）。如果它检测到明显的不一致，则 select-safe-coding-system 在选择编码系统之前会询问用户。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: select-safe-coding-system-function ¶
+</pre></div>
+<p>当输出操作的默认编码系统无法安全地编码该文本时，此变量命名要调用的函数以请求用户选择适当的编码系统来编码文本。此变量的默认值为 select-safe-coding-system。将文本写入文件（例如 write-region）或将文本发送到其他进程（例如 process-send-region）的 Emacs 原语通常调用此变量的值，除非coding-system-for-write 绑定到非-nil 值（请参阅为一项操作指定编码系统）。
+</p>
+<p>这里有两个函数可以用来让用户指定一个编码系统，并完成。请参阅完成。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: read-coding-system prompt &amp;optional default ¶
+</pre></div>
+<p>此函数使用 minibuffer 读取编码系统，以字符串提示进行提示，并将编码系统名称作为符号返回。如果用户输入空输入，默认指定返回哪个编码系统。它应该是一个符号或字符串。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: read-non-nil-coding-system prompt ¶
+</pre></div>
+<p>此函数使用 minibuffer 读取编码系统，以字符串提示进行提示，并将编码系统名称作为符号返回。如果用户尝试输入空输入，它会要求用户再试一次。请参阅编码系统。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="34.10.5_默认编码系统.html">默认编码系统</a>, Previous: <a href="34.10.3_Lisp_中的编码系统.html">Lisp_中的编码系统</a>, Up: <a href="34.10_编码系统.html">编码系统.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

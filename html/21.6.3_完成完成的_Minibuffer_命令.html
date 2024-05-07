@@ -1,0 +1,108 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>21.6.3 完成完成的 Minibuffer 命令</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">21.6.3 完成完成的 Minibuffer 命令</h3>
+<div class="nav-panel"><p>Next: <a href="21.6.4_高级完成函数.html">高级完成函数</a>, Previous: <a href="21.6.2_完成和小缓冲区.html">完成和小缓冲区</a>, Up: <a href="21.6_完成.html">完成.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节描述了在 minibuffer 中用于完成的键盘映射、命令和用户选项。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: minibuffer-completion-table ¶
+</pre></div>
+<p>此变量的值是用于在 minibuffer 中完成的完成表（参见基本完成函数）。这是包含完成读取传递给尝试完成的缓冲区局部变量。它由 minibuffer 完成命令使用，例如 minibuffer-complete。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: minibuffer-completion-predicate ¶
+</pre></div>
+<p>该变量的值是完成读取传递给尝试完成的谓词。该变量也被其他 minibuffer 完成函数使用。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: minibuffer-completion-confirm ¶
+</pre></div>
+<p>这个变量决定了 Emacs 在退出 minibuffer 之前是否要求确认；  complete-read 设置此变量，函数 minibuffer-complete-and-exit 在退出前检查该值。如果值为 nil，则不需要确认。如果值为confirm，用户可能会退出一个不是有效的完成替代的输入，但Emacs 要求确认。如果值为confirm-after-completion，则用户可能会以不是有效的完成替代的输入退出，但如果用户在minibuffer-confirm-exit-中的任何完成命令之后立即提交输入，Emacs 会要求确认命令。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: minibuffer-confirm-exit-commands ¶
+</pre></div>
+<p>如果完成读取的要求匹配参数是完成后确认，则此变量包含导致 Emacs 在退出迷你缓冲区之前要求确认的命令列表。如果用户在调用此列表中的任何命令后立即尝试退出 minibuffer，则请求确认。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: minibuffer-complete-word ¶
+</pre></div>
+<p>这个函数最多用一个单词来完成 minibuffer 的内容。即使 minibuffer 内容只有一个补全， minibuffer-complete-word 也不会在第一个不是单词组成的字符之外添加任何字符。请参阅语法表。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: minibuffer-complete ¶
+</pre></div>
+<p>这个函数尽可能地完成了 minibuffer 的内容。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: minibuffer-complete-and-exit ¶
+</pre></div>
+<p>这个函数完成了 minibuffer 的内容，如果不需要确认，即如果 minibuffer-completion-confirm 为 nil，则退出。如果需要确认，则通过立即重复此命令来给出 - 该命令被编程为连续运行两次时无需确认即可工作。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: minibuffer-completion-help ¶
+</pre></div>
+<p>此函数创建当前 minibuffer 内容的可能完成列表。它通过使用变量 minibuffer-completion-table 的值作为集合参数和 minibuffer-completion-predicate 的值作为谓词参数来调用所有完成。完成列表在名为 <strong>Completions</strong> 的缓冲区中显示为文本。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-completion-list completions ¶
+</pre></div>
+<p>此函数在标准输出中显示流的完成，通常是缓冲区。（有关流的更多信息，请参阅阅读和打印 Lisp 对象。）参数完成通常是由所有完成返回的完成列表，但并非必须如此。每个元素可以是一个符号或一个字符串，其中任何一个都可以简单地打印出来。它也可以是两个字符串的列表，就像字符串被连接一样打印。两个字符串中的第一个是实际完成，第二个字符串用作注释。
+</p>
+<p>该函数由 minibuffer-completion-help 调用。使用它的一种常见方法是与 with-output-to-temp-buffer 一起使用，如下所示：
+</p><div class="lisp">
+<pre class="lisp">(with-output-to-temp-buffer "*Completions*"
+  (display-completion-list
+    (all-completions (buffer-string) my-alist)))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">User Option: completion-auto-help ¶
+</pre></div>
+<p>如果此变量不为 nil，则完成命令会自动显示可能的完成列表，因为下一个字符不是唯一确定的，因此无法完成任何内容。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: minibuffer-local-completion-map ¶
+</pre></div>
+<p>当不需要完全匹配其中一个完成时，完成读取使用此值作为本地键映射。默认情况下，此键映射进行以下绑定：
+</p>
+<div class="lisp">
+<pre class="lisp">?
+</pre></div>
+<p>迷你缓冲区完成帮助
+</p><div class="lisp">
+<pre class="lisp">SPC
+</pre></div>
+<p>minibuffer-complete-word
+</p><div class="lisp">
+<pre class="lisp">TAB
+</pre></div>
+<p>小缓冲区完成
+</p>
+<p>并使用 minibuffer-local-map 作为其父键映射（参见 minibuffer-local-map 的定义）。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: minibuffer-local-must-match-map ¶
+</pre></div>
+<p>当需要完全匹配其中一个完成时，完成读取使用此值作为本地键映射。因此，没有键绑定到 exit-minibuffer，即无条件退出 minibuffer 的命令。默认情况下，此键映射进行以下绑定：
+</p>
+<div class="lisp">
+<pre class="lisp">C-j
+</pre></div>
+<p>minibuffer-完成并退出
+</p><div class="lisp">
+<pre class="lisp">RET
+</pre></div>
+<p>minibuffer-完成并退出
+</p>
+<p>并使用 minibuffer-local-completion-map 作为其父键映射。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: minibuffer-local-filename-completion-map ¶
+</pre></div>
+<p>这是一个简单地解除绑定 SPC 的稀疏键映射；  因为文件名可以包含空格。函数 read-file-name 将此键映射与 minibuffer-local-completion-map 或 minibuffer-local-must-match-map 组合。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: minibuffer-beginning-of-buffer-movement ¶
+</pre></div>
+<p>如果非零，如果 point 位于提示符末尾，则 M-&lt; 命令将移动到提示符末尾。如果 point 在提示结束处或之前，则移动到缓冲区的开头。如果此变量为 nil，则该命令的行为类似于缓冲区的开头。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="21.6.4_高级完成函数.html">高级完成函数</a>, Previous: <a href="21.6.2_完成和小缓冲区.html">完成和小缓冲区</a>, Up: <a href="21.6_完成.html">完成.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

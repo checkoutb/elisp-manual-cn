@@ -1,0 +1,67 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>19.2.3 Edebug 执行模式</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">19.2.3 Edebug 执行模式</h3>
+<div class="nav-panel"><p>Next: <a href="19.2.4_跳跃.html">跳跃</a>, Previous: <a href="19.2.2_为_Edebug_检测.html">为_Edebug_检测</a>, Up: <a href="19.2_调试.html">调试.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Edebug 支持多种执行模式来运行您正在调试的程序。我们将这些替代方案称为 Edebug 执行模式；  不要将它们与主要或次要模式混淆。当前的 Edebug 执行模式决定了 Edebug 在停止前继续执行多远——例如，它是在每个停止点停止，还是继续到下一个断点——以及 Edebug 在停止前显示评估进度的程度。
+</p>
+<p>通常，您通过键入命令以某种模式继续程序来指定 Edebug 执行模式。这是这些命令的表格；  除了 S 之外的所有程序都恢复执行，至少在一定距离内。
+</p>
+<div class="lisp">
+<pre class="lisp">S
+</pre></div>
+<p>停止：不再执行任何程序，而是等待更多的 Edebug 命令（edebug-stop）。
+</p><div class="lisp">
+<pre class="lisp">SPC
+</pre></div>
+<p>Step：在遇到的下一个停止点停止（edebug-step-mode）。
+</p><div class="lisp">
+<pre class="lisp">n
+</pre></div>
+<p>Next：在表达式之后遇到的下一个停止点停止（edebug-next-mode）。另请参阅 Jumping 中的 edebug-forward-sexp。
+</p><div class="lisp">
+<pre class="lisp">t
+</pre></div>
+<p>跟踪：在每个 Edebug 停止点（edebug-trace-mode）暂停（通常为一秒）。
+</p><div class="lisp">
+<pre class="lisp">T
+</pre></div>
+<p>快速跟踪：在每个停止点更新显示，但实际上并不暂停（edebug-Trace-fast-mode）。
+</p><div class="lisp">
+<pre class="lisp">g
+</pre></div>
+<p>Go：运行到下一个断点（edebug-go-mode）。请参阅 Edebug 断点。
+</p><div class="lisp">
+<pre class="lisp">c
+</pre></div>
+<p>继续：在每个断点处暂停一秒，然后继续（edebug-continue-mode）。
+</p><div class="lisp">
+<pre class="lisp">C
+</pre></div>
+<p>快速继续：将点移动到每个断点，但不要暂停（edebug-Continue-fast-mode）。
+</p><div class="lisp">
+<pre class="lisp">G
+</pre></div>
+<p>Go non-stop：忽略断点（edebug-Go-nonstop-mode）。您仍然可以通过键入 S 或任何编辑命令来停止程序。
+</p>
+<p>通常，上述列表中较早的执行模式比列表中较晚的模式运行程序更慢或停止得更快。
+</p>
+<p>当您进入一个新的 Edebug 级别时，Edebug 通常会在它遇到的第一个检测函数处停止。如果您希望只在断点处停止，或者根本不停止（例如，在收集覆盖率数据时），请将 edebug-initial-mode 的值从其默认步骤更改为 go、Go-nonstop 或其其中之一其他值（请参阅 Edebug 选项）。您可以使用 Cx Ca Cm (edebug-set-initial-mode) 轻松完成此操作：
+</p>
+<div class="lisp">
+<pre class="lisp">Command: edebug-set-initial-mode ¶
+</pre></div>
+<p>此命令绑定到 Cx Ca Cm，设置 edebug-initial-mode。它会提示您输入一个键来指示模式。您应该输入上面列出的八个键之一，用于设置相应的模式。
+</p>
+<p>请注意，您可能会多次重新输入相同的 Edebug 级别，例如，如果从一个命令多次调用检测函数。
+</p>
+<p>在执行或跟踪时，您可以通过键入任何 Edebug 命令来中断执行。Edebug 在下一个停止点停止程序，然后执行您键入的命令。例如，在执行期间键入 t 会在下一个停止点切换到跟踪模式。您可以使用 S 停止执行，而无需执行任何其他操作。
+</p>
+<p>如果您的函数碰巧读取输入，则您键入的旨在中断执行的字符可能会被该函数读取。您可以通过注意程序何时需要输入来避免这种意外结果。
+</p>
+<p>包含本节中的命令的键盘宏不完全起作用：退出 Edebug 以恢复程序，失去对键盘宏的跟踪。这不容易解决。此外，在 Edebug 外部定义或执行键盘宏不会影响 Edebug 内部的命令。这通常是一个优势。另请参阅 Edebug 选项中的 edebug-continue-kbd-macro 选项。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: edebug-sit-for-seconds ¶
+</pre></div>
+<p>此选项指定在跟踪模式或继续模式下执行步骤之间等待的秒数。默认值为 1 秒。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="19.2.4_跳跃.html">跳跃</a>, Previous: <a href="19.2.2_为_Edebug_检测.html">为_Edebug_检测</a>, Up: <a href="19.2_调试.html">调试.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

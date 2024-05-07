@@ -1,0 +1,14 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>2.4.5 序列类型</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">2.4.5 序列类型</h3>
+<div class="nav-panel"><p>Next: <a href="02.4.6_缺点单元格和列表类型.html">缺点单元格和列表类型</a>, Previous: <a href="02.4.4_符号类型.html">符号类型</a>, Up: <a href="02.4_编程类型.html">编程类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>序列是表示一组有序元素的 Lisp 对象。Emacs Lisp 中有两种序列：列表和数组。
+</p>
+<p>列表是最常用的序列。列表可以包含任何类型的元素，并且可以通过添加或删除元素轻松更改其长度。有关列表的更多信息，请参阅下一小节。
+</p>
+<p>数组是固定长度的序列。它们进一步细分为字符串、向量、字符表和布尔向量。向量可以包含任何类型的元素，而字符串元素必须是字符，而布尔向量元素必须是 t 或 nil。字符表类似于向量，只是它们由任何有效的字符代码索引。字符串中的字符可以像缓冲区中的字符一样具有文本属性（请参阅文本属性），但向量不支持文本属性，即使它们的元素恰好是字符。
+</p>
+<p>列表、字符串和其他数组类型也有重要的相似之处。例如，所有元素的长度都为 l，并且所有元素都有可以从零索引到 l 减一的元素。有几个函数，称为序列函数，可以接受任何类型的序列。例如，函数长度报告任何类型的序列的长度。请参阅序列、数组和向量。
+</p>
+<p>通常不可能两次读取相同的序列，因为序列总是在读取时重新创建。如果您将一个序列的读取语法阅读两次，您将得到两个内容相同的序列。有一个例外：空列表 () 总是代表同一个对象，nil。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="02.4.6_缺点单元格和列表类型.html">缺点单元格和列表类型</a>, Previous: <a href="02.4.4_符号类型.html">符号类型</a>, Up: <a href="02.4_编程类型.html">编程类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

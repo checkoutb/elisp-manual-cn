@@ -1,0 +1,141 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>29.4 窗口大小</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">29.4 窗口大小</h2>
+<div class="nav-panel"><p>Next: <a href="29.5_调整窗口大小.html">调整窗口大小</a>, Previous: <a href="29.3_选择窗口.html">选择窗口</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 提供了各种函数来查找窗口的高度和宽度。许多这些函数的返回值可以以像素为单位或以行和列为单位指定。在图形显示上，后者实际上对应于由 frame-char-height 和 frame-char-width 返回的 <code>帧</code> ( <code>frame</code> )默认字体指定的默认字符的高度和宽度（请参阅 Frame Font）。因此，如果窗口正在显示具有不同字体或大小的文本，则该窗口报告的行高和列宽可能与其中显示的实际文本行数或列数不同。
+</p>
+<p>窗口的总高度是由其主体及其顶部和底部装饰组成的行数（请参阅 Emacs Windows 的基本概念）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-total-height &amp;optional window round ¶
+</pre></div>
+<p>此函数返回窗口窗口的总高度（以行为单位）。如果 window 被省略或为零，则默认为选定的窗口。如果 window 是内部窗口，则返回值是其子窗口占据的总高度。
+</p>
+<p>如果窗口的像素高度不是其 <code>帧</code> ( <code>frame</code> )默认字符高度的整数倍，则窗口占用的行数在内部四舍五入。这样做的方式是，如果窗口是父窗口，则其所有子窗口的总高度在内部等于其父窗口的总高度。这意味着虽然两个窗口具有相同的像素高度，但它们的内部总高度可能相差一行。这也意味着，如果窗口是垂直组合的并且有下一个兄弟，则该兄弟的最顶行可以计算为此窗口的最顶行和总高度之和（请参阅坐标和窗口）
+</p>
+<p>如果可选参数 round 是上限，则此函数返回大于窗口像素高度除以其 <code>帧</code> ( <code>frame</code> )字符高度的最小整数；  如果是地板，则返回小于该值的最大整数；  对于任何其他回合，它会返回窗口总高度的内部值。
+</p>
+<p>窗口的总宽度是由其主体及其左右装饰组成的行数（请参阅 Emacs Windows 的基本概念）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-total-width &amp;optional window round ¶
+</pre></div>
+<p>此函数返回窗口窗口的总宽度（以列为单位）。如果 window 被省略或为零，则默认为选定的窗口。如果 window 是 internal，则返回值是其后代窗口占用的总宽度。
+</p>
+<p>如果窗口的像素宽度不是其 <code>帧</code> ( <code>frame</code> )字符宽度的整数倍，则窗口占用的行数在内部四舍五入。这样做的方式是，如果窗口是父窗口，则其内部所有子窗口的总宽度之和等于其父窗口的总宽度。这意味着尽管两个窗口具有相同的像素宽度，但它们的内部总宽度可能相差一列。这也意味着，如果这个窗口是水平组合的并且有下一个兄弟，那么这个兄弟的最左边的列可以计算为这个窗口最左边的列和总宽度的总和（参见坐标和窗口）。可选参数 round 的行为与 window-total-height 的行为相同。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-total-size &amp;optional window horizontal round ¶
+</pre></div>
+<p>此函数返回窗口窗口的总高度（以行为单位）或以列为单位的总宽度。如果horizo​​ntal被省略或nil，这相当于为window调用window-total-height；  否则相当于为window调用window-total-width。可选参数 round 的行为与 window-total-height 的行为相同。
+</p>
+<p>以下两个函数可用于以像素为单位返回窗口的总大小。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-pixel-height &amp;optional window ¶
+</pre></div>
+<p>此函数以像素为单位返回窗口窗口的总高度。window 必须是有效的窗口，并且默认为选定的窗口。
+</p>
+<p>返回值包括窗口顶部和底部装饰的高度。如果 window 是一个内部窗口，它的像素高度就是它的子窗口跨越的屏幕区域的像素高度。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-pixel-width &amp;optional window ¶
+</pre></div>
+<p>此函数以像素为单位返回窗口窗口的宽度。window 必须是有效的窗口，并且默认为选定的窗口。
+</p>
+<p>返回值包括窗口左右装饰的宽度。如果 window 是一个内部窗口，它的像素宽度就是它的子窗口跨越的屏幕区域的宽度。
+</p>
+<p>以下函数可用于确定给定窗口是否有任何相邻窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-full-height-p &amp;optional window ¶
+</pre></div>
+<p>如果窗口在其 <code>帧</code> ( <code>frame</code> )上方或下方没有其他窗口，则此函数返回非零。更准确地说，这意味着窗口的总高度等于该 <code>帧</code> ( <code>frame</code> )上根窗口的总高度。minibuffer 窗口在这方面不计算在内。如果 window 被省略或为零，则默认为选定的窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-full-width-p &amp;optional window ¶
+</pre></div>
+<p>如果窗口在其 <code>帧</code> ( <code>frame</code> )的左侧或右侧没有其他窗口，则此函数返回非零，即，其总宽度等于该 <code>帧</code> ( <code>frame</code> )上根窗口的总宽度。如果 window 被省略或为零，则默认为选定的窗口。
+</p>
+<p>窗口的主体高度是其主体的高度，不包括其顶部或底部的任何装饰（请参阅 Emacs Windows 的基本概念）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-body-height &amp;optional window pixelwise ¶
+</pre></div>
+<p>此函数返回窗口窗口主体的高度（以行为单位）。如果 window 被省略或为零，则默认为选中的窗口；  否则它必须是一个活动窗口。
+</p>
+<p>如果可选参数 pixelwise 不为零，则此函数返回以像素为单位的窗口的主体高度。
+</p>
+<p>如果 pixelwise 为 nil，则返回值向下舍入为最接近的整数（如有必要）。这意味着如果文本区域底部的一行仅部分可见，则该行不计算在内。这也意味着窗口主体的高度永远不能超过 window-total-height 返回的总高度。
+</p>
+<p>窗口的主体宽度是它的主体和文本区域的宽度，不包括它的任何左右装饰（请参阅 Emacs Windows 的基本概念）。
+</p>
+<p>请注意，当删除一个或两个边缘时（通过将它们的宽度设置为零），显示引擎会保留两个字符单元格，一个在窗口的每一侧，用于显示连续和截断字形，这会减少 2 列用于文本显示.  （下面描述的函数 window-max-chars-per-line 考虑了这种特性。）
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-body-width &amp;optional window pixelwise ¶
+</pre></div>
+<p>此函数返回窗口窗口主体的宽度（以列为单位）。如果 window 被省略或为零，则默认为选中的窗口；  否则它必须是一个活动窗口。
+</p>
+<p>如果可选参数 pixelwise 不为零，则此函数以像素为单位返回窗口的主体宽度。
+</p>
+<p>如果 pixelwise 为 nil，则返回值向下舍入为最接近的整数（如有必要）。这意味着如果文本区域右侧的一列仅部分可见，则该列不计算在内。这也意味着窗口主体的宽度永远不能超过 window-total-width 返回的总宽度。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-body-size &amp;optional window horizontal pixelwise ¶
+</pre></div>
+<p>此函数返回窗口的主体高度或主体宽度。如果horizo​​ntal省略或nil，则相当于为window调用window-body-height；  否则相当于调用window-body-width。在任何一种情况下，可选参数 pixelwise 都会传递给调用的函数。
+</p>
+<p>可以使用下面给出的函数检索窗口模式、选项卡和标题行的像素高度。它们的返回值通常是准确的，除非该窗口之前没有显示过：在这种情况下，返回值基于对用于窗口 <code>帧</code> ( <code>frame</code> )的字体的估计。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-mode-line-height &amp;optional window ¶
+</pre></div>
+<p>此函数返回窗口模式线的高度（以像素为单位）。window 必须是活动窗口，并且默认为选定的窗口。如果窗口没有模式行，则返回值为零。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-tab-line-height &amp;optional window ¶
+</pre></div>
+<p>此函数返回窗口标签行的高度（以像素为单位）。window 必须是活动窗口，并且默认为选定的窗口。如果窗口没有制表符行，则返回值为零。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-header-line-height &amp;optional window ¶
+</pre></div>
+<p>此函数返回窗口标题行的高度（以像素为单位）。window 必须是活动窗口，并且默认为选定的窗口。如果窗口没有标题行，则返回值为零。
+</p>
+<p>用于检索窗口分隔符（参见窗口分隔符）、边缘（参见边缘）、滚动条（参见滚动条）和显示边距（参见在边距中显示）的函数在相应部分中进行了描述。
+</p>
+<p>如果您的 Lisp 程序需要做出布局决策，您会发现以下函数很有用：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-max-chars-per-line &amp;optional window face ¶
+</pre></div>
+<p>该函数返回指定窗口窗口（必须是活窗口）中指定人脸面显示的字符数。如果重新映射面部（请参阅面部重新映射），则返回重新映射面部的信息。如果省略或为零，则面默认为默认面，窗口默认为所选窗口。
+</p>
+<p>与 window-body-width 不同，此函数考虑了脸部字体的实际大小，而不是以窗口 <code>帧</code> ( <code>frame</code> )的规范字符宽度为单位工作（请参阅 <code>帧</code> ( <code>frame</code> )字体）。如果窗口缺少一个或两个边缘，它还考虑了延续字形使用的空间。
+</p>
+<p>更改窗口大小（请参阅调整窗口大小）或拆分窗口（请参阅拆分窗口）的命令遵循变量 window-min-height 和 window-min-width，它们指定允许的最小窗口高度和宽度。它们还遵循变量 window-size-fixed，通过该变量可以固定窗口的大小（请参阅保留窗口大小）。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: window-min-height ¶
+</pre></div>
+<p>此选项指定任何窗口的最小总高度（以行为单位）。它的值必须容纳至少一个文本行和任何顶部或底部装饰。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: window-min-width ¶
+</pre></div>
+<p>此选项指定任何窗口的最小总宽度（以列为单位）。它的值必须容纳至少两个文本列和任何左或右装饰。
+</p>
+<p>下面的函数告诉一个特定的窗口可以变得多小，考虑到它的区域大小以及 window-min-height、window-min-width 和 window-size-fixed 的值（请参阅保留窗口大小）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-min-size &amp;optional window horizontal ignore pixelwise ¶
+</pre></div>
+<p>该函数返回窗口的最小尺寸。window 必须是有效的窗口，并且默认为选定的窗口。可选参数水平非零表示返回窗口的最小列数；  否则返回窗口的最小行数。
+</p>
+<p>如果实际设置了窗口大小，则返回值确保窗口的所有组件保持完全可见。对于水平 nil，它包括任何顶部或底部装饰。对于水平非零，它包括窗口的任何左侧或右侧装饰。
+</p>
+<p>可选参数忽略，如果非零，则意味着忽略固定大小的窗口、窗口最小高度或窗口最小宽度设置施加的限制。如果忽略等于安全，则活动窗口可能会变得像 window-safe-min-height 行和 window-safe-min-width 列一样小。如果 ignore 是一个窗口，则仅忽略该窗口的限制。任何其他非零值意味着忽略所有窗口的所有上述限制。
+</p>
+<p>可选参数 pixelwise non-nil 表示返回以像素为单位的最小窗口大小。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="29.5_调整窗口大小.html">调整窗口大小</a>, Previous: <a href="29.3_选择窗口.html">选择窗口</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

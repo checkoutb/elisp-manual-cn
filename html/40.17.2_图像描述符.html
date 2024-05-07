@@ -1,0 +1,164 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.17.2 图像描述符</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.17.2 图像描述符</h3>
+<div class="nav-panel"><p>Next: <a href="40.17.3_XBM_图像.html">XBM_图像</a>, Previous: <a href="40.17.1_图像格式.html">图像格式</a>, Up: <a href="40.17_图像.html">图像.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>图像描述符是一个列表，它指定图像的基础数据以及如何显示它。它通常用作显示覆盖或文本属性的值（请参阅其他显示规范）；  但请参阅显示图像，以获取将图像插入缓冲区的便捷辅助函数。
+</p>
+<p>每个图像描述符都具有 (image.props) 形式，其中 props 是交替的关键字符号和值的属性列表，至少包括指定图像类型的一对 :type type。
+</p>
+<p>定义图像尺寸的图像描述符，:width, :height, :max-width 和 :max-height，可以采用整数，表示以像素为单位的尺寸，或一对 (value.em)，其中 value 是尺寸的ems26 中的长度。一个 em 相当于字体的高度，值可以是整数或浮点数。
+</p>
+<p>以下是对所有图像类型有意义的属性列表（还有一些属性仅对某些图像类型有意义，如以下小节所述）：
+</p>
+<div class="lisp">
+<pre class="lisp">:type type
+</pre></div>
+<p>图像类型。请参阅图像格式。每个图像描述符都必须包含此属性。
+</p><div class="lisp">
+<pre class="lisp">:file file
+</pre></div>
+<p>这表示从文件文件加载图像。如果 file 不是绝对文件名，它会相对于 data-directory 的 images 子目录进行扩展，如果失败，则相对于 x-bitmap-file-path 列出的目录（请参阅面属性）。
+</p><div class="lisp">
+<pre class="lisp">:data data
+</pre></div>
+<p>这指定了原始图像数据。每个图像描述符必须具有 :data 或 :file，但不能同时具有。
+</p>
+<p>对于大多数图像类型， :data 属性的值应该是包含图像数据的字符串。某些图像类型不支持 :data;  对于其他一些人，仅 :data 是不够的，因此您需要将其他图像属性与 :data 一起使用。有关详细信息，请参阅以下小节。
+</p><div class="lisp">
+<pre class="lisp">:margin margin
+</pre></div>
+<p>这指定了在图像周围添加多少像素作为额外边距。值 margin 必须是一个非负数，或一对 (x . y) 这样的数字。如果是一对，x 指定水平添加多少像素，y 指定垂直添加多少像素。如果 :margin 未指定，则默认为零。
+</p><div class="lisp">
+<pre class="lisp">:ascent ascent
+</pre></div>
+<p>这指定了用于上升的图像高度量，即基线以上的部分。值 ascent 必须是 0 到 100 范围内的数字，或符号中心。
+</p>
+<p>如果 ascent 是一个数字，则图像高度的该百分比用于其上升。
+</p>
+<p>如果 ascent 为中心，则图像以中心线为中心垂直居中，该中心线将是在图像位置绘制的文本的垂直中心线，其方式由应用于图像的文本属性和叠加层指定。
+</p>
+<p>如果省略此属性，则默认为 50。
+</p><div class="lisp">
+<pre class="lisp">:relief relief
+</pre></div>
+<p>这会在图像周围添加一个阴影矩形。浮雕值指定阴影线的宽度，以像素为单位。如果浮雕为负，则绘制阴影，使图像显示为按下的按钮；  否则，它会显示为未按下的按钮。
+</p><div class="lisp">
+<pre class="lisp">:width width, :height height
+</pre></div>
+<p>:width 和 :height 关键字用于缩放图像。如果仅指定其中一个，则将计算另一个以保持纵横比。如果两者都指定，则可能不会保留纵横比。
+</p><div class="lisp">
+<pre class="lisp">:max-width max-width, :max-height max-height
+</pre></div>
+<p>如果图像的大小超过这些值，则使用 :max-width 和 :max-height 关键字进行缩放。如果设置了:width，它将优先于max-width，如果设置了:height，它将优先于max-height，但是您可以根据需要混合这些关键字。
+</p>
+<p>如果 :max-width 和 :height 都指定了，但 :width 没有指定，则保留纵横比可能需要宽度超过 :max-width。如果发生这种情况，缩放将使用较小的高度值，以便在不超过 :max-width 的情况下保持纵横比。同样，当同时指定 :max-height 和 :width 时，但没有指定 :height。例如，如果你有一个 200x100 的图像并指定 :width 应该是 400 并且 :max-height 应该是 150，你最终会得到一个 300x150 的图像： 保留纵横比并且不超过 <code>max</code> 设置.  这种参数组合是表示 <code>尽可能大地显示此图像，但不大于可用显示区域</code> 的有用方式。
+</p><div class="lisp">
+<pre class="lisp">:scale scale
+</pre></div>
+<p>这应该是一个数字，其中大于 1 的值意味着增加尺寸，低于 1 意味着通过乘以宽度和高度来减小尺寸。例如，值 0.25 将使图像大小变为原来的四分之一。如果缩放使图像大于 :max-width 或 :max-height 指定的大小，则生成的大小不会超过这两个值。如果 :scale 和 :height/:width 都指定了，则高度/宽度将根据指定的缩放因子进行调整。
+</p><div class="lisp">
+<pre class="lisp">:rotation angle
+</pre></div>
+<p>以度为单位指定旋转角度。仅支持 90 度的倍数，除非图像类型是 imagemagick。正值顺时针旋转，负值逆时针旋转。在缩放和裁剪之后执行旋转。
+</p><div class="lisp">
+<pre class="lisp">:transform-smoothing smooth
+</pre></div>
+<p>如果这是 t，则任何图像变换都将应用平滑；  如果为零，则不会应用平滑。使用的确切算法取决于平台，但应该等效于双线性过滤。禁用平滑将使用最近邻算法。
+</p>
+<p>如果未指定此属性，create-image 将使用 image-transform-smoothing 用户选项来说明是否应该进行缩放。此选项可以是 nil（不平滑）、t（使用平滑）或使用图像对象作为唯一参数调用的谓词函数，并且应该返回 nil 或 t。默认值是缩小以应用平滑，而大规模放大则不应用平滑。
+</p><div class="lisp">
+<pre class="lisp">:index frame
+</pre></div>
+<p>请参阅多帧图像。
+</p><div class="lisp">
+<pre class="lisp">:conversion algorithm
+</pre></div>
+<p>这指定了在图像显示之前应该应用于图像的转换算法；  值，algorithm，指定哪种算法。
+</p>
+<div class="lisp">
+<pre class="lisp">laplace
+</pre></div>
+<div class="lisp">
+<pre class="lisp">emboss
+</pre></div>
+<p>指定拉普拉斯边缘检测算法，该算法会模糊颜色的微小差异，同时突出较大的差异。人们有时认为这对于显示禁用按钮的图像很有用。
+</p><div class="lisp">
+<pre class="lisp">(edge-detection :matrix matrix :color-adjust adjust) ¶
+</pre></div>
+<p>指定通用边缘检测算法。矩阵必须是九元素列表或九元素数字向量。变换图像中位置 x/y 处的像素是根据该位置周围的原始像素计算的。矩阵为 x/y 邻域中的每个像素指定一个因子，该像素将影响变换后的像素；  元素 0 指定 x-1/y-1 处像素的因子，元素 1 指定 x/y-1 处像素的因子等，如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(x-1/y-1  x/y-1  x+1/y-1
+ x-1/y    x/y    x+1/y
+ x-1/y+1  x/y+1  x+1/y+1)
+</pre></div>
+<p>生成的像素是根据将周围像素的 RGB 值相加得到的颜色的颜色强度计算得出的，乘以指定的因子，然后将该总和除以因子绝对值的总和。
+</p>
+<p>拉普拉斯边缘检测目前使用的矩阵
+</p><div class="lisp">
+<pre class="lisp">(1  0  0
+ 0  0  0
+ 0  0 -1)
+</pre></div>
+<p>浮雕边缘检测使用矩阵
+</p><div class="lisp">
+<pre class="lisp">( 2 -1  0
+ -1  0  1
+  0  1 -2)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">disabled
+</pre></div>
+<p>指定转换图像以使其看起来被禁用。
+</p>
+<div class="lisp">
+<pre class="lisp">:mask mask
+</pre></div>
+<p>如果 mask 是启发式或（启发式 bg），则为图像构建一个剪贴蒙版，以便在图像后面可以看到帧的背景。如果未指定 bg，或者如果 bg 为 t，则通过查看图像的四个角来确定图像的背景颜色，假设角中最常出现的颜色是图像的背景颜色。否则， bg 必须是一个列表（红绿蓝），指定图像背景的颜色。
+</p>
+<p>如果掩码为 nil，则从图像中删除掩码（如果有掩码）。某些格式的图像包含一个掩码，可以通过指定 :mask nil 来删除该掩码。
+</p><div class="lisp">
+<pre class="lisp">:pointer shape
+</pre></div>
+<p>这指定鼠标指针悬停在该图像上时的指针形状。有关可用的指针形状，请参阅指针形状。
+</p><div class="lisp">
+<pre class="lisp">:map map ¶
+</pre></div>
+<p>这将热点的图像映射与该图像相关联。
+</p>
+<p>图像映射是一个列表，其中每个元素都具有格式（区域 id plist）。区域被指定为矩形、圆形或多边形。
+</p>
+<p>矩形是一个 cons (rect . ((x0 . y0) . (x1 . y1)))，它指定矩形区域左上角和右下角的像素坐标。
+</p>
+<p>圆是一个 cons (circle . ((x0 . y0) . r)) ，它指定圆的中心和半径；  r 可以是浮点数或整数。
+</p>
+<p>多边形是一个 cons (poly . [x0 y0 x1 y1 …])，其中向量中的每一对都描述了多边形中的一个角。
+</p>
+<p>当鼠标指针位于图像的热点区域时，查询该热点的plist；  如果它包含 help-echo 属性，则定义热点的工具提示，如果它包含指针属性，则定义鼠标光标在热点上时的形状。有关可用的指针形状，请参阅指针形状。
+</p>
+<p>当鼠标指针在热点上点击鼠标时，将热点的id和鼠标事件组合成一个事件；  例如，如果热点的 id 是 area4，则为 [area4 mouse-1]。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: image-mask-p spec &amp;optional frame ¶
+</pre></div>
+<p>如果图像规范具有掩码位图，则此函数返回 t。frame 是显示图像的框架。frame nil 或省略表示使用选定的帧（请参阅输入焦点）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: image-transforms-p &amp;optional frame ¶
+</pre></div>
+<p>如果 frame 支持图像缩放和旋转，此函数返回非 nil。frame nil 或省略表示使用选定的帧（请参阅输入焦点）。返回的列表包括指示支持哪些图像转换操作的符号：
+</p>
+<p>规模
+</p>
+<p>     帧通过 :scale、:width、:height、:max-width 和 :max-height 属性支持图像缩放。
+旋转90
+</p>
+<p>如果旋转角度是 90 度的整数倍，则框架支持图像旋转。
+</p>
+<p>如果不支持图像变换，:rotation, :crop, :width, :height, :scale, :max-width 和 :max-height 将只能通过 ImageMagick 使用，如果可用的话（参见 ImageMagick 图像）。
+</p>
+<p>脚注
+(26)
+</p>
+<p>在排版中，em 是与字体高度相等的距离。例如，当使用 12 点类型时，1 em 等于 12 点。它的使用确保距离和类型保持成比例。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.17.3_XBM_图像.html">XBM_图像</a>, Previous: <a href="40.17.1_图像格式.html">图像格式</a>, Up: <a href="40.17_图像.html">图像.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

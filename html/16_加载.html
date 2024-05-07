@@ -1,0 +1,12 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>16 加载</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h1 class="chapter">16 加载</h1>
+<div class="nav-panel"><p>Next: <a href="16.1_程序如何加载.html">程序如何加载</a>, Previous: <a href="15.6_自定义主题.html">自定义主题</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>加载 Lisp 代码文件意味着将其内容以 Lisp 对象的形式带入 Lisp 环境。Emacs 找到并打开文件，读取文本，评估每个表单，然后关闭文件。这样的文件也称为 Lisp 库。
+</p>
+<p>load 函数计算文件中的所有表达式，就像 eval-buffer 函数计算缓冲区中的所有表达式一样。不同之处在于加载函数读取和评估文件中在磁盘上找到的文本，而不是 Emacs 缓冲区中的文本。
+</p>
+<p>加载的文件必须包含 Lisp 表达式，作为源代码或字节编译代码。文件中的每个表单都称为顶级表单。可加载文件中的表单没有特殊格式；  文件中的任何形式都可以直接输入缓冲区并在那里进行评估。（事实上​​，大多数代码都是这样测试的。）最常见的形式是函数定义和变量定义。
+</p>
+<p>Emacs 还可以加载已编译的动态模块：共享库，提供用于 Emacs Lisp 程序的附加功能，就像用 Emacs Lisp 编写的包一样。当一个动态模块被加载时，Emacs 调用一个特别命名的初始化函数，该模块需要实现这个函数，并将附加的函数和变量暴露给 Emacs Lisp 程序。
+</p>
+<p>对于预先知道某些 Emacs 原语需要的外部库的按需加载，请参阅动态加载的库。
+</p>
+<div class="nav-panel"><p>Next: <a href="16.1_程序如何加载.html">程序如何加载</a>, Previous: <a href="15.6_自定义主题.html">自定义主题</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

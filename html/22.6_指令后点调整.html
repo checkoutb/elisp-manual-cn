@@ -1,0 +1,20 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.6 指令后点调整</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">22.6 指令后点调整</h2>
+<div class="nav-panel"><p>Next: <a href="22.7_输入事件.html">输入事件</a>, Previous: <a href="22.5_来自命令循环的信息.html">来自命令循环的信息</a>, Up: <a href="22_命令循环.html">命令循环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当 point 位于具有 display 或 composition 属性的文本序列的中间或不可见时，Emacs 无法显示光标。因此，在命令完成并返回命令循环后，如果点在这样的序列内，命令循环通常会将点移动到序列的边缘，从而使该序列实际上是无形的。
+</p>
+<p>命令可以通过设置变量 disable-point-adjustment 来禁止此功能：
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: disable-point-adjustment ¶
+</pre></div>
+<p>如果当命令返回命令循环时此变量非零，则命令循环不会检查这些文本属性，并且不会将点移出具有它们的序列。
+</p>
+<p>命令循环在每个命令之前将此变量设置为 nil，因此如果命令设置它，则效果仅适用于该命令。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: global-disable-point-adjustment ¶
+</pre></div>
+<p>如果将此变量设置为非零值，则将点移出这些序列的功能将完全关闭。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.7_输入事件.html">输入事件</a>, Previous: <a href="22.5_来自命令循环的信息.html">来自命令循环的信息</a>, Up: <a href="22_命令循环.html">命令循环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

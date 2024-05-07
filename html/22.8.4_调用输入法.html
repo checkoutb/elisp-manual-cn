@@ -1,0 +1,19 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.8.4 调用输入法</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">22.8.4 调用输入法</h3>
+<div class="nav-panel"><p>Next: <a href="22.8.5_引用字符输入.html">引用字符输入</a>, Previous: <a href="22.8.3_修改和翻译输入事件.html">修改和翻译输入事件</a>, Up: <a href="22.8_读数输入.html">读数输入.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>事件读取函数调用当前输入法，如果有的话（请参阅输入法）。如果 input-method-function 的值为非 nil，则应该是一个函数；  当 read-event 读取一个没有修饰位的打印字符（包括 SPC）时，它调用该函数，将字符作为参数传递。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: input-method-function ¶
+</pre></div>
+<p>如果这是非零，它的值指定当前输入法功能。
+</p>
+<p>警告：不要将此变量与 let 绑定。它通常是缓冲区本地的，如果你在读取输入时绑定它（这正是你绑定它的时候），在 Emacs 等待时异步切换缓冲区将导致值在错误的缓冲区中恢复。
+</p>
+<p>输入法函数应返回应用作输入的事件列表。（如果列表为 nil，则表示没有输入，因此 read-event 等待另一个事件。）这些事件在 unread-command-events 中的事件之前处理（请参阅杂项事件输入功能）。输入法函数返回的事件不会再次传递给输入法函数，即使它们正在打印没有修饰符位的字符。
+</p>
+<p>如果输入法函数调用 read-event 或 read-key-sequence，它应该先将 input-method-function 绑定到 nil，以防止递归。
+</p>
+<p>读取按键序列的第二个和后续事件时不调用输入法函数。因此，这些字符不受输入法处理。输入法函数应该测试overriding-local-map和overriding-terminal-local-map的值；  如果这些变量中的任何一个不为零，则输入方法应将其参数放入列表中并返回该列表而不进行进一步处理。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.8.5_引用字符输入.html">引用字符输入</a>, Previous: <a href="22.8.3_修改和翻译输入事件.html">修改和翻译输入事件</a>, Up: <a href="22.8_读数输入.html">读数输入.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

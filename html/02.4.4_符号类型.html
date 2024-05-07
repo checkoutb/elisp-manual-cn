@@ -1,0 +1,32 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>2.4.4 符号类型</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">2.4.4 符号类型</h3>
+<div class="nav-panel"><p>Next: <a href="02.4.5_序列类型.html">序列类型</a>, Previous: <a href="02.4.3_字符类型.html">字符类型</a>, Up: <a href="02.4_编程类型.html">编程类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>GNU Emacs Lisp 中的符号是一个有名字的对象。符号名称用作符号的打印表示。在普通的 Lisp 使用中，使用一个 obarray（请参阅创建和内部符号），一个符号的名称是唯一的——没有两个符号具有相同的名称。
+</p>
+<p>符号可以用作变量、函数名或保存属性列表。或者它可能仅用于与所有其他 Lisp 对象不同，以便可以可靠地识别它在数据结构中的存在。在给定的上下文中，通常只打算使用这些用途中的一种。但是您可以独立地以所有这些方式使用一个符号。
+</p>
+<p>名称以冒号 (’:’) 开头的符号称为关键字符号。这些符号自动充当常量，通常仅通过将未知符号与一些特定替代符号进行比较来使用。请参阅永不改变的变量。
+</p>
+<p>符号名称可以包含任何字符。大多数符号名称由字母、数字和标点符号 <code>-+=*/</code> 组成。这样的名称不需要特殊的标点；  只要名称看起来不像数字，名称的字符就足够了。（如果是，请在名称的开头写一个 <code>\</code> 以强制解释为符号。）字符 <code>_</code>!@$%^&amp;:&lt;&gt;{}?~   很少使用，但也不需要特殊的标点符号。任何其他字符都可以包含在符号名称中，方法是使用反斜杠对其进行转义。然而，与它在字符串中的使用相反，符号名称中的反斜杠只是简单地引用反斜杠后面的单个字符。例如，在字符串中，” 代表制表符；  然而，在符号名称中，” 仅仅引用了字母’t’。要使名称中包含制表符的符号，您必须实际使用制表符（前面带有反斜杠）。但很少有做这样的事情。
+</p>
+<p>Common Lisp 注意：在 Common Lisp 中，小写字母总是折叠成大写字母，除非它们被明确转义。在 Emacs Lisp 中，大写和小写字母是不同的。
+</p>
+<p>以下是符号名称的几个示例。请注意，第四个示例中的 <code>+</code> 被转义以防止它被读取为数字。在第六个示例中这不是必需的，因为名称的其余部分使其作为数字无效。
+</p>
+<div class="lisp">
+<pre class="lisp">foo                 ; A symbol named ‘foo’.
+FOO                 ; A symbol named ‘FOO’, different from ‘foo’.
+
+1+                  ; A symbol named ‘1+’
+                     ;   (not ‘+1’, which is an integer).
+
+\+1                 ; A symbol named ‘+1’
+                     ;   (not a very readable name).
+
+\(*\ 1\ 2\)         ; A symbol named ‘(* 1 2)’ (a worse name).
++-*/_~!@$%^&amp;=:&lt;&gt;{}  ; A symbol named ‘+-*/_~!@$%^&amp;=:&lt;&gt;{}’.
+                     ;   These characters need not be escaped.
+</pre></div>
+<p>作为符号名称作为其打印表示的规则的一个例外， <code>##</code> 是名称为空字符串的内部符号的打印表示。此外，’#:foo’ 是名称为 foo 的非内部符号的打印表示。（通常，Lisp 阅读器会实习所有符号；请参阅创建和实习符号。）
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="02.4.5_序列类型.html">序列类型</a>, Previous: <a href="02.4.3_字符类型.html">字符类型</a>, Up: <a href="02.4_编程类型.html">编程类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

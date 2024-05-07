@@ -1,0 +1,10 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>30.21 拖放</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">30.21 拖放</h2>
+<div class="nav-panel"><p>Next: <a href="30.22_颜色名称.html">颜色名称</a>, Previous: <a href="30.20_窗口系统选择.html">窗口系统选择</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当用户通过 Emacs 从另一个应用程序拖动某些东西时，该应用程序希望 Emacs 告诉它 Emacs 是否可以处理被拖动的数据。Emacs 使用变量 x-dnd-test-function 来确定要回复的内容。默认值为 x-dnd-default-test-function，如果要删除的数据类型存在于 x-dnd-known-types 中，则接受删除。如果您希望 Emacs 根据其他一些标准接受或拒绝丢弃，您可以自定义 x-dnd-test-function 和/或 x-dnd-known-types。
+</p>
+<p>如果你想改变 Emacs 处理丢弃不同类型或添加新类型的方式，自定义 x-dnd-types-alist。这需要详细了解其他应用程序用于拖放的类型。
+</p>
+<p>当在 Emacs 上放置一个 URL 时，它可能是一个文件，但也可能是另一种 URL 类型（https 等）。Emacs 首先检查 dnd-protocol-alist 以确定如何处理 URL。如果那里没有匹配项，Emacs 会在 browse-url-handlers 和 browse-url-default-handlers 中查找匹配项。如果仍未找到匹配项，则插入 URL 的文本。如果你想改变 Emacs 的行为，你可以自定义这些变量。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="30.22_颜色名称.html">颜色名称</a>, Previous: <a href="30.20_窗口系统选择.html">窗口系统选择</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

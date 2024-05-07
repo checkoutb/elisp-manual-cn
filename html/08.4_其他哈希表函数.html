@@ -1,0 +1,46 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>8.4 其他哈希表函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">8.4 其他哈希表函数</h2>
+<div class="nav-panel"><p>Next: <a href="09_符号.html">符号</a>, Previous: <a href="08.3_定义哈希比较.html">定义哈希比较</a>, Up: <a href="08_哈希表.html">哈希表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>以下是一些用于处理哈希表的其他函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: hash-table-p table ¶
+</pre></div>
+<p>如果 table 是哈希表对象，则返回非 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: copy-hash-table table ¶
+</pre></div>
+<p>此函数创建并返回表的副本。只有表本身被复制——键和值是共享的。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: hash-table-count table ¶
+</pre></div>
+<p>此函数返回表中的实际条目数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: hash-table-test table ¶
+</pre></div>
+<p>这将返回创建表时给出的测试值，以指定如何散列和比较键。请参阅 make-hash-table（请参阅创建哈希表）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: hash-table-weakness table ¶
+</pre></div>
+<p>此函数返回为哈希表指定的弱值。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: hash-table-rehash-size table ¶
+</pre></div>
+<p>这将返回表的重新散列大小。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: hash-table-rehash-threshold table ¶
+</pre></div>
+<p>这将返回表的重新哈希阈值。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: hash-table-size table ¶
+</pre></div>
+<p>这将返回表的当前标称大小。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="09_符号.html">符号</a>, Previous: <a href="08.3_定义哈希比较.html">定义哈希比较</a>, Up: <a href="08_哈希表.html">哈希表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

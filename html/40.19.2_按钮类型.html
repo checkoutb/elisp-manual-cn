@@ -1,0 +1,15 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.19.2 按钮类型</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.19.2 按钮类型</h3>
+<div class="nav-panel"><p>Next: <a href="40.19.3_制作按钮.html">制作按钮</a>, Previous: <a href="40.19.1_按钮属性.html">按钮属性</a>, Up: <a href="40.19_按钮.html">按钮.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>每个按钮都有一个按钮类型，它定义了按钮属性的默认值。按钮类型按层次结构排列，特殊类型继承自更通用的类型，因此很容易为特定任务定义特殊用途的按钮类型。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: define-button-type name &amp;rest properties ¶
+</pre></div>
+<p>定义一个名为 name（一个符号）的按钮类型。剩下的参数形成一个属性值对的序列，为这种类型的按钮指定默认属性值（一个按钮的类型可以通过在创建按钮时给它一个 type 属性来设置，使用 :type 关键字参数）。
+</p>
+<p>此外，关键字参数 :supertype 可用于指定 name 继承其默认属性值的按钮类型。请注意，这种继承仅在定义名称时发生；  对超类型的后续更改不会反映在其子类型中。
+</p>
+<p>没有必要使用 define-button-type 来定义按钮的默认属性——没有任何指定类型的按钮使用内置的 button-type 按钮——但我们鼓励这样做，因为这样做通常会使生成的代码更清晰、更高效。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.19.3_制作按钮.html">制作按钮</a>, Previous: <a href="40.19.1_按钮属性.html">按钮属性</a>, Up: <a href="40.19_按钮.html">按钮.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

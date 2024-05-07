@@ -1,0 +1,96 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>23.16 扫描键盘映射</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">23.16 扫描键盘映射</h2>
+<div class="nav-panel"><p>Next: <a href="23.17_菜单键映射.html">菜单键映射</a>, Previous: <a href="23.15_绑定键的命令.html">绑定键的命令</a>, Up: <a href="23_键盘映射.html">键盘映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍用于扫描所有当前键盘映射以打印帮助信息的功能。要在特定的键盘映射中显示绑定，可以使用 describe-keymap 命令（参见 GNU Emacs 手册中的其他帮助命令）
+</p>
+<div class="lisp">
+<pre class="lisp">Function: accessible-keymaps keymap &amp;optional prefix ¶
+</pre></div>
+<p>此函数返回可以从键映射（通过零个或多个前缀键）到达的所有键映射的列表。该值是一个具有表单元素的关联列表 (key.map)，其中 key 是一个前缀键，其在 keymap 中的定义是 map。
+</p>
+<p>alist 的元素是有序的，因此键的长度会增加。第一个元素始终是 ([] . keymap)，因为指定的 keymap 可以从其自身访问，其前缀为 no events。
+</p>
+<p>如果给出了前缀，则应该是前缀键序列；  那么accessible-keymaps 只包含前缀以prefix 开头的子图。这些元素看起来就像它们在 (accessible-keymaps) 的值中所做的一样；  唯一的区别是省略了一些元素。
+</p>
+<p>在下面的示例中，返回的 alist 表示键 ESC，显示为 ’^[’，是一个前缀键，其定义为稀疏键映射 (keymap (83 .center-paragraph) (115 . foo))。
+</p><div class="lisp">
+<pre class="lisp">(accessible-keymaps (current-local-map))
+⇒(([] keymap
+      (27 keymap   ; Note this keymap for ESC is repeated below.
+          (83 . center-paragraph)
+          (115 . center-line))
+      (9 . tab-to-tab-stop))
+
+
+   ("^[" keymap
+    (83 . center-paragraph)
+    (115 . foo)))
+
+</pre></div>
+<p>在以下示例中，Ch 是一个前缀键，它使用以 (keymap (118 . describe-variable)…) 开头的稀疏键映射。另一个前缀 Cx 4 使用一个键映射，它也是变量 ctl-x-4-map 的值。事件模式行是几个虚拟事件之一，用作窗口特殊部分中鼠标操作的前缀。
+</p><div class="lisp">
+<pre class="lisp">
+
+(accessible-keymaps (current-global-map))
+⇒ (([] keymap [set-mark-command beginning-of-line …
+                   delete-backward-char])
+
+    ("^H" keymap (118 . describe-variable) …
+     (8 . help-for-help))
+
+    ("^X" keymap [x-flush-mouse-queue …
+     backward-kill-sentence])
+
+    ("^[" keymap [mark-sexp backward-sexp …
+     backward-kill-word])
+
+    ("^X4" keymap (15 . display-buffer) …)
+
+    ([mode-line] keymap
+     (S-mouse-2 . mouse-split-window-horizontally) …))
+</pre></div>
+<p>这些并不是您实际看到的所有键盘映射。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: map-keymap function keymap ¶
+</pre></div>
+<p>函数 map-keymap 为 keymap 中的每个绑定调用一次函数。它传递两个参数，事件类型和绑定值。如果 keymap 有父级，则也包括父级的绑定。这以递归方式工作：如果父级本身有一个父级，那么祖父级的绑定也包括在内，依此类推。
+</p>
+<p>此函数是检查键盘映射中所有绑定的最简洁方法。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: where-is-internal command &amp;optional keymap firstonly noindirect no-remap ¶
+</pre></div>
+<p>该函数是 where-is 命令使用的子例程（参见 GNU Emacs 手册中的帮助）。它返回绑定到一组键映射中的命令的所有键序列（任意长度）的列表。
+</p>
+<p>参数命令可以是任何对象；  它与使用 eq 的所有键盘映射条目进行比较。
+</p>
+<p>如果 keymap 为 nil，则使用的映射是当前活动的 keymap，忽略 overriding-local-map（即假装其值为 nil）。如果 keymap 是 keymap，则搜索的映射是 keymap 和全局 keymap。如果 keymap 是 keymap 列表，则仅搜索这些 keymap。
+</p>
+<p>通常最好使用 overriding-local-map 作为 keymap 的表达式。然后 where-is-internal 精确搜索活动的键盘映射。要仅搜索全局映射，请将值 (keymap)（一个空的 keymap）作为 keymap 传递。
+</p>
+<p>如果 firstonly 是非 ascii，则该值是表示找到的第一个键序列的单个向量，而不是所有可能键序列的列表。如果 firstonly 是 t，则该值是第一个键序列，除了完全由 ASCII 字符（或 ASCII 字符的元变体）组成的键序列优于所有其他键序列并且返回值永远不能是菜单绑定。
+</p>
+<p>如果 noindirect 不为零，则 where-is-internal 不会在菜单项内部查找它们的命令。这使得搜索菜单项本身成为可能。
+</p>
+<p>第五个参数 no-remap 确定此函数如何处理命令重映射（请参阅重映射命令）。有两个感兴趣的案例：
+</p>
+<p>如果命令 other-command 重新映射到命令：
+</p>
+<p>     如果 no-remap 为 nil，则查找 other-command 的绑定并将它们视为它们也是 command 的绑定。如果 no-remap 不为零，则将向量 [remap other-command] 包含在可能的键序列列表中，而不是查找那些绑定。
+如果命令被重新映射到其他命令：
+</p>
+<p>如果 no-remap 为 nil，则返回 other-command 而不是 command 的绑定。如果 no-remap 不为零，则返回 command 的绑定，忽略它被重新映射的事实。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: describe-bindings &amp;optional prefix buffer-or-name ¶
+</pre></div>
+<p>此函数创建所有当前键绑定的列表，并将其显示在名为 <strong>Help</strong> 的缓冲区中。文本按模式分组——首先是次要模式，然后是主要模式，然后是全局绑定。
+</p>
+<p>如果 prefix 不是 nil，它应该是一个前缀键；  那么该列表仅包含以前缀开头的键。
+</p>
+<p>当具有连续 ASCII 码的多个字符具有相同定义时，它们会一起显示，如 ’firstchar..lastchar’。在这种情况下，您需要知道 ASCII 代码才能理解这意味着哪些字符。例如，在默认全局映射中，字符 <code>SPC .. ~</code> 由单行描述。SPC是ASCII 32，~是ASCII 126，它们之间的字符包括所有正常的打印字符，（例如，字母、数字、标点符号等）；  所有这些字符都绑定到 self-insert-command。
+</p>
+<p>如果 buffer-or-name 不为 nil，则它应该是缓冲区或缓冲区名称。然后 describe-bindings 列出该缓冲区的绑定，而不是当前缓冲区的绑定。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="23.17_菜单键映射.html">菜单键映射</a>, Previous: <a href="23.15_绑定键的命令.html">绑定键的命令</a>, Up: <a href="23_键盘映射.html">键盘映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

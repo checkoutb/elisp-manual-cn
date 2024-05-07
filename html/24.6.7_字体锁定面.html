@@ -1,0 +1,67 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.6.7 字体锁定面</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">24.6.7 字体锁定面</h3>
+<div class="nav-panel"><p>Next: <a href="24.6.8_语法字体锁定.html">语法字体锁定</a>, Previous: <a href="24.6.6_预计算字体.html">预计算字体</a>, Up: <a href="24.6_字体锁定模式.html">字体锁定模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Font Lock 模式可以使用任何面来突出显示，但 Emacs 定义了几个面专门用于 Font Lock 用于突出显示文本。下面列出了这些字体锁定面。它们也可以被主要模式用于字体锁定模式之外的语法突出显示（请参阅主要模式约定）。
+</p>
+<p>这些符号中的每一个都是面名和默认值为符号本身的变量。因此，font-lock-comment-face 的默认值为 font-lock-comment-face。
+</p>
+<p>列出了这些面孔及其典型用法的描述，并按照突出程度从高到低排列。如果一个模式的句法类别与使用描述不太吻合，则可以使用排序作为指导来分配面孔。
+</p>
+<div class="lisp">
+<pre class="lisp">font-lock-warning-face ¶
+</pre></div>
+<p>对于一个特殊的构造（例如，在 Emacs Lisp 符号中未转义的易混淆引号，如 ”foo’），或者极大地改变了其他文本的含义，如 Emacs Lisp 中的 ’;;;###autoload’ 和 ’ C中的#error’。
+</p><div class="lisp">
+<pre class="lisp">font-lock-function-name-face ¶
+</pre></div>
+<p>用于定义或声明的函数的名称。
+</p><div class="lisp">
+<pre class="lisp">font-lock-variable-name-face ¶
+</pre></div>
+<p>用于定义或声明的变量的名称。
+</p><div class="lisp">
+<pre class="lisp">font-lock-keyword-face ¶
+</pre></div>
+<p>用于具有特殊语法意义的关键字，例如 C 中的 <code>for</code> 和 <code>if</code> 。
+</p><div class="lisp">
+<pre class="lisp">font-lock-comment-face ¶
+</pre></div>
+<p>征求意见。
+</p><div class="lisp">
+<pre class="lisp">font-lock-comment-delimiter-face ¶
+</pre></div>
+<p>对于注释分隔符，例如 C 中的 ’<em><strong>’ 和 ’</strong></em>’。在大多数终端上，它继承自 font-lock-comment-face。
+</p><div class="lisp">
+<pre class="lisp">font-lock-type-face ¶
+</pre></div>
+<p>用于用户定义数据类型的名称。
+</p><div class="lisp">
+<pre class="lisp">font-lock-constant-face ¶
+</pre></div>
+<p>对于常量的名称，例如 C 中的 ’NULL’。
+</p><div class="lisp">
+<pre class="lisp">font-lock-builtin-face ¶
+</pre></div>
+<p>用于内置函数的名称。
+</p><div class="lisp">
+<pre class="lisp">font-lock-preprocessor-face ¶
+</pre></div>
+<p>用于预处理器命令。默认情况下，它继承自 font-lock-builtin-face。
+</p><div class="lisp">
+<pre class="lisp">font-lock-string-face ¶
+</pre></div>
+<p>对于字符串常量。
+</p><div class="lisp">
+<pre class="lisp">font-lock-doc-face ¶
+</pre></div>
+<p>用于嵌入在特殊格式的注释或字符串中的程序代码中的文档。默认情况下，此面继承自 font-lock-string-face。
+</p><div class="lisp">
+<pre class="lisp">font-lock-doc-markup-face ¶
+</pre></div>
+<p>使用 font-lock-doc-face 标记文本中的元素。它通常用于嵌入在程序代码中的文档中的标记结构，遵循诸如 Haddock、Javadoc 或 Doxygen 之类的约定。默认情况下，此面继承自 font-lock-constant-face。
+</p><div class="lisp">
+<pre class="lisp">font-lock-negation-char-face ¶
+</pre></div>
+<p>用于容易被忽视的否定字符。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="24.6.8_语法字体锁定.html">语法字体锁定</a>, Previous: <a href="24.6.6_预计算字体.html">预计算字体</a>, Up: <a href="24.6_字体锁定模式.html">字体锁定模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

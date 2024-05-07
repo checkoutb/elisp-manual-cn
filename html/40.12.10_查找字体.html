@@ -1,0 +1,32 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.12.10 查找字体</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.12.10 查找字体</h3>
+<div class="nav-panel"><p>Next: <a href="40.12.11_字体集.html">字体集</a>, Previous: <a href="40.12.9_字体选择.html">字体选择</a>, Up: <a href="40.12_面.html">面.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><div class="lisp">
+<pre class="lisp">Function: x-list-fonts name &amp;optional reference-face frame maximum width ¶
+</pre></div>
+<p>此函数返回与名称匹配的可用字体名称列表。name 应该是包含 Fontconfig、GTK+ 或 XLFD 格式的字体名称的字符串（请参阅 GNU Emacs 手册中的字体）。在 XLFD 字符串中，可以使用通配符：’*’ 字符匹配任何子字符串，’?’  字符匹配任何单个字符。匹配字体名称时忽略大小写。
+</p>
+<p>如果指定了可选参数 reference-face 和 frame，则返回的列表仅包括与当前在框架框架上的 reference-face（面名称）大小相同的字体。
+</p>
+<p>可选参数最大值设置返回多少字体的限制。如果它是非零，则返回值在第一个最大匹配字体之后被截断。在许多字体与模式匹配的情况下，为最大值指定一个较小的值可以使此函数更快。
+</p>
+<p>可选参数宽度指定所需的字体宽度。如果它不为 nil，则该函数仅返回其字符（平均）宽度为参考面宽度的字体。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: x-family-fonts &amp;optional family frame ¶
+</pre></div>
+<p>此函数返回一个列表，描述框架上家庭系列的可用字体。如果 family 被省略或为零，则此列表适用于所有系列，因此它包含所有可用字体。否则，family 必须是字符串；  它可能包含通配符 <code>？</code>   和 ’*’。
+</p>
+<p>该列表描述了该帧所在的显示；  如果 frame 被省略或为零，则它适用于所选帧的显示（请参阅输入焦点）。
+</p>
+<p>列表中的每个元素都是以下形式的向量：
+</p>
+<div class="lisp">
+<pre class="lisp">[family width point-size weight slant
+ fixed-p full registry-and-encoding]
+</pre></div>
+<p>前五个元素对应面属性；  如果您为面指定这些属性，它将使用此字体。
+</p>
+<p>最后三个元素提供有关字体的附加信息。如果字体是固定间距的，则 fixed-p 不为零。full 是字体的全名，registry-and-encoding 是一个字符串，给出了字体的注册和编码。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.12.11_字体集.html">字体集</a>, Previous: <a href="40.12.9_字体选择.html">字体选择</a>, Up: <a href="40.12_面.html">面.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

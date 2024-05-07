@@ -1,0 +1,30 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.14 自动填充</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">33.14 自动填充</h2>
+<div class="nav-panel"><p>Next: <a href="33.15_文本排序.html">文本排序</a>, Previous: <a href="33.13_自适应填充模式.html">自适应填充模式</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>自动填充模式是一种次要模式，可在插入文本时自动填充行。请参阅 GNU Emacs 手册中的自动填充。本节介绍自动填充模式使用的一些变量。有关可以显式调用以填充和对齐现有文本的函数的描述，请参阅填充。
+</p>
+<p>自动填充模式还启用了更改边距和对齐样式以重新填充部分文本的功能。请参阅填充边距。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: auto-fill-function ¶
+</pre></div>
+<p>这个缓冲区局部变量的值应该是一个函数（无参数），在自插入表 auto-fill-chars 中的一个字符后调用，见下文。它可能是 nil，在这种情况下没有什么特别的。
+</p>
+<p>当启用自动填充模式时，auto-fill-function 的值为 do-auto-fill。这是一个函数，其唯一目的是实现断线的常用策略。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: normal-auto-fill-function ¶
+</pre></div>
+<p>此变量指定用于自动填充功能的函数，如果和何时打开自动填充。主要模式可以为此变量设置缓冲区本地值，以改变自动填充的工作方式。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: auto-fill-chars ¶
+</pre></div>
+<p>自插入时调用自动填充功能的字符表 - 大多数语言环境中的空格和换行符。他们在表中有一个条目 t。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: comment-auto-fill-only-comments ¶
+</pre></div>
+<p>这个变量，如果非零，意味着只在注释中自动填充行。更准确地说，这意味着如果为当前缓冲区定义了注释语法，那么在注释之外自插入字符将不会调用自动填充函数。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.15_文本排序.html">文本排序</a>, Previous: <a href="33.13_自适应填充模式.html">自适应填充模式</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

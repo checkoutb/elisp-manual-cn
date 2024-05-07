@@ -1,0 +1,76 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>2.2 特殊读语法</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">2.2 特殊读语法</h2>
+<div class="nav-panel"><p>Next: <a href="02.3_注释.html">注释</a>, Previous: <a href="02.1_打印表示和读取语法.html">打印表示和读取语法</a>, Up: <a href="02_Lisp_数据类型.html">Lisp_数据类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs Lisp 通过特殊的散列符号表示许多特殊的对象和结构。
+</p>
+<div class="lisp">
+<pre class="lisp">‘#&lt;…&gt;’
+</pre></div>
+<p>没有读取语法的对象是这样显示的（请参阅 Printed Representation 和读取语法）。
+</p><div class="lisp">
+<pre class="lisp">‘##’
+</pre></div>
+<p>名称为空字符串的内部符号的打印表示形式（请参阅符号类型）。
+</p><div class="lisp">
+<pre class="lisp">‘#'’
+</pre></div>
+<p>这是函数的快捷方式，请参阅匿名函数。
+</p><div class="lisp">
+<pre class="lisp">‘#:’
+</pre></div>
+<p>名称为 foo 的非内部符号的打印表示是 ’#:foo’（请参阅符号类型）。
+</p><div class="lisp">
+<pre class="lisp">‘#N’
+</pre></div>
+<p>打印循环结构时，此构造用于表示结构循环回到自身的位置，’N’ 是起始列表计数：
+</p><div class="lisp">
+<pre class="lisp">(let ((a (list 1)))
+  (setcdr a a))
+=&gt; (1 . #0)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">‘#N=’
+‘#N#’
+</pre></div>
+<p>’#N=’ 给出对象的名称，而 ’#N#’ 表示该对象，因此在读回对象时，它们将是同一个对象而不是副本（请参阅循环对象的读取语法）。
+</p>
+<div class="lisp">
+<pre class="lisp">‘#xN’
+</pre></div>
+<p>’N’ 表示为十六进制数 (’#x2a’)。
+</p><div class="lisp">
+<pre class="lisp">‘#oN’
+</pre></div>
+<p>’N’ 表示为八进制数 (’#o52’)。
+</p><div class="lisp">
+<pre class="lisp">‘#bN’
+</pre></div>
+<p>’N’ 表示为二进制数 (’#b101010’)。
+</p><div class="lisp">
+<pre class="lisp">‘#(…)’
+</pre></div>
+<p>字符串文本属性（请参阅字符串中的文本属性）。
+</p><div class="lisp">
+<pre class="lisp">‘#^’
+</pre></div>
+<p>一个字符表（请参阅字符表类型）。
+</p><div class="lisp">
+<pre class="lisp">‘#s(hash-table …)’
+</pre></div>
+<p>哈希表（请参阅哈希表类型）。
+</p><div class="lisp">
+<pre class="lisp">‘?C’
+</pre></div>
+<p>一个字符（请参阅基本字符语法）。
+</p>
+<div class="lisp">
+<pre class="lisp">‘#$’
+</pre></div>
+<p>字节编译文件中的当前文件名（请参阅文档字符串和编译）。这并不意味着在 Emacs Lisp 源文件中使用。
+</p>
+<div class="lisp">
+<pre class="lisp">‘#@N’
+</pre></div>
+<p>跳过接下来的 <code>N</code> 个字符（见评论）。这在字节编译文件中使用，并不意味着在 Emacs Lisp 源文件中使用。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="02.3_注释.html">注释</a>, Previous: <a href="02.1_打印表示和读取语法.html">打印表示和读取语法</a>, Up: <a href="02_Lisp_数据类型.html">Lisp_数据类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

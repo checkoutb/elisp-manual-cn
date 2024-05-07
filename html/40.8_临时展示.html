@@ -1,0 +1,140 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.8 临时展示</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">40.8 临时展示</h2>
+<div class="nav-panel"><p>Next: <a href="40.9_叠加.html">叠加</a>, Previous: <a href="40.7_选择性显示.html">选择性显示</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Lisp 程序使用临时显示将输出放入缓冲区，然后将其呈现给用户阅读而不是编辑。许多帮助命令使用此功能。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: with-output-to-temp-buffer buffer-name body… ¶
+</pre></div>
+<p>该函数执行 body 中的表单，同时安排将它们打印的任何输出插入名为 buffer-name 的缓冲区中，如果需要，首先创建该缓冲区，然后进入帮助模式。（参见下面与-temp-buffer-window 类似的表格。）最后，缓冲区显示在某个窗口中，但该窗口未被选中。
+</p>
+<p>如果 body 中的表单没有改变输出缓冲区中的主要模式，因此在它们执行结束时它仍然是帮助模式，那么 with-output-to-temp-buffer 使这个缓冲区在最后是只读的，并且还扫描它以查找函数和变量名称，以使它们成为可点击的交叉引用。有关详细信息，请参阅文档字符串提示，特别是文档字符串中的超链接项目。
+</p>
+<p>字符串 buffer-name 指定临时缓冲区，它不需要已经存在。参数必须是字符串，而不是缓冲区。缓冲区最初被擦除（不询问任何问题），并在 with-output-to-temp-buffer 退出后标记为未修改。
+</p>
+<p>with-output-to-temp-buffer 将标准输出绑定到临时缓冲区，然后评估正文中的表单。默认情况下，使用正文中的 Lisp 输出函数输出到该缓冲区（但回显区域中的屏幕显示和消息，虽然它们是一般意义上的 <code>输出</code> ，但不受影响）。请参阅输出函数。
+</p>
+<p>有几个钩子可用于自定义此构造的行为；  它们在下面列出。
+</p>
+<p>返回正文中最后一个表单的值。
+</p><div class="lisp">
+<pre class="lisp">
+
+---------- Buffer: foo ----------
+ This is the contents of foo.
+---------- Buffer: foo ----------
+
+
+(with-output-to-temp-buffer "foo"
+    (print 20)
+    (print standard-output))
+⇒ #&lt;buffer foo&gt;
+
+---------- Buffer: foo ----------
+
+20
+
+#&lt;buffer foo&gt;
+
+---------- Buffer: foo ----------
+</pre></div>
+<div class="lisp">
+<pre class="lisp">User Option: temp-buffer-show-function ¶
+</pre></div>
+<p>如果此变量不为零，with-output-to-temp-buffer 将其作为函数调用以完成显示帮助缓冲区的工作。该函数有一个参数，即它应该显示的缓冲区。
+</p>
+<p>最好让这个函数像 with-output-to-temp-buffer 一样运行 temp-buffer-show-hook，在 save-selected-window 内并选择选定的窗口和缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: temp-buffer-setup-hook ¶
+</pre></div>
+<p>这个正常的钩子在评估 body 之前由 with-output-to-temp-buffer 运行。当钩子运行时，临时缓冲区是当前的。这个钩子通常设置了一个函数来将缓冲区置于帮助模式。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: temp-buffer-show-hook ¶
+</pre></div>
+<p>这个普通的钩子在显示临时缓冲区后由 with-output-to-temp-buffer 运行。当钩子运行时，临时缓冲区是当前的，并且显示它的窗口被选中。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: with-temp-buffer-window buffer-or-name action quit-function body… ¶
+</pre></div>
+<p>此宏类似于 with-output-to-temp-buffer。与该构造类似，它在安排将其打印的任何输出插入名为 buffer-or-name 的缓冲区并在某个窗口中显示该缓冲区的同时执行主体。但是，与 with-output-to-temp-buffer 不同，它不会自动将该缓冲区切换到帮助模式。
+</p>
+<p>参数 buffer-or-name 指定临时缓冲区。它可以是一个必须已经存在的缓冲区，也可以是一个字符串，在这种情况下，如有必要，将创建一个具有该名称的缓冲区。当 with-temp-buffer-window 退出时，缓冲区被标记为未修改和只读。
+</p>
+<p>此宏不调用 temp-buffer-show-function。相反，它将 action 参数传递给 display-buffer（请参阅选择用于显示缓冲区的窗口）以显示缓冲区。
+</p>
+<p>除非指定了参数 quit-function，否则返回 body 中最后一个表单的值。在这种情况下，使用两个参数调用它：显示缓冲区的窗口和正文的结果。最终的返回值就是退出函数返回的值。
+</p>
+<p>这个宏使用普通的钩子 temp-buffer-window-setup-hook 和 temp-buffer-window-show-hook 来代替 with-output-to-temp-buffer 运行的类似钩子。
+</p>
+<p>接下来描述的两个结构与 with-temp-buffer-window 基本相同，但与指定的不同：
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: with-current-buffer-window buffer-or-name action quit-function &amp;rest body ¶
+</pre></div>
+<p>这个宏类似于 with-temp-buffer-window 但不同的是，它使由 buffer-or-name 指定的缓冲区当前用于运行主体。
+</p>
+<p>显示临时缓冲区的窗口可以使用以下模式适合该缓冲区的大小：
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: temp-buffer-resize-mode ¶
+</pre></div>
+<p>启用此次要模式时，显示临时缓冲区的窗口会自动调整大小以适应其缓冲区的内容。
+</p>
+<p>当且仅当它是专门为缓冲区创建的时，才会调整窗口的大小。特别是，以前显示过另一个缓冲区的窗口不会调整大小。默认情况下，此模式使用 fit-window-to-buffer（请参阅调整窗口大小）来调整大小。您可以通过自定义以下选项 temp-buffer-max-height 和 temp-buffer-max-width 来指定不同的函数。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: temp-buffer-max-height ¶
+</pre></div>
+<p>此选项指定启用 temp-buffer-resize-mode 时显示临时缓冲区的窗口的最大高度（以行为单位）。它也可以是一个被调用来选择这样一个缓冲区的高度的函数。它有一个参数，缓冲区，并且应该返回一个正整数。在调用函数时，选择要调整大小的窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: temp-buffer-max-width ¶
+</pre></div>
+<p>此选项指定启用 temp-buffer-resize-mode 时显示临时缓冲区的窗口的最大宽度（以列为单位）。它也可以是一个被调用来选择这样一个缓冲区的宽度的函数。它有一个参数，缓冲区，并且应该返回一个正整数。在调用函数时，选择要调整大小的窗口。
+</p>
+<p>以下函数使用当前缓冲区进行临时显示：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: momentary-string-display string position &amp;optional char message ¶
+</pre></div>
+<p>此函数会在当前缓冲区的位置暂时显示字符串。它对撤消列表或缓冲区的修改状态没有影响。
+</p>
+<p>瞬时显示一直保持到下一个输入事件。如果下一个输入事件是 char，则 momentary-string-display 会忽略它并返回。否则，该事件将保持缓冲以供后续用作输入。因此，键入 char 将简单地从显示中删除字符串，而键入（例如）Cf 将从显示中删除字符串，然后（可能）向前移动点。默认情况下，参数 char 是一个空格。
+</p>
+<p>momentary-string-display 的返回值没有意义。
+</p>
+<p>如果字符串 string 不包含控制字符，您可以通过创建（然后删除）具有 before-string 属性的覆盖以更通用的方式完成相同的工作。请参见叠加属性。
+</p>
+<p>如果 message 不为 nil，则显示在 echo 区域中，而 string 显示在缓冲区中。如果它是 nil，则默认消息说键入 char 以继续。
+</p>
+<p>    在此示例中，点最初位于第二行的开头：
+    #+begin<em>_src</em> emacs-lisp
+———- Buffer: foo ———-
+This is the contents of foo.
+∗Second line.
+———- Buffer: foo ———-
+</p>
+<p>(momentary-string-display
+  "<strong>**</strong> Important Message! <strong>**</strong>"
+  (point) ?
+  "Type RET when done reading")
+⇒ t
+</p>
+<p>———- Buffer: foo ———-
+This is the contents of foo.
+</p>
+<ol>
+<li>
+Important Message! ****Second line.
+
+
+<p>———- Buffer: foo ———-
+</p>
+<p>———- Echo Area ———-
+Type RET when done reading
+———- Echo Area ———-
+    #+end<em>_src</em>
+</p></li></ol>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.9_叠加.html">叠加</a>, Previous: <a href="40.7_选择性显示.html">选择性显示</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

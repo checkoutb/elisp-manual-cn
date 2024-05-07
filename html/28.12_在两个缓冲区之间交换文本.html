@@ -1,0 +1,21 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>28.12 在两个缓冲区之间交换文本</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">28.12 在两个缓冲区之间交换文本</h2>
+<div class="nav-panel"><p>Next: <a href="28.13_缓冲间隙.html">缓冲间隙</a>, Previous: <a href="28.11_间接缓冲区.html">间接缓冲区</a>, Up: <a href="28_缓冲区.html">缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>专用模式有时需要让用户从同一个缓冲区访问几种截然不同的文本。例如，除了让用户访问文本本身之外，您可能还需要显示缓冲区文本的摘要。
+</p>
+<p>这可以通过多个缓冲区（在用户编辑文本时保持同步）或缩小（参见缩小）来实现。但是这些替代方案有时可能会变得乏味或过于昂贵，特别是如果每​​种类型的文本都需要昂贵的缓冲区全局操作以提供正确的显示和编辑命令。
+</p>
+<p>Emacs 为这种模式提供了另一种工具：您可以使用 buffer-swap-text 在两个缓冲区之间快速交换缓冲区文本。这个函数非常快，因为它不移动任何文本，它只改变缓冲区对象的内部数据结构以指向不同的文本块。使用它，您可以假装一组两个或多个缓冲区实际上是一个虚拟缓冲区，它将所有单独缓冲区的内容保存在一起。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: buffer-swap-text buffer ¶
+</pre></div>
+<p>这个函数交换当前缓冲区的文本和它的参数缓冲区的文本。如果两个缓冲区之一是间接缓冲区（请参阅间接缓冲区）或间接缓冲区的基本缓冲区，它会发出错误信号。
+</p>
+<p>与缓冲区文本相关的所有缓冲区属性也被交换：点和标记的位置、所有标记、覆盖、文本属性、撤消列表、启用多字节字符标志的值（参见启用多字节字符）等。
+</p>
+<p>警告：如果在 save-excursion 表单中调用此函数，则当前缓冲区将在离开表单时设置为 buffer，因为 save-excursion 用于保存位置和缓冲区的标记也将被交换。
+</p>
+<p>如果您在文件访问缓冲区上使用缓冲区交换文本，您应该设置一个挂钩来保存缓冲区的原始文本，而不是它被交换的内容。write-region-annotate-functions 用于此目的。您可能应该在缓冲区中将 buffer-saved-size 设置为 -2，以便与之交换的文本中的更改不会干扰自动保存。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="28.13_缓冲间隙.html">缓冲间隙</a>, Previous: <a href="28.11_间接缓冲区.html">间接缓冲区</a>, Up: <a href="28_缓冲区.html">缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

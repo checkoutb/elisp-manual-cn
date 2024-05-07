@@ -1,0 +1,68 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>8.1 创建哈希表</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">8.1 创建哈希表</h2>
+<div class="nav-panel"><p>Next: <a href="08.2_哈希表访问.html">哈希表访问</a>, Previous: <a href="08_哈希表.html">哈希表</a>, Up: <a href="08_哈希表.html">哈希表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>创建哈希表的主要功能是 make-hash-table。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-hash-table &amp;rest keyword-args ¶
+</pre></div>
+<p>该函数根据指定的参数创建一个新的哈希表。参数应该由交替的关键字（特别识别的特定符号）和对应的值组成。
+</p>
+<p>在 make-hash-table 中有几个关键字是有意义的，但你真正需要知道的只有两个是 :test 和 :weakness。
+</p>
+<p>：测试一下
+</p>
+<p>这指定了此哈希表的键查找方法。默认为 eql；  eq 和 equal 是其他选择：
+</p>
+<p>情商
+</p>
+<p>    如果它们是数字的键，则它们是相同的，也就是说，如果它们的值相等并且两者都是整数或都是浮点数；  否则，两个不同的对象永远不会相同。
+情商
+</p>
+<p>    任何两个不同的 Lisp 对象作为键是不同的。
+平等的
+</p>
+<p>两个 Lisp 对象是相同的，作为键，如果它们根据相等是相等的。
+</p>
+<p>     您可以使用 define-hash-table-test（请参阅定义哈希比较）来定义测试的其他可能性。
+:弱点弱
+</p>
+<p>哈希表的弱点指定哈希表中存在的键或值是否会使其免受垃圾收集。
+</p>
+<p>弱值必须是 nil、key、value、key-or-value、key-and-value 或 t 之一，它是 key-and-value 的别名。如果弱是键，则哈希表不会阻止其键被作为垃圾收集（如果它们没有在其他任何地方引用）；  如果确实收集了特定的键，则从哈希表中删除相应的关联。
+</p>
+<p>如果弱值是值，则哈希表不会阻止值被作为垃圾收集（如果它们没有在其他任何地方引用）；  如果确实收集了特定值，则从哈希表中删除相应的关联。
+</p>
+<p>如果 weak 是 key-and-value 或 t，则 key 和 value 都必须处于活动状态才能保持关联。因此，哈希表不保护键或值免受垃圾收集；  如果其中任何一个被作为垃圾收集，则删除关联。
+</p>
+<p>如果weak 是key-or-value，则key 或value 都可以保留关联。因此，当关联的键和值都被作为垃圾收集时（如果不是来自弱哈希表的引用），关联就会从哈希表中删除。
+</p>
+<p>     weak 的默认值是 nil，因此哈希表中引用的所有键和值都不会被垃圾回收。
+:size 大小
+</p>
+<p>这指定了您计划在哈希表中存储多少关联的提示。如果您知道大概的数字，您可以通过这种方式指定它来提高效率。如果您指定的大小太小，哈希表会在必要时自动增长，但这样做需要一些额外的时间。
+</p>
+<p>     默认大小为 65。
+:rehash-size rehash-size
+</p>
+<p>当您向哈希表添加关联并且该表已满时，它会自动增长。该值指定当时如何使哈希表变大。
+</p>
+<p>如果 rehash-size 是一个整数，它应该是正数，并且哈希表会通过在标称大小上增加大约那么多来增长。如果 rehash-size 是浮点数，它最好大于 1，并且哈希表通过将旧大小乘以大约该数字来增长。
+</p>
+<p>     默认值为 1.5。
+:rehash-threshold 阈值
+</p>
+<p>这指定了哈希表何时满的标准（因此它应该更大）。值 threshold 应该是一个不大于 1 的正浮点数。只要条目的实际数量超过标称大小乘以该值的近似值，哈希表就已满。阈值的默认值为 0.8125。
+</p>
+<p>您还可以使用散列表的打印表示来创建散列表。Lisp 阅读器可以读取此打印表示，前提是指定哈希表中的每个元素都具有有效的读取语法（请参阅打印表示和读取语法）。例如，下面指定了一个哈希表，其中包含分别与 val1（一个符号）和 300（一个数字）相关联的键 key1 和 key2（两个符号）。
+</p>
+<div class="lisp">
+<pre class="lisp">#s(hash-table size 30 data (key1 val1 key2 300))
+</pre></div>
+<p>但是请注意，当在 Emacs Lisp 代码中使用它时，它是否会创建一个新的哈希表是未定义的。如果你想创建一个新的哈希表，你应该总是使用 make-hash-table（参见自我评估表格）。
+</p>
+<p>哈希表的打印表示由~ #s~ 后跟以~ 哈希表~ 开头的列表组成。列表的其余部分应包含零个或多个属性值对，指定哈希表的属性和初始内容。属性和值按字面意思阅读。有效的属性名称是 size、test、weakness、rehash-size、rehash-threshold 和 data。data 属性应该是初始内容的键值对列表；  其他属性与上述匹配的生成哈希表关键字（:size、:test 等）具有相同的含义。
+</p>
+<p>请注意，您不能指定一个哈希表，其初始内容包括没有读取语法的对象，例如缓冲区和帧。此类对象可以在创建后添加到哈希表中。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="08.2_哈希表访问.html">哈希表访问</a>, Previous: <a href="08_哈希表.html">哈希表</a>, Up: <a href="08_哈希表.html">哈希表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,18 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.7.8 运动事件</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">22.7.8 运动事件</h3>
+<div class="nav-panel"><p>Next: <a href="22.7.9_焦点事件.html">焦点事件</a>, Previous: <a href="22.7.7_重复事件.html">重复事件</a>, Up: <a href="22.7_输入事件.html">输入事件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 有时会生成鼠标运动事件来描述没有任何按钮活动的鼠标运动。鼠标运动事件由如下所示的列表表示：
+</p>
+<div class="lisp">
+<pre class="lisp">(mouse-movement POSITION)
+</pre></div>
+<p>position 是一个鼠标位置列表（请参阅单击事件），指定鼠标光标的当前位置。与拖动事件的结束位置一样，此位置列表可能表示初始选定帧边界之外的位置，在这种情况下，列表包含该帧而不是窗口。
+</p>
+<p>特殊形式的跟踪鼠标可以在其体内生成运动事件。在跟踪鼠标形式之外，Emacs 不会仅仅为鼠标的运动生成事件，并且这些事件不会出现。请参阅鼠标跟踪。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: mouse-fine-grained-tracking ¶
+</pre></div>
+<p>当非零时，即使是非常小的移动也会生成鼠标运动事件。否则，只要鼠标光标仍然指向文本中的相同字形，就不会生成运动事件。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.7.9_焦点事件.html">焦点事件</a>, Previous: <a href="22.7.7_重复事件.html">重复事件</a>, Up: <a href="22.7_输入事件.html">输入事件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

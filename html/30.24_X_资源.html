@@ -1,0 +1,44 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>30.24 X 资源</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">30.24 X 资源</h2>
+<div class="nav-panel"><p>Next: <a href="30.25_显示功能测试.html">显示功能测试</a>, Previous: <a href="30.23_文本终端颜色.html">文本终端颜色</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍一些用于查询和使用 X 资源的函数和变量，或者它们在您的操作系统上的等价物。有关 X 资源的更多信息，请参阅 GNU Emacs 手册中的 X 资源。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: x-get-resource attribute class &amp;optional component subclass ¶
+</pre></div>
+<p>函数 x-get-resource 从 X Window 默认数据库中检索资源值。
+</p>
+<p>资源由键和类的组合来索引。该函数使用 <code>instance.attribute</code> 形式的键（其中instance 是调用Emacs 的名称）进行搜索，并使用 <code>Emacs.class</code> 作为类。
+</p>
+<p>可选参数组件和子类分别添加到键和类。您必须同时指定它们或都不指定。如果你指定它们，键是’instance.component.attribute’，类是’Emacs.class.subclass’。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: x-resource-class ¶
+</pre></div>
+<p>此变量指定 x-get-resource 应查找的应用程序名称。默认值为 <code>Emacs</code> 。您可以通过将此变量绑定到某个其他字符串（围绕对 x-get-resource 的调用）来检查其他应用程序名称的 X 资源。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: x-resource-name ¶
+</pre></div>
+<p>此变量指定 x-get-resource 应查找的实例名称。默认值是调用 Emacs 时使用的名称，或者是使用 <code>-name</code> 或 <code>-rn</code> 开关指定的值。
+</p>
+<p>为了说明上述一些内容，假设您有以下行：
+</p><div class="lisp">
+<pre class="lisp">xterm.vt100.background: yellow
+</pre></div>
+<p>在您的 X 资源文件中（其名称通常为 ~/.Xdefaults 或 ~/.Xresources）。然后：
+</p><div class="lisp">
+<pre class="lisp">(let ((x-resource-class "XTerm") (x-resource-name "xterm"))
+  (x-get-resource "vt100.background" "VT100.Background"))
+     ⇒ "yellow"
+
+(let ((x-resource-class "XTerm") (x-resource-name "xterm"))
+  (x-get-resource "background" "VT100" "vt100" "Background"))
+     ⇒ "yellow"
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Variable: inhibit-x-resources ¶
+</pre></div>
+<p>如果这个变量不为nil，Emacs 不会查找X 资源，X 资源在创建新帧时没有任何作用。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="30.25_显示功能测试.html">显示功能测试</a>, Previous: <a href="30.23_文本终端颜色.html">文本终端颜色</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

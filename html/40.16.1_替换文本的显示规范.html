@@ -1,0 +1,22 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.16.1 替换文本的显示规范</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.16.1 替换文本的显示规范</h3>
+<div class="nav-panel"><p>Next: <a href="40.16.2_指定空间.html">指定空间</a>, Previous: <a href="40.16_display财产.html">display财产</a>, Up: <a href="40.16_display财产.html">display财产.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>某些类型的显示规范指定要显示的内容而不是具有该属性的文本。这些被称为替换显示规范。Emacs 不允许用户以交互方式将点移动到以这种方式替换的缓冲区文本的中间。
+</p>
+<p>如果显示规范列表包含多个替换显示规范，则第一个替换显示规范。更换显示器规格会使大多数其他显示器规格无关紧要，因为这些规格不适用于更换。
+</p>
+<p>对于替换显示规范，具有属性的文本是指具有相同 Lisp 对象作为其显示属性的所有连续字符；  这些字符被替换为一个单元。如果两个字符有不同的 Lisp 对象作为它们的显示属性（即，不是 eq 的对象），它们将分别处理。
+</p>
+<p>这是一个说明这一点的例子。字符串用作替换显示规范，它将具有该属性的文本替换为指定的字符串（请参阅其他显示规范）。考虑以下函数：
+</p>
+<div class="lisp">
+<pre class="lisp">(defun foo ()
+  (dotimes (i 5)
+    (let ((string (concat "A"))
+          (start (+ i i (point-min))))
+      (put-text-property start (1+ start) 'display string)
+      (put-text-property start (+ 2 start) 'display string))))
+</pre></div>
+<p>此函数为缓冲区中的前十个字符中的每一个提供了一个显示属性，即字符串 <code>A</code> ，但它们并不都获得相同的字符串对象。前两个字符获得相同的字符串对象，因此它们被替换为一个’A’；  显示属性是在对 put-text-property 的两个单独调用中分配的这一事实无关紧要。类似地，接下来的两个字符得到第二个字符串（concat 创建一个新的字符串对象），因此它们被替换为一个 ’A’；  等等。因此，十个字符显示为五个 A。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.16.2_指定空间.html">指定空间</a>, Previous: <a href="40.16_display财产.html">display财产</a>, Up: <a href="40.16_display财产.html">display财产.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

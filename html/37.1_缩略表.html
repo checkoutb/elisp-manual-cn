@@ -1,0 +1,47 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>37.1 缩略表</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">37.1 缩略表</h2>
+<div class="nav-panel"><p>Next: <a href="37.2_定义缩写.html">定义缩写</a>, Previous: <a href="37_缩写和缩写扩展.html">缩写和缩写扩展</a>, Up: <a href="37_缩写和缩写扩展.html">缩写和缩写扩展.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍如何创建和操作缩写表。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-abbrev-table &amp;optional props ¶
+</pre></div>
+<p>该函数创建并返回一个新的空缩写表——一个不包含符号的 obarray。它是一个用零填充的向量。props 是应用于新表的属性列表（请参阅 Abbrev Table Properties）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: abbrev-table-p object ¶
+</pre></div>
+<p>如果 object 是缩写表，则此函数返回非 nil 值。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: clear-abbrev-table abbrev-table ¶
+</pre></div>
+<p>此函数取消定义 abbrev-table 中的所有缩写，使其为空。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: copy-abbrev-table abbrev-table ¶
+</pre></div>
+<p>此函数返回 abbrev-table 的副本——一个包含相同缩写定义的新缩写表。它不复制任何属性列表；  只有名称、值和函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: define-abbrev-table tabname definitions &amp;optional docstring &amp;rest props ¶
+</pre></div>
+<p>该函数将tabname（一个符号）定义为一个缩写表名，即作为一个变量，其值为一个缩写表。它根据定义在表中定义了缩写，一个元素列表的形式（缩写名展开[hook][props…]）。这些元素作为参数传递给define-abbrev。
+</p>
+<p>可选字符串 docstring 是变量 tabname 的文档字符串。属性列表 props 应用于缩写表（请参阅缩写表属性）。
+</p>
+<p>如果为同一个选项卡名多次调用此函数，则后续调用会将定义中的定义添加到选项卡名，而不是覆盖整个原始内容。（后续调用仅覆盖定义中显式重新定义或未定义的缩写。）
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: abbrev-table-name-list ¶
+</pre></div>
+<p>这是一个符号列表，其值为缩写表。define-abbrev-table 将新的缩写表名称添加到此列表中。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: insert-abbrev-table-description name &amp;optional human ¶
+</pre></div>
+<p>此函数在点之前插入名为 name 的缩写表的描述。参数名称是一个符号，其值为一个缩写表。
+</p>
+<p>如果 human 不是 nil，则描述是面向人的。系统缩写会这样列出和标识。否则，描述是一个 Lisp 表达式——对 define-abbrev-table 的调用，它将按照当前定义的方式定义名称，但没有系统缩写。（使用名称的模式或包应该将这些添加到单独的名称中。）
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="37.2_定义缩写.html">定义缩写</a>, Previous: <a href="37_缩写和缩写扩展.html">缩写和缩写扩展</a>, Up: <a href="37_缩写和缩写扩展.html">缩写和缩写扩展.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

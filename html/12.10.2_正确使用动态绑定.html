@@ -1,0 +1,19 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>12.10.2 正确使用动态绑定</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">12.10.2 正确使用动态绑定</h3>
+<div class="nav-panel"><p>Next: <a href="12.10.3_词法绑定.html">词法绑定</a>, Previous: <a href="12.10.1_动态绑定.html">动态绑定</a>, Up: <a href="12.10_变量绑定的作用域规则.html">变量绑定的作用域规则.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>动态绑定是一项强大的功能，因为它允许程序引用未在其本地文本范围内定义的变量。但是，如果不加约束地使用，这也会使程序难以理解。有两种干净的方法可以使用此技术：
+</p>
+<p>如果变量没有全局定义，则仅在绑定构造中将其用作局部变量，例如绑定变量的 let 表单的主体。如果在整个程序中始终遵循此约定，则变量的值将不会影响，也不会受到程序其他地方对相同变量符号的任何使用的影响。
+否则，使用 defvar、defconst（请参阅定义全局变量）或 defcustom（请参阅定义自定义变量）定义变量。通常，定义应该位于 Emacs Lisp 文件的顶层。它应尽可能包含一个解释变量含义和用途的文档字符串。您还应该选择变量的名称以避免名称冲突（请参阅 Emacs Lisp 编码约定）。
+</p>
+<p>然后你可以在程序的任何地方绑定变量，可靠地知道效果会是什么。无论您在哪里遇到变量，都可以很容易地返回定义，例如，通过 Ch v 命令（假设变量定义已加载到 Emacs 中）。请参阅 GNU Emacs 手册中的名称帮助。
+</p>
+<p>例如，通常将本地绑定用于可自定义的变量，例如 case-fold-search：
+</p>
+<div class="lisp">
+<pre class="lisp">(defun search-for-abc ()
+  "Search for the string \"abc\", ignoring case differences."
+  (let ((case-fold-search t))
+    (re-search-forward "abc")))
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="12.10.3_词法绑定.html">词法绑定</a>, Previous: <a href="12.10.1_动态绑定.html">动态绑定</a>, Up: <a href="12.10_变量绑定的作用域规则.html">变量绑定的作用域规则.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

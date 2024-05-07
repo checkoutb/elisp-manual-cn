@@ -1,0 +1,53 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>19.2.14 外部环境</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">19.2.14 外部环境</h3>
+<div class="nav-panel"><p>Next: <a href="19.2.15_调试和宏.html">调试和宏</a>, Previous: <a href="19.2.13_覆盖测试.html">覆盖测试</a>, Up: <a href="19.2_调试.html">调试.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Edebug 试图对您正在调试的程序透明，但它并没有完全成功。当您使用 e 或评估列表缓冲区评估表达式时，Edebug 也会通过临时恢复外部上下文来尝试保持透明。本节准确解释了 Edebug 恢复了什么上下文，以及 Edebug 如何无法完全透明。
+</p>
+<ol>
+<li>
+19.2.14.1 检查是否停止
+
+
+<p>每当进入 Edebug 时，它甚至需要在决定是否制作跟踪信息或停止程序之前保存和恢复某些数据。
+</p>
+<p>max-lisp-eval-depth（参见 Eval）和 max-specpdl-size（参见局部变量）都增加以减少 Edebug 对堆栈的影响。但是，在使用 Edebug 时，您仍然可能会用完堆栈空间。如果 Edebug 达到包含非常大的引用列表的递归深度检测代码的限制，您还可以扩大 edebug-max-depth 的值。
+键盘宏执行的状态被保存和恢复。当 Edebug 处于活动状态时，executing-kbd-macro 绑定为 nil，除非 edebug-continue-kbd-macro 为非 nil。
+</p>
+</li><li>
+19.2.14.2 调试显示更新
+
+
+<p>当 Edebug 需要显示某些东西时（例如，在跟踪模式下），它会从 Edebug 外部保存当前窗口配置（请参阅窗口配置）。当您退出 Edebug 时，它会恢复之前的窗口配置。
+</p>
+<p>Emacs 只有在暂停时才会重新显示。通常，当您继续执行时，程序会在断点处或单步执行后重新进入 Edebug，而不会在其间暂停或读取输入。在这种情况下，Emacs 永远没有机会重新显示外部配置。因此，您所看到的窗口配置与上次 Edebug 处于活动状态时相同，没有中断。
+</p>
+<p>进入 Edebug 以显示某些内容也会保存和恢复以下数据（尽管如果出现错误或退出信号，其中一些是故意不恢复的）。
+</p>
+<p>保存和恢复当前缓冲区是哪个缓冲区，以及当前缓冲区中的点和标记的位置。
+如果 edebug-save-windows 不为零（请参阅 Edebug 选项），则会保存和恢复外部窗口配置。
+</p>
+<p>窗口配置不会在错误或退出时恢复，但即使在错误或退出时会重新选择外部选定的窗口，以防保存行程处于活动状态。如果 edebug-save-windows 的值为列表，则仅保存和恢复列出的窗口。
+</p>
+<p>但是，源代码缓冲区的窗口开始和水平滚动不会恢复，因此显示在 Edebug 中保持一致。
+如果 edebug-save-displayed-buffer-points 不为零，则保存和恢复每个显示缓冲区中的点值。
+变量 overlay-arrow-position 和 overlay-arrow-string 被保存和恢复，因此您可以安全地从同一缓冲区中其他地方的递归编辑调用 Edebug。
+cursor-in-echo-area 本地绑定到 nil 以便光标显示在窗口中。
+</p>
+</li><li>
+19.2.14.3 Edebug 递归编辑
+
+
+<p>当进入 Edebug 并实际从用户读取命令时，它会保存（并稍后恢复）这些附加数据：
+</p>
+<p>当前匹配数据。请参阅匹配数据。
+变量 last-command、this-command、last-command-event、last-input-event、last-event-frame、last-nonmenu-event 和 track-mouse。Edebug 中的命令不会影响 Edebug 之外的这些变量。
+</p>
+<p>在 Edebug 中执行命令可以更改 this-command-keys 返回的键序列，并且无法从 Lisp 中重置键序列。
+</p>
+<p>Edebug 无法保存和恢复 unread-command-events 的值。在此变量具有重要值时输入 Edebug 可能会干扰您正在调试的程序的执行。
+在 Edebug 中执行的复杂命令被添加到变量 command-history。在极少数情况下，这可能会改变执行。
+在 Edebug 内，递归深度似乎比 Edebug 外的递归深度深一。自动更新的评估列表窗口并非如此。
+递归编辑将标准输出和标准输入绑定为 nil，但 Edebug 会在评估期间临时恢复它们。
+键盘宏定义的状态被保存和恢复。当 Edebug 处于活动状态时，defining-kbd-macro 绑定到 edebug-continue-kbd-macro。
+</p></li></ol>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="19.2.15_调试和宏.html">调试和宏</a>, Previous: <a href="19.2.13_覆盖测试.html">覆盖测试</a>, Up: <a href="19.2_调试.html">调试.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

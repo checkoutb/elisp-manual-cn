@@ -1,0 +1,23 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>42.5 与存档 Web 服务器的接口</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">42.5 与存档 Web 服务器的接口</h2>
+<div class="nav-panel"><p>Next: <a href="前言.html">前言</a>, Previous: <a href="42.4_创建和维护包档案.html">创建和维护包档案</a>, Up: <a href="42_准备分发的Lisp代码.html">准备分发的Lisp代码.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>提供对包存档的访问的 Web 服务器必须支持以下查询：
+</p>
+<div class="lisp">
+<pre class="lisp">archive-contents
+</pre></div>
+<p>返回描述存档内容的 lisp 表单。该表单是一个 <code>package-desc</code> 结构的列表（参见 package.el），除了列表的第一个元素是存档版本。
+</p><div class="lisp">
+<pre class="lisp">&lt;package name&gt;-readme.txt
+</pre></div>
+<p>返回包的详细描述。
+</p><div class="lisp">
+<pre class="lisp">&lt;file name&gt;.sig
+</pre></div>
+<p>返回文件的签名。
+</p><div class="lisp">
+<pre class="lisp">&lt;file name&gt;
+</pre></div>
+<p>返回文件。这将是多文件包的 tarball，或简单包的单个文件。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="前言.html">前言</a>, Previous: <a href="42.4_创建和维护包档案.html">创建和维护包档案</a>, Up: <a href="42_准备分发的Lisp代码.html">准备分发的Lisp代码.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

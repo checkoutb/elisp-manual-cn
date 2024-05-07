@@ -1,0 +1,10 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>2.4.13 功能类型</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">2.4.13 功能类型</h3>
+<div class="nav-panel"><p>Next: <a href="02.4.14_宏类型.html">宏类型</a>, Previous: <a href="02.4.12_哈希表类型.html">哈希表类型</a>, Up: <a href="02.4_编程类型.html">编程类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Lisp 函数是可执行代码，就像其他编程语言中的函数一样。在 Lisp 中，与大多数语言不同，函数也是 Lisp 对象。Lisp 中的非编译函数是 lambda 表达式：即第一个元素是符号 lambda 的列表（请参阅 Lambda 表达式）。
+</p>
+<p>在大多数编程语言中，不可能有没有名称的函数。在 Lisp 中，函数没有内在名称。lambda 表达式可以作为函数调用，即使它没有名称；  为了强调这一点，我们也称它为匿名函数（参见匿名函数）。Lisp 中的命名函数只是一个在其函数单元中具有有效函数的符号（请参阅定义函数）。
+</p>
+<p>大多数时候，当函数的名称以 Lisp 程序中的 Lisp 表达式编写时，就会调用函数。但是，您可以在运行时构造或获取函数对象，然后使用原始函数 funcall 和 apply 调用它。请参阅调用函数。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="02.4.14_宏类型.html">宏类型</a>, Previous: <a href="02.4.12_哈希表类型.html">哈希表类型</a>, Up: <a href="02.4_编程类型.html">编程类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>23.5 继承和键映射</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">23.5 继承和键映射</h2>
+<div class="nav-panel"><p>Next: <a href="23.6_前缀键.html">前缀键</a>, Previous: <a href="23.4_创建键盘映射.html">创建键盘映射</a>, Up: <a href="23_键盘映射.html">键盘映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>一个键映射可以继承另一个键映射的绑定，我们称之为父键映射。这样的键盘映射如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(keymap elements… . parent-keymap)
+</pre></div>
+<p>效果是这个键映射继承了父键映射的所有绑定，无论它们在查找键时可能是什么，但可以添加到它们或用元素覆盖它们。
+</p>
+<p>如果您使用 define-key 或其他键绑定函数更改父键映射中的绑定，则这些更改的绑定在继承键映射中可见，除非被元素所做的绑定遮蔽。反之则不然：如果您使用 define-key 更改继承键映射中的绑定，这些更改会记录在元素中，但对父键映射没有影响。
+</p>
+<p>使用父级构造键映射的正确方法是使用 set-keymap-parent；  如果您有直接使用父级构造键映射的代码，请将程序转换为使用 set-keymap-parent 。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: keymap-parent keymap ¶
+</pre></div>
+<p>这将返回 keymap 的父 keymap。如果 keymap 没有父级，则 keymap-parent 返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-keymap-parent keymap parent ¶
+</pre></div>
+<p>这会将 keymap 的父 keymap 设置为 parent，并返回 parent。如果 parent 为 nil，则此函数根本没有给 keymap 提供父级。
+</p>
+<p>如果键映射具有子映射（前缀键的绑定），它们也会收到新的父键映射，这些键映射反映了父为这些前缀键指定的内容。
+</p>
+<p>下面是一个示例，展示了如何创建一个继承自 text-mode-map 的键盘映射：
+</p><div class="lisp">
+<pre class="lisp">(let ((map (make-sparse-keymap)))
+  (set-keymap-parent map text-mode-map)
+  map)
+</pre></div>
+<p>非稀疏键映射也可以有父级，但这不是很有用。非稀疏键映射总是为每个没有修饰符位的数字字符代码指定一些绑定，即使它是 nil，所以这些字符的绑定永远不会从父键映射继承。
+</p>
+<p>有时你想创建一个从多个地图继承的键映射。您可以为此使用函数 make-composed-keymap 。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-composed-keymap maps &amp;optional parent ¶
+</pre></div>
+<p>此函数返回一个由现有键映射映射组成的新键映射，并且可以选择从父键映射父级继承。maps 可以是单个 keymap 或多个列表。在生成的新映射中查找键时，Emacs 依次在每个映射中搜索，然后在父映射中搜索，在第一个匹配时停止。任何一个映射中的 nil 绑定都会覆盖父映射中的任何绑定，但它不会覆盖任何其他映射中的任何非 nil 绑定。
+</p>
+<p>例如，这里是 Emacs 如何设置 help-mode-map 的父级，以便它继承自 button-buffer-map 和 special-mode-map：
+</p>
+<div class="lisp">
+<pre class="lisp">(defvar help-mode-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map
+      (make-composed-keymap button-buffer-map special-mode-map))
+    ... map) ... )
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="23.6_前缀键.html">前缀键</a>, Previous: <a href="23.4_创建键盘映射.html">创建键盘映射</a>, Up: <a href="23_键盘映射.html">键盘映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

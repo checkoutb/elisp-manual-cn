@@ -1,0 +1,12 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>12.9.1 限制</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">12.9.1 限制</h3>
+<div class="nav-panel"><p>Next: <a href="12.10_变量绑定的作用域规则.html">变量绑定的作用域规则</a>, Previous: <a href="12.9_当变量改变时运行函数。.html">当变量改变时运行函数。</a>, Up: <a href="12.9_当变量改变时运行函数。.html">当变量改变时运行函数。.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>有几种方法可以在不触发观察点的情况下修改（或至少看起来已修改）变量。
+</p>
+<p>由于观察点附加到符号，因此该机制不会捕获对包含在变量中的对象的修改（例如，通过列表修改函数，请参阅修改现有列表结构）。
+</p>
+<p>此外，C 代码可以绕过观察点机制直接修改变量的值。
+</p>
+<p>此功能的一个小限制（同样因为它针对符号）是只能观察动态范围的变量。这没有什么困难，因为可以通过检查变量范围内的代码轻松发现对词法变量的修改（与动态变量不同，动态变量可以由任何代码修改，请参阅变量绑定的范围规则）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="12.10_变量绑定的作用域规则.html">变量绑定的作用域规则</a>, Previous: <a href="12.9_当变量改变时运行函数。.html">当变量改变时运行函数。</a>, Up: <a href="12.9_当变量改变时运行函数。.html">当变量改变时运行函数。.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

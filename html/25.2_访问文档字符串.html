@@ -1,0 +1,152 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>25.2 访问文档字符串</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">25.2 访问文档字符串</h2>
+<div class="nav-panel"><p>Next: <a href="25.3_替换文档中的键绑定.html">替换文档中的键绑定</a>, Previous: <a href="25.1_文档基础.html">文档基础</a>, Up: <a href="25_文档.html">文档.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><div class="lisp">
+<pre class="lisp">Function: documentation-property symbol property &amp;optional verbatim ¶
+</pre></div>
+<p>此函数返回记录在属性属性下的符号属性列表中的文档字符串。它最常用于查找变量的文档字符串，其属性为变量文档。但是，它也可用于查找其他类型的文档，例如自定义组（但对于功能文档，请使用下面的文档功能）。
+</p>
+<p>如果属性值引用存储在 DOC 文件或字节编译文件中的文档字符串，则此函数查找该字符串并返回它。
+</p>
+<p>如果属性值不是 nil，不是字符串，并且不引用文件中的文本，则将其作为 Lisp 表达式求值以获得字符串。
+</p>
+<p>最后，此函数通过substitute-command-keys 传递字符串以替换键绑定（请参阅文档中的替换键绑定）。如果 verbatim 不为零，则跳过此步骤。
+</p>
+<div class="lisp">
+<pre class="lisp">(documentation-property 'command-line-processed
+   'variable-documentation)
+     ⇒ "Non-nil once command line has been processed"
+
+(symbol-plist 'command-line-processed)
+     ⇒ (variable-documentation 188902)
+
+(documentation-property 'emacs 'group-documentation)
+     ⇒ "Customization of the One True Editor."
+
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: documentation function &amp;optional verbatim ¶
+</pre></div>
+<p>此函数返回函数的文档字符串。它处理宏、命名键盘宏、特殊形式以及普通函数。
+</p>
+<p>如果 function 是一个符号，则此函数首先查找该符号的函数文档属性；  如果它具有非零值，则文档来自该值（如果该值不是字符串，则对其进行评估）。
+</p>
+<p>如果 function 不是符号，或者它没有 function-documentation 属性，则文档从实际函数定义中提取文档字符串，如果需要，则从文件中读取它。
+</p>
+<p>最后，除非 verbatim 不是 nil，否则此函数调用替代命令键。结果是要返回的文档字符串。
+</p>
+<p>如果函数没有函数定义，则文档函数会发出 void-function 错误信号。但是，如果函数定义没有文档字符串，也可以。在这种情况下，文档返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: face-documentation face ¶
+</pre></div>
+<p>该函数将人脸的文档字符串作为人脸返回。
+</p>
+<p>下面是使用文档和文档属性这两个函数的示例，用于在 <strong>Help</strong> 缓冲区中显示多个符号的文档字符串。
+</p><div class="lisp">
+<pre class="lisp">(defun describe-symbols (pattern)
+  "Describe the Emacs Lisp symbols matching PATTERN.
+All symbols that have PATTERN in their name are described
+in the *Help* buffer."
+  (interactive "sDescribe symbols matching: ")
+  (let ((describe-func
+         (lambda (s)
+
+           ;; Print description of symbol.
+           (if (fboundp s)             ; It is a function.
+               (princ
+                (format "%s\t%s\n%s\n\n" s
+                  (if (commandp s)
+                      (let ((keys (where-is-internal s)))
+                        (if keys
+                            (concat
+                             "Keys: "
+                             (mapconcat 'key-description
+                                        keys " "))
+                          "Keys: none"))
+                    "Function")
+
+                  (or (documentation s)
+                      "not documented"))))
+
+           (if (boundp s)              ; It is a variable.
+
+               (princ
+                (format "%s\t%s\n%s\n\n" s
+                  (if (custom-variable-p s)
+                      "Option " "Variable")
+
+                  (or (documentation-property
+                        s 'variable-documentation)
+                      "not documented"))))))
+        sym-list)
+
+
+    ;; Build a list of symbols that match pattern.
+    (mapatoms (lambda (sym)
+                (if (string-match pattern (symbol-name sym))
+                    (setq sym-list (cons sym sym-list)))))
+
+
+    ;; Display the data.
+    (help-setup-xref (list 'describe-symbols pattern)
+                 (called-interactively-p 'interactive))
+    (with-help-window (help-buffer)
+      (mapcar describe-func (sort sym-list 'string&lt;)))))
+
+</pre></div>
+<p>describe-symbols 函数的工作方式与 apropos 类似，但提供了更多信息。
+</p>
+<div class="lisp">
+<pre class="lisp">(describe-symbols "goal")
+
+---------- Buffer: *Help* ----------
+goal-column     Option
+Semipermanent goal column for vertical motion, as set by …
+
+
+minibuffer-temporary-goal-position      Variable
+not documented
+
+
+set-goal-column Keys: C-x C-n
+Set the current horizontal position as a goal for C-n and C-p.
+
+Those commands will move to this position in the line moved to
+rather than trying to keep the same horizontal position.
+With a non-nil argument ARG, clears out the goal column
+so that C-n and C-p resume vertical motion.
+The goal column is stored in the variable ‘goal-column’.
+
+(fn ARG)
+
+
+temporary-goal-column   Variable
+Current goal column for vertical motion.
+It is the column where point was at the start of the current run
+of vertical motion commands.
+
+When moving by visual lines via the function ‘line-move-visual’, it is a cons
+cell (COL . HSCROLL), where COL is the x-position, in pixels,
+divided by the default column width, and HSCROLL is the number of
+columns by which window is scrolled from left margin.
+
+When the ‘track-eol’ feature is doing its job, the value is
+‘most-positive-fixnum’.
+---------- Buffer: *Help* ----------
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: Snarf-documentation filename ¶
+</pre></div>
+<p>这个函数在构建 Emacs 时使用，就在可运行的 Emacs 被转储之前。它找到存储在文件 filename 中的文档字符串的位置，并将这些位置记录到函数定义和变量属性列表中的内存中。请参阅构建 Emacs。
+</p>
+<p>Emacs 从 emacs/etc 目录中读取文件 filename。稍后执行转储的 Emacs 时，将在目录 doc-directory 中查找相同的文件。通常文件名是 <code>DOC</code> 。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: doc-directory ¶
+</pre></div>
+<p>该变量包含目录的名称，该目录应包含文件 <code>DOC</code> ，该文件包含内置和预加载函数和变量的文档字符串。
+</p>
+<p>在大多数情况下，这与数据目录相同。当您从构建它的目录运行 Emacs 而不实际安装它时，它们可能会有所不同。请参阅数据目录的定义。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="25.3_替换文档中的键绑定.html">替换文档中的键绑定</a>, Previous: <a href="25.1_文档基础.html">文档基础</a>, Up: <a href="25_文档.html">文档.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

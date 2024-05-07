@@ -1,0 +1,91 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.17.2 主模式控制的缩进</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">33.17.2 主模式控制的缩进</h3>
+<div class="nav-panel"><p>Next: <a href="33.17.3_缩进整个区域.html">缩进整个区域</a>, Previous: <a href="33.17.1_缩进原语.html">缩进原语</a>, Up: <a href="33.17_缩进.html">缩进.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>每个主要模式的一个重要功能是自定义 TAB 键以正确缩进正在编辑的语言。本节介绍 TAB 键的机制以及如何控制它。本节中的函数返回不可预测的值。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: indent-for-tab-command &amp;optional rigid ¶
+</pre></div>
+<p>这是大多数编辑模式下绑定到 TAB 的命令。它通常的动作是缩进当前行，但它也可以插入一个制表符或缩进一个区域。
+</p>
+<p>这是它的作用：
+</p>
+<p>首先，它检查是否启用了瞬态标记模式以及该区域是否处于活动状态。如果是这样，它会调用 indent-region 来缩进该区域中的所有文本（请参阅缩进整个区域）。
+否则，如果 indent-line-function 中的缩进函数是 indent-to-left-margin （插入制表符的简单命令），或者如果变量 tab-always-indent 指定应该插入制表符（见下文），然后它插入一个制表符。
+否则，缩进当前行；  这是通过调用 indent-line-function 中的函数来完成的。如果该行已经缩进，并且 tab-always-indent 的值是完整的（见下文），它会尝试完成该点的文本。
+</p>
+<p>如果rigid 是非nil（交互式，带有前缀参数），那么在该命令缩进一行或插入一个制表符后，它也会刚性缩进从当前行开头开始的整个平衡表达式，以反映新的缩进。如果命令缩进区域，则忽略此参数。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: indent-line-function ¶
+</pre></div>
+<p>这个变量的值是 indent-for-tab-command 和其他各种缩进命令用来缩进当前行的函数。通常由主模式分配；  例如，Lisp 模式将其设置为 lisp-indent-line，C 模式将其设置为 c-indent-line，等等。默认值是相对缩进。请参阅代码的自动缩进。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: indent-according-to-mode ¶
+</pre></div>
+<p>该命令调用 indent-line-function 中的函数以适合当前主要模式的方式缩进当前行。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: newline-and-indent ¶
+</pre></div>
+<p>此函数插入​​换行符，然后根据主要模式缩进新行（刚插入的换行符之后的行）。它通过调用 indent-according-to-mode 来进行缩进。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: reindent-then-newline-and-indent ¶
+</pre></div>
+<p>此命令重新缩进当前行，在点处插入换行符，然后缩进新行（刚刚插入的换行符之后的行）。它通过调用 indent-according-to-mode 在两行上进行缩进。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: tab-always-indent ¶
+</pre></div>
+<p>此变量可用于自定义 TAB（indent-for-tab-command）命令的行为。如果值为 t（默认值），该命令通常只缩进当前行。如果值为 nil，则仅当 point 位于左边距或行的缩进中时，命令才会缩进当前行；  否则，它会插入一个制表符。如果该值是完整的，该命令首先尝试缩进当前行，如果该行已经缩进，它调用completion-at-point 来完成该点的文本（参见普通缓冲区中的完成）。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: tab-first-completion ¶
+</pre></div>
+<p>如果 tab-always-indent 是完整的，是否展开或缩进可以通过 tab-first-completion 变量进一步自定义。可以使用以下值：
+</p>
+<div class="lisp">
+<pre class="lisp">eol
+</pre></div>
+<p>仅当点位于行尾时才完成。
+</p><div class="lisp">
+<pre class="lisp">word
+</pre></div>
+<p>除非下一个字符具有单词语法，否则完成。
+</p><div class="lisp">
+<pre class="lisp">word-or-paren
+</pre></div>
+<p>完成，除非下一个字符具有单词语法或括号。
+</p><div class="lisp">
+<pre class="lisp">word-or-paren-or-punct
+</pre></div>
+<p>完整，除非下一个字符具有单词语法，或者是括号，或者是标点符号。
+</p>
+<p>在任何情况下，再次键入 TAB 总是会导致完成。
+</p>
+<p>一些主要模式需要支持其语法属于不同主要模式的嵌入文本区域。示例包括结合文档和源代码片段的文学编程源文件，包含 Python 或 JS 代码片段的 Yacc/Bison 程序等。为了正确缩进嵌入的块，主要模式需要将缩进委托给另一个模式的缩进引擎（例如，为 JS 代码调用 js-indent-line 或为 Python 调用 python-indent-line），同时为其提供一些上下文来指导缩进。就主要模式而言，应避免在其缩进代码中调用 widen 并遵守 prog-first-column。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: prog-indentation-context ¶
+</pre></div>
+<p>这个变量，当非零时，保存由高级主模式提供的子模式的缩进引擎的缩进上下文。该值应为 (first-column.rest) 形式的列表。列表的成员具有以下含义：
+</p>
+<div class="lisp">
+<pre class="lisp">first-column
+</pre></div>
+<p>用于顶级构造的列。这将替换子模式使用的顶级列的默认值，通常为零。
+</p><div class="lisp">
+<pre class="lisp">rest
+</pre></div>
+<p>该值当前未使用。
+</p>
+<p>主要模式的缩进引擎应使用以下便利功能，以支持作为另一个主要模式的子模式的调用。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: prog-first-column ¶
+</pre></div>
+<p>调用此函数而不是使用列号的文字值（通常为零）来缩进顶级程序结构。该函数的值是用于顶级构造的列号。当没有高级模式生效时，此函数返回零。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.17.3_缩进整个区域.html">缩进整个区域</a>, Previous: <a href="33.17.1_缩进原语.html">缩进原语</a>, Up: <a href="33.17_缩进.html">缩进.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

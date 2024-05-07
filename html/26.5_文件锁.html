@@ -1,0 +1,69 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>26.5 文件锁</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">26.5 文件锁</h2>
+<div class="nav-panel"><p>Next: <a href="26.6_文件信息.html">文件信息</a>, Previous: <a href="26.4_写入文件.html">写入文件</a>, Up: <a href="26_文件.html">文件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当两个用户同时编辑同一个文件时，他们很可能会相互干扰。Emacs 试图通过在文件被修改时记录文件锁来防止这种情况的发生。然后，Emacs 可以检测到第一次尝试修改访问被另一个 Emacs 作业锁定的文件的缓冲区的尝试，并询问用户要做什么。文件锁实际上是一个文件，一个具有特殊名称的符号链接，存储在与您正在编辑的文件相同的目录中。该名称是通过将 .# 附加到缓冲区的文件名来构造的。符号链接的目标将采用 user@host.pid:boot 形式，其中 user 替换为当前用户名（来自 user-login-name），host 替换为运行 Emacs 的主机的名称（来自系统-name)，带有 Emacs 进程 ID 的 pid，以及自上次重启以来的启动时间。如果引导时间不可用，则省略 :boot。（在不支持符号链接的文件系统上，将使用常规文件，其内容格式为 user@host.pid:boot。）
+</p>
+<p>当您使用 NFS 访问文件时，您和其他用户可能同时锁定同一个文件的可能性很小。如果发生这种情况，两个用户有可能同时进行更改，但 Emacs 仍然会警告第二个保存的用户。此外，检测访问磁盘上已更改文件的缓冲区的修改会捕获一些同时编辑的情况；  请参阅缓冲区修改时间。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-locked-p filename ¶
+</pre></div>
+<p>如果文件文件名未锁定，则此函数返回 nil。如果它被这个 Emacs 进程锁定，它返回 t，如果它被其他作业锁定，它返回锁定它的用户的名称。
+</p><div class="lisp">
+<pre class="lisp">
+
+(file-locked-p "foo")
+     ⇒ nil
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: lock-buffer &amp;optional filename ¶
+</pre></div>
+<p>如果当前缓冲区被修改，此函数将锁定文件文件名。参数文件名默认为当前缓冲区的访问文件。如果当前缓冲区没有访问文件，或者没有被修改，或者选项 create-lockfiles 为 nil，则什么都不做。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: unlock-buffer ¶
+</pre></div>
+<p>如果缓冲区被修改，此函数将解锁当前缓冲区中正在访问的文件。如果缓冲区没有被修改，那么文件不应该被锁定，所以这个函数什么都不做。如果当前缓冲区没有访问文件或未锁定，它也不会执行任何操作。此函数通过调用 display-warning 来处理文件系统错误，否则忽略错误。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: create-lockfiles ¶
+</pre></div>
+<p>如果这个变量是 nil，Emacs 不会锁定文件。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: lock-file-name-transforms ¶
+</pre></div>
+<p>默认情况下，Emacs 在与被锁定文件相同的目录中创建锁定文件。这可以通过自定义此变量来更改。Is 与 auto-save-file-name-transforms 具有相同的语法（请参阅自动保存）。例如，要让 Emacs 将所有锁定文件写入 /var/tmp/，你可以这样说：
+</p><div class="lisp">
+<pre class="lisp">(setq lock-file-name-transforms
+      '(("\\`/.*/\\([^/]+\\)\\'" "/var/tmp/\\1" t)))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: ask-user-about-lock file other-user ¶
+</pre></div>
+<p>当用户试图修改文件时调用此函数，但它被另一个名为 other-user 的用户锁定。此函数的默认定义要求用户说出要做什么。这个函数返回的值决定了 Emacs 下一步做什么：
+</p>
+<p>t 值表示要获取文件上的锁。然后这个用户可以编辑文件而其他用户失去锁定。
+nil 值表示忽略锁定并让该用户无论如何编辑文件。
+此函数可能会发出文件锁定错误的信号，在这种情况下，用户将要进行的更改不会发生。
+</p>
+<p>此错误的错误消息如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">error→ File is locked: file other-user
+</pre></div>
+<p>其中 file 是文件名， other-user 是锁定文件的用户名。
+</p>
+<p>如果您愿意，您可以用您自己的版本替换 ask-user-about-lock 功能，以另一种方式做出决定。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: remote-file-name-inhibit-locks ¶
+</pre></div>
+<p>您可以通过将变量 remote-file-name-inhibit-locks 设置为 t 来阻止创建远程锁定文件。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: lock-file-mode ¶
+</pre></div>
+<p>此命令以交互方式调用，切换当前缓冲区中 create-lockfiles 的本地值。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="26.6_文件信息.html">文件信息</a>, Previous: <a href="26.4_写入文件.html">写入文件</a>, Up: <a href="26_文件.html">文件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

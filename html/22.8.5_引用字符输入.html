@@ -1,0 +1,26 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.8.5 引用字符输入</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">22.8.5 引用字符输入</h3>
+<div class="nav-panel"><p>Next: <a href="22.8.6_杂项事件输入功能.html">杂项事件输入功能</a>, Previous: <a href="22.8.4_调用输入法.html">调用输入法</a>, Up: <a href="22.8_读数输入.html">读数输入.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>您可以使用函数 read-quoted-char 要求用户指定一个字符，并允许用户方便地指定一个控件或元字符，无论是字面还是八进制字符代码。命令quoted-insert 使用此功能。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: read-quoted-char &amp;optional prompt ¶
+</pre></div>
+<p>此函数与 read-char 类似，只是如果读取的第一个字符是八进制数字 (0-7)，它会读取任意数量的八进制数字（但如果找到非八进制数字则停止），并返回表示的字符通过那个数字字符代码。如果终止八进制数字序列的字符是 RET，则将其丢弃。此函数返回后，任何其他终止字符都将用作输入。
+</p>
+<p>读取第一个字符时会抑制退出，以便用户可以输入 Cg。请参阅退出。
+</p>
+<p>如果提供了提示，则它指定一个用于提示用户的字符串。提示字符串始终显示在回显区域中，后跟一个 <code>-</code> 。
+</p>
+<p>在以下示例中，用户键入八进制数 177（十进制为 127）。
+</p><div class="lisp">
+<pre class="lisp">(read-quoted-char "What character")
+
+---------- Echo Area ----------
+What character 1 7 7-
+---------- Echo Area ----------
+
+     ⇒ 127
+
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.8.6_杂项事件输入功能.html">杂项事件输入功能</a>, Previous: <a href="22.8.4_调用输入法.html">调用输入法</a>, Up: <a href="22.8_读数输入.html">读数输入.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

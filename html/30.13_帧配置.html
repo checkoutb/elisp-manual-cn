@@ -1,0 +1,18 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>30.13 帧配置</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">30.13 帧配置</h2>
+<div class="nav-panel"><p>Next: <a href="30.14_子帧.html">子帧</a>, Previous: <a href="30.12_提升、降低和重新堆叠帧.html">提升、降低和重新堆叠帧</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>帧配置记录了帧的当前排列、它们的所有属性以及每个帧的窗口配置。（请参阅窗口配置。）
+</p>
+<div class="lisp">
+<pre class="lisp">Function: current-frame-configuration ¶
+</pre></div>
+<p>此函数返回一个帧配置列表，该列表描述了帧的当前排列及其内容。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-frame-configuration configuration &amp;optional nodelete ¶
+</pre></div>
+<p>此函数恢复配置中描述的帧的状态。但是，此功能不会恢复已删除的帧。
+</p>
+<p>通常，此功能会删除所有未在配置中列出的现有帧。但如果 nodelete 不为零，则将不需要的帧图标化。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="30.14_子帧.html">子帧</a>, Previous: <a href="30.12_提升、降低和重新堆叠帧.html">提升、降低和重新堆叠帧</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

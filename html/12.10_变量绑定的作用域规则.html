@@ -1,0 +1,12 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>12.10 变量绑定的作用域规则</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">12.10 变量绑定的作用域规则</h2>
+<div class="nav-panel"><p>Next: <a href="12.10.1_动态绑定.html">动态绑定</a>, Previous: <a href="12.9.1_限制.html">限制</a>, Up: <a href="12_变量.html">变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当您为变量创建局部绑定时，该绑定仅在程序的有限部分内生效（请参阅局部变量）。本节准确描述了这意味着什么。
+</p>
+<p>每个本地绑定都有一定的范围和程度。范围是指在文本源代码中可以访问绑定的位置。范围是指当程序执行时，绑定存在的时间。
+</p>
+<p>默认情况下，Emacs 创建的本地绑定是动态绑定。这种绑定具有动态范围，这意味着程序的任何部分都可以潜在地访问变量绑定。它还具有动态范围，这意味着绑定仅在绑定构造（例如 let 表单的主体）正在执行时才持续。
+</p>
+<p>Emacs 可以选择创建词法绑定。词法绑定具有词法范围，这意味着对变量的任何引用都必须以文本形式位于绑定结构中9。它还具有不确定的范围，这意味着在某些情况下，即使在绑定构造完成执行之后，绑定也可以通过称为闭包的特殊对象继续存在。
+</p>
+<p>以下小节更详细地描述了动态绑定和词法绑定，以及如何在 Emacs Lisp 程序中启用词法绑定。
+</p>
+<div class="nav-panel"><p>Next: <a href="12.10.1_动态绑定.html">动态绑定</a>, Previous: <a href="12.9.1_限制.html">限制</a>, Up: <a href="12_变量.html">变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

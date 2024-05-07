@@ -1,0 +1,126 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>36.8 类别</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">36.8 类别</h2>
+<div class="nav-panel"><p>Next: <a href="37_缩写和缩写扩展.html">缩写和缩写扩展</a>, Previous: <a href="36.7_语法表内部.html">语法表内部</a>, Up: <a href="36_语法表.html">语法表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>类别提供了另一种按语法对字符进行分类的方法。您可以根据需要定义多个类别，然后将每个字符独立分配给一个或多个类别。与语法类不同，类别不是相互排斥的；  一个字符属于多个类别是正常的。
+</p>
+<p>每个缓冲区都有一个类别表，其中记录了定义了哪些类别以及哪些字符属于每个类别。每个类别表都定义了自己的类别，但通常这些类别是通过从标准类别表中复制来初始化的，因此标准类别在所有模式下都可用。
+</p>
+<p>每个类别都有一个名称，它是 ’ ’ 到 ’~’ 范围内的 ASCII 打印字符。当您使用 define-category 定义类别时，您可以指定类别的名称。
+</p>
+<p>类别表实际上是一个字符表（参见 Char-Tables）。索引 c 处的类别表元素是一个类别集（一个布尔向量），它指示字符 c 属于哪些类别。在这个范畴集中，如果索引 cat 处的元素是 t，则表示范畴 cat 是集合的成员，而字符 c 属于范畴 cat。
+</p>
+<p>对于接下来的三个函数，可选参数表默认为当前缓冲区的类别表。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: define-category char docstring &amp;optional table ¶
+</pre></div>
+<p>此函数为类别表定义了一个新类别，名称为 char 和文档文档字符串。
+</p>
+<p>这是为具有强从右到左方向性的字符定义新类别（请参阅双向显示）并在特殊类别表中使用它的示例。为了获得有关字符方向性的信息，示例代码使用了’bidi-class’ Unicode 属性（请参阅bidi-class）。
+</p><div class="lisp">
+<pre class="lisp">
+
+(defvar special-category-table-for-bidi
+  ;;     Make an empty category-table.
+  (let ((category-table (make-category-table))
+        ;; Create a char-table which gives the 'bidi-class' Unicode
+        ;; property for each character.
+        (uniprop-table
+         (unicode-property-table-internal 'bidi-class)))
+    (define-category ?R "Characters of bidi-class R, AL, or RLO"
+                     category-table)
+    ;; Modify the category entry of each character whose
+    ;; 'bidi-class' Unicode property is R, AL, or RLO --
+    ;; these have a right-to-left directionality.
+    (map-char-table
+     (lambda (key val)
+       (if (memq val '(R AL RLO))
+           (modify-category-entry key ?R category-table)))
+     uniprop-table)
+    category-table))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: category-docstring category &amp;optional table ¶
+</pre></div>
+<p>该函数返回类别表中类别类别的文档字符串。
+</p><div class="lisp">
+<pre class="lisp">(category-docstring ?a)
+     ⇒ "ASCII"
+(category-docstring ?l)
+     ⇒ "Latin"
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: get-unused-category &amp;optional table ¶
+</pre></div>
+<p>此函数返回当前未在表中定义的类别名称（字符）。如果所有可能的类别都在表中使用，则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: category-table ¶
+</pre></div>
+<p>该函数返回当前缓冲区的类别表。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: category-table-p object ¶
+</pre></div>
+<p>如果 object 是类别表，则此函数返回 t，否则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: standard-category-table ¶
+</pre></div>
+<p>此函数返回标准类别表。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: copy-category-table &amp;optional table ¶
+</pre></div>
+<p>此函数构造表的副本并将其返回。如果 table 未提供（或为 nil），则返回标准类别表的副本。否则，如果 table 不是类别表，则会发出错误信号。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-category-table table ¶
+</pre></div>
+<p>此函数使 table 成为当前缓冲区的类别表。它返回表。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-category-table ¶
+</pre></div>
+<p>这将创建并返回一个空的类别表。在一个空的类别表中，没有分配任何类别，也没有任何字符属于任何类别。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-category-set categories ¶
+</pre></div>
+<p>该函数返回一个新的类别集——一个布尔向量——其初始内容是字符串类别中列出的类别。类别的元素应该是类别名称；  新的类别集对于这些类别中的每一个都具有 t，而对于所有其他类别，则为 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">(make-category-set "al")
+     ⇒ #&amp;128"\0\0\0\0\0\0\0\0\0\0\0\0\2\20\0\0"
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: char-category-set char ¶
+</pre></div>
+<p>此函数返回当前缓冲区的类别表中字符 char 的类别集。这是记录字符 char 所属类别的布尔向量。函数 char-category-set 不分配存储空间，因为它返回存在于类别表中的相同 bool-vector。
+</p>
+<div class="lisp">
+<pre class="lisp">(char-category-set ?a)
+     ⇒ #&amp;128"\0\0\0\0\0\0\0\0\0\0\0\0\2\20\0\0"
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: category-set-mnemonics category-set ¶
+</pre></div>
+<p>此函数将类别集 category-set 转换为一个字符串，该字符串包含指定作为该集合成员的类别的字符。
+</p>
+<div class="lisp">
+<pre class="lisp">(category-set-mnemonics (char-category-set ?a))
+     ⇒ "al"
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: modify-category-entry char category &amp;optional table reset ¶
+</pre></div>
+<p>该函数修改category table table中char的category set（默认为当前buffer的category table）。char 可以是字符，也可以是 (min . max) 形式的 cons 单元格；  在后一种情况下，该函数修改 min 和 max 之间（包括）范围内的所有字符的类别集。
+</p>
+<p>通常，它通过向其添加类别来修改类别集。但是如果 reset 不是 nil，那么它会删除类别。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: describe-categories &amp;optional buffer-or-name ¶
+</pre></div>
+<p>该函数描述当前类别表中的类别规格。它将描述插入缓冲区，然后显示该缓冲区。如果 buffer-or-name 不为 nil，则改为描述该缓冲区的类别表。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="37_缩写和缩写扩展.html">缩写和缩写扩展</a>, Previous: <a href="36.7_语法表内部.html">语法表内部</a>, Up: <a href="36_语法表.html">语法表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

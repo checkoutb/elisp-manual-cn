@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>19.2.10 评估列表缓冲区</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">19.2.10 评估列表缓冲区</h3>
+<div class="nav-panel"><p>Next: <a href="19.2.11_在_Edebug_中打印.html">在_Edebug_中打印</a>, Previous: <a href="19.2.9_评估.html">评估</a>, Up: <a href="19.2_调试.html">调试.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>您可以使用名为 <strong>edebug</strong> 的评估列表缓冲区以交互方式评估表达式。您还可以设置每次 Edebug 更新显示时自动评估的表达式评估列表。
+</p>
+<div class="lisp">
+<pre class="lisp">E
+</pre></div>
+<p>切换到评估列表缓冲区 <strong>edebug</strong> (edebug-visit-eval-list)。
+</p>
+<p>在 <strong>edebug</strong> 缓冲区中，您可以使用 Lisp 交互模式的命令（参见 GNU Emacs 手册中的 Lisp 交互）以及这些特殊命令：
+</p>
+<div class="lisp">
+<pre class="lisp">C-j
+</pre></div>
+<p>在外部上下文中评估点之前的表达式，并将值插入缓冲区（edebug-eval-print-last-sexp）。前缀参数为零 (Cu 0 Cj) 时，不要缩短长项目（如字符串和列表）。
+</p><div class="lisp">
+<pre class="lisp">C-x C-e
+</pre></div>
+<p>在 Edebug 之外的上下文 (edebug-eval-last-sexp) 中计算点之前的表达式。
+</p><div class="lisp">
+<pre class="lisp">C-c C-u
+</pre></div>
+<p>从缓冲区的内容（edebug-update-eval-list）构建一个新的评估列表。
+</p><div class="lisp">
+<pre class="lisp">C-c C-d
+</pre></div>
+<p>删除该点所在的评估列表组 (edebug-delete-eval-item)。
+</p><div class="lisp">
+<pre class="lisp">C-c C-w
+</pre></div>
+<p>在当前停止点（edebug-where）切换回源代码缓冲区。
+</p>
+<p>您可以使用 Cj 或 Cx Ce 在评估列表窗口中评估表达式，就像在 <strong>scratch</strong> 中一样；  但它们是在 Edebug 之外的上下文中评估的。
+</p>
+<p>当您继续执行时，您以交互方式输入的表达式（及其结果）将丢失；  但是您可以设置一个评估列表，其中包含每次执行停止时要评估的表达式。
+</p>
+<p>为此，请在评估列表缓冲区中写入一个或多个评估列表组。评估列表组由一个或多个 Lisp 表达式组成。组由注释行分隔。
+</p>
+<p>命令 Cc Cu (edebug-update-eval-list) 重建评估列表，扫描缓冲区并使用每个组的第一个表达式。（想法是组的第二个表达式是先前计算和显示的值。）
+</p>
+<p>Edebug 的每个条目通过在缓冲区中插入每个表达式，然后是其当前值来重新显示评估列表。它还插入注释行，以便每个表达式成为自己的组。因此，如果您在不更改缓冲区文本的情况下再次键入 Cc Cu，则评估列表实际上不会更改。
+</p>
+<p>如果在评估列表中的评估期间发生错误，则错误消息将显示在字符串中，就好像它是结果一样。因此，使用当前无效变量的表达式不会中断您的调试。
+</p>
+<p>以下是添加了几个表达式后评估列表窗口的外观示例：
+</p>
+<div class="lisp">
+<pre class="lisp">(current-buffer)
+#&lt;buffer *scratch*&gt;
+;---------------------------------------------------------------
+(selected-window)
+#&lt;window 16 on *scratch*&gt;
+;---------------------------------------------------------------
+(point)
+196
+;---------------------------------------------------------------
+bad-var
+"Symbol's value as variable is void: bad-var"
+;---------------------------------------------------------------
+(recursion-depth)
+0
+;---------------------------------------------------------------
+this-command
+eval-last-sexp
+;---------------------------------------------------------------
+</pre></div>
+<p>要删除一个组，将点移入其中并键入 Cc Cd，或者简单地删除该组的文本并使用 Cc Cu 更新评估列表。要将新表达式添加到评估列表，请在合适的位置插入表达式，插入新的注释行，然后键入 Cc Cu。您无需在注释行中插入破折号——其内容无关紧要。
+</p>
+<p>选择 <strong>edebug</strong> 后，您可以使用 Cc Cw 返回到源代码缓冲区。*edebug* 缓冲区在您继续执行时被终止，并在下次需要时重新创建。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="19.2.11_在_Edebug_中打印.html">在_Edebug_中打印</a>, Previous: <a href="19.2.9_评估.html">评估</a>, Up: <a href="19.2_调试.html">调试.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

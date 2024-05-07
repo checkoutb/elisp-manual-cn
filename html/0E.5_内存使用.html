@@ -1,0 +1,41 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>E.5 内存使用</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">E.5 内存使用</h2>
+<div class="nav-panel"><p>Next: <a href="0E.6_C方言.html">C方言</a>, Previous: <a href="0E.4_堆栈分配的对象.html">堆栈分配的对象</a>, Up: <a href="附录_E_GNU_Emacs内部结构.html">E_GNU_Emacs内部结构.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这些函数和变量提供有关 Emacs 已完成的内存分配总量的信息，按数据类型细分。注意这些和垃圾收集返回的值之间的区别；  这些计算当前存在的对象，但这些计算所有分配的数量或大小，包括那些已经被释放的对象。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: cons-cells-consed ¶
+</pre></div>
+<p>到目前为止，此 Emacs 会话中已分配的 cons 单元的总数。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: floats-consed ¶
+</pre></div>
+<p>到目前为止，在此 Emacs 会话中已分配的浮点总数。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: vector-cells-consed ¶
+</pre></div>
+<p>到目前为止，在此 Emacs 会话中已分配的向量单元的总数。这包括类似矢量的对象，例如标记和覆盖，以及用户不可见的某些对象。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: symbols-consed ¶
+</pre></div>
+<p>到目前为止，此 Emacs 会话中已分配的符号总数。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: string-chars-consed ¶
+</pre></div>
+<p>到目前为止在此会话中分配的字符串字符总数。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: intervals-consed ¶
+</pre></div>
+<p>到目前为止，此 Emacs 会话中已分配的时间间隔总数。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: strings-consed ¶
+</pre></div>
+<p>到目前为止，此 Emacs 会话中已分配的字符串总数。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="0E.6_C方言.html">C方言</a>, Previous: <a href="0E.4_堆栈分配的对象.html">堆栈分配的对象</a>, Up: <a href="附录_E_GNU_Emacs内部结构.html">E_GNU_Emacs内部结构.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

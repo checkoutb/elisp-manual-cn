@@ -1,0 +1,169 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>4.5 字符与字符串的比较</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">4.5 字符与字符串的比较</h2>
+<div class="nav-panel"><p>Next: <a href="04.6_字符和字符串的转换.html">字符和字符串的转换</a>, Previous: <a href="04.4_修改字符串.html">修改字符串</a>, Up: <a href="04_字符串和字.html">字符串和字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><div class="lisp">
+<pre class="lisp">Function: char-equal character1 character2
+</pre></div>
+<p>如果参数表示相同的字符，此函数返回 t，否则返回 nil。如果 case-fold-search 不为零，此函数将忽略大小写的差异。
+</p>
+<div class="lisp">
+<pre class="lisp">(char-equal ?x ?x)
+     ⇒ t
+(let ((case-fold-search nil))
+  (char-equal ?x ?X))
+     ⇒ nil
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: string= string1 string2
+</pre></div>
+<p>如果两个字符串的字符完全匹配，则此函数返回 t。符号也可以作为参数，在这种情况下使用符号名称。无论大小写搜索如何，大小写总是很重要的。
+</p>
+<p>此函数等效于比较两个字符串的 equal（请参阅 Equality Predicates）。特别是忽略了两个字符串的文本属性；  如果您需要区分仅在文本属性上有所不同的字符串，请使用 equal-include-properties。但是，与 equal 不同的是，如果任一参数不是字符串或符号，则 string= 表示错误。
+</p>
+<div class="lisp">
+<pre class="lisp">(string= "abc" "abc")
+     ⇒ t
+(string= "abc" "ABC")
+     ⇒ nil
+(string= "ab" "ABC")
+     ⇒ nil
+</pre></div>
+<p>出于技术原因，当且仅当单字节和多字节字符串包含相同的字符代码序列并且所有这些代码都在 0 到 127（ASCII）或 160 到 255（八位图形）范围内时，它们才相等.  但是，当单字节字符串转换为多字节字符串时，代码在 160 到 255 范围内的所有字符都将转换为代码更高的字符，而 ASCII 字符保持不变。因此，单字节字符串及其到多字节的转换只有在字符串都是 ASCII 时才相等。字符代码 160 到 255 在多字节文本中并不完全正确，即使它们可能出现。因此，一个单字节字符串和一个多字节字符串是相等的而不都是 ASCII 的情况是一个技术上的怪事，很少有 Emacs Lisp 程序员遇到过。请参阅文本表示。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: string-equal string1 string2
+</pre></div>
+<p>string-equal 是 string= 的另一个名称。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: string-collate-equalp string1 string2 &amp;optional locale ignore-case
+</pre></div>
+<p>如果 string1 和 string2 在排序规则方面相等，则此函数返回 t。排序规则不仅取决于 string1 和 string2 中包含的字符的字典顺序，还取决于这些字符之间的关系的进一步规则。通常，它是由运行 Emacs 的语言环境定义的。
+</p>
+<p>例如，具有不同编码点但含义相同的字符可能被视为相等，例如不同的重音 Unicode 字符：
+</p>
+<div class="lisp">
+<pre class="lisp">(string-collate-equalp (string ?\uFF40) (string ?\u1FEF))
+     ⇒ t
+</pre></div>
+<p>可选参数 locale 是一个字符串，它会覆盖当前区域设置标识符的设置以进行排序。该值取决于系统；  区域设置 <code>en_US.UTF-8</code> 适用于 POSIX 系统，而例如 <code>enu_USA.1252</code> 适用于 MS-Windows 系统。
+</p>
+<p>如果 ignore-case 不为零，则字符在比较之前会转换为小写。
+</p>
+<p>要在 MS-Windows 系统上模拟符合 Unicode 的排序规则，请将 w32-collat​​e-ignore-punctuation 绑定到非零值，因为在 MS-Windows 上区域设置的代码集部分不能是 <code>UTF-8</code> 。
+</p>
+<p>如果您的系统不支持 locale 环境，则此函数的行为类似于 string-equal。
+</p>
+<p>不要使用此函数来比较文件名是否相等，因为文件系统通常不尊重排序规则实现的字符串的语言等价性。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: string&lt; string1 string2
+</pre></div>
+<p>此函数一次比较两个字符串一个字符。它同时扫描两个字符串以找到第一对不匹配的对应字符。如果这两个中较小的字符是来自 string1 的字符，则 string1 较小，并且此函数返回 t。如果较小的字符是来自 string2 的字符，则 string1 较大，并且此函数返回 nil。如果两个字符串完全匹配，则值为 nil。
+</p>
+<p>成对的字符根据它们的字符代码进行比较。请记住，小写字母在 ASCII 字符集中的数值高于其对应的大写字母；  数字和许多标点字符的数值低于大写字母。一个 ASCII 字符小于任何非 ASCII 字符；  单字节非 ASCII 字符总是小于任何多字节非 ASCII 字符（参见文本表示）。
+</p>
+<div class="lisp">
+<pre class="lisp">(string&lt; "abc" "abd")
+     ⇒ t
+(string&lt; "abd" "abc")
+     ⇒ nil
+(string&lt; "123" "abc")
+     ⇒ t
+</pre></div>
+<p>当字符串具有不同的长度，并且它们匹配到 string1 的长度时，则结果为 t。如果它们匹配到 string2 的长度，则结果为零。没有字符的字符串小于任何其他字符串。
+</p>
+<div class="lisp">
+<pre class="lisp">(string&lt; "" "abc")
+     ⇒ t
+(string&lt; "ab" "abc")
+     ⇒ t
+(string&lt; "abc" "")
+     ⇒ nil
+(string&lt; "abc" "ab")
+     ⇒ nil
+(string&lt; "" "")
+     ⇒ nil
+</pre></div>
+<p>符号也可以作为参数，在这种情况下，它们的打印名称会被比较。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: string-lessp string1 string2
+</pre></div>
+<p>string-lessp 是 string&lt; 的另一个名称。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: string-greaterp string1 string2
+</pre></div>
+<p>该函数以相反的顺序返回string1和string2的比较结果，即相当于调用(string-lessp string2 string1)。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: string-collate-lessp string1 string2 &amp;optional locale ignore-case
+</pre></div>
+<p>如果 string1 按排序顺序小于 string2，则此函数返回 t。排序顺序不仅取决于 string1 和 string2 中包含的字符的字典顺序，还取决于这些字符之间的关系的进一步规则。通常，它是由运行 Emacs 的语言环境定义的。
+</p>
+<p>例如，排序时可能会忽略标点符号和空格字符（请参阅序列）：
+</p>
+<div class="lisp">
+<pre class="lisp">(sort (list "11" "12" "1 1" "1 2" "1.1" "1.2") 'string-collate-lessp)
+     ⇒ ("11" "1 1" "1.1" "12" "1 2" "1.2")
+</pre></div>
+<p>此行为取决于系统；  例如，无论语言环境如何，Cygwin 上都不会忽略标点符号和空格。
+</p>
+<p>可选参数 locale 是一个字符串，它会覆盖当前区域设置标识符的设置以进行排序。该值取决于系统；  区域设置 <code>en_US.UTF-8</code> 适用于 POSIX 系统，而例如 <code>enu_USA.1252</code> 适用于 MS-Windows 系统。 <code>POSIX</code> 或 <code>C</code> 的语言环境值让 string-collat​​e-lessp 表现得像 string-lessp：
+</p>
+<div class="lisp">
+<pre class="lisp">(sort (list "11" "12" "1 1" "1 2" "1.1" "1.2")
+      (lambda (s1 s2) (string-collate-lessp s1 s2 "POSIX")))
+     ⇒ ("1 1" "1 2" "1.1" "1.2" "11" "12")
+</pre></div>
+<p>如果 ignore-case 不为零，则字符在比较之前会转换为小写。
+</p>
+<p>要在 MS-Windows 系统上模拟符合 Unicode 的排序规则，请将 w32-collat​​e-ignore-punctuation 绑定到非零值，因为在 MS-Windows 上区域设置的代码集部分不能是 <code>UTF-8</code> 。
+</p>
+<p>如果您的系统不支持 locale 环境，则此函数的行为类似于 string-lessp。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: string-version-lessp string1 string2
+</pre></div>
+<p>此函数按字典顺序比较字符串，但它将数字字符序列视为包含以十为基数的数字，然后比较这些数字。所以根据这个谓词，’foo2.png’ 比 ’foo12.png’  <code>小</code> ，即使 ’12’ 在字典上比 ’2’  <code>小</code> 。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: string-prefix-p string1 string2 &amp;optional ignore-case
+</pre></div>
+<p>如果 string1 是 string2 的前缀，则此函数返回非 nil；  即，如果string2 以string1 开头。如果可选参数 ignore-case 不为零，则比较忽略大小写差异。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: string-suffix-p suffix string &amp;optional ignore-case
+</pre></div>
+<p>如果 suffix 是字符串的后缀，此函数返回非 nil；  即，如果字符串以后缀结尾。如果可选参数 ignore-case 不为零，则比较忽略大小写差异。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: string-search needle haystack &amp;optional start-pos
+</pre></div>
+<p>返回 haystack 中第一个 needle 实例的位置，两者都是字符串。如果 start-pos 不为零，则从针中的该位置开始搜索。如果未找到匹配项，则返回 nil。该函数在进行比较时只考虑字符串中的字符；  文本属性被忽略。匹配始终区分大小写。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: compare-strings string1 start1 end1 string2 start2 end2 &amp;optional ignore-case
+</pre></div>
+<p>此函数将 string1 的指定部分与 string2 的指定部分进行比较。string1 的指定部分从索引 start1（包括）一直到索引 end1（不包括）；  start1 的 nil 表示字符串的开头，而 end1 的 nil 表示字符串的长度。同样，string2 的指定部分从索引 start2 一直运行到索引 end2。
+</p>
+<p>字符串通过其字符的数值进行比较。例如，如果 str1 的第一个不同字符具有较小的数值，则认为 str1 小于 str2。如果 ignore-case 不为零，则字符在比较之前转换为大写。单字节字符串被​​转换为多字节以进行比较（请参阅文本表示），因此单字节字符串及其到多字节的转换始终被视为相等。
+</p>
+<p>如果两个字符串的指定部分匹配，则值为 t。否则，该值是一个整数，表示有多少前导字符一致，哪个字符串少。它的绝对值是一加两个字符串开头一致的字符数。如果 string1（或其指定部分）小于，则符号为负。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: string-distance string1 string2 &amp;optional bytecompare
+</pre></div>
+<p>此函数返回源字符串 string1 和目标字符串 string2 之间的 Levenshtein 距离。Levenshtein 距离是将源字符串转换为目标字符串所需的单个字符更改（删除、插入或替换）的数量；  这是字符串之间编辑距离的一种可能定义。
+</p>
+<p>字符串的字母大小写对于计算距离很重要，但它们的文本属性被忽略。如果可选参数 bytecompare 不为 nil，则函数以字节而不是字符来计算距离。逐字节比较使用字符的内部 Emacs 表示，因此对于包含原始字节的多字节字符串会产生不准确的结果（请参阅文本表示）；  如果您需要原始字节的准确结果，请通过对字符串进行编码（请参阅显式编码和解码）使字符串成为单字节。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: assoc-string key alist &amp;optional case-fold
+</pre></div>
+<p>这个函数和 assoc 一样工作，除了 key 必须是一个字符串或符号，并且比较是使用 compare-strings 完成的。符号在测试前被转换为字符串。如果 case-fold 不为 nil，则 key 和 alist 的元素在比较之前转换为大写。与 assoc 不同，此函数还可以匹配 alist 中的字符串或符号元素，而不是 conses。特别是，alist 可以是字符串或符号的列表，而不是实际的 alist。请参阅关联列表。
+</p>
+<p>另请参阅比较文本中的函数 compare-buffer-substrings，了解比较缓冲区中文本的方法。函数 string-match 将正则表达式与字符串进行匹配，可用于一种字符串比较；  请参阅正则表达式搜索。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="04.6_字符和字符串的转换.html">字符和字符串的转换</a>, Previous: <a href="04.4_修改字符串.html">修改字符串</a>, Up: <a href="04_字符串和字.html">字符串和字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

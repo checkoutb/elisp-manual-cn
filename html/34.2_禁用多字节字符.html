@@ -1,0 +1,14 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>34.2 禁用多字节字符</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">34.2 禁用多字节字符</h2>
+<div class="nav-panel"><p>Next: <a href="34.3_转换文本表示.html">转换文本表示</a>, Previous: <a href="34.1_文本表示.html">文本表示</a>, Up: <a href="34_非ASCII字符.html">非ASCII字符.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>默认情况下，Emacs 以多字节模式启动：它使用内部编码存储缓冲区和字符串的内容，该内部编码使用多字节序列表示非 ASCII 字符。多字节模式允许您不受限制地使用所有支持的语言和脚本。
+</p>
+<p>在非常特殊的情况下，您可能希望禁用特定缓冲区的多字节字符支持。当缓冲区中禁用多字节字符时，我们称之为单字节模式。在单字节模式下，缓冲区中的每个字符都有一个字符代码，范围从 0 到 255（八进制 0377）；  0 到 127（八进制 0177）代表 ASCII 字符，128（八进制 0200）到 255（八进制 0377）代表非 ASCII 字符。
+</p>
+<p>要以单字节表示编辑特定文件，请使用 find-file-literally 访问它。请参阅访问文件的函数。您可以通过将多字节缓冲区保存到文件、终止缓冲区并再次使用 find-file-literally 访问文件来将多字节缓冲区转换为单字节。或者，您可以使用 Cx RET c（通用编码系统参数）并指定 <code>原始文本</code> 作为访问或保存文件的编码系统。请参阅 GNU Emacs 手册中的为文件文本指定编码系统。与 find-file-literally 不同，以 <code>原始文本</code> 形式查找文件不会禁用格式转换、解压缩或自动模式选择。
+</p>
+<p>缓冲区局部变量 enable-multibyte-characters 在多字节缓冲区中为非 nil，在单字节缓冲区中为 nil。模式行还指示缓冲区是否为多字节。对于图形显示，在多字节缓冲区中，模式行中指示字符集的部分有一个工具提示（除其他外），说明该缓冲区是多字节的。在单字节缓冲区中，不存在字符集指示符。因此，在单字节缓冲区中（当使用图形显示时），在访问文件的行尾约定（冒号、反斜杠等）的指示之前通常没有任何内容，除非您使用的是输入法。
+</p>
+<p>您可以通过在该缓冲区中调用命令 toggle-enable-multibyte-characters 来关闭特定缓冲区中的多字节支持。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="34.3_转换文本表示.html">转换文本表示</a>, Previous: <a href="34.1_文本表示.html">文本表示</a>, Up: <a href="34_非ASCII字符.html">非ASCII字符.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

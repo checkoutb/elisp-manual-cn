@@ -1,0 +1,143 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.19.3 文本属性搜索功能</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">33.19.3 文本属性搜索功能</h3>
+<div class="nav-panel"><p>Next: <a href="33.19.4_具有特殊含义的属性.html">具有特殊含义的属性</a>, Previous: <a href="33.19.2_更改文本属性.html">更改文本属性</a>, Up: <a href="33.19_文本属性.html">文本属性.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在文本属性的典型使用中，大多数情况下，几个或多个连续字符具有相同的属性值。与编写程序来逐个检查字符相比，处理具有相同属性值的文本块要快得多。
+</p>
+<p>以下是您可以用来执行此操作的函数。他们使用 eq 来比较属性值。在所有情况下，对象默认为当前缓冲区。
+</p>
+<p>为了获得良好的性能，对这些函数使用 limit 参数非常重要，尤其是那些搜索单个属性的函数 - 否则，如果您感兴趣的属性确实存在，它们可能会花费很长时间扫描到缓冲区的末尾不变。
+</p>
+<p>这些功能不移动点；  相反，它们返回一个位置（或零）。请记住，位置始终位于两个字符之间；  这些函数返回的位置在具有不同属性的两个字符之间。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: next-property-change pos &amp;optional object limit ¶
+</pre></div>
+<p>该函数从字符串或缓冲区对象中的位置 pos 向前扫描文本，直到它发现某个文本属性发生变化，然后返回变化的位置。换句话说，它返回 pos 之后的第一个字符的位置，其属性与 pos 之后的字符的属性不同。
+</p>
+<p>如果 limit 不为零，则扫描在位置限制处结束。如果在该点之前没有属性更改，则此函数返回限制。
+</p>
+<p>如果属性一直保持不变到对象的末尾，则值为 nil，并且 limit 为 nil。如果该值非零，则它是一个大于或等于 pos 的位置。仅当limit 等于pos 时，该值才等于pos。
+</p>
+<p>这是一个如何通过所有属性都是常量的文本块扫描缓冲区的示例：
+</p><div class="lisp">
+<pre class="lisp">(while (not (eobp))
+  (let ((plist (text-properties-at (point)))
+        (next-change
+         (or (next-property-change (point) (current-buffer))
+             (point-max))))
+    Process text from point to next-change…
+    (goto-char next-change)))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: previous-property-change pos &amp;optional object limit ¶
+</pre></div>
+<p>这类似于 next-property-change，但从 pos 向后扫描而不是向前扫描。如果值为非nil，则为小于等于pos的位置；  仅当limit 等于pos 时它才等于pos。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: next-single-property-change pos prop &amp;optional object limit ¶
+</pre></div>
+<p>该函数扫描文本以查找 prop 属性中的更改，然后返回更改的位置。扫描从字符串或缓冲区对象中的位置 pos 开始。换句话说，此函数返回 pos 之后的第一个字符的位置，其 prop 属性与 pos 之后的字符不同。
+</p>
+<p>如果 limit 不为零，则扫描在位置限制处结束。如果在此之前没有属性更改，则 next-single-property-change 返回限制。
+</p>
+<p>如果属性一直保持不变直到对象的末尾并且限制为 nil，则该值为 nil。如果值为非nil，则为大于等于pos的位置；  仅当limit 等于pos 时它才等于pos。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: previous-single-property-change pos prop &amp;optional object limit ¶
+</pre></div>
+<p>这类似于 next-single-property-change，但从 pos 向后扫描而不是向前扫描。如果值为非nil，则为小于等于pos的位置；  仅当limit 等于pos 时它才等于pos。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: next-char-property-change pos &amp;optional limit ¶
+</pre></div>
+<p>这与 next-property-change 类似，只是它考虑了覆盖属性和文本属性，如果在缓冲区结束之前没有发现任何变化，则返回最大缓冲区位置而不是 nil（在这个意义上，它类似于对应的覆盖函数 next-overlay-change，而不是 next-property-change）。没有对象操作数，因为此函数仅对当前缓冲区进行操作。它返回任何一种属性发生变化的下一个地址。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: previous-char-property-change pos &amp;optional limit ¶
+</pre></div>
+<p>这类似于 next-char-property-change，但从 pos 向后扫描而不是向前扫描，如果没有找到更改，则返回最小缓冲区位置。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: next-single-char-property-change pos prop &amp;optional object limit ¶
+</pre></div>
+<p>这与 next-single-property-change 类似，只是它考虑了覆盖属性和文本属性，如果在对象结束之前没有发现任何更改，则返回对象中的最大有效位置而不是 nil。与 next-char-property-change 不同，此函数确实有一个对象操作数；  如果 object 不是缓冲区，则仅考虑文本属性。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: previous-single-char-property-change pos prop &amp;optional object limit ¶
+</pre></div>
+<p>这类似于 next-single-char-property-change，但从 pos 向后扫描而不是向前扫描，如果未找到更改，则返回 object 中的最小有效位置。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: text-property-any start end prop value &amp;optional object ¶
+</pre></div>
+<p>如果 start 和 end 之间的至少一个字符具有值为 value 的属性 prop，则此函数返回非 nil。更准确地说，它返回第一个这样的字符的位置。否则，它返回零。
+</p>
+<p>可选的第五个参数 object 指定要扫描的字符串或缓冲区。位置是相对于对象的。object 的默认值是当前缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: text-property-not-all start end prop value &amp;optional object ¶
+</pre></div>
+<p>如果 start 和 end 之间的至少一个字符不具有值为 value 的属性 prop，则此函数返回非 nil。更准确地说，它返回第一个这样的字符的位置。否则，它返回零。
+</p>
+<p>可选的第五个参数 object 指定要扫描的字符串或缓冲区。位置是相对于对象的。object 的默认值是当前缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: text-property-search-forward prop &amp;optional value predicate not-current ¶
+</pre></div>
+<p>根据谓词搜索下一个将 text 属性 prop 设置为 value 的区域。
+</p>
+<p>这个函数是在 search-forward 和 friends 之后建模的，它移动点，但它返回一个描述匹配的结构，而不是在 match-beginning 和 friends 中返回它。
+</p>
+<p>如果找不到 text 属性，则函数返回 nil。如果找到，则将 point 放置在具有此文本属性匹配的区域的末尾，并返回 prop-match 结构。
+</p>
+<p>谓词可以是 t（等于的同义词）、nil（表示 <code>不等于</code> ）或将使用两个参数调用的谓词：第一个是值，第二个是文本属性的值我们正在检查。
+</p>
+<p>如果不是当前的，如果点在我们有匹配的区域中，则跳过该区域并找到下一个实例。
+</p>
+<p>prop-match 结构具有以下访问器：prop-match-beginning（匹配的开始）、prop-match-end（匹配的结束）和 prop-match-value（开始时的属性值）比赛）。
+</p>
+<p>在下面的示例中，假设您位于如下所示的缓冲区中：
+</p><div class="lisp">
+<pre class="lisp">This is a bold and here's bolditalic and this is the end.
+</pre></div>
+<p>即 <code>粗体</code> 字为粗体， <code>斜体</code> 字为斜体。
+</p>
+<p>以点开头：
+</p><div class="lisp">
+<pre class="lisp">(while (setq match (text-property-search-forward 'face 'bold t))
+  (push (buffer-substring (prop-match-beginning match)
+                          (prop-match-end match))
+        words))
+</pre></div>
+<p>这将挑选出所有使用粗体字的单词。
+</p>
+<div class="lisp">
+<pre class="lisp">(while (setq match (text-property-search-forward 'face nil t))
+  (push (buffer-substring (prop-match-beginning match)
+                          (prop-match-end match))
+        words))
+</pre></div>
+<p>这将挑选出所有没有面属性的位，这将导致列表 ’("This is a " "and here’s " "and this is the end")’ （只是颠倒过来，因为我们使用了 push）。
+</p>
+<div class="lisp">
+<pre class="lisp">(while (setq match (text-property-search-forward 'face nil nil))
+  (push (buffer-substring (prop-match-beginning match)
+                          (prop-match-end match))
+        words))
+</pre></div>
+<p>这将挑选出所有面部被设置为某物的区域，但这会被分成属性更改的地方，所以这里的结果将是 <code>（ ~粗体</code> <code>粗体</code> <code>斜体</code> ）’。
+</p>
+<p>对于可能使用它的更实际的示例，请考虑您有一个缓冲区，其中某些部分表示 URL，并且这些部分用 shr-url 标记。
+</p>
+<div class="lisp">
+<pre class="lisp">(while (setq match (text-property-search-forward 'shr-url nil nil))
+  (push (prop-match-value match) urls))
+</pre></div>
+<p>这将为您提供所有这些 URL 的列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: text-property-search-backward prop &amp;optional value predicate not-current ¶
+</pre></div>
+<p>这就像 text-property-search-backward 一样，只是向后搜索。但是，点被放置在匹配区域的开头而不是结尾。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.19.4_具有特殊含义的属性.html">具有特殊含义的属性</a>, Previous: <a href="33.19.2_更改文本属性.html">更改文本属性</a>, Up: <a href="33.19_文本属性.html">文本属性.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

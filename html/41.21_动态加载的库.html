@@ -1,0 +1,37 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>41.21 动态加载的库</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">41.21 动态加载的库</h2>
+<div class="nav-panel"><p>Next: <a href="41.22_安全考虑.html">安全考虑</a>, Previous: <a href="41.20_文件更改通知.html">文件更改通知</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>动态加载的库是在首次需要其设施时按需加载的库。Emacs 支持对其某些功能的这种按需加载支持库。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: dynamic-library-alist ¶
+</pre></div>
+<p>这是动态库和实现它们的外部库文件的列表。
+</p>
+<p>每个元素都是表单（库文件…）的列表，其中 car 是表示支持的外部库的符号，其余是为该库提供备用文件名的字符串。
+</p>
+<p>Emacs 尝试按照它们在列表中出现的顺序从文件中加载库；  如果没有找到，Emacs 会话将无法访问该库，并且它提供的功能将不可用。
+</p>
+<p>某些平台上的图像支持使用此功能。下面是设置此变量以支持 MS-Windows 上的图像的示例：
+</p>
+<div class="lisp">
+<pre class="lisp">(setq dynamic-library-alist
+      '((xpm "libxpm.dll" "xpm4.dll" "libXpm-nox4.dll")
+        (png "libpng12d.dll" "libpng12.dll" "libpng.dll"
+             "libpng13d.dll" "libpng13.dll")
+        (jpeg "jpeg62.dll" "libjpeg.dll" "jpeg-62.dll"
+              "jpeg.dll")
+        (tiff "libtiff3.dll" "libtiff.dll")
+        (gif "giflib4.dll" "libungif4.dll" "libungif.dll")
+        (svg "librsvg-2-2.dll")
+        (gdk-pixbuf "libgdk_pixbuf-2.0-0.dll")
+        (glib "libglib-2.0-0.dll")
+        (gobject "libgobject-2.0-0.dll")))
+</pre></div>
+<p>请注意，图像类型 pbm 和 xbm 不需要此变量中的条目，因为它们不依赖于外部库并且在 Emacs 中始终可用。
+</p>
+<p>另请注意，此变量并非用于访问外部库的通用工具；  只有 Emacs 已知的那些才能通过它加载。
+</p>
+<p>如果给定的库静态链接到 Emacs，则忽略此变量。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="41.22_安全考虑.html">安全考虑</a>, Previous: <a href="41.20_文件更改通知.html">文件更改通知</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

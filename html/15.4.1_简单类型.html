@@ -1,0 +1,87 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>15.4.1 简单类型</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">15.4.1 简单类型</h3>
+<div class="nav-panel"><p>Next: <a href="15.4.2_复合类型.html">复合类型</a>, Previous: <a href="15.4_自定义类型.html">自定义类型</a>, Up: <a href="15.4_自定义类型.html">自定义类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍所有简单的自定义类型。对于这些自定义类型中的一些，自定义小部件通过 CMi 或 M-TAB 提供内联完成。
+</p>
+<div class="lisp">
+<pre class="lisp">sexp
+</pre></div>
+<p>该值可以是任何可以打印和回读的 Lisp 对象。如果您不想花时间制定更具体的类型来使用，您可以使用 sexp 作为任何选项的后备。
+</p><div class="lisp">
+<pre class="lisp">integer
+</pre></div>
+<p>该值必须是整数。
+</p><div class="lisp">
+<pre class="lisp">natnum
+</pre></div>
+<p>该值必须是非负整数。
+</p><div class="lisp">
+<pre class="lisp">number
+</pre></div>
+<p>该值必须是数字（浮点数或整数）。
+</p><div class="lisp">
+<pre class="lisp">float
+</pre></div>
+<p>该值必须是浮点数。
+</p><div class="lisp">
+<pre class="lisp">string
+</pre></div>
+<p>该值必须是字符串。自定义缓冲区显示字符串，不使用分隔 ’"’ 字符或 ’\’ 引号。
+</p><div class="lisp">
+<pre class="lisp">regexp
+</pre></div>
+<p>与字符串类似，只是字符串必须是有效的正则表达式。
+</p><div class="lisp">
+<pre class="lisp">character
+</pre></div>
+<p>该值必须是字符代码。字符代码实际上是一个整数，但是这种类型通过在缓冲区中插入字符来显示值，而不是通过显示数字。
+</p><div class="lisp">
+<pre class="lisp">file
+</pre></div>
+<p>该值必须是文件名。小部件提供完成。
+</p><div class="lisp">
+<pre class="lisp">(file :must-match t)
+</pre></div>
+<p>该值必须是现有文件的文件名。小部件提供完成。
+</p><div class="lisp">
+<pre class="lisp">directory
+</pre></div>
+<p>该值必须是目录。小部件提供完成。
+</p><div class="lisp">
+<pre class="lisp">hook
+</pre></div>
+<p>该值必须是函数列表。此自定义类型用于挂钩变量。您可以在挂钩变量的 defcustom 中使用 :options 关键字来指定推荐在挂钩中使用的函数列表；  请参阅定义自定义变量。
+</p><div class="lisp">
+<pre class="lisp">symbol
+</pre></div>
+<p>该值必须是符号。它作为符号名称出现在自定义缓冲区中。小部件提供完成。
+</p><div class="lisp">
+<pre class="lisp">function
+</pre></div>
+<p>该值必须是 lambda 表达式或函数名。该小部件提供函数名称的补全。
+</p><div class="lisp">
+<pre class="lisp">variable
+</pre></div>
+<p>该值必须是变量名。小部件提供完成。
+</p><div class="lisp">
+<pre class="lisp">face
+</pre></div>
+<p>该值必须是一个符号，即面名称。小部件提供完成。
+</p><div class="lisp">
+<pre class="lisp">boolean
+</pre></div>
+<p>该值是布尔值——nil 或 t。请注意，通过将choice 和const 一起使用（请参阅下一节），您可以指定该值必须为nil 或t，还可以指定文本以适合替代项的特定含义的方式描述每个值。
+</p><div class="lisp">
+<pre class="lisp">key-sequence
+</pre></div>
+<p>该值是一个键序列。自定义缓冲区使用与 kbd 函数相同的语法显示键序列。请参阅键序列。
+</p><div class="lisp">
+<pre class="lisp">coding-system
+</pre></div>
+<p>该值必须是编码系统名称，您可以使用 M-TAB 完成。
+</p><div class="lisp">
+<pre class="lisp">color
+</pre></div>
+<p>该值必须是有效的颜色名称。该小部件提供颜色名称的补全，以及用于从 <strong>Colors</strong> 缓冲区中显示的颜色名称列表中选择颜色名称的示例和按钮。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="15.4.2_复合类型.html">复合类型</a>, Previous: <a href="15.4_自定义类型.html">自定义类型</a>, Up: <a href="15.4_自定义类型.html">自定义类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

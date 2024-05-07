@@ -1,0 +1,314 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>11.4.1 pcase宏</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">11.4.1 pcase宏</h3>
+<div class="nav-panel"><p>Next: <a href="11.4.2_扩展_pcase.html">扩展_pcase</a>, Previous: <a href="11.4_模式匹配条件.html">模式匹配条件</a>, Up: <a href="11.4_模式匹配条件.html">模式匹配条件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>有关背景，请参阅模式匹配条件。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: pcase expression &amp;rest clauses ¶
+</pre></div>
+<p>子句中的每个子句都具有以下形式：（模式主体形式…）。
+</p>
+<p>计算表达式以确定它的值，expval。在模式与 expval 匹配的子句中查找第一个子句，并将控制权传递给该子句的主体形式。
+</p>
+<p>如果匹配，则 pcase 的值是成功子句中最后一个 body-forms 的值。否则，pcase 的计算结果为 nil。 
+</p>
+<p>每个模式都必须是一个 pcase 模式，它可以使用下面定义的核心模式之一，或者通过 pcase-defmacro 定义的模式之一（请参阅扩展 pcase）。
+</p>
+<p>本小节的其余部分描述了不同形式的核心模式，提供了一些示例，并以使用某些模式形式提供的 let-binding 工具的重要警告作为结尾。核心模式可以有以下形式：
+</p>
+<div class="lisp">
+<pre class="lisp">_
+</pre></div>
+<p>匹配任何 expval。这也称为无关或通配符。
+</p><div class="lisp">
+<pre class="lisp">'val
+</pre></div>
+<p>如果 expval 等于 val，则匹配。比较是通过 equal 来完成的（参见 Equality Predicates）。
+</p><div class="lisp">
+<pre class="lisp">keyword
+</pre></div>
+<div class="lisp">
+<pre class="lisp">integer
+</pre></div>
+<div class="lisp">
+<pre class="lisp">string
+</pre></div>
+<p>如果 expval 等于文字对象，则匹配。这是上面 ’val 的一个特例，可能是因为这些类型的字面量对象是自引用的。
+</p><div class="lisp">
+<pre class="lisp">symbol
+</pre></div>
+<p>匹配任何 expval，另外让 let-binds 符号与 expval 匹配，这样该绑定可用于 body-forms（请参阅动态绑定）。
+</p>
+<p>如果symbol 是排序模式seqpat 的一部分（例如，通过使用and，下面），则绑定也可用于seqpat 出现在symbol 之后的部分。这种用法有一些注意事项，请参阅注意事项。
+</p>
+<p>要避免的两个符号是 t，它的行为类似于 _（上图）并且已被弃用，以及 nil，它表示错误。同样，绑定关键字符号也没有任何意义（请参阅永不更改的变量）。
+</p><div class="lisp">
+<pre class="lisp">(cl-type type)
+</pre></div>
+<p>如果 expval 是 type 类型，则匹配，这是 cl-typep 接受的类型描述符（请参阅 Common Lisp Extensions 中的类型谓词）。例子：
+</p>
+<div class="lisp">
+<pre class="lisp">(cl-type integer)
+(cl-type (integer 0 10))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">(pred function)
+</pre></div>
+<p>如果谓词函数在 expval 上调用时返回非零，则匹配。可以使用语法 (pred (not function)) 来否定测试。谓词函数可以具有以下形式之一：
+</p>
+<div class="lisp">
+<pre class="lisp">function name (a symbol)
+</pre></div>
+<p>使用一个参数 expval 调用命名函数。
+</p>
+<p>    示例：整数 p
+拉姆达表达式
+</p><div class="lisp">
+<pre class="lisp">
+
+</pre></div>
+<p>使用一个参数 expval 调用匿名函数（请参阅 Lambda 表达式）。
+</p>
+<p>示例： (lambda (n) (= 42 n))
+</p><div class="lisp">
+<pre class="lisp">function call with n args
+</pre></div>
+<p>使用 n 个参数（其他元素）和一个附加的第 n+1 个参数（即 expval）调用函数（函数调用的第一个元素）。
+</p>
+<p>示例：（= 42）
+本例中，函数为=，n为1，实际函数调用变为：(= 42 expval)。 
+</p>
+<div class="lisp">
+<pre class="lisp">(app function pattern)
+</pre></div>
+<p>如果在 expval 上调用的函数返回与模式匹配的值，则匹配。函数可以采用上面为 pred 描述的形式之一。然而，与 pred 不同的是，app 根据模式而不是布尔真值测试结果。
+</p><div class="lisp">
+<pre class="lisp">(guard boolean-expression)
+</pre></div>
+<p>如果 boolean-expression 计算结果为非 nil，则匹配。
+</p><div class="lisp">
+<pre class="lisp">(let pattern expr)
+</pre></div>
+<p>评估 expr 以获取 exprval，如果 exprval 匹配模式则匹配。（之所以称为 let，是因为模式可以使用符号将符号绑定到值。） 
+</p>
+<p>排序模式（也称为 seqpat）是一种按顺序处理其子模式参数的模式。pcase 有两个：and 和 or。它们的行为方式与共享其名称的特殊形式类似（请参阅组合条件的构造），但它们不是处理值，而是处理子模式。
+</p>
+<div class="lisp">
+<pre class="lisp">(and pattern1…)
+</pre></div>
+<p>尝试按顺序匹配 pattern1…，直到其中一个无法匹配。在这种情况下，同样无法匹配，其余的子模式不会被测试。如果所有子模式都匹配，则匹配。
+</p><div class="lisp">
+<pre class="lisp">(or pattern1 pattern2…)
+</pre></div>
+<p>尝试按顺序匹配 pattern1、pattern2、…，直到其中一个成功。在那种情况下，或者同样匹配，其余的子模式不会被测试。
+</p>
+<p>为了向 body-forms 呈现一致的环境（参见评估简介）（从而避免匹配时的评估错误），模式绑定的变量集是每个子模式绑定的变量的并集。如果一个变量没有被匹配的子模式绑定，那么它被绑定为 nil。
+</p><div class="lisp">
+<pre class="lisp">(rx rx-expr…)
+</pre></div>
+<p>将字符串与正则表达式 rx-expr… 匹配，使用 rx 正则表达式表示法（请参阅 rx 结构化正则表达式表示法），就像通过字符串匹配一样。
+</p>
+<p>除了通常的 rx 语法，rx-expr… 可以包含以下结构：
+</p>
+<div class="lisp">
+<pre class="lisp">(let ref rx-expr…)
+</pre></div>
+<p>将符号 ref 绑定到匹配 rx-expr…. 的子匹配。 ref 以 body-forms 绑定到子匹配或 nil 的字符串，但也可以在 backref 中使用。
+</p><div class="lisp">
+<pre class="lisp">(backref ref)
+</pre></div>
+<p>与标准的 backref 结构类似，但这里的 ref 也可以是前一个 (let ref …) 结构引入的名称。 
+</p>
+<p>示例： 优于 cl-case
+</p>
+<p>这是一个示例，它突出了 pcase 相对于 cl-case 的一些优势（请参阅 Common Lisp Extensions 中的条件）。
+</p>
+<div class="lisp">
+<pre class="lisp">(pcase (get-return-code x)
+  ;; string
+  ((and (pred stringp) msg)
+   (message "%s" msg))
+
+  ;; symbol
+  ('success       (message "Done!"))
+  ('would-block   (message "Sorry, can't do it now"))
+  ('read-only     (message "The shmliblick is read-only"))
+  ('access-denied (message "You do not have the needed rights"))
+
+  ;; default
+  (code           (message "Unknown return code %S" code)))
+</pre></div>
+<p>使用 cl-case，您需要显式声明一个局部变量 code 来保存 get-return-code 的返回值。cl-case 也很难与字符串一起使用，因为它使用 eql 进行比较。
+示例：使用和
+</p>
+<p>一个常见的习惯用法是编写一个以 and 开头的模式，其中一个或多个符号子模式提供与随后的子模式（以及主体形式）的绑定。例如，以下模式匹配一​​位整数。
+</p>
+<div class="lisp">
+<pre class="lisp">(and
+  (pred integerp)
+  n                     ; bind n to expval
+  (guard (&lt;= -9 n 9)))
+</pre></div>
+<p>首先，如果 (integerp expval) 的计算结果为非零，则 pred 匹配。接下来，n 是一个匹配任何东西并将 n 绑定到 expval 的符号模式。最后，如果布尔表达式 (&lt;= -9 n 9)（注意对 n 的引用）的计算结果为非零，则防护匹配。如果所有这些子模式都匹配，则匹配。
+示例：使用 pcase 重新表述
+</p>
+<p>这是另一个示例，展示了如何将简单的匹配任务从其传统实现（函数 grok/traditional）重新表述为使用 pcase（函数 grok/pcase）的匹配任务。这两个函数的文档字符串是： <code>如果 OBJ 是 ~key:NUMBER</code> 形式的字符串，则返回 NUMBER（字符串）。否则，返回列表（ <code>149</code> 默认）。~   一、传统实现（见正则表达式）：
+</p>
+<div class="lisp">
+<pre class="lisp">(defun grok/traditional (obj)
+  (if (and (stringp obj)
+           (string-match "^key:\\([[:digit:]]+\\)$" obj))
+      (match-string 1 obj)
+    (list "149" 'default)))
+
+
+(grok/traditional "key:0")   ⇒ "0"
+(grok/traditional "key:149") ⇒ "149"
+(grok/traditional 'monolith) ⇒ ("149" default)
+</pre></div>
+<p>重新表述演示了符号绑定以及 or、and、pred、app 和 let。
+</p>
+<div class="lisp">
+<pre class="lisp">(defun grok/pcase (obj)
+  (pcase obj
+    ((or                                     ; line 1
+      (and                                   ; line 2
+       (pred stringp)                        ; line 3
+       (pred (string-match                   ; line 4
+              "^key:\\([[:digit:]]+\\)$"))   ; line 5
+       (app (match-string 1)                 ; line 6
+            val))                            ; line 7
+      (let val (list "149" 'default)))       ; line 8
+     val)))                                  ; line 9
+
+
+(grok/pcase "key:0")   ⇒ "0"
+(grok/pcase "key:149") ⇒ "149"
+(grok/pcase 'monolith) ⇒ ("149" default)
+</pre></div>
+<p>grok/pcase 的大部分是 pcase 形式的单个子句，第 1-8 行的模式，第 9 行的（单个）主体形式。模式是 or，它尝试依次匹配其参数子模式，首先是 and（第 2-7 行），然后是 let（第 8 行），直到其中一个成功。
+</p>
+<p>与前面的示例一样（参见示例 1），并以 pred 子模式开始，以确保以下子模式与正确类型的对象（在本例中为字符串）一起工作。如果 (stringp expval) 返回 nil，则 pred 失败，因此也失败了。
+</p>
+<p>下一个 pred（第 4-5 行）计算 (string-match RX expval) 并在结果为非 nil 时进行匹配，这意味着 expval 具有所需的形式：key:NUMBER。再一次，失败了，pred 失败了，and 也失败了。
+</p>
+<p>最后（在这一系列和子模式中），app 评估 (match-string 1 expval)（第 6 行）以获取临时值 tmp（即 <code>NUMBER</code> 子字符串）并尝试将 tmp 与模式 val（行7）。由于这是一个符号模式，它无条件匹配并且另外将 val 绑定到 tmp。
+</p>
+<p>现在该应用程序已匹配，所有和子模式都已匹配，所以和匹配。同样，一旦和已经匹配，或者匹配并且不继续尝试子模式 let（第 8 行）。
+</p>
+<p>让我们考虑一下 obj 不是字符串，或者它是字符串但格式错误的情况。在这种情况下，pred 之一（第 3-5 行）无法匹配，因此（第 2 行）无法匹配，因此或（第 1 行）继续尝试子模式 let（第 8 行）。
+</p>
+<p>首先，让计算 (list "149" ’default) 得到 ("149" default) exprval，然后尝试将 exprval 与模式 val 匹配。由于这是一个符号模式，它无条件匹配并且另外将 val 绑定到 exprval。现在 let 已经匹配，或者匹配。
+</p>
+<p>注意 and 和 let 子模式是如何以相同的方式完成的：通过在进程绑定 val 中尝试（总是成功）匹配符号模式 val。因此，or 总是匹配并且控制总是传递给 body 表单（第 9 行）。因为这是成功匹配的 pcase 子句中的最后一个主体形式，所以它是 pcase 的值，也是 grok/pcase 的返回值（参见什么是函数？）。
+排序模式中符号的注意事项
+</p>
+<p>前面的示例都使用了以某种方式包含符号子模式的排序模式。以下是有关该用法的一些重要细节。
+</p>
+<p>当 symbol 在 seqpat 中多次出现时，第二次和后续的出现不会扩展为重新绑定，而是使用 eq 扩展为相等测试。
+</p>
+<p>以下示例具有一个 pcase 形式，其中包含两个子句和两个 seqpat，A 和 B。A 和 B 都首先检查 expval 是否是一对（使用 pred），然后将符号绑定到 expval 的 car 和 cdr（每个使用一个 app ）。
+</p>
+<p>对于 A，因为符号 st 被提及两次，第二次提及成为使用 eq 的相等性测试。另一方面，B 使用两个单独的符号 s1 和 s2，它们都成为独立的绑定。
+</p>
+<div class="lisp">
+<pre class="lisp">
+
+(defun grok (object)
+  (pcase object
+    ((and (pred consp)        ; seqpat A
+          (app car st)        ; first mention: st
+          (app cdr st))       ; second mention: st
+     (list 'eq st))
+
+    ((and (pred consp)        ; seqpat B
+          (app car s1)        ; first mention: s1
+          (app cdr s2))       ; first mention: s2
+     (list 'not-eq s1 s2))))
+
+
+(let ((s "yow!"))
+  (grok (cons s s)))      ⇒ (eq "yow!")
+(grok (cons "yo!" "yo!")) ⇒ (not-eq "yo!" "yo!")
+(grok '(4 2))             ⇒ (not-eq 4 (2))
+</pre></div>
+<p>副作用代码引用符号未定义。避免。例如，这里有两个类似的函数。都使用和，符号和守卫：
+</p>
+<div class="lisp">
+<pre class="lisp">(defun square-double-digit-p/CLEAN (integer)
+  (pcase (* integer integer)
+    ((and n (guard (&lt; 9 n 100))) (list 'yes n))
+    (sorry (list 'no sorry))))
+
+(square-double-digit-p/CLEAN 9) ⇒ (yes 81)
+(square-double-digit-p/CLEAN 3) ⇒ (no 9)
+
+
+(defun square-double-digit-p/MAYBE (integer)
+  (pcase (* integer integer)
+    ((and n (guard (&lt; 9 (incf n) 100))) (list 'yes n))
+    (sorry (list 'no sorry))))
+
+(square-double-digit-p/MAYBE 9) ⇒ (yes 81)
+(square-double-digit-p/MAYBE 3) ⇒ (yes 9)  ; WRONG!
+</pre></div>
+<p>区别在于保护中的布尔表达式：CLEAN 简单直接地引用 n，而 MAYBE 在表达式 (incf n) 中引用具有副作用的 n。当整数为 3 时，会发生以下情况：
+</p>
+<p>第一个 n 将其绑定到 expval，即计算 (* 3 3) 或 9 的结果。
+    评估布尔表达式：
+</p><div class="lisp">
+<pre class="lisp">start:   (&lt; 9 (incf n)        100)
+becomes: (&lt; 9 (setq n (1+ n)) 100)
+becomes: (&lt; 9 (setq n (1+ 9)) 100)
+
+becomes: (&lt; 9 (setq n 10)     100)
+                                   ; side-effect here!
+becomes: (&lt; 9       n         100) ; n now bound to 10
+becomes: (&lt; 9      10         100)
+becomes: t
+</pre></div>
+<p>因为评估的结果是非零，所以保护匹配和匹配，并且控制传递到该子句的主体形式。 
+</p>
+<p>除了断言 9 是一个两位数的整数在数学上的错误之外，MAYBE 还有另一个问题。主体形式再次引用 n，但我们根本看不到更新后的值 10。这是怎么回事？
+</p>
+<p>总而言之，最好完全避免对符号模式的副作用引用，不仅在 boolean-expression（在 guard 中），而且在 expr（在 let）和 function（在 pred 和 app）中。
+在匹配时，子句的主体形式可以引用模式 let-binds 的符号集。当 seqpat 是 and 时，这个集合是所有符号的并集，每个符号的子模式 let-binds。这是有道理的，因为为了匹配，所有子模式都必须匹配。
+</p>
+<p>当 seqpat 为 or 时，情况有所不同： or 匹配第一个匹配的子模式；  其余的子模式被忽略。每个子模式让绑定不同的符号集是没有意义的，因为主体形式无法区分哪个子模式匹配并在不同的集合中进行选择。例如，以下内容无效：
+</p>
+<div class="lisp">
+<pre class="lisp">(require 'cl-lib)
+(pcase (read-number "Enter an integer: ")
+  ((or (and (pred cl-evenp)
+            e-num)      ; bind e-num to expval
+       o-num)           ; bind o-num to expval
+   (list e-num o-num)))
+
+
+Enter an integer: 42
+error→ Symbol’s value as variable is void: o-num
+
+Enter an integer: 149
+error→ Symbol’s value as variable is void: e-num
+</pre></div>
+<p>评估正文形式（list e-num o-num）表示错误。为了区分子模式，您可以使用另一个符号，在所有子模式中名称相同但值不同。重写上面的例子：
+</p>
+<div class="lisp">
+<pre class="lisp">(require 'cl-lib)
+(pcase (read-number "Enter an integer: ")
+  ((and num                                ; line 1
+        (or (and (pred cl-evenp)           ; line 2
+                 (let spin 'even))         ; line 3
+            (let spin 'odd)))              ; line 4
+   (list spin num)))                       ; line 5
+
+
+Enter an integer: 42
+⇒ (even 42)
+
+Enter an integer: 149
+⇒ (odd 149)
+</pre></div>
+<p>第 1 行用 and 和符号 <code>分解</code> 了 expval 绑定（在本例中为 num）。在第 2 行，或以与之前相同的方式开始，但不是绑定不同的符号，而是使用 let 两次（第 3-4 行）在两个子模式中绑定相同的符号自旋。spin 的值区分子模式。正文形式引用了这两个符号（第 5 行）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="11.4.2_扩展_pcase.html">扩展_pcase</a>, Previous: <a href="11.4_模式匹配条件.html">模式匹配条件</a>, Up: <a href="11.4_模式匹配条件.html">模式匹配条件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

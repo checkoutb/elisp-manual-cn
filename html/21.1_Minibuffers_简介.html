@@ -1,0 +1,22 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>21.1 Minibuffers 简介</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">21.1 Minibuffers 简介</h2>
+<div class="nav-panel"><p>Next: <a href="21.2_用_Minibuffer_读取文本字符串.html">用_Minibuffer_读取文本字符串</a>, Previous: <a href="21_小缓冲区.html">小缓冲区</a>, Up: <a href="21_小缓冲区.html">小缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在大多数情况下，minibuffer 是一个普通的 Emacs 缓冲区。缓冲区中的大多数操作，例如编辑命令，都在微型缓冲区中正常工作。但是，许多管理缓冲区的操作不适用于小缓冲区。minibuffer 的名称始终采用 <code>*Minibuf-number*</code> 形式，并且不能更改。Minibuffers 仅显示在仅用于 minibuffers 的特殊窗口中；  这些窗口总是出现在框架的底部。（有时帧没有 minibuffer 窗口，有时一种特殊的帧只包含一个 minibuffer 窗口；请参阅 Minibuffers 和 Frames。）
+</p>
+<p>minibuffer 中的文本总是以提示字符串开头，该文本由使用 minibuffer 的程序指定，以告诉用户要键入哪种类型的输入。此文本被标记为只读，因此您不会意外删除或更改它。它也被标记为一个字段（请参阅定义和使用字段），以便某些运动功能，包括行首、前向词、前向句子和前向段落，停止在提示符和实际文字。
+</p>
+<p>minibuffer 的窗口通常是一行；  如果内容需要更多空间，它会自动增长。当 minibuffer 处于活动状态时，您可以使用窗口调整命令显式地临时调整其窗口大小；  当 minibuffer 退出时，窗口恢复到正常大小。当 minibuffer 未激活时，您可以通过使用框架的另一个窗口中的窗口大小调整命令或用鼠标拖动模式线来永久调整其窗口大小。（由于当前实现的细节，resize-mini-windows 必须为 nil。）如果框架只包含一个 minibuffer 窗口，你可以通过改变框架的大小来改变它的大小。
+</p>
+<p>使用 minibuffer 读取输入事件，这会改变变量的值，例如 this-command 和 last-command（请参阅命令循环中的信息）。如果您不想更改它们，您的程序应该将它们绑定在使用 minibuffer 的代码周围。
+</p>
+<p>在某些情况下，即使存在活动的 minibuffer，命令也可以使用 minibuffer；  这样的 minibuffer 称为递归 minibuffer。第一个 minibuffer 被命名为 ’<strong>Minibuf-1</strong>’。递归小缓冲区通过增加名称末尾的数字来命名。（名称以空格开头，这样它们就不会出现在正常的缓冲区列表中。）在几个递归小缓冲区中，最里面的（或最近进入的）是活动的小缓冲区——你可以通过键入 RET ( exit-minibuffer) 中。我们通常称它为 minibuffer。您可以通过设置变量 enable-recursive-minibuffers 或将该名称的属性放在命令符号上来允许或禁止递归 minibuffers（请参阅 Recursive Minibuffers。）
+</p>
+<p>与其他缓冲区一样，迷你缓冲区使用本地键映射（请参阅键映射）来指定特殊键绑定。调用 minibuffer 的函数还根据要完成的工作设置其本地映射。有关未完成的 minibuffer 本地映射，请参阅Reading Text Strings with the Minibuffer。有关完成的小缓冲区本地映射，请参阅执行完成的小缓冲区命令。
+</p>
+<p>一个活动的 minibuffer 通常有主模式 minibuffer-mode。这是没有任何特殊功能的 Emacs 内部模式。要自定义 minibuffer 的设置，我们建议您使用 minibuffer-setup-hook（参见 Minibuffer Miscellany）而不是 minibuffer-mode-hook，因为前者在 minibuffer 完全初始化后稍后运行。
+</p>
+<p>当一个 minibuffer 处于非活动状态时，它的主要模式是 minibuffer-inactive-mode，带有键盘映射 minibuffer-inactive-mode-map。仅当 minibuffer 位于单独的帧中时，这才真正有用。请参阅小缓冲区和帧。
+</p>
+<p>当 Emacs 以批处理模式运行时，任何从 minibuffer 读取的请求实际上都会从 Emacs 启动时提供的标准输入描述符中读取一行。这仅支持基本输入：在批处理模式下没有任何特殊的 minibuffer 功能（历史、完成等）可用。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="21.2_用_Minibuffer_读取文本字符串.html">用_Minibuffer_读取文本字符串</a>, Previous: <a href="21_小缓冲区.html">小缓冲区</a>, Up: <a href="21_小缓冲区.html">小缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

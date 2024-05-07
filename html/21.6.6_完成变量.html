@@ -1,0 +1,61 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>21.6.6 完成变量</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">21.6.6 完成变量</h3>
+<div class="nav-panel"><p>Next: <a href="21.6.7_编程完成.html">编程完成</a>, Previous: <a href="21.6.5_读取文件名.html">读取文件名</a>, Up: <a href="21.6_完成.html">完成.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>以下是一些可用于更改默认完成行为的变量。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: completion-styles ¶
+</pre></div>
+<p>此变量的值是用于执行完成的完成样式（符号）列表。完成样式是一组用于生成完成的规则​​。出现此列表的每个符号都必须在完成样式列表中具有相应的条目。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: completion-styles-alist ¶
+</pre></div>
+<p>此变量存储可用完成样式的列表。列表中的每个元素都有以下形式
+</p>
+<div class="lisp">
+<pre class="lisp">(style try-completion all-completions doc)
+</pre></div>
+<p>这里的style是完成样式的名称（一个符号），可以在completion-styles变量中用来指代这个样式；  try-completion 是完成完成的函数；  all-completions 是列出完成的函数；  doc 是描述完成样式的字符串。
+</p>
+<p>try-completion 和 all-completion 函数都应该接受四个参数：字符串、集合、谓词和点。字符串、集合和谓词参数与 try-completion 中的含义相同（请参阅基本完成函数），并且 point 参数是字符串中 point 的位置。如果每个函数执行了它的工作，它应该返回一个非 nil 值，如果它没有完成它应该返回一个 nil（例如，如果没有办法根据完成样式完成字符串）。
+</p>
+<p>当用户调用像 minibuffer-complete 之类的完成命令时（参见 Minibuffer Commands that Do Completion），Emacs 会查找 completion-styles 中列出的第一个样式并调用它的 try-completion 函数。如果这个函数返回 nil，Emacs 将移动到下一个列出的完成样式并调用它的 try-completion 函数，依此类推，直到其中一个 try-completion 函数成功执行完成并返回一个非 nil 值。类似的过程用于通过 all-completions 函数列出完成。
+</p>
+<p>有关可用完成样式的描述，请参阅 The GNU Emacs Manual 中的 Completion Styles。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: completion-category-overrides ¶
+</pre></div>
+<p>此变量指定在完成某些类型的文本时要使用的特殊完成样式和其他完成行为。它的值应该是一个具有表单元素的列表 (category . alist)。类别是描述正在完成的事情的符号；  目前，定义了缓冲区、文件和 unicode-name 类别，但其他类别可以通过专门的完成函数定义（参见 Programmed Completion）。alist 是一个关联列表，描述了相应类别的完成应如何表现。支持以下 alist 键：
+</p>
+<div class="lisp">
+<pre class="lisp">styles
+</pre></div>
+<p>该值应该是完成样式（符号）的列表。
+</p><div class="lisp">
+<pre class="lisp">cycle
+</pre></div>
+<p>该值应该是该类别的completion-cycle-threshold 的值（请参阅The GNU Emacs Manual 中的Completion Options）。
+</p>
+<p>将来可能会定义其他 alist 条目。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: completion-extra-properties ¶
+</pre></div>
+<p>此变量用于指定当前完成命令的额外属性。它旨在通过专门的完成命令进行绑定。它的值应该是属性和值对的列表。支持以下属性：
+</p>
+<div class="lisp">
+<pre class="lisp">:annotation-function
+</pre></div>
+<p>该值应该是在完成缓冲区中添加注释的函数。这个函数必须接受一个参数，一个完成，并且应该返回 nil 或一个要在完成旁边显示的字符串。除非此函数将自己的面放在注释后缀字符串上，否则默认情况下会将完成注释面添加到该字符串中。
+</p><div class="lisp">
+<pre class="lisp">:affixation-function
+</pre></div>
+<p>该值应该是为完成添加前缀和后缀的函数。这个函数必须接受一个参数，一个完成列表，并且应该返回一个带注释的完成列表。返回列表的每个元素必须是三元素列表、完成、前缀字符串和后缀字符串。此函数优先于 :annotation-function。
+</p><div class="lisp">
+<pre class="lisp">:exit-function
+</pre></div>
+<p>该值应该是执行完成后要运行的函数。该函数应该接受两个参数，字符串和状态，其中字符串是字段完成的文本，状态指示发生了什么样的操作：如果文本现在完成，则完成，如果文本无法进一步完成但完成是唯一的未完成，或者如果文本是有效的完成，但可以进一步完成。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="21.6.7_编程完成.html">编程完成</a>, Previous: <a href="21.6.5_读取文件名.html">读取文件名</a>, Up: <a href="21.6_完成.html">完成.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

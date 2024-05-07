@@ -1,0 +1,74 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>29.17.3 带有侧窗的帧布局</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">29.17.3 带有侧窗的帧布局</h3>
+<div class="nav-panel"><p>Next: <a href="29.18_原子窗口.html">原子窗口</a>, Previous: <a href="29.17.2_侧窗选项和功能.html">侧窗选项和功能</a>, Up: <a href="29.17_侧窗.html">侧窗.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>侧窗可用于创建更复杂的 <code>帧</code> ( <code>frame</code> )布局，例如集成开发环境 (IDE) 提供的 <code>帧</code> ( <code>frame</code> )布局。在这样的布局中，主窗口区域是进行正常编辑活动的地方。侧窗不是为通常意义上的编辑而设计的。相反，它们应该显示与当前编辑活动互补的信息，例如文件列表、标签或缓冲区、帮助信息、搜索或 grep 结果或 shell 输出。
+</p>
+<p>这种 <code>帧</code> ( <code>frame</code> )的布局可能如下所示：
+</p><div class="lisp">
+<pre class="lisp"> ___________________________________
+|          *Buffer List*            |
+|___________________________________|
+|     |                       |     |
+|  *  |                       |  *  |
+|  d  |                       |  T  |
+|  i  |                       |  a  |
+|  r  |   Main Window Area    |  g  |
+|  e  |                       |  s  |
+|  d  |                       |  *  |
+|  *  |                       |     |
+|_____|_______________________|_____|
+| *help*/*grep*/  |  *shell*/       |
+| *Completions*   |  *compilation*  |
+|_________________|_________________|
+|             Echo Area             |
+|___________________________________|
+</pre></div>
+<p>以下示例说明了如何将窗口参数（请参阅窗口参数）与 display-buffer-in-side-window（请参阅在侧窗口中显示缓冲区）一起使用来设置代码以生成上述 <code>帧</code> ( <code>frame</code> )布局。
+</p><div class="lisp">
+<pre class="lisp">
+
+(defvar parameters
+  '(window-parameters . ((no-other-window . t)
+                         (no-delete-other-windows . t))))
+
+(setq fit-window-to-buffer-horizontally t)
+(setq window-resize-pixelwise t)
+
+(setq
+ display-buffer-alist
+ `(("\\*Buffer List\\*" display-buffer-in-side-window
+    (side . top) (slot . 0) (window-height . fit-window-to-buffer)
+    (preserve-size . (nil . t)) ,parameters)
+   ("\\*Tags List\\*" display-buffer-in-side-window
+    (side . right) (slot . 0) (window-width . fit-window-to-buffer)
+    (preserve-size . (t . nil)) ,parameters)
+   ("\\*\\(?:help\\|grep\\|Completions\\)\\*"
+    display-buffer-in-side-window
+    (side . bottom) (slot . -1) (preserve-size . (nil . t))
+    ,parameters)
+   ("\\*\\(?:shell\\|compilation\\)\\*" display-buffer-in-side-window
+    (side . bottom) (slot . 1) (preserve-size . (nil . t))
+    ,parameters)))
+</pre></div>
+<p>这为具有固定名称的缓冲区指定了 display-buffer-alist 条目（请参阅选择用于显示缓冲区的窗口）。特别是，它要求在 <code>帧</code> ( <code>frame</code> )顶部显示高度可调的 <strong>Buffer List*，在 <code>帧</code> ( <code>frame</code> )右侧显示宽度可调的 *Tags List*。它还要求 *help*、*grep</strong> 和 <strong>Completions</strong> 缓冲区在 <code>帧</code> ( <code>frame</code> )的左下方共享一个窗口，并且 <strong>shell</strong> 和 <strong>compilation</strong> 缓冲区出现在​​ <code>帧</code> ( <code>frame</code> )右下方的窗口中 <code>帧</code> ( <code>frame</code> )。
+</p>
+<p>请注意，选项 fit-window-to-buffer-horizo​​ntally 必须具有非零值才能允许水平调整窗口。还添加了要求保留 <code>帧</code> ( <code>frame</code> )顶部和底部的侧窗高度以及 <code>帧</code> ( <code>frame</code> )左侧或右侧的侧窗宽度的条目。为了确保在最大化帧时侧窗保持其各自的大小，变量 window-resize-pixelwise 设置为非零值。请参阅调整窗口大小。
+</p>
+<p>最后一种形式还通过为每个窗口安装 no-other-window 参数来确保通过 Cx o 无法访问任何已创建的侧窗口。此外，它通过为每个窗口安装 no-delete-other-windows 参数来确保不会通过 Cx 1 删除侧窗口。
+</p>
+<p>由于 dired 缓冲区没有固定名称，我们使用特殊函数 dired-default-directory-on-left 来在 <code>帧</code> ( <code>frame</code> )左侧显示精简目录缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">(defun dired-default-directory-on-left ()
+  "Display `default-directory' in side window on left, hiding details."
+  (interactive)
+  (let ((buffer (dired-noselect default-directory)))
+    (with-current-buffer buffer (dired-hide-details-mode t))
+    (display-buffer-in-side-window
+     buffer `((side . left) (slot . 0)
+              (window-width . fit-window-to-buffer)
+              (preserve-size . (t . nil)) ,parameters))))
+</pre></div>
+<p>评估前面的表单并按任意顺序键入 Mx list-buffers、Ch f、Mx shell、Mx list-tags 和 Mx dired-default-directory-on-left 现在应该重现上面勾勒的 <code>帧</code> ( <code>frame</code> )布局。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="29.18_原子窗口.html">原子窗口</a>, Previous: <a href="29.17.2_侧窗选项和功能.html">侧窗选项和功能</a>, Up: <a href="29.17_侧窗.html">侧窗.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

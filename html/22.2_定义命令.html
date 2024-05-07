@@ -1,0 +1,10 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.2 定义命令</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">22.2 定义命令</h2>
+<div class="nav-panel"><p>Next: <a href="22.2.1_使用_interactive.html">使用_interactive</a>, Previous: <a href="22.1_命令循环概述.html">命令循环概述</a>, Up: <a href="22_命令循环.html">命令循环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>特殊形式 interactive 将 Lisp 函数转换为命令。交互表单必须位于函数体的顶层，通常作为函数体的第一个表单；  这适用于 lambda 表达式（请参阅 Lambda 表达式）和 defun 形式（请参阅定义函数）。这个表单在函数的实际执行过程中什么都不做；  它的存在作为一个标志，告诉 Emacs 命令循环该函数可以交互调用。交互形式的参数指定应该如何读取交互调用的参数。
+</p>
+<p>或者，可以在函数符号的交互形式属性中指定交互形式。此属性的非 nil 值优先于函数体本身中的任何交互形式。这个功能很少使用。
+</p>
+<p>有时，一个函数只打算以交互方式调用，而不是直接从 Lisp 调用。在这种情况下，给函数一个非 nil 仅交互属性，直接或通过声明（请参阅声明表单）。如果从 Lisp 调用命令，这会导致字节编译器发出警告。describe-function 的输出将包含类似的信息。该属性的值可以是：一个字符串，字节编译器将直接在其警告中使用该字符串（它应该以句点结尾，而不是以大写字母开头，例如， <code>use (system-name) instead.</code> ） ;  吨；  任何其他符号，它应该是在 Lisp 代码中使用的替代函数。
+</p>
+<p>泛型函数（参见泛型函数）不能通过向它们添加交互形式来转换为命令。
+</p>
+<div class="nav-panel"><p>Next: <a href="22.2.1_使用_interactive.html">使用_interactive</a>, Previous: <a href="22.1_命令循环概述.html">命令循环概述</a>, Up: <a href="22_命令循环.html">命令循环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

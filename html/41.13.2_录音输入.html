@@ -1,0 +1,22 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>41.13.2 录音输入</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">41.13.2 录音输入</h3>
+<div class="nav-panel"><p>Next: <a href="41.14_终端输出.html">终端输出</a>, Previous: <a href="41.13.1_输入模式.html">输入模式</a>, Up: <a href="41.13_终端输入.html">终端输入.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><div class="lisp">
+<pre class="lisp">Function: recent-keys &amp;optional include-cmds ¶
+</pre></div>
+<p>此函数返回一个向量，其中包含来自键盘或鼠标的最后 300 个输入事件。包括所有输入事件，无论它们是否被用作键序列的一部分。因此，您始终会获得最后 300 个输入事件，不包括键盘宏生成的事件。（这些被排除在外，因为它们对调试不太感兴趣；看到调用宏的事件就足够了。）
+</p>
+<p>如果 include-cmds 不是 nil，则结果向量中的完整键序列与 (nil . COMMAND) 形式的伪事件交错，其中 COMMAND 是键序列的绑定（请参阅命令循环概述）。
+</p>
+<p>对 clear-this-command-keys 的调用（请参阅命令循环中的信息）会导致此函数随后立即返回一个空向量。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: open-dribble-file filename ¶
+</pre></div>
+<p>此函数打开一个名为 filename 的 dribbble 文件。当一个 dribble 文件打开时，来自键盘或鼠标的每个输入事件（但不是来自键盘宏的输入事件）都会写入该文件中。非字符事件使用由 <code>&lt;…&gt;</code> 包围的打印表示来表示。请注意，敏感信息（例如密码）最终可能会记录在 dribble 文件中。
+</p>
+<p>通过使用 nil 参数调用此函数来关闭 dribble 文件。
+</p>
+<p>另请参阅 open-termscript 函数（请参阅终端输出）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="41.14_终端输出.html">终端输出</a>, Previous: <a href="41.13.1_输入模式.html">输入模式</a>, Up: <a href="41.13_终端输入.html">终端输入.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

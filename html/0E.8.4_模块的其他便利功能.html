@@ -1,0 +1,68 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>E.8.4 模块的其他便利功能</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">E.8.4 模块的其他便利功能</h3>
+<div class="nav-panel"><p>Next: <a href="0E.8.5_模块中的非本地出口.html">模块中的非本地出口</a>, Previous: <a href="0E.8.3_Lisp和模块值之间的转换.html">Lisp和模块值之间的转换</a>, Up: <a href="0E.8_编写动态加载的模块.html">编写动态加载的模块.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本小节描述了模块 API 提供的一些便利功能。和前面小节中描述的函数一样，它们实际上都是函数指针，需要通过 emacs_env 指针调用。在 Emacs 25 调用它们可用的第一个版本之后引入的函数的描述。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: bool eq (emacs_env *env, emacs_value a, emacs_value b) ¶
+</pre></div>
+<p>如果 a 和 b 表示的 Lisp 对象相同，则此函数返回 true，否则返回 false。这与 Lisp 函数 eq 相同（参见 Equality Predicates），但避免了对参数表示的对象进行实习的需要。
+</p>
+<p>没有其他相等谓词的 API 函数，因此您需要使用下面描述的 intern 和 funcall 来执行更复杂的相等测试。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: bool is_not_nil (emacs_env *env, emacs_value arg) ¶
+</pre></div>
+<p>该函数测试 arg 表示的 Lisp 对象是否为非 nil；  它相应地返回真或假。
+</p>
+<p>请注意，您可以通过使用 intern 来获得一个表示 nil 的 emacs_value 来实现等效测试，然后使用上述 eq 来测试相等性。但是使用这个功能更方便。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: emacs_value type_of (emacs_env *env, emacs_value arg) ¶
+</pre></div>
+<p>此函数将 arg 的类型作为表示符号的值返回：字符串表示字符串，整数表示整数，进程表示进程等。请参阅类型谓词。如果您的代码需要依赖于对象类型，您可以使用 intern 和 eq 与已知类型符号进行比较。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: emacs_value intern (emacs_env *env, const char *name) ¶
+</pre></div>
+<p>此函数返回一个名为 name 的内部 Emacs 符号，它应该是一个以 ASCII 空字符结尾的字符串。如果一个符号尚不存在，它会创建一个新符号。
+</p>
+<p>与下面描述的 funcall 一起，该函数提供了一种调用任何 Lisp 可调用 Emacs 函数的方法，前提是它的名称是纯 ASCII 字符串。例如，下面是如何通过调用更强大的 Emacs 实习函数来实习名称 name_str 是非 ASCII 的符号（请参阅创建和实习符号）：
+</p><div class="lisp">
+<pre class="lisp">emacs_value fintern = env-&gt;intern (env, "intern");
+emacs_value sym_name =
+  env-&gt;make_string (env, name_str, strlen (name_str));
+emacs_value symbol = env-&gt;funcall (env, fintern, 1, &amp;sym_name);
+</pre></div>
+<p>emacs_value fintern = env-&gt;intern (env, "intern");
+emacs_value sym_name =
+  env-&gt;make_string (env, name_str, strlen (name_str));
+emacs_value 符号 = env-&gt;funcall (env, fintern, 1, &amp;sym_name);
+</p>
+<div class="lisp">
+<pre class="lisp">Function: emacs_value funcall (emacs_env *env, emacs_value func, ptrdiff_t nargs, emacs_value *args) ¶
+</pre></div>
+<p>此函数调用指定的函数，将 args 参数从 args 指向的数组传递给它。参数 func 可以是函数符号（例如，由上述实习生返回）、make_function 返回的模块函数（参见编写模块函数）、用 C 编写的子例程等。如果 nargs 为零，则 args 可以是 NULL 指针.
+</p>
+<p>该函数返回 func 返回的值。
+</p>
+<p>如果您的模块包含可能长时间运行的代码，最好不时检查该代码中的用户是否想要退出，例如，通过键入 Cg（请参阅退出）。自 Emacs 26.1 起可用的以下函数就是为此目的而提供的。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: bool should_quit (emacs_env *env) ¶
+</pre></div>
+<p>如果用户想退出，此函数返回 true。在这种情况下，我们建议您的模块函数中止任何正在进行的处理并尽快返回。在大多数情况下，请改用 process_input。
+</p>
+<p>除了检查用户是否想要退出之外，要处理输入事件，请使用以下函数，该函数从 Emacs 27.1 开始可用。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: enum emacs_process_input_result process_input (emacs_env *env) ¶
+</pre></div>
+<p>此函数处理待处理的输入事件。如果用户想要退出或在处理信号时发生错误，它会返回 emacs_process_input_quit。在这种情况下，我们建议您的模块函数中止任何正在进行的处理并尽快返回。如果模块代码可以继续运行，process_input 返回 emacs_process_input_continue。当且仅当 env 中没有挂起的非本地退出时，返回值是 emacs_process_input_continue。如果模块在调用 process_input 后​​继续，则变量值和缓冲区内容等全局状态可能已以任意方式修改。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: int open_channel (emacs_env *env, emacs_value pipe_process) ¶
+</pre></div>
+<p>此功能从 Emacs 28 开始可用，它为现有管道进程打开了一个通道。pipe_process 必须引用由 make-pipe-process 创建的现有管道进程。管道流程。如果成功，返回值将是一个新的文件描述符，您可以使用它来写入管道。与所有其他模块函数不同，您可以使用从任意线程返回的文件描述符，即使没有模块环境处于活动状态。您可以使用 write 函数写入文件描述符。完成后，使用 close 关闭文件描述符。(libc) 低级 I/O。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="0E.8.5_模块中的非本地出口.html">模块中的非本地出口</a>, Previous: <a href="0E.8.3_Lisp和模块值之间的转换.html">Lisp和模块值之间的转换</a>, Up: <a href="0E.8_编写动态加载的模块.html">编写动态加载的模块.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

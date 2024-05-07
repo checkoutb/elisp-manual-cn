@@ -1,0 +1,103 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.5 来自命令循环的信息</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">22.5 来自命令循环的信息</h2>
+<div class="nav-panel"><p>Next: <a href="22.6_指令后点调整.html">指令后点调整</a>, Previous: <a href="22.4_区分交互调用.html">区分交互调用</a>, Up: <a href="22_命令循环.html">命令循环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>编辑器命令循环设置几个 Lisp 变量来保存它自己和正在运行的命令的状态记录。除了 this-command 和 last-command 之外，在 Lisp 程序中更改这些变量中的任何一个通常都是一个坏主意。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: last-command ¶
+</pre></div>
+<p>该变量记录了命令循环执行的上一个命令的名称（当前命令之前的命令）。通常，该值是具有函数定义的符号，但这不能保证。
+</p>
+<p>当命令返回命令循环时，从 this-command 复制该值，除非该命令为以下命令指定了前缀参数。
+</p>
+<p>此变量始终是当前终端的本地变量，不能是缓冲区本地的。请参阅多个终端。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: real-last-command ¶
+</pre></div>
+<p>这个变量由 Emacs 设置，就像 last-command 一样，但不会被 Lisp 程序改变。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: last-repeatable-command ¶
+</pre></div>
+<p>此变量存储不属于输入事件的最近执行的命令。这是命令 repeat 将尝试重复，请参阅 GNU Emacs 手册中的重复。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: this-command ¶
+</pre></div>
+<p>该变量记录了编辑器命令循环正在执行的命令的名称。与 last-command 一样，它通常是带有函数定义的符号。
+</p>
+<p>命令循环在运行命令之前设置此变量，并在命令完成时将其值复制到 last-command（除非命令为以下命令指定了前缀参数）。
+</p>
+<p>一些命令在执行期间设置此变量，作为接下来运行的任何命令的标志。特别是，用于杀死文本的函数将 this-command 设置为 kill-region，以便紧随其后的任何杀死命令都知道将被杀死的文本附加到前一个杀死。
+</p>
+<p>如果您不希望某个特定命令在出错的情况下被识别为前一个命令，则必须对该命令进行编码以防止这种情况发生。一种方法是在命令开头将 this-command 设置为 t，并在最后将 this-command 设置回其正确值，如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(defun foo (args…)
+  (interactive …)
+  (let ((old-this-command this-command))
+    (setq this-command t)
+    …do the work…
+    (setq this-command old-this-command)))
+</pre></div>
+<p>我们没有将 this-command 与 let 绑定，因为这样会在出错的情况下恢复旧值——在这种情况下，let 的一个特性正是我们想要避免的。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: this-original-command ¶
+</pre></div>
+<p>这与 this-command 具有相同的值，除非发生命令重新映射（请参阅重新映射命令）。在这种情况下，this-command 给出了实际运行的命令（重新映射的结果），而 this-original-command 给出了指定运行但重新映射到另一个命令的命令。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: current-minibuffer-command ¶
+</pre></div>
+<p>this 与 this-command 具有相同的值，但在进入 minibuffer 时被递归绑定。此变量可用于 minibuffer 挂钩等，以确定打开当前 minibuffer 会话的命令。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: this-command-keys ¶
+</pre></div>
+<p>此函数返回一个字符串或向量，其中包含调用当前命令的键序列。该命令使用 read-event 读取的任何没有超时的事件都会被添加到最后。
+</p>
+<p>但是，如果该命令调用了 read-key-sequence，它会返回最后读取的密钥序列。请参阅按键序列输入。如果序列中的所有事件都是适合字符串的字符，则该值是字符串。请参阅输入事件。
+</p>
+<div class="lisp">
+<pre class="lisp">(this-command-keys)
+;; Now use C-u C-x C-e to evaluate that.
+     ⇒ "^X^E"
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: this-command-keys-vector ¶
+</pre></div>
+<p>与 this-command-keys 类似，只是它始终以向量形式返回事件，因此您无需处理将输入事件存储在字符串中的复杂性（请参阅将键盘事件放入字符串中）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: clear-this-command-keys &amp;optional keep-record ¶
+</pre></div>
+<p>此函数清空事件表，以便 this-command-keys 返回。除非 keep-record 不为零，否则它还会清空函数最近键（请参阅记录输入）随后将返回的记录。这在读取密码后很有用，可以防止密码在某些情况下无意中作为下一个命令的一部分回显。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: last-nonmenu-event ¶
+</pre></div>
+<p>此变量保存作为键序列的一部分读取的最后一个输入事件，不计算鼠标菜单产生的事件。
+</p>
+<p>这个变量的一个用途是告诉 x-popup-menu 在哪里弹出菜单。它也被 y-or-np 内部使用（参见 Yes-or-No Queries）。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: last-command-event ¶
+</pre></div>
+<p>此变量设置为命令循环作为命令的一部分读取的最后一个输入事件。这个变量的主要用途是在 self-insert-command 中，它使用它来决定插入哪个字符。
+</p><div class="lisp">
+<pre class="lisp">last-command-event
+;; Now use C-u C-x C-e to evaluate that.
+     ⇒ 5
+</pre></div>
+<p>该值为 5，因为那是 Ce 的 ASCII 码。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: last-event-frame ¶
+</pre></div>
+<p>此变量记录最后一个输入事件被定向到哪个帧。通常这是在生成事件时选择的帧，但如果该帧已将输入焦点重定向到另一个帧，则该值是事件被重定向到的帧。请参阅输入焦点。
+</p>
+<p>如果最后一个事件来自键盘宏，则值为宏。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.6_指令后点调整.html">指令后点调整</a>, Previous: <a href="22.4_区分交互调用.html">区分交互调用</a>, Up: <a href="22_命令循环.html">命令循环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>6 序列、数组和向量</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h1 class="chapter">6 序列、数组和向量</h1>
+<div class="nav-panel"><p>Next: <a href="06.1_序列.html">序列</a>, Previous: <a href="05.9.2_符号外的属性列表.html">符号外的属性列表</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>序列类型是另外两种 Lisp 类型的联合：列表和数组。换句话说，任何列表都是序列，任何数组都是序列。所有序列的共同属性是每个序列都是有序的元素集合。
+</p>
+<p>数组是一个固定长度的对象，每个元素都有一个槽。所有元素都可以在恒定时间内访问。数组的四种类型是字符串、向量、字符表和布尔向量。
+</p>
+<p>列表是一系列元素，但它不是单个原始对象；  它由 cons 单元格组成，每个元素一个单元格。查找第 n 个元素需要查看 n 个 cons 单元格，因此距离列表开头较远的元素需要更长的时间才能访问。但是可以将元素添加到列表中，或者删除元素。
+</p>
+<p>下图显示了这些类型之间的关系：
+</p>
+<div class="lisp">
+<pre class="lisp"> _____________________________________________
+|                                             |
+|          Sequence                           |
+|  ______   ________________________________  |
+| |      | |                                | |
+| | List | |             Array              | |
+| |      | |    ________       ________     | |
+| |______| |   |        |     |        |    | |
+|          |   | Vector |     | String |    | |
+|          |   |________|     |________|    | |
+|          |  ____________   _____________  | |
+|          | |            | |             | | |
+|          | | Char-table | | Bool-vector | | |
+|          | |____________| |_____________| | |
+|          |________________________________| |
+|_____________________________________________|
+
+</pre></div>
+<div class="nav-panel"><p>Next: <a href="06.1_序列.html">序列</a>, Previous: <a href="05.9.2_符号外的属性列表.html">符号外的属性列表</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

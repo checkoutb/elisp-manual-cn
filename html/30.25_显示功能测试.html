@@ -1,0 +1,136 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>30.25 显示功能测试</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">30.25 显示功能测试</h2>
+<div class="nav-panel"><p>Next: <a href="31_位置.html">位置</a>, Previous: <a href="30.24_X_资源.html">X_资源</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节中的功能描述了特定显示器的基本功能。Lisp 程序可以使用它们来调整它们的行为以适应显示器的功能。例如，如果不支持弹出菜单，通常使用弹出菜单的程序可以使用 minibuffer。
+</p>
+<p>这些函数中的可选参数 display 指定要询问问题的显示器。它可以是显示名称、帧（指定该帧所在的显示）或 nil（表示所选帧的显示，请参阅输入焦点）。
+</p>
+<p>有关获取有关显示信息的其他功能，请参阅颜色名称、文本终端颜色。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-popup-menus-p &amp;optional display ¶
+</pre></div>
+<p>如果显示支持弹出菜单，则此函数返回 t，否则返回 nil。对弹出菜单的支持需要鼠标可用，因为在 Emacs 显示的某些部分上单击鼠标会弹出菜单。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-graphic-p &amp;optional display ¶
+</pre></div>
+<p>如果 display 是能够同时显示多个帧和几种不同字体的图形显示，则此函数返回 t。对于使用诸如 X 之类的窗口系统的显示器来说是这样，对于文本终端来说是假的。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-mouse-p &amp;optional display ¶
+</pre></div>
+<p>如果显示器有鼠标可用，此函数返回 t，否则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-color-p &amp;optional display ¶
+</pre></div>
+<p>如果屏幕是彩色屏幕，此函数返回 t。它曾经被称为 x-display-color-p，并且仍然支持该名称作为别名。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-grayscale-p &amp;optional display ¶
+</pre></div>
+<p>如果屏幕可以显示灰色阴影，则此函数返回 t。（所有彩色显示器都可以做到这一点。）
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-supports-face-attributes-p attributes &amp;optional display ¶
+</pre></div>
+<p>如果支持属性中的所有面部属性，则此函数返回非零（请参阅面部属性）。
+</p>
+<p><code>支持</code> 的定义有点启发式，但基本上意味着包含属性中所有属性的面，当与显示的默认面合并时，可以用以下方式表示
+</p>
+<p>外观与默认面不同，并且
+在精神上接近属性指定的内容，如果不准确的话。
+</p>
+<p>点 (2) 意味着任何可以显示粗体的显示都将满足 :weight black 属性，只要可以显示一些淡黄色， :foreground "yellow" 也会满足，但是 tty 不会满足 :slant italic显示代码自动将暗面替换为斜体。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-selections-p &amp;optional display ¶
+</pre></div>
+<p>如果显示支持选择，则此函数返回 t。窗口显示通常支持选择，但在某些其他情况下也可能支持它们。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-images-p &amp;optional display ¶
+</pre></div>
+<p>如果 display 可以显示图像，此函数返回 t。窗口化显示器原则上应该处理图像，但有些系统缺乏对此的支持。在不支持图像的显示器上，Emacs 无法显示工具栏。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-screens &amp;optional display ¶
+</pre></div>
+<p>此函数返回与显示器关联的屏幕数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-pixel-height &amp;optional display ¶
+</pre></div>
+<p>此函数以像素为单位返回屏幕的高度。在字符终端上，它以字符为单位给出高度。
+</p>
+<p>对于图形终端，请注意，在多显示器设置中，这是指与显示器相关的所有物理显示器的像素高度。请参阅多个终端。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-pixel-width &amp;optional display ¶
+</pre></div>
+<p>此函数以像素为单位返回屏幕的宽度。在字符终端上，它以字符为单位给出宽度。
+</p>
+<p>对于图形终端，请注意，在多显示器设置中，这是指与显示器相关的所有物理显示器的像素宽度。请参阅多个终端。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-mm-height &amp;optional display ¶
+</pre></div>
+<p>此函数以毫米为单位返回屏幕高度，如果 Emacs 无法获取该信息，则返回 nil。
+</p>
+<p>对于图形终端，请注意，在多显示器设置中，这是指与显示器相关的所有物理显示器的高度。请参阅多个终端。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-mm-width &amp;optional display ¶
+</pre></div>
+<p>此函数以毫米为单位返回屏幕宽度，如果 Emacs 无法获取该信息，则返回 nil。
+</p>
+<p>对于图形终端，请注意，在多显示器设置中，这是指与显示器相关的所有物理显示器的宽度。请参阅多个终端。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: display-mm-dimensions-alist ¶
+</pre></div>
+<p>此变量允许用户指定 display-mm-height 和 display-mm-width 返回的图形显示的尺寸，以防系统提供不正确的值。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-backing-store &amp;optional display ¶
+</pre></div>
+<p>此函数返回显示器的后备存储功能。后备存储是指记录未曝光的窗口（和部分窗口）的像素，以便在曝光时可以非常快速地显示出来。
+</p>
+<p>值可以是始终、映射时或无用的符号。当问题不适用于某种显示时，该函数也可以返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-save-under &amp;optional display ¶
+</pre></div>
+<p>如果显示器支持 SaveUnder 功能，则此函数返回非 nil。弹出窗口使用该功能来保存它们模糊的像素，以便它们可以快速弹出。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-planes &amp;optional display ¶
+</pre></div>
+<p>此函数返回显示器支持的平面数。这通常是每个像素的位数。对于 tty 显示，它以支持的颜色数中的两个为基数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-visual-class &amp;optional display ¶
+</pre></div>
+<p>此函数返回屏幕的视觉类。该值是以下符号之一：static-gray（有限的、不可改变的灰度）、gray-scale（全范围的灰度）、static-color（有限的、不可改变的颜色）、pseudo-color（有限的颜色）、真彩色（全系列颜色）和直接彩色（全系列颜色）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-color-cells &amp;optional display ¶
+</pre></div>
+<p>此函数返回屏幕支持的颜色单元数。
+</p>
+<p>这些函数获取有关 Emacs 显示指定显示的正在使用的窗口系统的附加信息。（出于历史原因，它们的名称以 x- 开头。）
+</p>
+<div class="lisp">
+<pre class="lisp">Function: x-server-version &amp;optional display ¶
+</pre></div>
+<p>该函数返回在显示器上运行的 GUI 窗口系统的版本号列表，例如 GNU 和 Unix 系统上的 X 服务器。该值是一个由三个整数组成的列表：协议的主要版本号和次要版本号，以及窗口系统软件本身的特定于发行商的版本号。在 GNU 和 Unix 系统上，这些通常是 X 协议的版本和 X 服务器软件的发行商特定的版本号。在 MS-Windows 上，这是 Windows 操作系统的版本。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: x-server-vendor &amp;optional display ¶
+</pre></div>
+<p>此函数返回提供窗口系统软件的供应商（作为字符串）。在 GNU 和 Unix 系统上，这实际上意味着分发 X 服务器的人。在 MS-Windows 上，这是 Windows 操作系统 (Microsoft) 的供应商 ID 字符串。
+</p>
+<p>当 X 的开发人员将软件分销商标记为 <code>供应商</code> 时，他们表明了他们的错误假设，即任何系统都不能以非商业方式开发和分发。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="31_位置.html">位置</a>, Previous: <a href="30.24_X_资源.html">X_资源</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

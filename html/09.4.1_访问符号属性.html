@@ -1,0 +1,62 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>9.4.1 访问符号属性</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">9.4.1 访问符号属性</h3>
+<div class="nav-panel"><p>Next: <a href="09.4.2_标准符号属性.html">标准符号属性</a>, Previous: <a href="09.4_符号属性.html">符号属性</a>, Up: <a href="09.4_符号属性.html">符号属性.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>以下函数可用于访问符号属性。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: get symbol property ¶
+</pre></div>
+<p>此函数返回符号属性列表中名为 property 的属性的值。如果没有这样的属性，则返回 nil。因此，nil 值与该属性不存在之间没有区别。
+</p>
+<p>name 属性使用 eq 与现有属性名称进行比较，因此任何对象都是合法属性。
+</p>
+<p>请参阅 put 示例。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: put symbol property value ¶
+</pre></div>
+<p>此函数将值放在属性名称属性下的符号属性列表中，替换任何先前的属性值。put 函数返回值。
+</p><div class="lisp">
+<pre class="lisp">(put 'fly 'verb 'transitive)
+     ⇒'transitive
+(put 'fly 'noun '(a buzzing little bug))
+     ⇒ (a buzzing little bug)
+(get 'fly 'verb)
+     ⇒ transitive
+(symbol-plist 'fly)
+     ⇒ (verb transitive noun (a buzzing little bug))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: symbol-plist symbol ¶
+</pre></div>
+<p>该函数返回符号的属性列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: setplist symbol plist ¶
+</pre></div>
+<p>此函数将符号的属性列表设置为 plist。通常，plist 应该是一个格式良好的属性列表，但这不是强制的。返回值为 plist。
+</p><div class="lisp">
+<pre class="lisp">(setplist 'foo '(a 1 b (2 3) c nil))
+     ⇒ (a 1 b (2 3) c nil)
+(symbol-plist 'foo)
+     ⇒ (a 1 b (2 3) c nil)
+</pre></div>
+<p>对于不用于普通目的的特殊 obarray 中的符号，以非标准方式使用属性列表单元格可能是有意义的；  事实上，缩写机制就是这样做的（参见缩写和缩写扩展）。
+</p>
+<p>您可以根据 setplist 和 plist-put 定义 put，如下所示：
+</p><div class="lisp">
+<pre class="lisp">(defun put (symbol prop value)
+  (setplist symbol
+            (plist-put (symbol-plist symbol) prop value)))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: function-get symbol property &amp;optional autoload ¶
+</pre></div>
+<p>此函数与 get 相同，除了如果 symbol 是函数别名的名称，它会在命名实际函数的符号的属性列表中查找。请参阅定义函数。如果可选参数 autoload 不为零，并且符号是自动加载的，则此函数将尝试自动加载它，因为自动加载可能会设置符号的属性。如果 autoload 是符号宏，仅当 symbol 是自动加载的宏时才尝试自动加载。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: function-put function property value ¶
+</pre></div>
+<p>此函数将函数的属性设置为值。函数应该是一个符号。这个函数比调用 put 来设置函数的属性更受欢迎，因为它会让我们有一天能够实现旧属性到新属性的重新映射。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="09.4.2_标准符号属性.html">标准符号属性</a>, Previous: <a href="09.4_符号属性.html">符号属性</a>, Up: <a href="09.4_符号属性.html">符号属性.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

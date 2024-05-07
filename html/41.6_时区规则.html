@@ -1,0 +1,21 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>41.6 时区规则</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">41.6 时区规则</h2>
+<div class="nav-panel"><p>Next: <a href="41.7_时间转换.html">时间转换</a>, Previous: <a href="41.5_时间.html">时间</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>默认时区由 TZ 环境变量确定。请参阅操作系统环境。例如，您可以使用 (setenv "TZ" "UTC0") 告诉 Emacs 默认为世界时。如果 TZ 不在环境中，Emacs 使用系统挂钟时间，这是一个依赖于平台的默认时区。
+</p>
+<p>支持的 TZ 字符串集取决于系统。GNU 和许多其他系统支持 tzdata 数据库，例如，’"America/New<em>_York</em>"’ 指定纽约市附近位置的时区和夏令时历史。GNU 和大多数其他系统支持 POSIX 样式的 TZ 字符串，例如，’"EST+5EDT,M4.1.0/2,M10.5.0/2"’ 指定纽约从 1987 年到 2006 年使用的规则。所有系统都支持该字符串’"UTC0"’ 表示世界时。
+</p>
+<p>与本地时间相互转换的函数接受可选的时区规则参数，该参数指定转换的时区和夏令时历史。如果时区规则被省略或为零，则转换使用 Emacs 的默认时区。如果是 t，则转换使用世界时。如果是 wall，则转换使用系统挂钟时间。如果是字符串，则转换使用相当于将 TZ 设置为该字符串的时区规则。如果它是一个列表（偏移量缩写），其中偏移量是世界时间以东的整数秒数，而缩写是一个字符串，则转换使用具有给定偏移量和缩写的固定时区。整数偏移量被视为 (offset abbr)，其中 abbr 是 POSIX 兼容平台上的数字缩写，在 MS-Windows 上未指定。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: current-time-zone &amp;optional time zone ¶
+</pre></div>
+<p>此函数返回一个描述用户所在时区的列表。
+</p>
+<p>该值的形式为（偏移缩写）。这里的 offset 是一个整数，表示世界时间（格林威治以东）之前的秒数。负值表示格林威治以西。第二个元素 abbr 是一个字符串，它给出了时区的缩写，例如， <code>CST</code> 代表中国标准时间或美国中部标准时间。当夏令时开始或结束时，这两个元素都可以改变；  如果用户指定了不使用季节性时间调整的时区，则该值在时间上是恒定的。
+</p>
+<p>如果操作系统没有提供计算该值所需的所有信息，则列表的未知元素为零。
+</p>
+<p>如果给定参数时间，则指定要分析的时间值而不是当前时间。可选参数 zone 默认为当前时区规则。操作系统限制时间和区域值的范围。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="41.7_时间转换.html">时间转换</a>, Previous: <a href="41.5_时间.html">时间</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

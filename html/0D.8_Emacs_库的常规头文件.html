@@ -1,0 +1,112 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>D.8 Emacs 库的常规头文件</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">D.8 Emacs 库的常规头文件</h2>
+<div class="nav-panel"><p>Next: <a href="附录_E_GNU_Emacs内部结构.html">E_GNU_Emacs内部结构</a>, Previous: <a href="0D.7_撰写注释的技巧.html">撰写注释的技巧</a>, Up: <a href="附录_D_提示和约定.html">D_提示和约定.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 有在 Lisp 库中使用特殊注释的约定，将它们划分为多个部分并提供诸如谁编写它们的信息。对这些项目使用标准格式使工具（和人员）更容易提取相关信息。本节从一个示例开始解释这些约定：
+</p>
+<div class="lisp">
+<pre class="lisp">;;; foo.el --- Support for the Foo programming language  -*- lexical-binding: t; -*-
+
+;; Copyright (C) 2010-2021 Your Name
+
+
+;; Author: Your Name &lt;yourname@example.com&gt;
+;; Maintainer: Someone Else &lt;someone@example.com&gt;
+;; Created: 14 Jul 2010
+
+;; Keywords: languages
+;; URL: https://example.com/foo
+
+;; This file is not part of GNU Emacs.
+
+;; This file is free software…
+…
+;; along with this file.  If not, see &lt;https://www.gnu.org/licenses/&gt;.
+
+</pre></div>
+<p>第一行应该有这种格式：
+</p>
+<div class="lisp">
+<pre class="lisp">;;; filename --- description  -*- lexical-binding: t; -*-
+</pre></div>
+<p>描述应包含在一行中。如果文件需要在 ’-*-’ 规范中设置更多变量，请在词法绑定之后添加。如果这会使第一行太长，请在文件末尾使用局部变量部分。
+</p>
+<p>版权声明通常会列出您的姓名（如果您编写了文件）。如果您的雇主声称对您的作品拥有版权，您可能需要将其列出。不要说版权所有者是自由软件基金会（或该文件是 GNU Emacs 的一部分），除非您的文件已被 Emacs 发行版接受。有关版权和许可声明形式的更多信息，请参阅 GNU 网站上的指南。
+</p>
+<p>版权声明之后是几行标题注释行，每行都以’;;;开头。标题名称：’。以下是 header-name 的常规可能性表：
+</p>
+<div class="lisp">
+<pre class="lisp">‘Author’
+</pre></div>
+<p>此标头至少说明了该库的主要作者的姓名和电子邮件地址。如果有多个作者，请在以 ;; 开头的续行中列出他们。和一个制表符或至少两个空格。我们建议包括一个联系电子邮件地址，格式为 <code>&lt;...&gt;</code> 。例如：
+</p><div class="lisp">
+<pre class="lisp">;;  作者：你的名字 &lt;yourname@example.com&gt;
+;;  其他人 &lt;someone@example.com&gt;
+;;  另一个人 &lt;another@example.com&gt;
+</pre></div>
+<div class="lisp">
+<pre class="lisp">‘Maintainer’
+</pre></div>
+<p>此标头与作者标头具有相同的格式。它列出了当前维护文件的人员（响应错误报告等）。
+</p>
+<p>如果没有维护者标头，则假定作者标头中的人是维护者。Emacs 中的一些文件使用 ’emacs-devel@gnu.org’ 作为维护者，这意味着作者不再对文件负责，并且它作为 Emacs 的一部分进行维护。
+</p><div class="lisp">
+<pre class="lisp">‘Created’
+</pre></div>
+<p>此可选行给出文件的原始创建日期，仅用于历史兴趣。
+</p><div class="lisp">
+<pre class="lisp">‘Version’
+</pre></div>
+<p>如果你想记录单个 Lisp 程序的版本号，把它们放在这一行。与 Emacs 一起分发的 Lisp 文件通常没有 <code>版本</code> 标头，因为 Emacs 本身的版本号用于相同的目的。如果您要分发多个文件的集合，我们建议不要在每个文件中编写版本，而只在主要文件中编写。
+</p><div class="lisp">
+<pre class="lisp">‘Keywords’ ¶
+</pre></div>
+<p>此行列出了 finder-by-keyword 帮助命令的关键字。请使用该命令查看有意义的关键字列表。命令 Mx checkdoc-package-keywords RET 将查找并显示任何不在 finder-known-keywords 中的关键字。如果您将变量 checkdoc-package-keywords-flag 设置为非 nil，则 checkdoc 命令将在其检查中包含关键字验证。
+</p>
+<p>此字段是人们在按主题查找内容时如何找到您的包裹的方式。要分隔关键字，您可以使用空格、逗号或同时使用两者。
+</p>
+<p>这个字段的名字是不幸的，因为人们通常认为它是编写描述其包的任意关键字的地方，而不仅仅是相关的 Finder 关键字。
+</p><div class="lisp">
+<pre class="lisp">‘URL’
+</pre></div>
+<div class="lisp">
+<pre class="lisp">‘Homepage’
+</pre></div>
+<p>这些行说明了图书馆的网站。
+</p><div class="lisp">
+<pre class="lisp">‘Package-Version’
+</pre></div>
+<p>如果’Version’不适合包管理器使用，那么一个包可以定义’Package-Version’；  它将被使用。如果 ’Version’ 是 RCS id 或其他无法由 version-to-list 解析的东西，这很方便。请参阅包装基础知识。
+</p><div class="lisp">
+<pre class="lisp">‘Package-Requires’
+</pre></div>
+<p>如果存在，它会命名当前包依赖于正确操作的包。请参阅包装基础知识。包管理器在下载时（以确保下载完整的包集）和激活时（以确保仅在包的所有依赖项都已激活时才激活包）都使用它。
+</p>
+<p>它的格式是单行的列表列表。每个子列表的汽车是一个包的名称，作为一个符号。每个子列表的 cadr 是可接受的最小版本号，作为可以由 version-to-list 解析的字符串。缺少版本的条目（即，只是一个符号或一个元素的子列表的条目）等同于具有版本 <code>0</code> 的条目。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">;; Package-Requires: ((gnus "1.0") (bubbles "2.7.2") cl-lib (seq))
+</pre></div>
+<p>包代码自动定义一个名为 <code>emacs</code> 的包，其中包含当前运行的 Emacs 的版本号。这可用于要求包的 Emacs 最低版本。
+</p>
+<p>几乎每个 Lisp 库都应该有 ’Author’ 和 ’Keywords’ 标题注释行。如果合适，请使用其他。您也可以将标题行与其他标题名称一起放入 - 它们没有标准含义，因此它们不会造成任何伤害。
+</p>
+<p>我们使用额外的风格化注释来细分库文件的内容。这些应该通过空行与其他任何内容分开。这是他们的表格：
+</p>
+<div class="lisp">
+<pre class="lisp">‘;;; Commentary:’
+</pre></div>
+<p>这开始介绍性注释，解释图书馆如何工作。它应该紧跟在复制权限之后，由 <code>更改日志</code> 、 <code>历史</code> 或 <code>代码</code> 注释行终止。该文本由 Finder 包使用，因此在该上下文中应该是有意义的。
+</p><div class="lisp">
+<pre class="lisp">‘;;; Change Log:’
+</pre></div>
+<p>这将开始一个可选的文件随时间变化的日志。不要在本节中提供太多信息——最好将详细日志保存在版本控制系统（如 Emacs 所做的那样）或单独的 ChangeLog 文件中。 <code>历史</code> 是 <code>更改日志</code> 的替代品。
+</p><div class="lisp">
+<pre class="lisp">‘;;; Code:’
+</pre></div>
+<p>这开始了程序的实际代码。
+</p><div class="lisp">
+<pre class="lisp">‘;;; filename ends here’
+</pre></div>
+<p>这是页脚线；  它出现在文件的最后。其目的是使人们能够通过缺少页脚行来检测文件的截断版本。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="附录_E_GNU_Emacs内部结构.html">E_GNU_Emacs内部结构</a>, Previous: <a href="0D.7_撰写注释的技巧.html">撰写注释的技巧</a>, Up: <a href="附录_D_提示和约定.html">D_提示和约定.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

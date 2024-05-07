@@ -1,0 +1,52 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.8.3 扬克</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">33.8.3 扬克</h3>
+<div class="nav-panel"><p>Next: <a href="33.8.4_Yanking_函数.html">Yanking_函数</a>, Previous: <a href="33.8.2_杀死函数.html">杀死函数</a>, Up: <a href="33.8_环.html">环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Yanking 是指从 kill ring 中插入文本，但不会盲目插入文本。yank 命令和相关命令使用 insert-for-yank 在插入之前对文本执行特殊处理。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: insert-for-yank string ¶
+</pre></div>
+<p>此函数的工作方式类似于插入，除了它根据 yank-handler 文本属性以及变量 yank-handled-properties 和 yank-excluded-properties（见下文）处理字符串中的文本，然后将结果插入到当前缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: insert-buffer-substring-as-yank buf &amp;optional start end ¶
+</pre></div>
+<p>此函数类似于 insert-buffer-substring，不同之处在于它根据 yank-handled-properties 和 yank-excluded-properties 处理文本。（它不处理 yank-handler 属性，该属性通常不会出现在缓冲区文本中。）
+</p>
+<p>如果将 yank-handler 文本属性放在字符串的全部或部分上，则会改变 insert-for-yank 插入字符串的方式。如果字符串的不同部分具有不同的 yank-handler 值（与 eq 进行比较），则每个子字符串将单独处理。属性值必须是一到四个元素的列表，格式如下（第一个元素之后的元素可以省略）：
+</p>
+<div class="lisp">
+<pre class="lisp">(function param noexclude undo)
+</pre></div>
+<p>以下是元素的作用：
+</p>
+<div class="lisp">
+<pre class="lisp">function
+</pre></div>
+<p>当 function 不为 nil 时，调用它而不是 insert 来插入字符串，并带有一个参数——要插入的字符串。
+</p><div class="lisp">
+<pre class="lisp">param
+</pre></div>
+<p>如果 param 存在且非 nil，它将替换字符串（或正在处理的字符串的子字符串）作为传递给函数（或插入）的对象。例如，如果函数是 yank-rectangle，则参数应该是要插入为矩形的字符串列表。
+</p><div class="lisp">
+<pre class="lisp">noexclude
+</pre></div>
+<p>如果 noexclude 存在且非 nil，则禁用 yank-handled-properties 和 yank-excluded-properties 对插入字符串的正常操作。
+</p><div class="lisp">
+<pre class="lisp">undo
+</pre></div>
+<p>如果 undo 存在且非 nil，它是一个函数，将由 yank-pop 调用以撤消当前对象的插入。它使用两个参数调用，即当前区域的开始和结束。function 可以设置 yank-undo-function 来覆盖 undo 值。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: yank-handled-properties ¶
+</pre></div>
+<p>此变量为抽出的文本指定特殊的文本属性处理条件。它在插入文本后（通常，或通过 yank-handler 属性）生效，并且在 yank-excluded-properties 生效之前生效。
+</p>
+<p>该值应该是一个元素列表（prop . fun）。每个 alist 元素都按顺序处理。扫描插入的文本以查找具有文本属性 eq 到 prop 的文本段；  对于每个这样的拉伸，fun 会使用三个参数调用：属性的值，以及文本的开始和结束位置。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: yank-excluded-properties ¶
+</pre></div>
+<p>此变量的值是要从插入的文本中删除的属性列表。它的默认值包含可能导致令人讨厌的结果的属性，例如使文本响应鼠标或指定键绑定。它在 yank-handled-properties 之后生效。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.8.4_Yanking_函数.html">Yanking_函数</a>, Previous: <a href="33.8.2_杀死函数.html">杀死函数</a>, Up: <a href="33.8_环.html">环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

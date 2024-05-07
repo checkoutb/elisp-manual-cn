@@ -1,0 +1,30 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>26.13.1 概述</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">26.13.1 概述</h3>
+<div class="nav-panel"><p>Next: <a href="26.13.2_往返规范.html">往返规范</a>, Previous: <a href="26.13_文件格式转换.html">文件格式转换</a>, Up: <a href="26.13_文件格式转换.html">文件格式转换.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>函数插入文件内容：
+</p>
+<ul>
+<li>
+最初，将文件中的字节插入缓冲区；
+</li><li>
+将字节解码为适当的字符；
+</li><li>
+处理由 format-alist 中的条目定义的格式；  和
+</li><li>
+调用后插入文件函数中的函数。
+</li></ul>
+<p>函数写入区域：
+</p>
+<ul>
+<li>
+最初，调用 write-region-annotate-functions 中的函数；
+</li><li>
+处理由 format-alist 中的条目定义的格式；
+</li><li>
+根据需要将字符编码为字节；  和
+</li><li>
+用字节修改文件。
+</li></ul>
+<p>这显示了最低级别操作的对称性；  阅读和写作以相反的顺序处理事情。本节的其余部分描述了围绕上述三个变量的两个工具，以及一些相关的函数。编码系统，有关字符编码和解码的详细信息。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="26.13.2_往返规范.html">往返规范</a>, Previous: <a href="26.13_文件格式转换.html">文件格式转换</a>, Up: <a href="26.13_文件格式转换.html">文件格式转换.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

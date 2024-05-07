@@ -1,0 +1,65 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>21.3 用 Minibuffer 读取 Lisp 对象</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">21.3 用 Minibuffer 读取 Lisp 对象</h2>
+<div class="nav-panel"><p>Next: <a href="21.4_小缓冲区历史.html">小缓冲区历史</a>, Previous: <a href="21.2_用_Minibuffer_读取文本字符串.html">用_Minibuffer_读取文本字符串</a>, Up: <a href="21_小缓冲区.html">小缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍使用 minibuffer 读取 Lisp 对象的函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: read-minibuffer prompt &amp;optional initial ¶
+</pre></div>
+<p>这个函数使用 minibuffer 读取一个 Lisp 对象，并返回它而不评估它。参数 prompt 和 initial 与 read-from-minibuffer 一样使用。
+</p>
+<p>这是 read-from-minibuffer 函数的简化接口：
+</p>
+<div class="lisp">
+<pre class="lisp">(read-minibuffer prompt initial)
+≡
+(let (minibuffer-allow-text-properties)
+  (read-from-minibuffer prompt initial nil t))
+</pre></div>
+<p>这是一个示例，其中我们提供字符串 <code>(testing)</code> 作为初始输入：
+</p><div class="lisp">
+<pre class="lisp">
+
+(read-minibuffer
+ "Enter an expression: " (format "%s" '(testing)))
+
+;; Here is how the minibuffer is displayed:
+
+
+---------- Buffer: Minibuffer ----------
+Enter an expression: (testing)∗
+---------- Buffer: Minibuffer ----------
+</pre></div>
+<p>用户可以立即键入 RET 以使用初始输入作为默认值，或者可以编辑输入。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: eval-minibuffer prompt &amp;optional initial ¶
+</pre></div>
+<p>这个函数使用 minibuffer 读取一个 Lisp 表达式，计算它，然后返回结果。参数 prompt 和 initial 与 read-from-minibuffer 一样使用。
+</p>
+<p>这个函数只计算调用 read-minibuffer 的结果：
+</p><div class="lisp">
+<pre class="lisp">(eval-minibuffer prompt initial)
+≡
+(eval (read-minibuffer prompt initial))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: edit-and-eval-command prompt form ¶
+</pre></div>
+<p>这个函数读取 minibuffer 中的 Lisp 表达式，计算它，然后返回结果。该命令和 eval-minibuffer 的区别在于，这里的初始形式不是可选的，它被视为要转换为打印表示的 Lisp 对象，而不是文本字符串。它使用 prin1 打印，因此如果是字符串，则双引号字符 (’"’) 会出现在初始文本中。请参阅输出函数。
+</p>
+<p>在以下示例中，我们为用户提供了一个初始文本已经是有效形式的表达式：
+</p><div class="lisp">
+<pre class="lisp">(edit-and-eval-command "Please edit: " '(forward-word 1))
+
+;; After evaluation of the preceding expression,
+;;   the following appears in the minibuffer:
+
+
+---------- Buffer: Minibuffer ----------
+Please edit: (forward-word 1)∗
+---------- Buffer: Minibuffer ----------
+</pre></div>
+<p>立即键入 RET 将退出 minibuffer 并评估表达式，从而向前移动一个单词。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="21.4_小缓冲区历史.html">小缓冲区历史</a>, Previous: <a href="21.2_用_Minibuffer_读取文本字符串.html">用_Minibuffer_读取文本字符串</a>, Up: <a href="21_小缓冲区.html">小缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

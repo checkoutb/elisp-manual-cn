@@ -1,0 +1,10 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.7.3 鼠标事件</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">22.7.3 鼠标事件</h3>
+<div class="nav-panel"><p>Next: <a href="22.7.4_点击事件.html">点击事件</a>, Previous: <a href="22.7.2_功能键.html">功能键</a>, Up: <a href="22.7_输入事件.html">输入事件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 支持四种鼠标事件：单击事件、拖动事件、按钮按下事件和运动事件。所有鼠标事件都表示为列表。列表的 CAR 是事件类型；  这说明涉及哪个鼠标按钮，以及使用了哪些修饰键。事件类型还可以区分两次或三次按钮按下（请参阅重复事件）。列表元素的其余部分提供位置和时间信息。
+</p>
+<p>对于键查找，只有事件类型很重要：相同类型的两个事件必须运行相同的命令。该命令可以使用 <code>e</code> 交互代码访问这些事件的完整值。请参阅代码字符以进行交互。
+</p>
+<p>以鼠标事件开始的键序列是使用鼠标所在窗口中缓冲区的键映射读取的，而不是当前缓冲区。这并不意味着在窗口中单击会选择该窗口或其缓冲区——这完全在键序列的命令绑定的控制之下。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.7.4_点击事件.html">点击事件</a>, Previous: <a href="22.7.2_功能键.html">功能键</a>, Up: <a href="22.7_输入事件.html">输入事件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

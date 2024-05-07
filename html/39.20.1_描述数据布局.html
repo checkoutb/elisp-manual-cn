@@ -1,0 +1,78 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>39.20.1 描述数据布局</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">39.20.1 描述数据布局</h3>
+<div class="nav-panel"><p>Next: <a href="39.20.2_解包和打包字节的函数.html">解包和打包字节的函数</a>, Previous: <a href="39.20_打包和解包字节数组.html">打包和解包字节数组</a>, Up: <a href="39.20_打包和解包字节数组.html">打包和解包字节数组.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>要控制解包和打包，您需要编写数据布局规范，也称为 Bindat 类型表达式。这可以是基本类型或由多个字段组成的复合类型，其中规范控制要处理的每个字段的长度，以及如何打包或解包。我们通常将 bindat 类型值保存在名称以 -bindat-spec 结尾的变量中；  这种名称会被自动识别为有风险的（请参阅文件局部变量）。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: bindat-type &amp;rest type ¶
+</pre></div>
+<p>根据 Bindat 类型表达式类型创建一个 Bindat 类型值对象。
+</p>
+<p>字段的类型描述了该字段表示的对象的大小（以字节为单位），在多字节字段的情况下，还描述了字节在字段中的排序方式。两种可能的排序是大端（也称为 <code>网络字节排序</code> ）和小端。例如，大端序中的数字#x23cd（十进制9165）将是两个字节#x23 #xcd；  在小端，#xcd #x23。以下是可能的类型值：
+</p>
+<div class="lisp">
+<pre class="lisp">u8
+</pre></div>
+<div class="lisp">
+<pre class="lisp">byte
+</pre></div>
+<p>无符号字节，长度为 1。
+</p><div class="lisp">
+<pre class="lisp">uint bitlen
+</pre></div>
+<p>网络字节顺序的无符号整数，带有 bitlen 位。bitlen 必须是 8 的倍数。
+</p><div class="lisp">
+<pre class="lisp">uintr bitlen
+</pre></div>
+<p>小端序的无符号整数，带有 bitlen 位。bitlen 必须是 8 的倍数。
+</p><div class="lisp">
+<pre class="lisp">str len
+</pre></div>
+<p>长度为 len 的字节字符串。
+</p><div class="lisp">
+<pre class="lisp">strz &amp;optional len
+</pre></div>
+<p>以零结尾的字节串，可以是任意长度，也可以是长度为 len 的固定大小字段。
+</p><div class="lisp">
+<pre class="lisp">vec len [type]
+</pre></div>
+<p>len 元素的向量。元素的类型由类型给出，默认为字节。类型可以是任何 Bindat 类型表达式。
+</p><div class="lisp">
+<pre class="lisp">repeat len [type]
+</pre></div>
+<p>与 vec 类似，但它解包到列表并从列表中打包，而 vec 解包到向量。
+</p><div class="lisp">
+<pre class="lisp">bits len
+</pre></div>
+<p>设置为 1 的位列表（以 len 个字节为单位）。字节按大端顺序获取，位编号从 8 * len - 1 开始，以零结尾。例如：位 2 将 #x28 #x1c 解包到 (2 3 4 11 13) 和 #x1c #x28 到 (3 5 10 11 12)。
+</p><div class="lisp">
+<pre class="lisp">fill len
+</pre></div>
+<p>len 个字节仅用作填充符。在打包时，这些字节保持不变，这通常意味着它们保持为零。解包时，这只是返回 nil。
+</p><div class="lisp">
+<pre class="lisp">align len
+</pre></div>
+<p>除了字节数是跳到下一个 len 字节的倍数之外，与 fill 相同。
+</p><div class="lisp">
+<pre class="lisp">type exp
+</pre></div>
+<p>这让你可以间接引用一个类型：exp 是一个 Lisp 表达式，它应该返回一个 Bindat 类型值。
+</p><div class="lisp">
+<pre class="lisp">unit exp
+</pre></div>
+<p>这是一个使用 0 位空间的普通类型。exp 描述了当我们尝试 <code>解包</code> 这样一个字段时返回的值。
+</p><div class="lisp">
+<pre class="lisp">struct fields...
+</pre></div>
+<p>由多个字段组成的复合类型。每个字段都采用（名称类型）形式，其中类型可以是任何 Bindat 类型表达式。当字段的值不值得命名时，name 可以是 _，对齐和填充字段通常是这种情况。当上下文明确表明这是一个 Bindat 类型表达式时，可以省略符号结构。
+</p>
+<p>在上述类型中，len 和 bitlen 以整数形式给出，指定字段中的字节数（或位数）。当字段的长度不固定时，通常取决于前面字段的值。出于这个原因，长度 len 不必是一个常数，而是可以是任何 Lisp 表达式，它可以通过名称引用先前字段的值。
+</p>
+<p>例如，前导字节给出后续 16 位整数向量的大小的数据布局规范可以是：
+</p>
+<div class="lisp">
+<pre class="lisp">(bindat-type
+  (len      u8)
+  (payload  vec (1+ len) uint 16))
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="39.20.2_解包和打包字节的函数.html">解包和打包字节的函数</a>, Previous: <a href="39.20_打包和解包字节数组.html">打包和解包字节数组</a>, Up: <a href="39.20_打包和解包字节数组.html">打包和解包字节数组.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

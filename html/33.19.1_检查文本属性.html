@@ -1,0 +1,71 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.19.1 检查文本属性</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">33.19.1 检查文本属性</h3>
+<div class="nav-panel"><p>Next: <a href="33.19.2_更改文本属性.html">更改文本属性</a>, Previous: <a href="33.19_文本属性.html">文本属性</a>, Up: <a href="33.19_文本属性.html">文本属性.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>检查文本属性的最简单方法是询问特定字符的特定属性的值。为此，请使用 get-text-property。使用 text-properties-at 获取字符的整个属性列表。有关一次检查多个字符的属性的函数，请参阅文本属性搜索函数。
+</p>
+<p>这些函数处理字符串和缓冲区。请记住，字符串中的位置从 0 开始，而缓冲区中的位置从 1 开始。传递当前缓冲区以外的缓冲区可能会很慢。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: get-text-property pos prop &amp;optional object ¶
+</pre></div>
+<p>此函数返回对象（缓冲区或字符串）中位置 pos 之后的字符的 prop 属性值。参数对象是可选的，默认为当前缓冲区。
+</p>
+<p>如果严格来说没有 prop 属性，但字符有一个属于符号的属性类别，则 get-text-property 返回该符号的 prop 属性。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: get-char-property position prop &amp;optional object ¶
+</pre></div>
+<p>此函数类似于 get-text-property，只是它先检查叠加层，然后检查文本属性。请参见叠加。
+</p>
+<p>参数对象可以是字符串、缓冲区或窗口。如果它是一个窗口，则显示在该窗口中的缓冲区用于文本属性和覆盖，但只考虑该窗口的活动覆盖。如果 object 是缓冲区，则首先考虑该缓冲区中的覆盖，按优先级递减的顺序，然后是文本属性。如果 object 是字符串，则只考虑文本属性，因为字符串永远不会有覆盖。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: get-pos-property position prop &amp;optional object ¶
+</pre></div>
+<p>这个函数和get-char-property类似，只是它关注的是属性的粘性和叠加层的前进设置，而不是角色在（即之后）位置的属性。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: get-char-property-and-overlay position prop &amp;optional object ¶
+</pre></div>
+<p>这类似于 get-char-property，但提供了有关属性值来自的叠加层的额外信息。
+</p>
+<p>它的值是一个 cons 单元格，其 CAR 是属性值，相同的值 get-char-property 将返回相同的参数。它的 CDR 是在其中找到该属性的叠加层，如果它是作为文本属性找到的或根本没有找到，则为 nil。
+</p>
+<p>如果位置在对象的末尾，则该值的 CAR 和 CDR 均为 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: char-property-alias-alist ¶
+</pre></div>
+<p>此变量包含一个将属性名称映射到替代属性名称列表的 alist。如果字符没有为属性指定直接值，则按顺序查询替代属性名称；  使用第一个非零值。此变量优先于 default-text-properties，类别属性优先于此变量。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: text-properties-at position &amp;optional object ¶
+</pre></div>
+<p>此函数返回字符串或缓冲区对象中位置处字符的整个属性列表。如果 object 为 nil，则默认为当前缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: default-text-properties ¶
+</pre></div>
+<p>此变量包含一个属性列表，为文本属性提供默认值。每当一个字符没有直接、通过类别符号或通过 char-property-alias-alist 指定属性的值时，都会使用存储在此列表中的值。这是一个例子：
+</p>
+<div class="lisp">
+<pre class="lisp">(setq default-text-properties '(foo 69)
+      char-property-alias-alist nil)
+;; Make sure character 1 has no properties of its own.
+(set-text-properties 1 2 nil)
+;; What we get, when we ask, is the default value.
+(get-text-property 1 'foo)
+     ⇒ 69
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: object-intervals OBJECT ¶
+</pre></div>
+<p>此函数将对象中的间隔（即文本属性）的副本作为间隔列表返回。对象必须是字符串或缓冲区。更改此列表的结构不会更改对象中的间隔。
+</p>
+<div class="lisp">
+<pre class="lisp">(object-intervals (propertize "foo" 'face 'bold))
+     ⇒ ((0 3 (face bold)))
+</pre></div>
+<p>返回列表中的每个元素代表一个区间。每个区间有三部分：第一部分是开始，第二部分是结束，第三部分是文本属性本身。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.19.2_更改文本属性.html">更改文本属性</a>, Previous: <a href="33.19_文本属性.html">文本属性</a>, Up: <a href="33.19_文本属性.html">文本属性.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>29.23 水平滚动</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">29.23 水平滚动</h2>
+<div class="nav-panel"><p>Next: <a href="29.24_坐标和窗口.html">坐标和窗口</a>, Previous: <a href="29.22_垂直小数滚动.html">垂直小数滚动</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>水平滚动意味着将窗口中的图像向左或向右移动正常字符宽度的指定倍数。每个窗口都有一个水平滚动位置，它是一个数字，从不小于零。它指定将内容向左移动多远。将窗口内容向左移动通常会使某些字符的全部或部分从左侧消失，而某些其他字符的全部或部分则出现在右侧。通常的值为零。
+</p>
+<p>水平滚动位置以正常字符宽度为单位测量，即默认字体中的空间宽度。因此，如果值为 5，则意味着窗口内容向左滚动正常字符宽度的 5 倍。有多少字符实际上消失在左侧取决于它们的宽度，并且可能因行而异。
+</p>
+<p>因为我们在内循环中从一边到另一边阅读，在外循环中从上到下阅读，水平滚动的效果不像文本或垂直滚动​​。文本滚动涉及选择要显示的部分文本，垂直滚动会连续移动窗口内容；  但是水平滚动会导致每行的一部分离开屏幕。
+</p>
+<p>通常，没有水平滚动生效；  那么最左边的列位于窗口的左边缘。在这种状态下，向右滚动是没有意义的，因为边缘左侧没有数据可以显示；  所以这是不允许的。允许向左滚动；  它将第一列文本滚动到窗口边缘，并可以在右侧显示之前被截断的其他列。一旦一个窗口有一个非零的向左水平滚动量，您可以将它滚动回右边，但只能将净水平滚动减少到零。您可以向左滚动多远没有限制，但最终所有文本都会从左边缘消失。
+</p>
+<p>如果设置了 auto-hscroll-mode，redisplay 会根据需要自动更改窗口的水平滚动，以确保该点始终可见。但是，您仍然可以显式设置水平滚动值。您指定的值用作自动滚动的下限，即自动滚动不会将窗口滚动到小于指定列的列。
+</p>
+<p>auto-hscroll-mode 的默认值为 t；  将其设置为 current-line 会激活自动水平滚动的一种变体，其中仅显示光标的行水平滚动以使点可见，窗口的其余部分要么未滚动，要么处于由 scroll-left 设置的最小滚动量和向右滚动，见下文。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: scroll-left &amp;optional count set-minimum ¶
+</pre></div>
+<p>此函数将选定的窗口计数列向左滚动（如果计数为负数，则向右滚动）。count 的默认值是窗口宽度，负 2。
+</p>
+<p>返回值是更改后有效的向左水平滚动的总量——就像 window-hscroll 返回的值（如下）。
+</p>
+<p>请注意，基本方向为从右到左的段落中的文本（请参阅双向显示）以相反的方向移动：例如，当使用正值 count 调用向左滚动时，它会向右移动。
+</p>
+<p>一旦您将窗口尽可能向右滚动，回到其向左滚动总量为零的正常位置，尝试再向右滚动将无效。
+</p>
+<p>如果 set-minimum 不为零，则新的滚动量成为自动滚动的下限；  也就是说，自动滚动不会将窗口滚动到小于此函数返回值的列。交互式调用通过非零设置最小值。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: scroll-right &amp;optional count set-minimum ¶
+</pre></div>
+<p>此函数将选定的窗口计数列向右滚动（如果计数为负数，则向左滚动）。count 的默认值是窗口宽度，减 2。除了滚动方向之外，这就像向左滚动一样。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-hscroll &amp;optional window ¶
+</pre></div>
+<p>此函数返回窗口的总向左水平滚动——窗口中的文本向左滚动超过左边距的列数。（在从右到左的段落中，该值是向右滚动的总量。） window 的默认值是选定的窗口。
+</p>
+<p>返回值永远不会是负数。当窗口中没有进行水平滚动时（通常是这种情况），它为零。
+</p><div class="lisp">
+<pre class="lisp">
+
+(window-hscroll)
+     ⇒ 0
+
+(scroll-left 5)
+     ⇒ 5
+
+(window-hscroll)
+     ⇒ 5
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: set-window-hscroll window columns ¶
+</pre></div>
+<p>该函数设置窗口的水平滚动。columns 的值指定滚动量，以从左边距（从右到左段落中的右边距）为单位的列。参数列应为零或正数；  如果不是，则将其视为零。目前不支持列的小数值。
+</p>
+<p>请注意，如果您通过使用 M-: 以简单的方式评估调用来测试 set-window-hscroll，它可能看起来不起作用。发生的情况是该函数设置水平滚动值并返回，但随后重新显示调整水平滚动以使点可见，这会覆盖函数所做的。如果在 point 距离左边距足够远以保持可见的情况下调用它，您可以观察到该函数的效果。
+</p>
+<p>返回的值是列。
+</p>
+<div class="lisp">
+<pre class="lisp">(set-window-hscroll (selected-window) 10)
+     ⇒ 10
+</pre></div>
+<p>以下是如何确定给定位置位置是否由于水平滚动而不在屏幕上：
+</p><div class="lisp">
+<pre class="lisp">(defun hscroll-on-screen (window position)
+  (save-excursion
+    (goto-char position)
+    (and
+     (&gt;= (- (current-column) (window-hscroll window)) 0)
+     (&lt; (- (current-column) (window-hscroll window))
+        (window-width window)))))
+
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="29.24_坐标和窗口.html">坐标和窗口</a>, Previous: <a href="29.22_垂直小数滚动.html">垂直小数滚动</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

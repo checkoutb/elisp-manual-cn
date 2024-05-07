@@ -1,0 +1,130 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>2.8 等式谓词</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">2.8 等式谓词</h2>
+<div class="nav-panel"><p>Next: <a href="02.9_可变性.html">可变性</a>, Previous: <a href="02.7_类型谓词.html">类型谓词</a>, Up: <a href="02_Lisp_数据类型.html">Lisp_数据类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在这里，我们描述了测试两个对象之间是否相等的函数。其他函数测试特定类型对象（例如字符串）之间的内容是否相等。对于这些谓词，请参阅描述数据类型的相应章节。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: eq object1 object2
+</pre></div>
+<p>如果 object1 和 object2 是同一个对象，此函数返回 t，否则返回 nil。
+</p>
+<p>如果 object1 和 object2 是同名的符号，它们通常是同一个对象——但请参阅创建和内部符号以了解例外情况。对于其他非数字类型（例如，列表、向量、字符串），具有相同内容或元素的两个参数不一定彼此 eq：只有当它们是相同的对象时它们才是 eq，这意味着内容的变化一个的内容将反映在另一个内容的相同变化上。
+</p>
+<p>如果 object1 和 object2 是具有不同类型或值的数字，则它们不能是同一个对象，并且 eq 返回 nil。如果它们是具有相同值的 fixnums，那么它们是相同的对象并且 eq 返回 t。如果它们是分开计算的，但碰巧具有相同的值和相同的非固定数字类型，那么它们可能是也可能不是同一个对象，并且 eq 返回 t 或 nil 取决于 Lisp 解释器是创建一个对象还是两个对象。
+</p>
+<div class="lisp">
+<pre class="lisp">(eq 'foo 'foo)
+     ⇒ t
+
+
+(eq ?A ?A)
+     ⇒ t
+
+
+(eq 3.0 3.0)
+     ⇒ t or nil
+;; Equal floats may or may not be the same object.
+
+
+(eq (make-string 3 ?A) (make-string 3 ?A))
+     ⇒ nil
+
+
+(eq "asdf" "asdf")
+     ⇒ t or nil
+;; Equal string constants or may not be the same object.
+
+
+(eq '(1 (2 (3))) '(1 (2 (3))))
+     ⇒ nil
+
+
+(setq foo '(1 (2 (3))))
+     ⇒ (1 (2 (3)))
+(eq foo foo)
+     ⇒ t
+(eq foo '(1 (2 (3))))
+     ⇒ nil
+
+
+(eq [(1 2) 3] [(1 2) 3])
+     ⇒ nil
+
+
+(eq (point-marker) (point-marker))
+     ⇒ nil
+</pre></div>
+<p>make-symbol 函数返回一个 uninterned 符号，与在 Lisp 表达式中写入名称时使用的符号不同。具有相同名称的不同符号不是 eq。请参阅创建和嵌入符号。
+</p>
+<div class="lisp">
+<pre class="lisp">(eq (make-symbol "foo") 'foo)
+     ⇒ nil
+</pre></div>
+<p>Emacs Lisp 字节编译器可能会将相同的文字对象（例如文字字符串）折叠成对同一对象的引用，其效果是字节编译的代码会将此类对象比较为 eq，而同一代码的解释版本则不会。因此，您的代码不应该依赖具有相同文字内容的对象，要么是 eq，要么不是 eq，它应该使用比较对象内容的函数，例如 equal，如下所述。同样，您的代码不应修改文字对象（例如，将文本属性放在文字字符串上），因为这样做可能会影响相同内容的其他文字对象，如果字节编译器折叠它们。
+</p><div class="lisp">
+<pre class="lisp">Function: equal object1 object2
+</pre></div>
+<p>如果 object1 和 object2 具有相等的分量，则此函数返回 t，否则返回 nil。eq 测试它的参数是否是同一个对象，而 equal 则在不同的参数内部查找它们的元素或内容是否相同。因此，如果两个对象是 eq，它们是相等的，但反过来并不总是正确的。
+</p><div class="lisp">
+<pre class="lisp">(equal 'foo 'foo)
+     ⇒ t
+
+
+(equal 456 456)
+     ⇒ t
+
+
+(equal "asdf" "asdf")
+     ⇒ t
+
+(eq "asdf" "asdf")
+     ⇒ nil
+
+
+(equal '(1 (2 (3))) '(1 (2 (3))))
+     ⇒ t
+
+(eq '(1 (2 (3))) '(1 (2 (3))))
+     ⇒ nil
+
+
+(equal [(1 2) 3] [(1 2) 3])
+     ⇒ t
+
+(eq [(1 2) 3] [(1 2) 3])
+     ⇒ nil
+
+
+(equal (point-marker) (point-marker))
+     ⇒ t
+
+
+(eq (point-marker) (point-marker))
+     ⇒ nil
+</pre></div>
+<p>字符串的比较区分大小写，但不考虑文本属性——它只比较字符串中的字符。请参阅文本属性。使用 equal-include-properties 也可以比较文本属性。出于技术原因，当且仅当单字节字符串和多字节字符串包含相同的字符代码序列并且所有这些代码都在 0 到 127 (ASCII) 范围内时，它们才相等。
+</p><div class="lisp">
+<pre class="lisp">(equal "asdf" "ASDF")
+     ⇒ nil
+</pre></div>
+<p>equal 函数递归地比较对象的内容，如果它们是整数、字符串、标记、向量、布尔向量、字节码函数对象、字符表、记录或字体对象。只有当它们是 eq 时，其他对象才被认为是相等的。例如，两个不同的缓冲区永远不会被认为是相等的，即使它们的文本内容相同。
+</p>
+<p>对于相等，相等是递归定义的；  例如，给定两个 cons 单元格 x 和 y，(equal xy) 当且仅当以下两个表达式都返回 t 时返回 t：
+</p><div class="lisp">
+<pre class="lisp">(equal (car x) (car y))
+(equal (cdr x) (cdr y))
+</pre></div>
+<p>因此，比较循环列表可能会导致导致错误的深度递归，这可能会导致违反直觉的行为，例如 (equal ab) 返回 t 而 (equal ba) 表示错误。
+</p><div class="lisp">
+<pre class="lisp">Function: equal-including-properties object1 object2
+</pre></div>
+<p>此函数在所有情况下都表现得像相等，但还要求两个字符串相等，它们具有相同的文本属性。
+</p><div class="lisp">
+<pre class="lisp">(equal "asdf" (propertize "asdf" 'asdf t))
+     ⇒ t
+
+(equal-including-properties "asdf"
+                            (propertize "asdf" 'asdf t))
+     ⇒ nil
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="02.9_可变性.html">可变性</a>, Previous: <a href="02.7_类型谓词.html">类型谓词</a>, Up: <a href="02_Lisp_数据类型.html">Lisp_数据类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.2.6 模式挂钩</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">24.2.6 模式挂钩</h3>
+<div class="nav-panel"><p>Next: <a href="24.2.7_列表模式.html">列表模式</a>, Previous: <a href="24.2.5_基本主要模式.html">基本主要模式</a>, Up: <a href="24.2_主要模式.html">主要模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>每个主要模式命令都应该通过运行与模式无关的普通钩子 change-major-mode-after-body-hook、其模式钩子和普通钩子 after-change-major-mode-hook 来完成。它通过调用 run-mode-hooks 来做到这一点。如果主模式是派生模式，也就是说，如果它在其主体中调用另一个主模式（父模式），它应该在 delay-mode-hooks 中执行此操作，以便父模式不会自己运行这些挂钩。相反，派生模式对 run-mode-hooks 的调用也会运行父模式挂钩。请参阅主要模式约定。
+</p>
+<p>Emacs 22 之前的 Emacs 版本没有延迟模式挂钩。24 之前的版本没有 change-major-mode-after-body-hook。当用户实现的主要模式不使用 run-mode-hooks 并且尚未更新以使用这些新功能时，它们将不会完全遵循这些约定：它们可能过早运行父模式挂钩，或者无法运行之后-更改主要模式挂钩。如果您遇到这样的主要模式，请更正它以遵循这些约定。
+</p>
+<p>当您使用 define-derived-mode 定义主要模式时，它会自动确保遵循这些约定。如果您 <code>手动</code> 定义主模式，而不是使用定义派生模式，请使用以下函数自动处理这些约定。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: run-mode-hooks &amp;rest hookvars ¶
+</pre></div>
+<p>主要模式应使用此函数运行其模式挂钩。它类似于 run-hooks（参见 Hooks），但它也运行 change-major-mode-after-body-hook、hack-local-variables（当缓冲区访问文件时）（参见文件局部变量）和更改后主要模式挂钩。它所做的最后一件事是评估父模式声明的任何 :after-hook 形式（请参阅定义派生模式）。
+</p>
+<p>在执行延迟模式挂钩表单期间调用此函数时，它不会运行挂钩或破解本地变量或立即评估表单。相反，它会安排下一次调用 run-mode-hooks 来运行它们。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: delay-mode-hooks body… ¶
+</pre></div>
+<p>当一个主模式命令调用另一个主模式命令时，它应该在延迟模式挂钩内执行此操作。
+</p>
+<p>该宏执行 body，但在 body 执行期间告诉所有 run-mode-hooks 调用延迟运行它们的钩子。在 delay-mode-hooks 构造结束后，挂钩将在下一次调用 run-mode-hooks 期间实际运行。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: change-major-mode-after-body-hook ¶
+</pre></div>
+<p>这是一个由 run-mode-hooks 运行的普通钩子。它在模式挂钩之前运行。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: after-change-major-mode-hook ¶
+</pre></div>
+<p>这是一个由 run-mode-hooks 运行的普通钩子。它在每个正确编写的主要模式命令的最后运行。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="24.2.7_列表模式.html">列表模式</a>, Previous: <a href="24.2.5_基本主要模式.html">基本主要模式</a>, Up: <a href="24.2_主要模式.html">主要模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

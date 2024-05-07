@@ -1,0 +1,80 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>15.6 自定义主题</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">15.6 自定义主题</h2>
+<div class="nav-panel"><p>Next: <a href="16_加载.html">加载</a>, Previous: <a href="15.5_应用自定义.html">应用自定义</a>, Up: <a href="15_自定义设置.html">自定义设置.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>自定义主题是可以作为一个单元启用或禁用的设置集合。请参阅 GNU Emacs 手册中的自定义主题。每个自定义主题都由 Emacs Lisp 源文件定义，该源文件应遵循本节中描述的约定。（除了手动编写自定义主题，您还可以使用类似自定义的界面创建一个；请参阅 GNU Emacs 手册中的创建自定义主题。）
+</p>
+<p>自定义主题文件应命名为 foo-theme.el，其中 foo 是主题名称。文件中的第一个 Lisp 表单应该是对 deftheme 的调用，最后一个表单应该是对提供主题的调用。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: deftheme theme &amp;optional doc ¶
+</pre></div>
+<p>此宏将主题（一个符号）声明为自定义主题的名称。可选参数 doc 应该是描述主题的字符串；  这是用户调用 describe-theme 命令或类型时显示的描述？  在 <code>*自定义主题*</code> 缓冲区中。
+</p>
+<p>不允许使用两个特殊的主题名称（使用它们会导致错误）：user 是存储用户直接自定义设置的虚拟主题，changed 是存储在自定义系统之外所做的更改的虚拟主题。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: provide-theme theme ¶
+</pre></div>
+<p>此宏声明已完全指定名为 theme 的主题。
+</p>
+<p>在 deftheme 和 provide-theme 之间是指定主题设置的 Lisp 表单：通常是调用 custom-theme-set-variables 和/或调用 custom-theme-set-faces。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: custom-theme-set-variables theme &amp;rest args ¶
+</pre></div>
+<p>此函数指定自定义主题主题的变量设置。主题应该是一个符号。args 中的每个参数都应该是形式的列表
+</p>
+<div class="lisp">
+<pre class="lisp">(var expression [now [request [comment]]])
+</pre></div>
+<p>其中列表条目的含义与自定义设置变量中的含义相同。请参阅应用自定义。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: custom-theme-set-faces theme &amp;rest args ¶
+</pre></div>
+<p>此函数指定自定义主题主题的面部设置。主题应该是一个符号。args 中的每个参数都应该是形式的列表
+</p>
+<div class="lisp">
+<pre class="lisp">(face spec [now [comment]])
+</pre></div>
+<p>其中列表条目与 custom-set-faces 中的含义相同。请参阅应用自定义。
+</p>
+<p>理论上，主题文件还可以包含其他 Lisp 表单，在加载主题时会对其进行评估，但这是错误的表单。为了防止加载包含恶意代码的主题，Emacs 会在首次加载任何非内置主题之前显示源文件并要求用户确认。因此，主题通常不是字节编译的，当 Emacs 寻找要加载的主题时，源文件通常优先。
+</p>
+<p>以下函数对于以编程方式启用和禁用主题很有用：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: custom-theme-p theme ¶
+</pre></div>
+<p>如果主题（一个符号）是自定义主题的名称（即，已加载到 Emacs 中的自定义主题，无论主题是否启用），此函数返回一个非零值。否则，它返回零。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: custom-known-themes ¶
+</pre></div>
+<p>此变量的值是加载到 Emacs 中的主题列表。每个主题都由一个 Lisp 符号（主题名称）表示。此变量的默认值是一个包含两个虚拟主题的列表：（用户已更改）。在应用任何自定义主题之前所做的更改的主题存储设置（例如，在自定义之外设置的变量）。用户主题存储用户自定义和保存的设置。使用 deftheme 宏声明的任何其他主题都将添加到此列表的前面。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: load-theme theme &amp;optional no-confirm no-enable ¶
+</pre></div>
+<p>此函数从其源文件加载名为 theme 的自定义主题，在变量 custom-theme-load-path 指定的目录中查找源文件。请参阅 GNU Emacs 手册中的自定义主题。它还启用主题（除非可选参数 no-enable 为非 nil），使其变量和面设置生效。它会在加载主题之前提示用户确认，除非可选参数 no-confirm 为非零。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: require-theme feature &amp;optional noerror ¶
+</pre></div>
+<p>此函数在 custom-theme-load-path 中搜索提供功能的文件，然后加载它。这类似于函数 require（请参阅功能），除了它搜索 custom-theme-load-path 而不是 load-path（请参阅库搜索）。这在需要加载支持 Lisp 文件时需要不适合的自定义主题中很有用。
+</p>
+<p>如果根据 featurep 在当前 Emacs 会话中不存在应该是符号的特性，则 require-theme 会按顺序搜索名为 feature 并添加了 <code>.elc</code> 或 <code>.el</code> 后缀的文件，在 custom-theme-load-path 指定的目录中。
+</p>
+<p>如果成功找到并加载了提供功能的文件，则 require-theme 返回功能。可选参数 noerror 确定如果搜索或加载失败会发生什么。如果为 nil，则该函数发出错误信号；  否则，它返回 nil。如果文件加载成功但不提供功能，则 require-theme 会发出错误信号；  这是无法压制的。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: enable-theme theme ¶
+</pre></div>
+<p>此功能启用名为主题的自定义主题。如果没有加载此类主题，则会发出错误信号。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: disable-theme theme ¶
+</pre></div>
+<p>此功能禁用名为主题的自定义主题。主题保持加载状态，以便后续调用 enable-theme 将重新启用它。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="16_加载.html">加载</a>, Previous: <a href="15.5_应用自定义.html">应用自定义</a>, Up: <a href="15_自定义设置.html">自定义设置.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

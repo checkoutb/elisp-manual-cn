@@ -1,0 +1,44 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>39.7 向进程发送输入</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">39.7 向进程发送输入</h2>
+<div class="nav-panel"><p>Next: <a href="39.8_向进程发送信号.html">向进程发送信号</a>, Previous: <a href="39.6_过程信息.html">过程信息</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>异步子进程在 Emacs 向它们发送输入时接收输入，这是通过本节中的函数完成的。您必须指定将输入发送到的进程以及要发送的输入数据。如果子进程运行一个程序，则数据出现在该程序的标准输入中；  对于连接，数据被发送到连接的设备或程序。
+</p>
+<p>某些操作系统在 pty 中用于缓冲输入的空间有限。在这些系统上，Emacs 会定期在其他字符之间发送一个 EOF，以强制它们通过。对于大多数程序，这些 EOF 没有害处。
+</p>
+<p>子进程输入通常在子进程接收它之前使用编码系统进行编码，就像写入文件的文本一样。您可以使用 set-process-coding-system 指定要使用的编码系统（请参阅流程信息）。否则，编码系统来自coding-system-for-write，如果不是零的话；  或者来自默认机制（请参阅默认编码系统）。
+</p>
+<p>有时系统无法接受该进程的输入，因为输入缓冲区已满。发生这种情况时，发送函数会等待片刻，接受来自子进程的输出，然后重试。这使子进程有机会读取更多待处理的输入并在缓冲区中腾出空间。它还允许过滤器（包括当前运行的过滤器）、哨兵和计时器运行——所以在编写代码时要考虑到这一点。
+</p>
+<p>在这些函数中，进程参数可以是进程或进程名称，或者缓冲区或缓冲区名称（通过 get-buffer-process 表示进程）。nil 表示当前缓冲区的进程。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: process-send-string process string ¶
+</pre></div>
+<p>此函数将字符串的内容作为标准输入发送处理。它返回零。例如，要制作一个 Shell 缓冲区列表文件：
+</p>
+<div class="lisp">
+<pre class="lisp">(process-send-string "shell&lt;1&gt;" "ls\n")
+     ⇒ nil
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: process-send-region process start end ¶
+</pre></div>
+<p>此函数将由 start 和 end 定义的区域中的文本作为标准输入发送到处理。
+</p>
+<p>除非 start 和 end 都是整数或指示当前缓冲区中位置的标记，否则会发出错误信号。（哪个数字更大并不重要。）
+</p>
+<div class="lisp">
+<pre class="lisp">Function: process-send-eof &amp;optional process ¶
+</pre></div>
+<p>此函数使进程在其输入中看到文件结尾。EOF 出现在已经发送给它的任何文本之后。函数返回进程。
+</p>
+<div class="lisp">
+<pre class="lisp">(process-send-eof "shell")
+     ⇒ "shell"
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: process-running-child-p &amp;optional process ¶
+</pre></div>
+<p>这个函数会告诉你一个进程，它不能是一个连接，而是一个真正的子进程，是否已经将其终端的控制权交给了它自己的子进程。如果为真，则函数返回进程的前台进程组的数字 ID；  如果 Emacs 可以确定不是这样，它返回 nil。如果 Emacs 无法判断这是否为真，则值为 t。如果进程是网络、串行或管道连接，或者子进程未处于活动状态，则此函数会发出错误信号。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="39.8_向进程发送信号.html">向进程发送信号</a>, Previous: <a href="39.6_过程信息.html">过程信息</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

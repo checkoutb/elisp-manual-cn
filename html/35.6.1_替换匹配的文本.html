@@ -1,0 +1,47 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>35.6.1 替换匹配的文本</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">35.6.1 替换匹配的文本</h3>
+<div class="nav-panel"><p>Next: <a href="35.6.2_简单匹配数据访问.html">简单匹配数据访问</a>, Previous: <a href="35.6_匹配数据.html">匹配数据</a>, Up: <a href="35.6_匹配数据.html">匹配数据.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>此函数替换上次搜索匹配的全部或部分文本。它通过匹配数据工作。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: replace-match replacement &amp;optional fixedcase literal string subexp ¶
+</pre></div>
+<p>此函数对缓冲区或字符串执行替换操作。
+</p>
+<p>如果您在缓冲区中进行了最后一次搜索，则应省略字符串参数或为其指定 nil，并确保当前缓冲区是您执行最后一次搜索的缓冲区。然后这个函数编辑缓冲区，用替换替换匹配的文本。它在替换文本的末尾留下点。
+</p>
+<p>如果您对字符串执行了最后一次搜索，请传递与字符串相同的字符串。然后这个函数返回一个新字符串，其中匹配的文本被替换替换。
+</p>
+<p>如果 fixedcase 不为 nil，则 replace-match 使用替换文本而不进行大小写转换；  否则，它会根据要替换的文本的大小写来转换替换文本。如果原始文本全部大写，这会将替换文本转换为大写。如果原始文本的所有单词都大写，则替换文本的所有单词都大写。如果所有单词都是一个字母并且它们都是大写的，则它们被视为大写单词而不是全部大写单词。
+</p>
+<p>如果literal 不是nil，那么替换会按原样插入，唯一的更改是根据需要更改大小写。如果它是 nil（默认值），那么字符 ’\’ 会被特殊处理。如果替换中出现 <code>\</code> ，则它必须是以下序列之一的一部分：
+</p>
+<div class="lisp">
+<pre class="lisp">‘\&amp;’ ¶
+</pre></div>
+<p>这代表整个文本被替换。
+</p><div class="lisp">
+<pre class="lisp">‘\n’, where n is a digit ¶
+</pre></div>
+<p>这代表与原始正则表达式中的第 n 个子表达式匹配的文本。子表达式是分组在 ” 中的那些表达式。如果第 n 个子表达式从不匹配，则替换为空字符串。
+</p><div class="lisp">
+<pre class="lisp">‘\\’ ¶
+</pre></div>
+<p>这代表替换文本中的单个 <code>\</code> 。
+</p><div class="lisp">
+<pre class="lisp">‘\?’
+</pre></div>
+<p>这代表它本身（为了与 replace-regexp 和相关命令的兼容性；请参阅 The GNU Emacs Manual 中的 Regexp Replace）。
+</p>
+<p>’\’ 后面的任何其他字符都表示错误。
+</p>
+<p>’\&amp;’ 和 ” 执行的替换发生在大小写转换（如果有）之后。因此，它们替换的字符串永远不会进行大小写转换。
+</p>
+<p>如果 subexp 不为零，则表示仅替换匹配的正则表达式的子表达式编号 subexp，而不是整个匹配。例如，匹配 ’foo ’ 后，调用 replace-match with 1 as subexp 意味着只替换匹配 ” 的文本。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: match-substitute-replacement replacement &amp;optional fixedcase literal string subexp ¶
+</pre></div>
+<p>此函数返回将通过替换匹配插入缓冲区的文本，但不修改缓冲区。如果您想向用户展示实际的替换结果，使用 ” 或 ’\&amp;’ 等结构替换匹配的组，这将非常有用。参数替换和可选的固定大小写、文字、字符串和子表达式与替换匹配具有相同的含义。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="35.6.2_简单匹配数据访问.html">简单匹配数据访问</a>, Previous: <a href="35.6_匹配数据.html">匹配数据</a>, Up: <a href="35.6_匹配数据.html">匹配数据.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

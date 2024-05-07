@@ -1,0 +1,90 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>D.1 Emacs Lisp 编码约定</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">D.1 Emacs Lisp 编码约定</h2>
+<div class="nav-panel"><p>Next: <a href="0D.2_键绑定约定.html">键绑定约定</a>, Previous: <a href="附录_D_提示和约定.html">D_提示和约定</a>, Up: <a href="附录_D_提示和约定.html">D_提示和约定.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>以下是编写广泛使用的 Emacs Lisp 代码时应遵循的约定：
+</p>
+<ul>
+<li>
+简单地加载一个包不应该改变 Emacs 的编辑行为。包括一个或多个命令以启用和禁用该功能，或调用它。
+
+</li><li>
+对于包含自定义定义的任何文件，此约定都是强制性的。如果修复此类文件以遵循此约定需要不兼容的更改，请继续进行不兼容的更改；  不要推迟它。
+</li><li>
+您应该选择一个简短的词来区分您的程序与其他 Lisp 程序。程序中所有全局符号的名称，即变量、常量和函数的名称，都应以所选前缀开头。用连字符 <code>-</code> 将前缀与名称的其余部分分开。这种做法有助于避免名称冲突，因为 Emacs Lisp 中的所有全局变量共享相同的名称空间，并且所有函数共享另一个名称空间29。如果符号不打算被其他包使用，请使用两个连字符来分隔前缀和名称。
+
+</li><li>
+有时，对于一个供用户使用的命令名称，如果在包的名称前缀之前加上一些单词会更方便。例如，我们的约定是列出名为 <code>list-something</code> 的对象的命令，例如，一个名为 <code>frob</code> 的包可能有一个命令 <code>list-frobs</code> ，而它的其他全局符号以 <code>frob-</code> 开头.  此外，定义函数、变量等的结构如果以 <code>define-</code> 开头，效果会更好，因此将名称前缀放在名称后面。
+
+</li><li>
+此建议甚至适用于不是 Emacs Lisp 中的原语的传统 Lisp 原语的名称，例如 copy-list。信不信由你，定义复制列表的合理方法不止一种。安全起见；  附加您的名称前缀以生成类似 foo-copy-list 或 mylib-copy-list 的名称。
+
+</li><li>
+如果您编写了一个您认为应该以特定名称添加到 Emacs 的函数，例如 twiddle-files，请不要在程序中以该名称调用它。在你的程序中调用它 mylib-twiddle-files，然后发送邮件到 ’bug-gnu-emacs@gnu.org’ 建议我们将它添加到 Emacs。如果我们这样做，我们可以很容易地更改名称。
+
+</li><li>
+如果一个前缀不够用，你的包可以使用两个或三个替代的通用前缀，只要它们有意义。
+</li><li>
+我们建议在新代码中启用词法绑定，并转换现有的 Emacs Lisp 代码以启用词法绑定（如果尚未启用）。请参阅使用词法绑定。
+</li><li>
+在每个单独的 Lisp 文件的末尾调用提供。请参阅功能。
+</li><li>
+如果一个文件需要预先加载某些其他 Lisp 程序，那么文件开头的注释应该这样说明。此外，使用 require 确保它们已加载。请参阅功能。
+</li><li>
+如果文件 foo 使用另一个文件 bar 中定义的宏，但不使用 bar 中定义的任何函数或变量，则 foo 应包含以下表达式：
+<div class="lisp">
+<pre class="lisp">(eval-when-compile (require 'bar))
+</pre></div>
+</li><li>
+这告诉 Emacs 在字节编译 foo 之前加载 bar，以便宏定义在编译期间可用。使用 eval-when-compile 可以避免在使用 foo 的编译版本时加载 bar。它应该在文件中第一次使用宏之前调用。请参阅宏和字节编译。
+</li><li>
+除非确实需要，否则避免在运行时加载其他库。如果您的文件在没有其他库的情况下根本无法工作，那么只需在顶层需要该库并完成它。但是如果你的文件包含几个独立的特性，并且只有一两个需要额外的库，那么考虑将 require 语句放在相关函数中而不是顶层。或者在需要时使用自动加载语句来加载额外的库。这样，不使用文件这些方面的人不需要加载额外的库。
+</li><li>
+如果您需要 Common Lisp 扩展，请使用 cl-lib 库而不是旧的 cl 库。后一个库已被弃用，并将在未来版本的 Emacs 中删除。
+</li><li>
+定义主模式时，请遵循主模式约定。请参阅主要模式约定。
+</li><li>
+定义次要模式时，请遵循次要模式约定。请参阅编写次要模式的约定。
+</li><li>
+如果函数的目的是告诉您某个条件是真还是假，请给函数起一个以 <code>p</code> 结尾的名称（代表 <code>谓词</code> ）。如果名称是一个单词，则只添加 <code>p</code> ；  如果名称是多个单词，请添加 <code>-p</code> 。例如 framep 和 frame-live-p。我们建议避免在布尔变量名称中使用此 -p 后缀，除非该变量绑定到谓词函数；  相反，请使用 -flag 后缀或 is-foo 之类的名称。
+</li><li>
+如果变量的目的是存储单个函数，请给它一个以 <code>-function</code> 结尾的名称。如果变量的目的是存储函数列表（即变量是一个钩子），请遵循钩子的命名约定。请参阅挂钩。
+</li><li>
+使用 unload-feature 将撤消通常通过加载功能完成的更改（例如向挂钩添加功能）。但是，如果加载功能做了一些不寻常且更复杂的事情，您可以定义一个名为 feature-unload-function 的函数，并使其撤消任何此类特殊更改。如果存在，卸载功能将自动运行此功能。请参阅卸载。
+</li><li>
+为 Emacs 原语定义别名是个坏主意。通常您应该使用标准名称。别名可能有用的情况是它有助于向后兼容或可移植性。
+</li><li>
+如果一个包需要定义一个别名或一个新函数以与其他版本的 Emacs 兼容，请使用包前缀命名它，而不是使用它在其他版本中出现的原始名称。这是一个来自 Gnus 的示例，它提供了许多此类兼容性问题的示例。
+
+<div class="lisp">
+<pre class="lisp">(defalias 'gnus-point-at-bol
+  (if (fboundp 'point-at-bol)
+      'point-at-bol
+    'line-beginning-position))
+</pre></div>
+</li><li>
+重新定义或建议 Emacs 原语是一个坏主意。它可能为特定程序做正确的事情，但不知道其他程序可能会因此而中断。
+</li><li>
+同样，一个 Lisp 包建议另一个 Lisp 包中的函数也是一个坏主意（请参阅建议 Emacs Lisp 函数）。
+</li><li>
+避免在库和包中使用 eval-after-load 和 with-eval-after-load（请参阅 Hooks for Loading）。此功能用于个人定制；  在 Lisp 程序中使用它是不干净的，因为它以在该文件中不可见的方式修改了另一个 Lisp 文件的行为。这是调试的障碍，很像建议另一个包中的函数。
+</li><li>
+如果一个文件确实替换了 Emacs 的任何标准函数或库程序，文件开头的显着注释应该说明哪些函数被替换，以及替换的行为与原始的行为有何不同。
+</li><li>
+定义函数或变量的构造应该是宏，而不是函数，并且它们的名称应该以 <code>define-</code> 开头。宏应该接收要定义为第一个参数的名称。这将帮助各种工具自动找到定义。避免在宏本身中构造名称，因为这会使这些工具感到困惑。
+</li><li>
+在其他一些系统中，有选择以 <code>*</code> 开头和结尾的变量名的约定。我们在 Emacs Lisp 中不使用该约定，因此请不要在您的程序中使用它。（Emacs 仅将此类名称用于特殊用途的缓冲区。）如果所有库都使用相同的约定，人们会发现 Emacs 更加连贯。
+</li><li>
+Emacs Lisp 源文件的默认文件编码系统是 UTF-8（请参阅文本表示）。在您的程序包含非 UTF-8 字符的罕见情况下，您应该在源文件的 <code>-*-</code> 行或局部变量列表中指定适当的编码系统。请参阅 GNU Emacs 手册中的文件中的局部变量。
+</li><li>
+使用默认缩进参数缩进文件。
+</li><li>
+不要养成自己把右括号放在行上的习惯；  Lisp 程序员发现这令人不安。
+</li><li>
+如果您分发副本，请在文件上贴上版权声明和复制许可声明。请参阅 Emacs 库的常规标头。
+</li></ul>
+<p>脚注
+(29)
+</p>
+<p>Common Lisp 风格的包系统的好处被认为不会超过成本。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="0D.2_键绑定约定.html">键绑定约定</a>, Previous: <a href="附录_D_提示和约定.html">D_提示和约定</a>, Up: <a href="附录_D_提示和约定.html">D_提示和约定.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

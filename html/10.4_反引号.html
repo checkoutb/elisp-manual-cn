@@ -1,0 +1,51 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>10.4 反引号</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">10.4 反引号</h2>
+<div class="nav-panel"><p>Next: <a href="10.5_评估.html">评估</a>, Previous: <a href="10.3_引用.html">引用</a>, Up: <a href="10_评估.html">评估.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>反引号结构允许您引用列表，但有选择地评估该列表的元素。在最简单的情况下，它与特殊形式的引号相同（在上一节中描述；请参阅引用）。例如，这两种形式产生相同的结果：
+</p>
+<div class="lisp">
+<pre class="lisp">`(a list of (+ 2 3) elements)
+     ⇒ (a list of (+ 2 3) elements)
+
+'(a list of (+ 2 3) elements)
+     ⇒ (a list of (+ 2 3) elements)
+</pre></div>
+<p>反引号参数中的特殊标记 <code>，</code> 表示一个不是常量的值。Emacs Lisp 评估器评估 ’,’ 的参数，并将值放入列表结构中：
+</p>
+<div class="lisp">
+<pre class="lisp">`(a list of ,(+ 2 3) elements)
+     ⇒ (a list of 5 elements)
+</pre></div>
+<p>在列表结构的更深层次上也允许使用 ’,’ 进行替换。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">`(1 2 (3 ,(+ 4 5)))
+     ⇒ (1 2 (3 9))
+</pre></div>
+<p>您还可以使用特殊标记 <code>，@</code> 将评估值拼接到结果列表中。拼接列表的元素成为与结果列表的其他元素处于同一级别的元素。不使用 ’‘’ 的等效代码通常是不可读的。这里有些例子：
+</p>
+<div class="lisp">
+<pre class="lisp">(setq some-list '(2 3))
+     ⇒ (2 3)
+
+(cons 1 (append some-list '(4) some-list))
+     ⇒ (1 2 3 4 2 3)
+
+`(1 ,@some-list 4 ,@some-list)
+     ⇒ (1 2 3 4 2 3)
+
+
+(setq list '(hack foo bar))
+     ⇒ (hack foo bar)
+
+(cons 'use
+  (cons 'the
+    (cons 'words (append (cdr list) '(as elements)))))
+     ⇒ (use the words foo bar as elements)
+
+`(use the words ,@(cdr list) as elements)
+     ⇒ (use the words foo bar as elements)
+</pre></div>
+<p>如果反引号构造的子表达式没有替换或拼接，则它的行为类似于引号，因为它产生可能共享且不应修改的 conses、向量和字符串。请参阅自我评估表。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="10.5_评估.html">评估</a>, Previous: <a href="10.3_引用.html">引用</a>, Up: <a href="10_评估.html">评估.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>28.7 只读缓冲区</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">28.7 只读缓冲区</h2>
+<div class="nav-panel"><p>Next: <a href="28.8_缓冲区列表.html">缓冲区列表</a>, Previous: <a href="28.6_缓冲区修改时间.html">缓冲区修改时间</a>, Up: <a href="28_缓冲区.html">缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>如果缓冲区是只读的，则您无法更改其内容，尽管您可以通过滚动和缩小来更改内容视图。
+</p>
+<p>只读缓冲区用于两种情况：
+</p>
+<p>访问写保护文件的缓冲区通常是只读的。
+</p>
+<p>在这里，目的是通知用户编辑缓冲区以将其保存在文件中可能是徒劳的或不可取的。尽管如此，想要更改缓冲区文本的用户可以在使用 Cx Cq 清除只读标志后执行此操作。
+Dired 和 Rmail 等模式在使用通常的编辑命令更改内容时将缓冲区设为只读，这可能是一个错误。
+</p>
+<p>这些模式的特殊命令将 buffer-read-only 绑定到 nil（使用 let）或 bind-inhibit-read-only 到 t 在它们自己更改文本的位置周围。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: buffer-read-only ¶
+</pre></div>
+<p>此缓冲区局部变量指定缓冲区是否为只读。如果此变量非零，则缓冲区是只读的。但是，仍然可以修改具有禁止只读文本属性的字符。请参阅禁止只读。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: inhibit-read-only ¶
+</pre></div>
+<p>如果此变量非零，则只读缓冲区，并且根据实际值，可能会修改部分或全部只读字符。缓冲区中的只读字符是那些具有非零只读文本属性的字符。有关文本属性的更多信息，请参阅具有特殊含义的属性。
+</p>
+<p>如果 inhibitor-read-only 为 t，则所有只读字符属性均无效。如果 inhibitor-read-only 是一个列表，那么如果它们是列表的成员，则只读字符属性无效（与 eq 进行比较）。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: read-only-mode &amp;optional arg ¶
+</pre></div>
+<p>这是只读次要模式（缓冲区本地次要模式）的模式命令。开启模式时，buffer-read-only在缓冲区中为非nil；  禁用时，缓冲区中的缓冲区只读为零。调用约定与其他次要模式命令相同（请参阅编写次要模式的约定）。
+</p>
+<p>这种次要模式主要用作缓冲区只读的包装器；  与大多数次要模式不同，没有单独的只读模式变量。即使禁用只读模式，具有非零只读文本属性的字符仍然是只读的。要暂时忽略所有只读状态，请绑定禁止只读，如上所述。
+</p>
+<p>启用只读模式时，如果选项 view-read-only 为非零，则此模式命令也会启用查看模式。请参阅 GNU Emacs 手册中的 Miscellaneous Buffer Operations。禁用只读模式时，如果启用了查看模式，它将禁用查看模式。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: barf-if-buffer-read-only &amp;optional position ¶
+</pre></div>
+<p>如果当前缓冲区是只读的，则此函数会发出缓冲区只读错误信号。如果位置处的文本（默认为点）设置了禁止只读文本属性，则不会引发错误。
+</p>
+<p>如果当前缓冲区是只读的，请参阅使用交互，以获取另一种发出错误信号的方法。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="28.8_缓冲区列表.html">缓冲区列表</a>, Previous: <a href="28.6_缓冲区修改时间.html">缓冲区修改时间</a>, Up: <a href="28_缓冲区.html">缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

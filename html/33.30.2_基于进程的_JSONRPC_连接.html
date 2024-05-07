@@ -1,0 +1,21 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.30.2 基于进程的 JSONRPC 连接</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">33.30.2 基于进程的 JSONRPC 连接</h3>
+<div class="nav-panel"><p>Next: <a href="33.30.3_JSONRPC_JSON对象格式.html">JSONRPC_JSON对象格式</a>, Previous: <a href="33.30.1_概述.html">概述</a>, Up: <a href="33.30_JSONRPC_通信.html">JSONRPC_通信.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>为方便起见，jsonrpc 库带有一个内置的 jsonrpc-process-connection 传输实现，可以与本地子进程对话（使用标准输入和标准输出）；  或 TCP 主机（使用套接字）；  或 Emacs 的进程对象可以表示的任何其他远程端点（请参阅进程）。
+</p>
+<p>使用这种传输方式，JSONRPC 消息在网络上被编码为纯文本，并以一些基本的 HTTP 样式的封装头开头，例如 <code>Content-Length</code> 。
+</p>
+<p>有关在 JSONRPC 之上使用此传输方案的应用程序示例，请参阅语言服务器协议。
+</p>
+<p>除了强制性的 :request-dispatcher 和 :notification-dispatcher initargs 之外，jsonrpc-process-connection 类的用户应该将以下 initargs 作为关键字-值对传递给 make-instance：
+</p>
+<div class="lisp">
+<pre class="lisp">:on-shutdown
+</pre></div>
+<p>值必须是一个活动的过程对象或一个没有参数的函数，产生一个这样的对象。如果传递了一个进程对象，该对象应该包含一个预先建立的连接；  否则，在创建对象后立即调用该函数。
+</p><div class="lisp">
+<pre class="lisp">:process
+</pre></div>
+<p>值必须是单个参数的函数，即 jsonrpc-process-connection 对象。该函数在底层进程对象被删除后调用（要么是 jsonrpc-shutdown 故意的，要么是由于某些外部原因而意外）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.30.3_JSONRPC_JSON对象格式.html">JSONRPC_JSON对象格式</a>, Previous: <a href="33.30.1_概述.html">概述</a>, Up: <a href="33.30_JSONRPC_通信.html">JSONRPC_通信.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

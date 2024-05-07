@@ -1,0 +1,83 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>6.3 操作数组的函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">6.3 操作数组的函数</h2>
+<div class="nav-panel"><p>Next: <a href="06.4_向量.html">向量</a>, Previous: <a href="06.2_数组.html">数组</a>, Up: <a href="06_序列、数组和向量.html">序列、数组和向量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在本节中，我们将描述接受所有类型数组的函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: arrayp object ¶
+</pre></div>
+<p>如果对象是数组（即向量、字符串、布尔向量或字符表），则此函数返回 t。
+</p>
+<div class="lisp">
+<pre class="lisp">(arrayp [a])
+     ⇒ t
+(arrayp "asdf")
+     ⇒ t
+(arrayp (syntax-table))    ;; A char-table.
+     ⇒ t
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: aref arr index ¶
+</pre></div>
+<p>此函数返回数组或记录 arr 的索引元素。第一个元素的索引为零。
+</p>
+<div class="lisp">
+<pre class="lisp">(setq primes [2 3 5 7 11 13])
+     ⇒ [2 3 5 7 11 13]
+(aref primes 4)
+     ⇒ 11
+
+(aref "abcdefg" 1)
+     ⇒ 98           ; ‘b’ is ASCII code 98.
+</pre></div>
+<p>另请参见序列中的函数 elt。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: aset array index object ¶
+</pre></div>
+<p>此函数将数组的第一个元素设置为对象。它返回对象。
+</p>
+<div class="lisp">
+<pre class="lisp">(setq w (vector 'foo 'bar 'baz))
+     ⇒ [foo bar baz]
+(aset w 0 'fu)
+     ⇒ fu
+w
+     ⇒ [fu bar baz]
+
+
+;; copy-sequence copies the string to be modified later.
+(setq x (copy-sequence "asdfasfd"))
+     ⇒ "asdfasfd"
+(aset x 3 ?Z)
+     ⇒ 90
+x
+     ⇒ "asdZasfd"
+</pre></div>
+<p>数组应该是可变的。请参阅可变性。
+</p>
+<p>如果数组是字符串而对象不是字符，则会导致错误类型参数错误。如果需要插入字符，该函数会将单字节字符串转换为多字节。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: fillarray array object ¶
+</pre></div>
+<p>该函数用对象填充数组数组，使数组的每个元素都是对象。它返回数组。
+</p>
+<div class="lisp">
+<pre class="lisp">(setq a (copy-sequence [a b c d e f g]))
+     ⇒ [a b c d e f g]
+(fillarray a 0)
+     ⇒ [0 0 0 0 0 0 0]
+a
+     ⇒ [0 0 0 0 0 0 0]
+
+(setq s (copy-sequence "When in the course"))
+     ⇒ "When in the course"
+(fillarray s ?-)
+     ⇒ "------------------"
+</pre></div>
+<p>如果数组是字符串而对象不是字符，则会导致错误类型参数错误。
+</p>
+<p>通用序列函数 copy-sequence 和 length 通常对已知为数组的对象很有用。请参阅序列。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="06.4_向量.html">向量</a>, Previous: <a href="06.2_数组.html">数组</a>, Up: <a href="06_序列、数组和向量.html">序列、数组和向量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.5.4 延迟警告</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.5.4 延迟警告</h3>
+<div class="nav-panel"><p>Next: <a href="40.6_不可见文本.html">不可见文本</a>, Previous: <a href="40.5.3_警告选项.html">警告选项</a>, Up: <a href="40.5_报告警告.html">报告警告.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>有时，您可能希望避免在命令运行时显示警告，仅在命令结束后显示。您可以为此使用功能延迟警告。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: delay-warning type message &amp;optional level buffer-name ¶
+</pre></div>
+<p>此函数是显示警告的延迟对应物（请参阅警告基础知识），并且使用相同的参数调用它。警告消息排队到延迟警告列表中。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: delayed-warnings-list ¶
+</pre></div>
+<p>此变量的值是当前命令完成后要显示的警告列表。每个元素必须是一个列表
+</p>
+<div class="lisp">
+<pre class="lisp">(type message [level [buffer-name]])
+</pre></div>
+<p>与显示警告的参数列表形式相同，含义相同。运行 post-command-hook（请参阅命令循环概述）后，Emacs 命令循环立即显示此变量指定的所有警告，然后将其重置为 nil。
+</p>
+<p>需要进一步自定义延迟警告机制的程序可以更改变量delayed-warnings-hook：
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: delayed-warnings-hook ¶
+</pre></div>
+<p>这是一个普通的钩子，由 Emacs 命令循环在 post-command-hook 之后运行，以处理和显示延迟警告。
+</p>
+<p>它的默认值是两个函数的列表：
+</p><div class="lisp">
+<pre class="lisp">(collapse-delayed-warnings display-delayed-warnings)
+</pre></div>
+<p>函数 collapse-delayed-warnings 从延迟警告列表中删除重复的条目。函数 display-delayed-warnings 依次对 delay-warnings-list 中的每个条目调用 display-warning，然后将 delay-warnings-list 设置为 nil。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.6_不可见文本.html">不可见文本</a>, Previous: <a href="40.5.3_警告选项.html">警告选项</a>, Up: <a href="40.5_报告警告.html">报告警告.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

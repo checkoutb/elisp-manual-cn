@@ -1,0 +1,46 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.8.6 环的内部</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">33.8.6 环的内部</h3>
+<div class="nav-panel"><p>Next: <a href="33.9_撤消.html">撤消</a>, Previous: <a href="33.8.5_低级环.html">低级环</a>, Up: <a href="33.8_环.html">环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>变量 kill-ring 以字符串列表的形式保存 kill ring 的内容。最近的杀戮总是在列表的前面。
+</p>
+<p>kill-ring-yank-pointer 变量指向 kill ring 列表中的一个链接，其 CAR 是接下来要 yank 的文本。我们说它标识了环的前部。将 kill-ring-yank-pointer 移动到不同的链接称为旋转 kill ring。我们将 kill ring 称为 <code>环</code> ，因为移动 yank 指针的函数会从列表的末尾环绕到开头，反之亦然。杀环的旋转是虚拟的；  它不会改变 kill-ring 的值。
+</p>
+<p>kill-ring 和 kill-ring-yank-pointer 都是 Lisp 变量，其值通常是列表。kill-ring-yank-pointer 名称中的单词 <code>pointer</code> 表示该变量的目的是标识列表中的一个元素以供下一个 yank 命令使用。
+</p>
+<p>kill-ring-yank-pointer 的值始终等于 kill ring 列表中的链接之一。它标识的元素是该链接的 CAR。更改 kill ring 的 Kill 命令也将此变量设置为 kill-ring 的值。效果是旋转圆环，使新杀死的文本在最前面。
+</p>
+<p>下图显示了变量 kill-ring-yank-pointer 指向 kill ring 中的第二个条目（ <code>some text</code> <code>a different piece of text</code> <code>yet old text</code> ）。
+</p>
+<div class="lisp">
+<pre class="lisp">kill-ring                  ---- kill-ring-yank-pointer
+  |                       |
+  |                       v
+  |     --- ---          --- ---      --- ---
+   --&gt; |   |   |------&gt; |   |   |--&gt; |   |   |--&gt; nil
+        --- ---          --- ---      --- ---
+         |                |            |
+         |                |            |
+         |                |             --&gt;"yet older text"
+         |                |
+         |                 --&gt; "a different piece of text"
+         |
+          --&gt; "some text"
+</pre></div>
+<p>这种情况可能发生在 Cy (yank) 紧接着 My (yank-pop) 之后。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: kill-ring ¶
+</pre></div>
+<p>此变量保存已终止文本序列的列表，最近先终止。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: kill-ring-yank-pointer ¶
+</pre></div>
+<p>此变量的值指示杀伤环的哪个元素位于环的前面以进行拉拽。更准确地说，该值是 kill-ring 值的尾部，其 CAR 是 Cy 应该拉出的 kill 字符串。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: kill-ring-max ¶
+</pre></div>
+<p>这个变量的值是在元素最终被丢弃之前，杀伤环可以增长到的最大长度。kill-ring-max 的默认值为 60。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.9_撤消.html">撤消</a>, Previous: <a href="33.8.5_低级环.html">低级环</a>, Up: <a href="33.8_环.html">环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

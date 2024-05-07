@@ -1,0 +1,69 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>10.2.4 符号函数间接</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">10.2.4 符号函数间接</h3>
+<div class="nav-panel"><p>Next: <a href="10.2.5_函数形式的评估.html">函数形式的评估</a>, Previous: <a href="10.2.3_列表形式的分类.html">列表形式的分类</a>, Up: <a href="10.2_表格种类.html">表格种类.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>如果列表的第一个元素是符号，则评估检查符号的功能单元，并使用其内容而不是原始符号。如果内容是另一个符号，则重复这个称为符号函数间接的过程，直到它获得一个非符号。有关符号函数间接的更多信息，请参阅命名函数。
+</p>
+<p>此过程的一个可能结果是无限循环，如果符号的功能单元引用相同的符号。否则，我们最终会得到一个非符号，它应该是一个函数或其他合适的对象。
+</p>
+<p>更准确地说，我们现在应该有一个 Lisp 函数（一个 lambda 表达式）、一个字节码函数、一个原始函数、一个 Lisp 宏、一个特殊形式或一个自动加载对象。这些类型中的每一种都是以下部分之一中描述的案例。如果对象不是这些类型之一，Emacs 会发出无效函数错误信号。
+</p>
+<p>以下示例说明了符号间接过程。我们使用 fset 设置符号的函数单元格，使用 symbol-function 获取函数单元格内容（请参阅访问函数单元格内容）。具体来说，我们将符号 car 存储到 first 的函数单元中，并将符号 first 存储到 erste 的函数单元中。
+</p><div class="lisp">
+<pre class="lisp">
+
+;; Build this function cell linkage:
+;;   -------------       -----        -------        -------
+;;  | #&lt;subr car&gt; | &lt;-- | car |  &lt;-- | first |  &lt;-- | erste |
+;;   -------------       -----        -------        -------
+
+(symbol-function 'car)
+     ⇒ #&lt;subr car&gt;
+
+(fset 'first 'car)
+     ⇒ car
+
+(fset 'erste 'first)
+     ⇒ first
+
+(erste '(1 2 3))   ; Call the function referenced by erste.
+     ⇒ 1
+</pre></div>
+<p>相比之下，下面的例子调用了一个没有任何符号函数间接的函数，因为第一个元素是一个匿名 Lisp 函数，而不是一个符号。
+</p>
+<div class="lisp">
+<pre class="lisp">((lambda (arg) (erste arg))
+ '(1 2 3))
+     ⇒ 1
+</pre></div>
+<p>执行函数本身会评估它的主体；  这在调用 erste 时确实涉及符号函数间接。
+</p>
+<p>这种形式很少使用，现在已弃用。相反，你应该把它写成：
+</p><div class="lisp">
+<pre class="lisp">
+(funcall (lambda (arg) (erste arg))
+         '(1 2 3))
+</pre></div>
+<p>要不就
+</p><div class="lisp">
+<pre class="lisp">(let ((arg '(1 2 3))) (erste arg))
+</pre></div>
+<p>内置函数indirect-function 提供了一种显式执行符号函数间接的简便方法。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: indirect-function function &amp;optional noerror ¶
+</pre></div>
+<p>该函数返回函数作为函数的含义。如果函数是一个符号，那么它会找到函数的函数定义并从那个值开始。如果函数不是符号，则返回函数本身。
+</p>
+<p>如果最终符号未绑定，则此函数返回 nil。如果符号链中存在循环，则表示循环函数间接错误。
+</p>
+<p>可选参数 noerror 已过时，为了向后兼容而保留，并且没有效果。
+</p>
+<p>以下是如何在 Lisp 中定义间接函数：
+</p><div class="lisp">
+<pre class="lisp">(defun indirect-function (function)
+  (if (and function
+           (symbolp function))
+      (indirect-function (symbol-function function))
+    function))
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="10.2.5_函数形式的评估.html">函数形式的评估</a>, Previous: <a href="10.2.3_列表形式的分类.html">列表形式的分类</a>, Up: <a href="10.2_表格种类.html">表格种类.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,274 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>E.8.3 Lisp和模块值之间的转换</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">E.8.3 Lisp和模块值之间的转换</h3>
+<div class="nav-panel"><p>Next: <a href="0E.8.4_模块的其他便利功能.html">模块的其他便利功能</a>, Previous: <a href="0E.8.2_编写模块函数.html">编写模块函数</a>, Up: <a href="0E.8_编写动态加载的模块.html">编写动态加载的模块.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>除了极少数例外，大多数模块都需要与调用它们的 Lisp 程序交换数据：接受模块函数的参数并从模块函数返回值。为此，模块 API 提供了 emacs_value 类型，它表示通过 API 通信的 Emacs Lisp 对象；  它是 Emacs C 原语中使用的 Lisp_Object 类型的功能等价物（请参阅编写 Emacs 原语）。本节介绍模块 API 中允许创建与基本 Lisp 数据类型对应的 emacs_value 对象的部分，以及如何从与 Lisp 对象对应的 emacs_value 对象中的 C 数据访问。
+</p>
+<p>下面描述的所有函数实际上都是通过指向每个模块函数接受的环境的指针提供的函数指针。因此，模块代码应该通过环境指针调用这些函数，如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">emacs_env *env;  /* the environment pointer */
+env-&gt;some_function (arguments…);
+</pre></div>
+<p>emacs_env 指针通常来自模块函数的第一个参数，或者如果您需要模块初始化函数中的环境，则来自对 get_environment 的调用。
+</p>
+<p>下面描述的大部分功能在 Emacs 25 中可用，这是第一个支持动态模块的 Emacs 版本。对于在后来的 Emacs 版本中可用的少数功能，我们提到了第一个支持它们的 Emacs 版本。
+</p>
+<p>以下 API 函数从 emacs_value 对象中提取各种 C 数据类型的值。如果参数 emacs_value 对象不是函数所期望的类型，它们都会引发错误类型参数错误条件（请参阅类型谓词）。请参阅模块中的非本地退出，了解有关 Emacs 模块中信号错误如何工作的详细信息，以及如何在模块内部的错误条件报告给 Emacs 之前捕获它们。API 函数 type_of（参见 type_of）可用于获取 emacs_value 对象的类型。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: intmax_t extract_integer (emacs_env *env, emacs_value arg) ¶
+</pre></div>
+<p>此函数返回由 arg 指定的 Lisp 整数的值。返回值的 C 数据类型 intmax_t 是 C 编译器支持的最宽整数数据类型，通常为 long long。如果 arg 的值不适合 intmax_t，则该函数使用错误符号 overflow-error 发出错误信号。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: bool extract_big_integer (emacs_env *env, emacs_value arg, int *sign, ptrdiff_t *count, emacs_limb_t *magnitude) ¶
+</pre></div>
+<p>这个函数从 Emacs 27 开始可用，它提取 arg 的整数值。arg 的值必须是整数（fixnum 或 bignum）。如果 sign 不为 NULL，它将 arg 的符号（-1、0 或 +1）存储到 *sign 中。幅度存储到幅度如下。如果count 和magnitude 都不是NULL，那么magnitude 必须指向一个至少包含*count unsigned long 元素的数组。如果幅度大到足以容纳 arg 的幅度，则此函数将幅度以 little-endian 形式写入幅度数组，将写入的数组元素的数量存储到 *count 中，并返回 true。如果幅度不够大，它将所需的数组大小存储到 *count 中，发出错误信号并返回 false。如果 count 不为 NULL 且幅度为 NULL，则该函数将所需的数组大小存储到 *count 中并返回 true。
+</p>
+<p>Emacs保证*count的最大要求值永远不会超过min(PTRDIFF_MAX, SIZE_MAX)/sizeof(emacs_limb_t)，所以可以使用malloc(*count * sizeof *magnitude)来分配幅度数组，不用担心size中的整数溢出计算。
+</p>
+<div class="lisp">
+<pre class="lisp">Type alias: emacs_limb_t ¶
+</pre></div>
+<p>这是一个无符号整数类型，用作大整数转换函数的幅度数组的元素类型。该类型保证具有唯一的对象表示，即没有填充位。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: EMACS_LIMB_MAX ¶
+</pre></div>
+<p>此宏扩展为一个常量表达式，指定 emacs_limb_t 对象的最大可能值。该表达式适用于#if。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: double extract_float (emacs_env *env, emacs_value arg) ¶
+</pre></div>
+<p>此函数返回由 arg 指定的 Lisp 浮点值，作为 C 双精度值。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: struct timespec extract_time (emacs_env *env, emacs_value arg) ¶
+</pre></div>
+<p>此函数从 Emacs 27 开始可用，它将 arg 解释为 Emacs Lisp 时间值并返回相应的 struct timespec。请参阅一天中的时间。struct timespec 表示具有纳秒精度的时间戳。它有以下成员：
+</p>
+<div class="lisp">
+<pre class="lisp">time_t tv_sec
+</pre></div>
+<p>整数秒数。
+</p><div class="lisp">
+<pre class="lisp">long tv_nsec
+</pre></div>
+<p>以纳秒数表示的小数秒。对于 extract_time 返回的时间戳，它始终是非负数且小于 10 亿。（虽然 POSIX 要求 tv_nsec 的类型为 long，但在某些非标准平台上该类型为 long long。）
+</p>
+<p>请参阅 (libc) 已用时间。
+</p>
+<p>如果时间的精度高于纳秒，则此函数会将其截断为纳秒精度，直至负无穷大。如果时间（截断为纳秒）不能由 struct timespec 表示，则此函数会发出错误信号。例如，如果 time_t 是 32 位整数类型，则 100 亿秒的时间值将发出错误信号，但 600 皮秒的时间值将被截断为零。
+</p>
+<p>如果您需要处理 struct timespec 无法表示的时间值，或者如果您想要更高的精度，请调用 Lisp 函数 encode-time 并使用它的返回值。请参阅时间转换。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: bool copy_string_contents (emacs_env *env, emacs_value arg, char *buf, ptrdiff_t *len) ¶
+</pre></div>
+<p>此函数将 arg 指定的 Lisp 字符串的 UTF-8 编码文本存储在 buf 指向的 char 数组中，该数组应该有足够的空间来保存至少 *len 个字节，包括终止的空字节。参数 len 不能是 NULL 指针，并且在调用函数时，它应该指向一个指定 buf 大小（以字节为单位）的值。
+</p>
+<p>如果 *len 指定的缓冲区大小足以容纳字符串的文本，则函数将复制到 buf 的实际字节数存储在 *len 中，包括终止的空字节，并返回 true。如果缓冲区太小，该函数会引发 args-out-of-range 错误条件，将所需的字节数存储在 *len 中，并返回 false。有关如何处理未决错误条件的信息，请参阅模块中的非本地出口。
+</p>
+<p>参数 buf 可以是 NULL 指针，在这种情况下，函数将存储 arg 内容所需的字节数存储在 *len 中，并返回 true。这是确定存储特定字符串所需的 buf 大小的方法：首先调用 NULL 作为 buf 的 copy_string_contents，然后分配足够的内存来保存函数在 *len 中存储的字节数，然后再次调用该函数-NULL buf 实际执行文本复制。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: emacs_value vec_get (emacs_env *env, emacs_value vector, ptrdiff_t index) ¶
+</pre></div>
+<p>此函数返回索引处的向量元素。第一个向量元素的索引为零。如果 index 的值无效，该函数将引发 args-out-of-range 错误条件。要从函数返回的值中提取 C 数据，请使用此处描述的其他提取函数，适用于存储在该向量元素中的 Lisp 数据类型。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ptrdiff_t vec_size (emacs_env *env, emacs_value vector) ¶
+</pre></div>
+<p>此函数返回向量中的元素数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: void vec_set (emacs_env *env, emacs_value vector, ptrdiff_t index, emacs_value value) ¶
+</pre></div>
+<p>此函数将值存储在索引为索引的向量元素中。如果 index 的值无效，它会引发 args-out-of-range 错误条件。
+</p>
+<p>以下 API 函数从基本 C 数据类型创建 emacs_value 对象。它们都返回创建的 emacs_value 对象。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: emacs_value make_integer (emacs_env *env, intmax_t n) ¶
+</pre></div>
+<p>此函数接受一个整数参数 n 并返回相应的 emacs_value 对象。它根据 n 的值是否在 most-negative-fixnum 和 most-positive-fixnum 设置的限制内返回一个 fixnum 或一个 bignum（请参阅整数基础）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: emacs_value make_big_integer (emacs_env *env, int sign, ptrdiff_t count, const emacs_limb_t *magnitude) ¶
+</pre></div>
+<p>这个函数从 Emacs 27 开始可用，它接受一个任意大小的整数参数并返回一个对应的 emacs_value 对象。sign 参数给出返回值的符号。如果 sign 不为零，则幅度必须指向一个至少包含 count 个元素的数组，该数组指定返回值的 little-endian 幅度。
+</p>
+<p>以下示例使用 GNU 多精度库 (GMP) 来计算给定整数之后的下一个可能的素数。有关 GMP 的一般概述，请参阅 (gmp)Top，有关如何将幅度数组与 GMP mpz_t 值相互转换，请参阅 (gmp)Integer Import and Export。
+</p>
+<div class="lisp">
+<pre class="lisp">#include &lt;emacs-module.h&gt;
+int plugin_is_GPL_compatible;
+
+#include &lt;assert.h&gt;
+#include &lt;limits.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+
+#include &lt;gmp.h&gt;
+
+static void
+memory_full (emacs_env *env)
+{
+  static const char message[] = "Memory exhausted";
+  emacs_value data = env-&gt;make_string (env, message,
+                                       strlen (message));
+  env-&gt;non_local_exit_signal
+    (env, env-&gt;intern (env, "error"),
+     env-&gt;funcall (env, env-&gt;intern (env, "list"), 1, &amp;data));
+}
+
+enum
+{
+  order = -1, endian = 0, nails = 0,
+  limb_size = sizeof (emacs_limb_t),
+  max_nlimbs = ((SIZE_MAX &lt; PTRDIFF_MAX ? SIZE_MAX : PTRDIFF_MAX)
+                / limb_size)
+};
+
+static bool
+extract_big_integer (emacs_env *env, emacs_value arg, mpz_t result)
+{
+  ptrdiff_t nlimbs;
+  bool ok = env-&gt;extract_big_integer (env, arg, NULL, &amp;nlimbs, NULL);
+  if (!ok)
+    return false;
+  assert (0 &lt; nlimbs &amp;&amp; nlimbs &lt;= max_nlimbs);
+  emacs_limb_t *magnitude = malloc (nlimbs * limb_size);
+  if (magnitude == NULL)
+    {
+      memory_full (env);
+      return false;
+    }
+  int sign;
+  ok = env-&gt;extract_big_integer (env, arg, &amp;sign, &amp;nlimbs, magnitude);
+  assert (ok);
+  mpz_import (result, nlimbs, order, limb_size, endian, nails, magnitude);
+  free (magnitude);
+  if (sign &lt; 0)
+    mpz_neg (result, result);
+  return true;
+}
+
+static emacs_value
+make_big_integer (emacs_env *env, const mpz_t value)
+{
+  size_t nbits = mpz_sizeinbase (value, 2);
+  int bitsperlimb = CHAR_BIT * limb_size - nails;
+  size_t nlimbs = nbits / bitsperlimb + (nbits % bitsperlimb != 0);
+  emacs_limb_t *magnitude
+    = nlimbs &lt;= max_nlimbs ? malloc (nlimbs * limb_size) : NULL;
+  if (magnitude == NULL)
+    {
+      memory_full (env);
+      return NULL;
+    }
+  size_t written;
+  mpz_export (magnitude, &amp;written, order, limb_size, endian, nails, value);
+  assert (written == nlimbs);
+  assert (nlimbs &lt;= PTRDIFF_MAX);
+  emacs_value result = env-&gt;make_big_integer (env, mpz_sgn (value),
+                                              nlimbs, magnitude);
+  free (magnitude);
+  return result;
+}
+
+static emacs_value
+next_prime (emacs_env *env, ptrdiff_t nargs, emacs_value *args,
+            void *data)
+{
+  assert (nargs == 1);
+  mpz_t p;
+  mpz_init (p);
+  extract_big_integer (env, args[0], p);
+  mpz_nextprime (p, p);
+  emacs_value result = make_big_integer (env, p);
+  mpz_clear (p);
+  return result;
+}
+
+int
+emacs_module_init (struct emacs_runtime *runtime)
+{
+  emacs_env *env = runtime-&gt;get_environment (runtime);
+  emacs_value symbol = env-&gt;intern (env, "next-prime");
+  emacs_value func
+    = env-&gt;make_function (env, 1, 1, next_prime, NULL, NULL);
+  emacs_value args[] = {symbol, func};
+  env-&gt;funcall (env, env-&gt;intern (env, "defalias"), 2, args);
+  return 0;
+}
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: emacs_value make_float (emacs_env *env, double d) ¶
+</pre></div>
+<p>这个函数接受一个双参数 d 并返回相应的 Emacs 浮点值。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: emacs_value make_time (emacs_env *env, struct timespec time) ¶
+</pre></div>
+<p>该函数从 Emacs 27 开始可用，它采用 struct timespec 参数 time 并将相应的 Emacs 时间戳作为一对（ticks .hz）返回。请参阅一天中的时间。返回值表示与时间完全相同的时间戳：所有输入值都是可表示的，并且永远不会损失精度。time.tv_sec 和 time.tv_nsec 可以是任意值。特别是，没有要求将时间标准化。这意味着 time.tv_nsec 可以为负数或大于 999,999,999。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: emacs_value make_string (emacs_env *env, const char *str, ptrdiff_t len) ¶
+</pre></div>
+<p>此函数从 str 指向的 C 文本字符串创建一个 Emacs 字符串，该字符串的字节长度（不包括终止的空字节）为 len。str 中的原始字符串可以是 ASCII 字符串，也可以是 UTF-8 编码的非 ASCII 字符串；  它可以包含嵌入的空字节，并且不必以 str[len] 处的终止空字节结尾。如果 len 为负数或超过 Emacs 字符串的最大长度，该函数将引发溢出错误错误条件。如果 len 为零，则 str 可以为 NULL，否则它必须指向有效内存。对于非零 len，make_string 返回唯一的可变字符串对象。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: emacs_value make_unibyte_string (emacs_env *env, const char *str, ptrdiff_t len) ¶
+</pre></div>
+<p>该函数与make_string类似，但对C字符串中字节的值没有限制，可用于将二进制数据以单字节字符串的形式传递给Emacs。
+</p>
+<p>API 不提供操作 Lisp 数据结构的函数，例如，使用 cons 和 list 创建列表（请参阅构建 Cons 单元格和列表），使用 car 和 cdr 提取列表成员（请参阅访问列表元素），使用 vector (请参阅向量函数）等。对于这些，使用下一小节中描述的 intern 和 funcall 来调用相应的 Lisp 函数。
+</p>
+<p>通常，emacs_value 对象的生命周期相当短：当用于创建它们的 emacs_env 指针超出范围时，它就会结束。有时，您可能需要创建全局引用：emacs_value 对象可以随心所欲地存在。使用以下两个函数来管理此类对象。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: emacs_value make_global_ref (emacs_env *env, emacs_value value) ¶
+</pre></div>
+<p>此函数返回值的全局引用。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: void free_global_ref (emacs_env *env, emacs_value global_value) ¶
+</pre></div>
+<p>此函数释放之前由 make_global_ref 创建的 global_value。调用后 global_value 不再有效。您的模块代码应将每次调用 make_global_ref 与相应的 free_global_ref 配对。
+</p>
+<p>保留需要稍后传递给模块函数的 C 数据结构的另一种方法是创建用户指针对象。用户指针或 user-ptr 对象是封装了 C 指针的 Lisp 对象，并且可以具有关联的终结器函数，该函数在对象被垃圾回收时调用（请参阅垃圾回收）。模块 API 提供了创建和访问 user-ptr 对象的函数。如果在不代表 user-ptr 对象的 emacs_value 上调用这些函数，则会引发错误类型参数错误条件。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: emacs_value make_user_ptr (emacs_env *env, emacs_finalizer fin, void *ptr) ¶
+</pre></div>
+<p>此函数创建并返回一个包装 C 指针 ptr 的用户 ptr 对象。终结器函数 fin 可以是 NULL 指针（意味着没有终结器），也可以是具有以下签名的函数：
+</p><div class="lisp">
+<pre class="lisp">typedef void (*emacs_finalizer) (void *ptr);
+</pre></div>
+<p>如果 fin 不是一个 NULL 指针，当 user-ptr 对象被垃圾回收时，它将以 ptr 作为参数被调用。不要在终结器中运行任何昂贵的代码，因为 GC 必须快速完成以保持 Emacs 响应。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: void * get_user_ptr (emacs_env *env, emacs_value arg) ¶
+</pre></div>
+<p>此函数从 arg 表示的 Lisp 对象中提取 C 指针。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: void set_user_ptr (emacs_env *env, emacs_value arg, void *ptr) ¶
+</pre></div>
+<p>此函数将嵌入在由 arg 表示的 user-ptr 对象中的 C 指针设置为 ptr。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: emacs_finalizer get_user_finalizer (emacs_env *env, emacs_value arg) ¶
+</pre></div>
+<p>此函数返回由 arg 表示的 user-ptr 对象的终结器，如果没有终结器，则返回 NULL。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: void set_user_finalizer (emacs_env *env, emacs_value arg, emacs_finalizer fin) ¶
+</pre></div>
+<p>此函数将 arg 表示的 user-ptr 对象的终结器更改为 fin。如果 fin 是 NULL 指针，则 user-ptr 对象将没有终结器。
+</p>
+<p>请注意，emacs_finalizer 类型适用于用户指针和模块函数终结器。请参阅模块函数终结器。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="0E.8.4_模块的其他便利功能.html">模块的其他便利功能</a>, Previous: <a href="0E.8.2_编写模块函数.html">编写模块函数</a>, Up: <a href="0E.8_编写动态加载的模块.html">编写动态加载的模块.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

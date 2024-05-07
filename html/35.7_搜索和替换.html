@@ -1,0 +1,179 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>35.7 搜索和替换</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">35.7 搜索和替换</h2>
+<div class="nav-panel"><p>Next: <a href="35.8_编辑中使用的标准正则表达式.html">编辑中使用的标准正则表达式</a>, Previous: <a href="35.6.4_保存和恢复匹配数据.html">保存和恢复匹配数据</a>, Up: <a href="35_搜索和匹配.html">搜索和匹配.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>如果你想在缓冲区的一部分中找到一个正则表达式的所有匹配项并替换它们，最灵活的方法是使用 re-search-forward 和 replace-match 编写一个显式循环，如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(while (re-search-forward "foo[ \t]+bar" nil t)
+  (replace-match "foobar"))
+</pre></div>
+<p>有关替换匹配的说明，请参阅替换匹配的文本。
+</p>
+<p>将替换限制在特定区域可能更方便。函数 replace-regexp-in-region 就是这样做的。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: replace-regexp-in-region regexp replacement &amp;optional start end ¶
+</pre></div>
+<p>此函数将所有出现的正则表达式替换为开始和结束之间的缓冲区文本区域中的替换；  start 默认为点的位置， end 默认为缓冲区的最后一个可访问位置。regexp 的搜索区分大小写，并且在不改变其字母大小写的情况下插入替换。替换字符串可以使用与替换匹配相同的以 ’\’ 开头的特殊元素。该函数返回被替换的次数，如果没有找到正则表达式，则返回 nil。该函数保留点的位置。
+</p>
+<div class="lisp">
+<pre class="lisp">(replace-regexp-in-region "foo[ \t]+bar" "foobar")
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: replace-string-in-region string replacement &amp;optional start end ¶
+</pre></div>
+<p>此函数的工作方式类似于 replace-regexp-in-region，但搜索和替换文字字符串而不是正则表达式。
+</p>
+<p>Emacs 还具有替换字符串中匹配项的特殊功能。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: replace-regexp-in-string regexp rep string &amp;optional fixedcase literal subexp start ¶
+</pre></div>
+<p>此函数复制字符串并在其中搜索正则表达式的匹配项，并用 rep 替换它们。它返回修改后的副本。如果 start 不为零，则从 string 中的该索引开始搜索匹配项，并且返回的值不包括 string 的第一个开始字符。要获取整个转换后的字符串，请将字符串的第一个起始字符与返回值连接起来。
+</p>
+<p>此函数使用replace-match 进行替换，并将可选参数fixedcase、literal 和subexp 传递给replace-match。
+</p>
+<p>rep 可以是一个函数，而不是一个字符串。在这种情况下，replace-regexp-in-string 为每个匹配调用 rep，将匹配的文本作为其唯一参数传递。它收集 rep 返回的值并将其作为替换字符串传递给 replace-match。此时的匹配数据是匹配正则表达式与字符串子串的结果。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: string-replace from-string to-string in-string ¶
+</pre></div>
+<p>此函数将 in-string 中所有出现的 from-string 替换为 to-string 并返回结果。它可能会返回一个不变的参数，一个常量字符串或一个新字符串。大小写很重要，文本属性被忽略。
+</p>
+<p>如果您想按照查询替换的方式编写命令，您可以使用 perform-replace 来完成这项工作。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: perform-replace from-string replacements query-flag regexp-flag delimited-flag &amp;optional repeat-count map start end backward region-noncontiguous-p ¶
+</pre></div>
+<p>这个函数是查询替换和相关命令的核心。它在开始和结束位置之间的文本中搜索出现的 from-string 并替换其中的部分或全部。如果 start 为 nil（或省略），则使用 point 代替，缓冲区可访问部分的结尾用于 end。（如果可选参数向后不为零，则搜索从末尾开始并向后。）
+</p>
+<p>如果 query-flag 为 nil，则替换所有出现；  否则，它会询问用户如何处理每个问题。
+</p>
+<p>如果 regexp-flag 为非 nil，则 from-string 被视为正则表达式；  否则，它必须在字面上匹配。如果 delimited-flag 不为零，则仅考虑由单词边界包围的替换。
+</p>
+<p>参数replaces 指定用什么替换出现的内容。如果是字符串，则使用该字符串。它也可以是字符串列表，以循环顺序使用。
+</p>
+<p>如果replacements 是一个cons 单元格（function .data），这意味着在每次匹配后调用函数来获取替换文本。该函数使用两个参数调用：数据和已经进行的替换次数。
+</p>
+<p>如果重复计数非零，它应该是一个整数。然后它指定在循环推进到下一个之前使用替换列表中的每个字符串的次数。
+</p>
+<p>如果 from-string 包含大写字母，则 perform-replace 将 case-fold-search 绑定到 nil，并且它使用替换而不改变它们的大小写。
+</p>
+<p>通常，keymap query-replace-map 定义了查询的可能用户响应。参数映射，如果非零，则指定要使用的键映射，而不是查询替换映射。
+</p>
+<p>Non-nil region-noncontiguous-p 表示 start 和 end 之间的区域由不连续的片段组成。最常见的例子是一个矩形区域，其中的片段由换行符分隔。
+</p>
+<p>此函数使用两个函数之一来搜索下一个出现的 from-string。这些函数由两个变量的值指定：replace-re-search-function 和 replace-search-function。当参数 regexp-flag 为非 nil 时调用前者，当它为 nil 时调用后者。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: query-replace-map ¶
+</pre></div>
+<p>此变量包含一个特殊的键映射，它定义了 perform-replace 的有效用户响应和使用它的命令，以及 y-or-np 和 map-y-or-np。这张地图有两个不同寻常之处：
+</p>
+<p>键绑定不是命令，只是对使用此映射的函数有意义的符号。
+不支持前缀键；  每个键绑定都必须用于单事件键序列。这是因为函数不使用 read-key-sequence 来获取输入；  相反，他们阅读单个事件并 <code>手动</code> 查找。
+</p>
+<p>以下是 query-replace-map 的有意义的绑定。其中一些仅对查询替换和朋友有意义。
+</p>
+<div class="lisp">
+<pre class="lisp">act
+</pre></div>
+<p>一定要采取正在考虑的行动——换句话说， <code>是</code> 。
+</p><div class="lisp">
+<pre class="lisp">skip
+</pre></div>
+<p>不要对这个问题采取行动——换句话说， <code>不</code> 。
+</p><div class="lisp">
+<pre class="lisp">exit
+</pre></div>
+<p>回答这个问题 <code>否</code> ，并放弃整个系列的问题，假设答案是 <code>否</code> 。
+</p><div class="lisp">
+<pre class="lisp">exit-prefix
+</pre></div>
+<p>与退出类似，但将按下的键添加到未读命令事件（请参阅杂项事件输入功能）。
+</p><div class="lisp">
+<pre class="lisp">act-and-exit
+</pre></div>
+<p>回答这个问题 <code>是</code> ，并放弃整个系列的问题，假设随后的答案将是 <code>否</code> 。
+</p><div class="lisp">
+<pre class="lisp">act-and-show
+</pre></div>
+<p>回答这个问题 <code>是</code> ，但显示结果——不要前进到下一个问题。
+</p><div class="lisp">
+<pre class="lisp">automatic
+</pre></div>
+<p>用 <code>是</code> 回答这个问题和该系列中的所有后续问题，无需进一步的用户交互。
+</p><div class="lisp">
+<pre class="lisp">backup
+</pre></div>
+<p>回到之前提出问题的地方。
+</p><div class="lisp">
+<pre class="lisp">undo
+</pre></div>
+<p>撤消上次更换并返回执行更换的位置。
+</p><div class="lisp">
+<pre class="lisp">undo-all
+</pre></div>
+<p>撤消所有替换并返回执行第一次替换的位置。
+</p><div class="lisp">
+<pre class="lisp">edit
+</pre></div>
+<p>输入一个递归编辑来处理这个问题——而不是通常会采取的任何其他操作。
+</p><div class="lisp">
+<pre class="lisp">edit-replacement
+</pre></div>
+<p>在 minibuffer 中编辑这个问题的替换。
+</p><div class="lisp">
+<pre class="lisp">delete-and-edit
+</pre></div>
+<p>删除正在考虑的文本，然后输入递归编辑以替换它。
+</p><div class="lisp">
+<pre class="lisp">recenter
+</pre></div>
+<div class="lisp">
+<pre class="lisp">scroll-up
+</pre></div>
+<div class="lisp">
+<pre class="lisp">scroll-down
+</pre></div>
+<div class="lisp">
+<pre class="lisp">scroll-other-window
+</pre></div>
+<div class="lisp">
+<pre class="lisp">scroll-other-window-down
+</pre></div>
+<p>执行指定的窗口滚动操作，然后再问同样的问题。只有 y-or-np 和相关函数使用这个答案。
+</p><div class="lisp">
+<pre class="lisp">quit
+</pre></div>
+<p>立即执行戒烟。只有 y-or-np 和相关函数使用这个答案。
+</p><div class="lisp">
+<pre class="lisp">help
+</pre></div>
+<p>显示一些帮助，然后再次询问。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: multi-query-replace-map ¶
+</pre></div>
+<p>此变量包含一个键映射，该键映射通过提供在多缓冲区替换中有用的附加键绑定来扩展查询替换映射。额外的绑定是：
+</p>
+<div class="lisp">
+<pre class="lisp">automatic-all
+</pre></div>
+<p>对于所有剩余的缓冲区，用 <code>是</code> 回答这个问题和该系列中的所有后续问题，无需进一步的用户交互。
+</p><div class="lisp">
+<pre class="lisp">exit-current
+</pre></div>
+<p>回答 <code>否</code> 这个问题，并放弃当前缓冲区的整个系列问题。继续到序列中的下一个缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: replace-search-function ¶
+</pre></div>
+<p>此变量指定一个函数，该函数执行替换调用以搜索下一个要替换的字符串。它的默认值是向前搜索。任何其他值都应命名为 3 个参数的函数：search-forward 的前 3 个参数（请参阅搜索字符串）。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: replace-re-search-function ¶
+</pre></div>
+<p>此变量指定一个函数，该函数执行替换调用以搜索下一个要替换的正则表达式。它的默认值是重新搜索。任何其他值都应命名为 3 个参数的函数：re-search-forward 的前 3 个参数（请参阅正则表达式搜索）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="35.8_编辑中使用的标准正则表达式.html">编辑中使用的标准正则表达式</a>, Previous: <a href="35.6.4_保存和恢复匹配数据.html">保存和恢复匹配数据</a>, Up: <a href="35_搜索和匹配.html">搜索和匹配.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

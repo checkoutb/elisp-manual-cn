@@ -1,0 +1,144 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.9.2 覆盖属性</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.9.2 覆盖属性</h3>
+<div class="nav-panel"><p>Next: <a href="40.9.3_搜索覆盖.html">搜索覆盖</a>, Previous: <a href="40.9.1_管理覆盖.html">管理覆盖</a>, Up: <a href="40.9_叠加.html">叠加.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>覆盖属性类似于文本属性，因为改变字符显示方式的属性可以来自任一来源。但在大多数方面，它们是不同的。请参阅文本属性进行比较。
+</p>
+<p>文本属性被认为是文本的一部分；  叠加层及其属性被特别认为不是文本的一部分。因此，在各种缓冲区和字符串之间复制文本会保留文本属性，但不会尝试保留覆盖。更改缓冲区的文本属性会将缓冲区标记为已修改，而移动覆盖或更改其属性则不会。与文本属性更改不同，覆盖属性更改不会记录在缓冲区的撤消列表中。
+</p>
+<p>由于多个叠加层可以为同一个字符指定一个属性值，因此 Emacs 允许您为每个叠加层指定一个优先级值。优先级值用于决定哪些重叠覆盖将 <code>获胜</code> 。
+</p>
+<p>这些函数读取和设置覆盖的属性：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: overlay-get overlay prop ¶
+</pre></div>
+<p>此函数返回覆盖中记录的属性 prop 的值（如果有）。如果 overlay 没有记录该属性的任何值，但它确实有一个作为符号的类别属性，则使用该符号的 prop 属性。否则，该值为 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: overlay-put overlay prop value ¶
+</pre></div>
+<p>该函数将overlay中记录的property prop的值设置为value。它返回值。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: overlay-properties overlay ¶
+</pre></div>
+<p>这将返回覆盖属性列表的副本。
+</p>
+<p>另请参阅函数 get-char-property，它检查给定字符的叠加属性和文本属性。请参阅检查文本属性。
+</p>
+<p>许多叠加属性具有特殊含义；  这是他们的表格：
+</p>
+<div class="lisp">
+<pre class="lisp">priority ¶
+</pre></div>
+<p>该属性的值决定了覆盖的优先级。如果要指定优先级值，请使用 nil（或零）或正整数。任何其他值都有未定义的行为。
+</p>
+<p>当两个或多个覆盖覆盖相同的字符并且都指定相同的属性时，优先级很重要；  优先级值较大的一个会覆盖另一个。（对于 face 属性，优先级较高的叠加层的值不会完全覆盖另一个值；相反，它的面属性会覆盖较低优先级的面属性的面属性。）如果两个叠加层具有相同的优先级值，并且其中一个嵌套在另一种，那么内在的将胜过外在的。如果两者都没有嵌套在另一个中，那么您不应该假设哪个覆盖将占上风。
+</p>
+<p>目前，所有叠加层都优先于文本属性。
+</p>
+<p>请注意，Emacs 有时会对其某些内部覆盖使用非数字优先级值，因此不要尝试对覆盖的优先级进行算术运算（除非它是您创建的）。特别是，用于显示区域的覆盖使用表单（primary .secondary）的优先级值，其中primary 值如上所述使用，而secondary 是在primary 和嵌套考虑无法解决问题时使用的备用值覆盖之间的优先级。但是，建议您不要根据这个实现细节来设计 Lisp 程序；  如果您需要按优先顺序放置叠加层，请使用叠加层-at 的 sorted 参数。请参阅搜索叠加层。
+</p><div class="lisp">
+<pre class="lisp">window ¶
+</pre></div>
+<p>如果 window 属性不为 nil，则覆盖仅适用于该窗口。
+</p><div class="lisp">
+<pre class="lisp">category ¶
+</pre></div>
+<p>如果叠加层具有类别属性，我们将其称为叠加层的类别。它应该是一个符号。符号的属性用作叠加层属性的默认值。
+</p><div class="lisp">
+<pre class="lisp">face ¶
+</pre></div>
+<p>此属性控制文本的外观（请参阅 Faces）。该属性的值可以如下：
+</p>
+<p>面名（符号或字符串）。
+匿名面：表单的属性列表（关键字值…），其中每个关键字是面属性名称，值是该属性的值。
+面列表。每个列表元素应该是面名称或匿名面。这指定了一个面，它是每个列出的面的属性的聚合。列表中较早出现的面具有更高的优先级。
+形式为 (foreground-color . color-name) 或 (background-color . color-name) 的 cons 单元格。这指定前景色或背景色，类似于 (:foreground color-name) 或 (:background color-name)。支持这种形式只是为了向后兼容，应该避免使用。
+</p>
+<div class="lisp">
+<pre class="lisp">mouse-face ¶
+</pre></div>
+<p>当鼠标在覆盖范围内时，使用此属性代替 face。但是，Emacs 会忽略该属性中所有改变文本大小的面属性（例如，:height、:weight 和 :slant）。这些属性始终与未突出显示的文本中的相同。
+</p><div class="lisp">
+<pre class="lisp">display ¶
+</pre></div>
+<p>该属性激活了改变文本显示方式的各种功能。例如，它可以使文本显得更高或更短、更高或更低、更宽或更窄，或者替换为图像。请参阅显示属性。
+</p><div class="lisp">
+<pre class="lisp">help-echo ¶
+</pre></div>
+<p>如果覆盖具有帮助回显属性，那么当您将鼠标移动到覆盖中的文本上时，Emacs 会在回显区域或工具提示窗口中显示帮助字符串。有关详细信息，请参阅文本帮助回显。
+</p><div class="lisp">
+<pre class="lisp">field ¶
+</pre></div>
+<p>具有相同字段属性的连续字符构成一个字段。包括前向字和行首在内的一些运动功能在字段边界处停止移动。请参阅定义和使用字段。
+</p><div class="lisp">
+<pre class="lisp">modification-hooks ¶
+</pre></div>
+<p>这个属性的值是一个函数列表，如果覆盖层中的任何字符被更改或者如果文本被严格地插入到覆盖层中，则该函数将被调用。
+</p>
+<p>每次更改之前和之后都会调用挂钩函数。如果函数保存它们收到的信息，并在调用之间比较注释，它们可以准确地确定缓冲区文本中发生了哪些更改。
+</p>
+<p>在更改之前调用时，每个函数都会接收四个参数：overlay、nil 以及要修改的文本范围的开头和结尾。
+</p>
+<p>在更改后调用时，每个函数都会接收五个参数：叠加层、t、刚刚修改的文本范围的开始和结束，以及被该范围替换的更改前文本的长度。（对于插入，更改前的长度为零；对于删除，该长度是删除的字符数，并且更改后的开头和结尾相等。）
+</p>
+<p>当这些函数被调用时，禁止修改钩子被绑定到非零。如果函数修改了缓冲区，您可能希望将 inhibitor-modification-hooks 绑定到 nil，以便为这些修改运行更改挂钩。但是，这样做可能会递归调用您自己的更改挂钩，因此请务必为此做好准备。请参阅更改挂钩。
+</p>
+<p>文本属性也支持 modify-hooks 属性，但细节有些不同（请参阅具有特殊含义的属性）。
+</p><div class="lisp">
+<pre class="lisp">insert-in-front-hooks ¶
+</pre></div>
+<p>此属性的值是在叠加层开头插入文本之前和之后要调用的函数列表。调用约定与修改钩子函数相同。
+</p><div class="lisp">
+<pre class="lisp">insert-behind-hooks ¶
+</pre></div>
+<p>此属性的值是在叠加层末尾插入文本之前和之后要调用的函数列表。调用约定与修改钩子函数相同。
+</p><div class="lisp">
+<pre class="lisp">invisible ¶
+</pre></div>
+<p>invisible 属性可以使叠加层中的文本不可见，也就是说它不会出现在屏幕上。有关详细信息，请参阅不可见文本。
+</p><div class="lisp">
+<pre class="lisp">intangible ¶
+</pre></div>
+<p>覆盖上的无形属性就像无形文本属性一样工作。它已经过时了。有关详细信息，请参阅具有特殊含义的属性。
+</p><div class="lisp">
+<pre class="lisp">isearch-open-invisible
+</pre></div>
+<p>此属性告诉增量搜索如何使不可见的覆盖永久可见，如果最终匹配与其重叠。请参阅不可见文本。
+</p><div class="lisp">
+<pre class="lisp">isearch-open-invisible-temporary
+</pre></div>
+<p>此属性告诉增量搜索如何在搜索期间使不可见的覆盖暂时可见。请参阅不可见文本。
+</p><div class="lisp">
+<pre class="lisp">before-string ¶
+</pre></div>
+<p>此属性的值是要添加到叠加层开头的显示的字符串。该字符串在任何意义上都不会出现在缓冲区中——只出现在屏幕上。
+</p><div class="lisp">
+<pre class="lisp">after-string ¶
+</pre></div>
+<p>此属性的值是要添加到叠加层末尾显示的字符串。该字符串在任何意义上都不会出现在缓冲区中——只出现在屏幕上。
+</p><div class="lisp">
+<pre class="lisp">line-prefix
+</pre></div>
+<p>此属性指定在显示时添加到每个非连续行的显示规范。请参阅截断。
+</p><div class="lisp">
+<pre class="lisp">wrap-prefix
+</pre></div>
+<p>此属性指定在显示时添加到每个续行的显示规范。请参阅截断。
+</p><div class="lisp">
+<pre class="lisp">evaporate ¶
+</pre></div>
+<p>如果此属性为非零，则如果覆盖为空（即，如果其长度为零），则会自动删除覆盖。如果你给一个空覆盖（见空覆盖）一个非零的蒸发属性，它会立即删除它。请注意，除非覆盖具有此属性，否则当从缓冲区中删除其开始位置和结束位置之间的文本时，它不会被删除。
+</p><div class="lisp">
+<pre class="lisp">keymap ¶
+</pre></div>
+<p>如果此属性不为 nil，则它为文本的一部分指定一个键映射。此键映射优先于大多数其他键映射（请参阅活动键映射），并且当点位于覆盖范围内时使用它，其中 front-and-rear-advance 属性定义边界是否被视为在覆盖范围内。
+</p><div class="lisp">
+<pre class="lisp">local-map ¶
+</pre></div>
+<p>local-map 属性与 keymap 类似，但替换了缓冲区的本地映射，而不是扩充现有的 keymap。这也意味着它的优先级低于次要模式键映射。
+</p>
+<p>keymap 和 local-map 属性不会影响由 before-string、after-string 或 display 属性显示的字符串。这仅与鼠标单击和落在字符串上的其他鼠标事件相关，因为点从不在字符串上。要为字符串绑定特殊的鼠标事件，请为其分配一个键映射或本地映射文本属性。请参阅具有特殊含义的属性。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.9.3_搜索覆盖.html">搜索覆盖</a>, Previous: <a href="40.9.1_管理覆盖.html">管理覆盖</a>, Up: <a href="40.9_叠加.html">叠加.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

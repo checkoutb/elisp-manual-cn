@@ -1,0 +1,94 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>29.12 切换到窗口中的缓冲区</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">29.12 切换到窗口中的缓冲区</h2>
+<div class="nav-panel"><p>Next: <a href="29.13_在合适的窗口中显示缓冲区.html">在合适的窗口中显示缓冲区</a>, Previous: <a href="29.11_缓冲区和窗口.html">缓冲区和窗口</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍在某些窗口中切换到指定缓冲区的高级函数。一般来说， <code>切换到缓冲区</code> 意味着（1）在某个窗口中显示缓冲区，（2）使该窗口成为选定的窗口（并将其 <code>帧</code> ( <code>frame</code> )作为选定的帧），以及（3）使缓冲区成为当前缓冲区。
+</p>
+<p>不要使用这些函数来临时使缓冲区成为当前缓冲区，以便 Lisp 程序可以访问或修改它。它们有副作用，例如更改窗口历史记录（请参阅窗口历史记录），如果以这种方式使用，用户会感到惊讶。如果你想在 Lisp 中修改当前缓冲区，请使用 with-current-buffer、save-current-buffer 或 set-buffer。请参阅当前缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: switch-to-buffer buffer-or-name &amp;optional norecord force-same-window ¶
+</pre></div>
+<p>此命令尝试在所选窗口中显示缓冲区或名称并将其设为当前缓冲区。它通常以交互方式使用（作为 Cx b 的绑定），以及在 Lisp 程序中。返回值是切换到的缓冲区。
+</p>
+<p>如果 buffer-or-name 为 nil，则默认为 other-buffer 返回的缓冲区（请参阅缓冲区列表）。如果 buffer-or-name 是一个不是任何现有缓冲区名称的字符串，则此函数创建一个具有该名称的新缓冲区；  新缓冲区的主模式由变量主模式确定（请参阅主模式）。
+</p>
+<p>通常，指定的缓冲区放在缓冲区列表的前面——全局缓冲区列表和选定帧的缓冲区列表（请参阅缓冲区列表）。但是，如果可选参数 norecord 为非零，则不会这样做。
+</p>
+<p>有时，所选窗口可能不适合显示缓冲区。如果所选窗口是一个 minibuffer 窗口，或者如果所选窗口强烈专用于其缓冲区（请参阅专用窗口），则会发生这种情况。在这种情况下，该命令通常会尝试通过调用 pop-to-buffer（见下文）在其他窗口中显示缓冲区。
+</p>
+<p>如果可选参数 force-same-window 不为 nil 并且所选窗口不适合显示缓冲区，则此函数在非交互调用时总是会发出错误信号。在交互使用中，如果选择的窗口是一个 minibuffer 窗口，这个函数会尝试使用其他的窗口来代替。如果所选窗口强烈专用于其缓冲区，则可以使用下面描述的选项 switch-to-buffer-in-dedicated-window 继续。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: switch-to-buffer-in-dedicated-window ¶
+</pre></div>
+<p>此选项，如果非 nil，则允许在交互调用时继续切换到缓冲区，并且所选窗口强烈专用于其缓冲区。
+</p>
+<p>遵循以下值：
+</p>
+<div class="lisp">
+<pre class="lisp">nil
+</pre></div>
+<p>在非交互式使用中不允许切换并发出错误信号。
+</p><div class="lisp">
+<pre class="lisp">prompt
+</pre></div>
+<p>提示用户是否允许切换。
+</p><div class="lisp">
+<pre class="lisp">pop
+</pre></div>
+<p>调用 pop-to-buffer 以继续。
+</p><div class="lisp">
+<pre class="lisp">t
+</pre></div>
+<p>将选定的窗口标记为非专用并继续。
+</p>
+<p>此选项不影响 switch-to-buffer 的非交互式调用。
+</p>
+<p>默认情况下，切换到缓冲区尝试保留窗口点。可以使用以下选项调整此行为。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: switch-to-buffer-preserve-window-point ¶
+</pre></div>
+<p>如果此变量为 nil，则 switch-to-buffer 将在该缓冲区点的位置显示由 buffer-or-name 指定的缓冲区。如果此变量已显示，它会尝试在所选窗口中的先前位置显示缓冲区，前提是缓冲区当前显示在任何可见或图标 <code>帧</code> ( <code>frame</code> )上的某个其他窗口中。如果此变量为 t，则 switch-to-buffer 无条件地尝试在所选窗口中的先前位置显示缓冲区。
+</p>
+<p>如果缓冲区已经显示在所选窗口中或以前从未出现在其中，或者如果 switch-to-buffer 调用 pop-to-buffer 来显示缓冲区，则忽略此变量。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: switch-to-buffer-obey-display-actions ¶
+</pre></div>
+<p>如果此变量不为 nil，则 switch-to-buffer 遵循由 display-buffer-overriding-action、display-buffer-alist 和其他显示相关变量指定的显示操作。
+</p>
+<p>接下来的两个命令类似于 switch-to-buffer，除了所描述的功能。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: switch-to-buffer-other-window buffer-or-name &amp;optional norecord ¶
+</pre></div>
+<p>此函数在选定窗口以外的某个窗口中显示由 buffer-or-name 指定的缓冲区。它在内部使用了 pop-to-buffer 函数（见下文）。
+</p>
+<p>如果选定的窗口已经显示了指定的缓冲区，它会继续这样做，但仍然会找到另一个窗口来显示它。
+</p>
+<p>buffer-or-name 和 norecord 参数与 switch-to-buffer 中的含义相同。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: switch-to-buffer-other-frame buffer-or-name &amp;optional norecord ¶
+</pre></div>
+<p>此函数在新帧中显示由 buffer-or-name 指定的缓冲区。它在内部使用了 pop-to-buffer 函数（见下文）。
+</p>
+<p>如果指定的缓冲区已经显示在另一个窗口中，则在当前终端上的任何 <code>帧</code> ( <code>frame</code> )中，这将切换到该窗口而不是创建新 <code>帧</code> ( <code>frame</code> )。但是，所选窗口从未用于此目的。
+</p>
+<p>buffer-or-name 和 norecord 参数与 switch-to-buffer 中的含义相同。
+</p>
+<p>上面的命令使用了pop-to-buffer功能，可以灵活的在某个窗口中显示一个缓冲区，并选择该窗口进行编辑。反过来，pop-to-buffer 使用 display-buffer 来显示缓冲区。因此，所有影响显示缓冲区的变量也会影响它。有关 display-buffer 的文档，请参阅选择显示缓冲区的窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: pop-to-buffer buffer-or-name &amp;optional action norecord ¶
+</pre></div>
+<p>此函数使 buffer-or-name 成为当前缓冲区并将其显示在某个窗口中，最好不是当前选择的窗口。然后它选择显示窗口。如果该窗口位于不同的图形 <code>帧</code> ( <code>frame</code> )上，则尽可能为该 <code>帧</code> ( <code>frame</code> )提供输入焦点（请参阅输入焦点）。
+</p>
+<p>如果 buffer-or-name 为 nil，则默认为 other-buffer 返回的缓冲区（请参阅缓冲区列表）。如果 buffer-or-name 是一个不是任何现有缓冲区名称的字符串，则此函数创建一个具有该名称的新缓冲区；  新缓冲区的主模式由变量主模式确定（请参阅主模式）。在任何情况下，即使没有找到合适的窗口来显示它，该缓冲区也会成为当前缓冲区并返回。
+</p>
+<p>如果 action 不是 nil，它应该是传递给 display-buffer 的显示操作（请参阅选择用于显示缓冲区的窗口）。或者，非零、非列表值意味着弹出到选定窗口以外的窗口——即使缓冲区已经显示在选定窗口中。
+</p>
+<p>与 switch-to-buffer 一样，此函数更新缓冲区列表，除非 norecord 为非零。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="29.13_在合适的窗口中显示缓冲区.html">在合适的窗口中显示缓冲区</a>, Previous: <a href="29.11_缓冲区和窗口.html">缓冲区和窗口</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

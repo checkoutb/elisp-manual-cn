@@ -1,0 +1,52 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.5.2 警告变量</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.5.2 警告变量</h3>
+<div class="nav-panel"><p>Next: <a href="40.5.3_警告选项.html">警告选项</a>, Previous: <a href="40.5.1_警告基础.html">警告基础</a>, Up: <a href="40.5_报告警告.html">报告警告.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>程序可以通过绑定本节中描述的变量来自定义其警告的显示方式。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: warning-levels ¶
+</pre></div>
+<p>此列表定义警告严重性级别的含义和严重性顺序。每个元素定义一个严重性级别，它们按严重性降序排列。
+</p>
+<p>每个元素都有形式（级别字符串函数），其中级别是它定义的严重级别。字符串指定此级别的文本描述。string 应该使用 ’%s’ 来指定放置警告类型信息的位置，或者它可以省略 ’%s’ 以便不包含该信息。
+</p>
+<p>可选函数，如果非零，是一个不带参数调用的函数，以引起用户的注意。
+</p>
+<p>通常不应更改此变量的值。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: warning-prefix-function ¶
+</pre></div>
+<p>如果非零，则该值是为警告生成前缀文本的函数。程序可以将变量绑定到合适的函数。display-warning 使用警告缓冲区当前调用此函数，该函数可以在其中插入文本。该文本成为警告消息的开头。
+</p>
+<p>该函数使用两个参数调用，即严重性级别及其在警告级别中的条目。它应该返回一个列表以用作条目（此值不必是警告级别的实际成员）。通过构造此值，函数可以更改警告的严重性，或为给定的严重性级别指定不同的处理。
+</p>
+<p>如果变量的值为 nil 则没有函数可以调用。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: warning-series ¶
+</pre></div>
+<p>程序可以将此变量绑定到 t 以表示下一个警告应该开始一个系列。当多个警告形成一个系列时，这意味着在系列的第一个警告上留下点，而不是为每个警告继续移动它，以便它出现在最后一个警告上。当本地绑定解除绑定并且warning-series 再次变为nil 时，该系列结束。
+</p>
+<p>该值也可以是具有函数定义的符号。这等效于 t，除了下一个警告还将调用没有参数且警告缓冲区当前的函数。该函数可以插入文本，作为一系列警告的标题。
+</p>
+<p>一旦系列开始，该值就是一个标记，它指向系列开始的警告缓冲区中的缓冲区位置。
+</p>
+<p>该变量的正常值为 nil，这意味着分别处理每个警告。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: warning-fill-prefix ¶
+</pre></div>
+<p>当此变量为非零时，它指定用于填充每个警告文本的填充前缀。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: warning-fill-column ¶
+</pre></div>
+<p>填写警告的列。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: warning-type-format ¶
+</pre></div>
+<p>此变量指定在警告消息中显示警告类型的格式。以这种方式格式化类型的结果将包含在消息中，由警告级别条目中的字符串控制。默认值为 ~ (%s)~ 。如果将其绑定到 ~~ ，则根本不会出现警告类型。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.5.3_警告选项.html">警告选项</a>, Previous: <a href="40.5.1_警告基础.html">警告基础</a>, Up: <a href="40.5_报告警告.html">报告警告.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

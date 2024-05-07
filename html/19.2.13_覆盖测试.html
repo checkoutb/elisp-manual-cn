@@ -1,0 +1,38 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>19.2.13 覆盖测试</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">19.2.13 覆盖测试</h3>
+<div class="nav-panel"><p>Next: <a href="19.2.14_外部环境.html">外部环境</a>, Previous: <a href="19.2.12_跟踪缓冲区.html">跟踪缓冲区</a>, Up: <a href="19.2_调试.html">调试.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Edebug 提供基本的覆盖测试和执行频率的显示。
+</p>
+<p>覆盖测试通过将每个表达式的结果与之前的结果进行比较来工作；  如果自从您在当前 Emacs 会话中开始测试覆盖率以来，程序中的每个表单都返回了两个不同的值，则认为它已被覆盖。因此，要对您的程序进行覆盖测试，请在各种条件下执行它并注意其行为是否正确；  当您尝试了足够多的不同条件以使每个表单返回两个不同的值时，Edebug 会告诉您。
+</p>
+<p>覆盖测试会使执行速度变慢，因此只有在 edebug-test-coverage 不为零时才会执行。对检测函数的所有执行执行频率计数，即使执行模式是 Go-nonstop，也不管是否启用了覆盖测试。
+</p>
+<p>使用 Cx X = (edebug-display-freq-count) 显示定义的覆盖信息和频率计数。Just = (edebug-temp-display-freq-count) 暂时显示相同的信息，直到您键入另一个键。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: edebug-display-freq-count ¶
+</pre></div>
+<p>此命令显示当前定义的每一行的频率计数数据。
+</p>
+<p>它在每行代码之后插入频率计数作为注释行。您可以使用一个撤消命令撤消所有插入。计数出现在表达式之前的 ’(’ 或表达式之后的 ’)’ 下，或变量的最后一个字符上。为了简化显示，如果计数等于同一行上先前表达式的计数，则不显示计数。
+</p>
+<p>表达式计数后面的字符 <code>=</code> 表示该表达式每次计算时都返回相同的值。换句话说，它还没有被覆盖用于覆盖测试目的。
+</p>
+<p>要清除定义的频率计数和覆盖数据，只需使用 eval-defun 重新设置即可。
+</p>
+<p>例如，在使用源断点评估 (fac 5) 并将 edebug-test-coverage 设置为 t 后，到达断点时，频率数据如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(defun fac (n)
+  (if (= n 0) (edebug))
+;#6           1      = =5
+  (if (&lt; 0 n)
+;#5         =
+      (* n (fac (1- n)))
+;#    5               0
+    1))
+;#   0
+</pre></div>
+<p>注释行显示 fac 被调用了 6 次。第一个 if 语句返回 5 次，每次都返回相同的结果；  第二个 if 的条件也是如此。fac 的递归调用根本没有返回。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="19.2.14_外部环境.html">外部环境</a>, Previous: <a href="19.2.12_跟踪缓冲区.html">跟踪缓冲区</a>, Up: <a href="19.2_调试.html">调试.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

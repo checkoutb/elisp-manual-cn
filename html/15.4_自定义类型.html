@@ -1,0 +1,18 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>15.4 自定义类型</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">15.4 自定义类型</h2>
+<div class="nav-panel"><p>Next: <a href="15.4.1_简单类型.html">简单类型</a>, Previous: <a href="15.3_定义自定义变量.html">定义自定义变量</a>, Up: <a href="15_自定义设置.html">自定义设置.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当您使用 defcustom 定义用户选项时，您必须指定其自定义类型。这是一个 Lisp 对象，它描述 (1) 哪些值是合法的，以及 (2) 如何在自定义缓冲区中显示该值以进行编辑。
+</p>
+<p>您可以使用 :type 关键字在 defcustom 中指定自定义类型。:type 的参数被评估，但只在执行 defcustom 时评估一次，因此改变值没有用。通常我们使用带引号的常量。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">(defcustom diff-command "diff"
+  "The command to use to run diff."
+  :type '(string)
+  :group 'diff)
+</pre></div>
+<p>通常，自定义类型是一个列表，其第一个元素是一个符号，它是以下部分中定义的自定义类型名称之一。在这个符号之后是一些参数，具体取决于符号。在类型符号及其参数之间，您可以选择编写关键字-值对（请参阅类型关键字）。
+</p>
+<p>一些类型符号不使用任何参数；  这些被称为简单类型。对于简单类型，如果不使用任何关键字-值对，则可以省略类型符号周围的括号。例如，仅字符串作为自定义类型就等同于 (string)。
+</p>
+<p>所有自定义类型都作为小部件实现；  有关详细信息，请参阅 The Emacs Widget Library 中的简介。
+</p>
+<div class="nav-panel"><p>Next: <a href="15.4.1_简单类型.html">简单类型</a>, Previous: <a href="15.3_定义自定义变量.html">定义自定义变量</a>, Up: <a href="15_自定义设置.html">自定义设置.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

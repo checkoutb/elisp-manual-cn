@@ -1,0 +1,10 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>21.6 完成</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">21.6 完成</h2>
+<div class="nav-panel"><p>Next: <a href="21.6.1_基本完成函数.html">基本完成函数</a>, Previous: <a href="21.5_初始输入.html">初始输入</a>, Up: <a href="21_小缓冲区.html">小缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>补全是一项功能，它从名称的缩写开始填充名称的其余部分。完成通过将用户的输入与有效名称列表进行比较，并确定有多少名称是由用户键入的内容唯一确定的。例如，当你输入 Cx b (switch-to-buffer)，然后输入你想切换到的缓冲区名称的前几个字母，然后输入 TAB (minibuffer-complete)，Emacs 将名称扩展为尽其所能。
+</p>
+<p>标准 Emacs 命令提供符号、文件、缓冲区和进程名称的补全；  使用本节中的函数，您可以实现其他类型名称的补全。
+</p>
+<p>try-completion 函数是完成的基本原语：它返回给定初始字符串的最长确定完成，以及要匹配的给定字符串集。
+</p>
+<p>完成读取功能为完成提供了更高级别的接口。对完成读取的调用指定如何确定有效名称列表。然后该函数使用本地键映射激活迷你缓冲区，该映射将一些键绑定到对完成有用的命令。其他函数提供了方便的简单接口，用于通过完成读取某些类型的名称。
+</p>
+<div class="nav-panel"><p>Next: <a href="21.6.1_基本完成函数.html">基本完成函数</a>, Previous: <a href="21.5_初始输入.html">初始输入</a>, Up: <a href="21_小缓冲区.html">小缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

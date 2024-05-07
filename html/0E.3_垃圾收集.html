@@ -1,0 +1,227 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>E.3 垃圾收集</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">E.3 垃圾收集</h2>
+<div class="nav-panel"><p>Next: <a href="0E.4_堆栈分配的对象.html">堆栈分配的对象</a>, Previous: <a href="0E.2_纯存储.html">纯存储</a>, Up: <a href="附录_E_GNU_Emacs内部结构.html">E_GNU_Emacs内部结构.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当一个程序创建一个列表或用户定义一个新函数（例如通过加载一个库）时，该数据被放置在正常存储中。如果正常存储空间不足，那么 Emacs 会要求操作系统分配更多内存。不同类型的 Lisp 对象，例如符号、cons 单元、小向量、标记等，在内存中被隔离在不同的块中。（大向量、长字符串、缓冲区和某些其他相当大的编辑类型被分配在单独的块中，每个对象一个；小字符串被打包成 8k 字节的块，小向量被打包成 4k 字节的块） .
+</p>
+<p>除了基本向量之外，许多对象（如标记、叠加层和缓冲区）都像向量一样进行管理。对应的 C 数据结构包括 union vectorlike_header 字段，其 size 成员包含 enum pvec_type 枚举的子类型，以及有关此结构包含多少 Lisp_Object 字段以及其余数据大小的信息。计算对象的内存占用需要此信息，并在迭代向量块时由向量分配代码使用。
+</p>
+<p>使用一些存储一段时间，然后通过（例如）终止缓冲区或删除指向对象的最后一个指针来释放它是很常见的。Emacs 提供了一个垃圾收集器来回收这个废弃的存储。垃圾收集器本质上是通过查找和标记 Lisp 程序仍可访问的所有 Lisp 对象来操作的。首先，它假定所有符号、它们的值和相关的函数定义以及当前在堆栈上的任何数据都是可访问的。任何可以通过其他可访问对象间接访问的对象也是可访问的，但是这种计算是 <code>保守地</code> 完成的，因此它可能会稍微高估有多少对象是可访问的。
+</p>
+<p>标记完成后，所有仍未标记的对象都是垃圾。无论 Lisp 程序或用户做什么，都无法引用它们，因为不再有办法接触它们。他们的空间也可以重复使用，因为没有人会想念他们。垃圾收集器的第二（清扫）阶段安排重用它们。（但由于标记是 <code>保守地</code> 完成的，因此并非所有未使用的对象都保证被任何一次扫描进行垃圾收集。）
+</p>
+<p>扫描阶段将未使用的 cons 单元放入空闲列表以供将来分配；  同样适用于符号和标记。它压缩了可访问的字符串，因此它们占用更少的 8k 块；  然后它释放其他 8k 块。来自向量块的不可达向量被合并以创建最大可能的空闲区域；  如果一个空闲区域跨越一个完整的 4k 块，则该块被释放。否则，空闲区域被记录在一个空闲列表数组中，其中每个条目对应一个相同大小区域的空闲列表。大型向量、缓冲区和其他大型对象是单独分配和释放的。
+</p>
+<p>Common Lisp 注意：与其他 Lisp 不同，GNU Emacs Lisp 在空闲列表为空时不会调用垃圾收集器。相反，它只是请求操作系统分配更多存储空间，然后继续处理直到 gc-cons-threshold 字节被使用。
+</p>
+<p>这意味着您可以确保垃圾收集器不会在 Lisp 程序的某个部分运行，方法是在它之前显式调用垃圾收集器（前提是该部分程序不使用太多空间来强制执行第二个垃圾收藏）。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: garbage-collect ¶
+</pre></div>
+<p>此命令运行垃圾收集，并返回有关正在使用的空间量的信息。（如果自上次垃圾收集以来使用的 Lisp 数据的 gc-cons-threshold 字节以上，垃圾收集也会自发发生。）
+</p>
+<p>垃圾收集返回一个列表，其中包含有关正在使用的空间量的信息，其中每个条目的形式为 <code>（使用的名称大小）</code> 或 <code>（使用的名称大小免费）</code> 。在条目中，name 是描述该条目所代表的对象类型的符号，size 是每个对象使用的字节数，used 是在堆中找到的那些对象的数量，可选的 free 是那些不存在但 Emacs 保留以供将来分配的对象。所以总体结果是：
+</p><div class="lisp">
+<pre class="lisp">((conses cons-size used-conses free-conses)
+ (symbols symbol-size used-symbols free-symbols)
+ (strings string-size used-strings free-strings)
+ (string-bytes byte-size used-bytes)
+ (vectors vector-size used-vectors)
+ (vector-slots slot-size used-slots free-slots)
+ (floats float-size used-floats free-floats)
+ (intervals interval-size used-intervals free-intervals)
+ (buffers buffer-size used-buffers)
+ (heap unit-size total-size free-size))
+</pre></div>
+<p>这是一个例子：
+</p>
+<div class="lisp">
+<pre class="lisp">(garbage-collect)
+      ⇒ ((conses 16 49126 8058) (symbols 48 14607 0)
+                 (strings 32 2942 2607)
+                 (string-bytes 1 78607) (vectors 16 7247)
+                 (vector-slots 8 341609 29474) (floats 8 71 102)
+                 (intervals 56 27 26) (buffers 944 8)
+                 (heap 1024 11715 2678))
+</pre></div>
+<p>下面是解释每个元素的表格。请注意，最后一个堆条目是可选的，并且仅在底层 malloc 实现提供 mallinfo 功能时才存在。
+</p>
+<div class="lisp">
+<pre class="lisp">cons-size
+</pre></div>
+<p>cons 单元的内部大小，即 sizeof (struct Lisp_Cons)。
+</p><div class="lisp">
+<pre class="lisp">used-conses
+</pre></div>
+<p>正在使用的 cons 单元数。
+</p><div class="lisp">
+<pre class="lisp">free-conses
+</pre></div>
+<p>已从操作系统获得空间但当前未使用的 cons 单元数。
+</p><div class="lisp">
+<pre class="lisp">symbol-size
+</pre></div>
+<p>符号的内部大小，即 sizeof (struct Lisp_Symbol)。
+</p><div class="lisp">
+<pre class="lisp">used-symbols
+</pre></div>
+<p>正在使用的符号数。
+</p><div class="lisp">
+<pre class="lisp">free-symbols
+</pre></div>
+<p>已从操作系统获得空间但当前未使用的符号数。
+</p><div class="lisp">
+<pre class="lisp">string-size
+</pre></div>
+<p>字符串头的内部大小，即 sizeof (struct Lisp_String)。
+</p><div class="lisp">
+<pre class="lisp">used-strings
+</pre></div>
+<p>正在使用的字符串标头数。
+</p><div class="lisp">
+<pre class="lisp">free-strings
+</pre></div>
+<p>已从操作系统获得空间但当前未使用的字符串标头数。
+</p><div class="lisp">
+<pre class="lisp">byte-size
+</pre></div>
+<p>这是为了方便而使用的，等于 sizeof (char)。
+</p><div class="lisp">
+<pre class="lisp">used-bytes
+</pre></div>
+<p>所有字符串数据的总大小（以字节为单位）。
+</p><div class="lisp">
+<pre class="lisp">vector-size
+</pre></div>
+<p>长度为 1 的向量的大小（以字节为单位），包括其标头。
+</p><div class="lisp">
+<pre class="lisp">used-vectors
+</pre></div>
+<p>从向量块分配的向量头的数量。
+</p><div class="lisp">
+<pre class="lisp">slot-size
+</pre></div>
+<p>向量槽的内部大小，总是等于 sizeof (Lisp_Object)。
+</p><div class="lisp">
+<pre class="lisp">used-slots
+</pre></div>
+<p>所有使用的向量中的槽数。插槽计数可能包括来自矢量头的部分或全部开销，具体取决于平台。
+</p><div class="lisp">
+<pre class="lisp">free-slots
+</pre></div>
+<p>所有向量块中的空闲槽数。
+</p><div class="lisp">
+<pre class="lisp">float-size
+</pre></div>
+<p>浮点对象的内部大小，即 sizeof (struct Lisp_Float)。（不要将其与本机平台浮动或双精度混淆。）
+</p><div class="lisp">
+<pre class="lisp">used-floats
+</pre></div>
+<p>正在使用的浮点数。
+</p><div class="lisp">
+<pre class="lisp">free-floats
+</pre></div>
+<p>已从操作系统获得空间但当前未使用的浮点数。
+</p><div class="lisp">
+<pre class="lisp">interval-size
+</pre></div>
+<p>区间对象的内部大小，即sizeof(struct interval)。
+</p><div class="lisp">
+<pre class="lisp">used-intervals
+</pre></div>
+<p>正在使用的间隔数。
+</p><div class="lisp">
+<pre class="lisp">free-intervals
+</pre></div>
+<p>已从操作系统获得空间但当前未使用的间隔数。
+</p><div class="lisp">
+<pre class="lisp">buffer-size
+</pre></div>
+<p>缓冲区的内部大小，即 sizeof (struct buffer)。（不要与 buffer-size 函数返回的值混淆。）
+</p><div class="lisp">
+<pre class="lisp">used-buffers
+</pre></div>
+<p>正在使用的缓冲区对象的数量。这包括对用户不可见的已终止缓冲区，即 all_buffers 列表中的所有缓冲区。
+</p><div class="lisp">
+<pre class="lisp">unit-size
+</pre></div>
+<p>堆空间测量的单位，总是等于 1024 字节。
+</p><div class="lisp">
+<pre class="lisp">total-size
+</pre></div>
+<p>总堆大小，以单位大小为单位。
+</p><div class="lisp">
+<pre class="lisp">free-size
+</pre></div>
+<p>当前未使用的堆空间，以单位大小为单位。
+</p>
+<p>如果纯空间发生溢出（请参阅 Pure Storage），并且 Emacs 使用（现已过时的）unexec 方法（请参阅构建 Emacs）转储，则垃圾收集返回 nil，因为在这种情况下无法完成真正的垃圾收集。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: garbage-collection-messages ¶
+</pre></div>
+<p>如果这个变量不为 nil，Emacs 会在垃圾回收的开始和结束时显示一条消息。默认值为无。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: post-gc-hook ¶
+</pre></div>
+<p>这是一个在垃圾回收结束时运行的普通钩子。在钩子函数运行时垃圾收集被禁止，所以要小心编写它们。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: gc-cons-threshold ¶
+</pre></div>
+<p>此变量的值是在一次垃圾回收之后必须为 Lisp 对象分配的存储字节数，以便触发另一次垃圾回收。您可以使用垃圾收集返回的结果来获取有关特定对象类型大小的信息；  分配给缓冲区内容的空间不计算在内。
+</p>
+<p>初始阈值为 GC_DEFAULT_THRESHOLD，在 alloc.c 中定义。由于它是以 word_size 为单位定义的，因此默认 32 位配置的值为 400,000，而 64 位配置的值为 800,000。如果您指定一个较大的值，垃圾回收的发生频率就会降低。这减少了垃圾收集所花费的时间，但增加了总内存使用量。在运行创建大量 Lisp 数据的程序时，您可能希望这样做。
+</p>
+<p>您可以通过指定较小的值（低至 GC_DEFAULT_THRESHOLD 的 1/10）来提高收集频率。小于此最小值的值将仅在后续垃圾收集之前有效，此时垃圾收集会将阈值设置回最小值。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: gc-cons-percentage ¶
+</pre></div>
+<p>此变量的值指定垃圾回收发生之前的 consing 数量，作为当前堆大小的一部分。此标准和 gc-cons-threshold 并行应用，垃圾收集仅在满足这两个标准时才会发生。
+</p>
+<p>随着堆大小的增加，执行垃圾回收的时间也会增加。因此，可能希望按比例减少它们的频率。
+</p>
+<p>通过 gc-cons-threshold 和 gc-cons-percentage 对垃圾收集器的控制只是近似值。尽管 Emacs 会定期检查阈值耗尽，但出于效率原因，它不会在每次更改堆或 gc-cons-threshold 或 gc-cons-percentage 后立即执行此操作，因此耗尽阈值不会立即触发垃圾收集。此外，为了提高阈值计算的效率，Emacs 近似于堆大小，它计算堆中当前可访问对象使用的字节数。
+</p>
+<p>垃圾收集返回的值描述了 Lisp 数据使用的内存量，按数据类型细分。相比之下，函数 memory-limit 提供有关 Emacs 当前使用的内存总量的信息。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: memory-limit ¶
+</pre></div>
+<p>此函数返回 Emacs 当前使用的虚拟内存的总字节数除以 1024 的估计值。您可以使用它来大致了解您的操作如何影响内存使用。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: memory-full ¶
+</pre></div>
+<p>如果 Emacs 的 Lisp 对象几乎没有内存，则此变量为 t，否则为 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: memory-use-counts ¶
+</pre></div>
+<p>这将返回一个数字列表，该列表计算在此 Emacs 会话中创建的对象的数量。这些计数器中的每一个都会针对某种对象递增。有关详细信息，请参阅文档字符串。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: memory-info ¶
+</pre></div>
+<p>此函数返回系统总内存量以及其中有多少是空闲的。在不受支持的系统上，该值可能为零。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: gcs-done ¶
+</pre></div>
+<p>这个变量包含到目前为止在这个 Emacs 会话中完成的垃圾回收的总数。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: gc-elapsed ¶
+</pre></div>
+<p>此变量包含到目前为止在此 Emacs 会话中垃圾收集期间经过的总秒数，作为浮点数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: memory-report ¶
+</pre></div>
+<p>有时查看 Emacs 在哪里使用内存（在各种变量、缓冲区和缓存中）很有用。此命令将打开一个新缓冲区（称为 <code>*内存报告*</code> ），除了列出 <code>最大</code> 缓冲区和变量之外，该缓冲区还将提供概述。
+</p>
+<p>这里的所有数据都是近似的，因为实际上没有一致的方法来计算变量的大小。例如，两个变量可能共享数据结构的一部分，这将被计算两次，但是这个命令仍然可以提供一个有用的高级概述，了解 Emacs 的哪些部分正在使用内存。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="0E.4_堆栈分配的对象.html">堆栈分配的对象</a>, Previous: <a href="0E.2_纯存储.html">纯存储</a>, Up: <a href="附录_E_GNU_Emacs内部结构.html">E_GNU_Emacs内部结构.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

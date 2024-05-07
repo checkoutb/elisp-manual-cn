@@ -1,0 +1,54 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>41.10 时间计算</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">41.10 时间计算</h2>
+<div class="nav-panel"><p>Next: <a href="41.11_延迟执行的定时器.html">延迟执行的定时器</a>, Previous: <a href="41.9_处理器运行时间.html">处理器运行时间</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这些函数使用时间值执行日历计算（请参阅时间）。与任何时间值一样，其任何时间值参数的 nil 值代表当前系统时间，单个数字代表自纪元以来的秒数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: time-less-p t1 t2 ¶
+</pre></div>
+<p>如果时间值 t1 小于时间值 t2，则返回 t。如果任一参数是 NaN，则结果为零。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: time-equal-p t1 t2 ¶
+</pre></div>
+<p>如果 t1 和 t2 是相等的时间值，则返回 t。如果任一参数是 NaN，则结果为零。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: time-subtract t1 t2 ¶
+</pre></div>
+<p>这将返回两个时间值之间的时间差 t1 - t2，作为 Lisp 时间值。结果是准确的，它的时钟分辨率并不比它的两个参数的分辨率差。仅当它是无限的或 NaN 时，结果才是浮点数。如果需要经过秒数单位的差异，可以使用 time-convert 或 float-time 进行转换。请参阅时间转换。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: time-add t1 t2 ¶
+</pre></div>
+<p>这将返回两个时间值的总和，使用与时间减法相同的转换规则。一个参数应该表示一个时间差而不是一个时间点，作为一个时间值，通常只是一个经过的秒数。以下是如何将秒数添加到时间值：
+</p>
+<div class="lisp">
+<pre class="lisp">(time-add time seconds)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: time-to-days time-value ¶
+</pre></div>
+<p>假设默认时区，此函数返回第 1 年开始与时间值之间的天数。操作系统限制时间和区域值的范围。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: time-to-day-in-year time-value ¶
+</pre></div>
+<p>假设默认时区，这将返回与时间值对应的一年中的天数。操作系统限制时间和区域值的范围。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: date-leap-year-p year ¶
+</pre></div>
+<p>如果 year 是闰年，此函数返回 t。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: date-days-in-month year month ¶
+</pre></div>
+<p>返回一年中月份的天数。例如，2020 年 2 月有 29 天。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: date-ordinal-to-time year ordinal ¶
+</pre></div>
+<p>将年份中的序数日期作为解码的时间结构返回。例如，2004 年的第 120 天是 4 月 29 日。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="41.11_延迟执行的定时器.html">延迟执行的定时器</a>, Previous: <a href="41.9_处理器运行时间.html">处理器运行时间</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

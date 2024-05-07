@@ -1,0 +1,127 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>26.9.4 扩展文件名的函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">26.9.4 扩展文件名的函数</h3>
+<div class="nav-panel"><p>Next: <a href="26.9.5_生成唯一文件名.html">生成唯一文件名</a>, Previous: <a href="26.9.3_目录名称.html">目录名称</a>, Up: <a href="26.9_文件名.html">文件名.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>扩展文件名意味着将相对文件名转换为绝对文件名。由于这是相对于默认目录完成的，因此您必须指定默认目录以及要扩展的文件名。它还涉及扩展诸如 ~/ 之类的缩写（参见 abbreviate-file-name），并消除诸如 ./ 和 name/../ 之类的冗余。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: expand-file-name filename &amp;optional directory ¶
+</pre></div>
+<p>此函数将文件名转换为绝对文件名。如果提供了目录，则如果文件名是相对的且不以 <code>~</code> 开头，则它是默认目录。（directory 的值本身应该是绝对目录名或目录文件名；它可以以’~’ 开头。）否则，使用当前缓冲区的 default-directory 值。例如：
+</p><div class="lisp">
+<pre class="lisp">
+
+(expand-file-name "foo")
+     ⇒ "/xcssun/users/rms/lewis/foo"
+
+(expand-file-name "../foo")
+     ⇒ "/xcssun/users/rms/foo"
+
+(expand-file-name "foo" "/usr/spool/")
+     ⇒ "/usr/spool/foo"
+</pre></div>
+<p>如果第一个斜杠之前的文件名部分是’<code>'，它会扩展为您的主目录，该目录通常由 HOME 环境变量的值指定（参见 GNU Emacs 手册中的通用变量）。如果第一个斜杠之前的部分是 '~user' 并且如果 user 是一个有效的登录名，它会展开到用户的主目录。如果您不希望对可能以文字 ~~</code> 开头的相对文件名进行此扩展，则可以使用 (concat (file-name-as-directory directory) filename) 而不是 (expand-file-name filename directory)。
+</p>
+<p>包含 <code>.</code> 的文件名 或 ’..’ 被简化为它们的规范形式：
+</p>
+<div class="lisp">
+<pre class="lisp">(expand-file-name "bar/../foo")
+     ⇒ "/xcssun/users/rms/lewis/foo"
+
+</pre></div>
+<p>在某些情况下，前导 ’..’ 组件可以保留在输出中：
+</p>
+<div class="lisp">
+<pre class="lisp">(expand-file-name "../home" "/")
+     ⇒ "/../home"
+</pre></div>
+<p>这是为了在根目录 / 之上具有超级根概念的文件系统。在其他文件系统上，/../ 的解释与 / 完全相同。
+</p>
+<p>扩大。或空字符串返回默认目录：
+</p>
+<div class="lisp">
+<pre class="lisp">(expand-file-name "." "/usr/spool/")
+     ⇒ "/usr/spool"
+(expand-file-name "" "/usr/spool/")
+     ⇒ "/usr/spool"
+</pre></div>
+<p>请注意，expand-file-name 不会扩展环境变量；  只有替换文件名才能做到这一点：
+</p>
+<div class="lisp">
+<pre class="lisp">(expand-file-name "$HOME/foo")
+     ⇒ "/xcssun/users/rms/lewis/$HOME/foo"
+</pre></div>
+<p>另请注意，expand-file-name 不遵循任何级别的符号链接。这导致 file-truename 和 expand-file-name 对待 ’..’ 的方式不同。假设 ’/tmp/bar’ 是指向目录 ’/tmp/foo/bar’ 的符号链接，我们得到：
+</p>
+<div class="lisp">
+<pre class="lisp">(file-truename "/tmp/bar/../myfile")
+     ⇒ "/tmp/foo/myfile"
+
+(expand-file-name "/tmp/bar/../myfile")
+     ⇒ "/tmp/myfile"
+</pre></div>
+<p>如果您可能需要遵循 ’..’ 之前的符号链接，则应确保调用 file-truename 而不事先直接或间接调用 expand-file-name。见真名。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: default-directory ¶
+</pre></div>
+<p>此缓冲区局部变量的值是当前缓冲区的默认目录。它应该是一个绝对目录名；  它可能以’〜’开头。此变量在每个缓冲区中都是缓冲区本地的。
+</p>
+<p>expand-file-name 在其第二个参数为 nil 时使用默认目录。
+</p>
+<p>该值始终是以斜杠结尾的字符串。
+</p>
+<div class="lisp">
+<pre class="lisp">default-directory
+     ⇒ "/user/lewis/manual/"
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: substitute-in-file-name filename ¶
+</pre></div>
+<p>此函数将文件名中的环境变量引用替换为环境变量值。遵循标准 Unix shell 语法，’$’ 是替换环境变量值的前缀。如果输入包含’$$’，则转换为’$’；  这为用户提供了一种引用 <code>$</code> 的方法。
+</p>
+<p>环境变量名称是跟在 <code>$</code> 后面的一系列字母数字字符（包括下划线）。如果 <code>$</code> 后面的字符是 <code>{</code> ，那么变量名就是匹配的 <code>}</code> 之前的所有内容。
+</p>
+<p>在由替换文件名产生的输出上调用替换文件名往往会给出不正确的结果。例如，使用 ’$$’ 引用单个 ” 可能会导致重复替换。因此，调用此函数并将输出放在将传递给此函数的位置的程序需要将所有 <code>$</code> 字符加倍，以防止随后出现错误结果。
+</p>
+<p>这里我们假设保存用户主目录的环境变量 HOME 的值为 <code>/xcssun/users/rms</code> 。
+</p>
+<div class="lisp">
+<pre class="lisp">(substitute-in-file-name "$HOME/foo")
+     ⇒ "/xcssun/users/rms/foo"
+</pre></div>
+<p>替换后，如果 ’~’ 或 ’<em>’ 紧跟在另一个 ’</em>’ 之后，该函数将丢弃它之前的所有内容（直到紧接在前面的 ’/’）。
+</p>
+<div class="lisp">
+<pre class="lisp">(substitute-in-file-name "bar/~/foo")
+     ⇒ "~/foo"
+
+(substitute-in-file-name "/usr/local/$HOME/foo")
+     ⇒ "/xcssun/users/rms/foo"
+     ;; /usr/local/ has been discarded.
+</pre></div>
+<p>有时，不需要扩展文件名。在这种情况下，可以引用文件名来抑制扩展，并按字面意思处理文件名。通过在文件名前加上’/:’来进行引用。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: file-name-quote name ¶
+</pre></div>
+<p>此宏将引号前缀 <code>/:</code> 添加到文件名。对于本地文件名，它在名称前加上’/:’。如果 name 是远程文件名，则 name 的本地部分（请参阅使某些文件名 <code>魔术</code> ）被引用。如果 name 已经是带引号的文件名，则 name 原封不动地返回。
+</p><div class="lisp">
+<pre class="lisp">(substitute-in-file-name (file-name-quote "bar/~/foo"))
+     ⇒ "/:bar/~/foo"
+
+
+(substitute-in-file-name (file-name-quote "/ssh:host:bar/~/foo"))
+     ⇒ "/ssh:host:/:bar/~/foo"
+</pre></div>
+<p>该宏不能用于从魔术文件名中抑制文件名处理程序（请参阅使某些文件名 <code>魔术</code> ）。
+</p><div class="lisp">
+<pre class="lisp">Macro: file-name-unquote name ¶
+</pre></div>
+<p>此宏从文件名中删除引号前缀 <code>/:</code> （如果有）。如果 name 是远程文件名，则 name 的本地部分不加引号。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: file-name-quoted-p name ¶
+</pre></div>
+<p>当名称以前缀 <code>/:</code> 引用时，此宏返回非零。如果 name 是远程文件名，则检查 name 的本地部分。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="26.9.5_生成唯一文件名.html">生成唯一文件名</a>, Previous: <a href="26.9.3_目录名称.html">目录名称</a>, Up: <a href="26.9_文件名.html">文件名.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

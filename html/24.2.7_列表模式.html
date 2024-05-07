@@ -1,0 +1,129 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.2.7 列表模式</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">24.2.7 列表模式</h3>
+<div class="nav-panel"><p>Next: <a href="24.2.8_通用模式.html">通用模式</a>, Previous: <a href="24.2.6_模式挂钩.html">模式挂钩</a>, Up: <a href="24.2_主要模式.html">主要模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>列表模式是显示列表数据的主要模式，即由条目组成的数据，每个条目占一行文本，其内容分为列。表格列表模式提供了漂亮打印行和列的工具，并根据每列中的值对行进行排序。它源自特殊模式（参见基本主要模式）。
+</p>
+<p>表格列表模式旨在被更专业的主要模式用作父模式。示例包括进程菜单模式（参见进程信息）和包菜单模式（参见 GNU Emacs 手册中的包菜单）。
+</p>
+<p>这样的派生模式应该以通常的方式使用 define-derived-mode，将 tabulated-list-mode 指定为第二个参数（请参阅定义派生模式）。define-derived-mode 表单的主体应通过为下面记录的变量分配值来指定表格数据的格式；  可选地，然后它可以调用函数 tabulated-list-init-header，它将用列的名称填充标题。
+</p>
+<p>派生模式还应该定义一个列表命令。这不是模式命令，是用户调用的（例如，Mx list-processes）。列表命令应该创建或切换到缓冲区，打开派生模式，指定列表数据，最后调用 tabulated-list-print 填充缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: tabulated-list-gui-sort-indicator-asc ¶
+</pre></div>
+<p>此变量指定要在 GUI 框架上使用的字符，以指示该列按升序排序。
+</p>
+<p>每当您更改列表缓冲区中的排序方向时，该指示器都会在升序（ <code>asc</code> ）和降序（ <code>desc</code> ）之间切换。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: tabulated-list-gui-sort-indicator-desc ¶
+</pre></div>
+<p>与 tabulated-list-gui-sort-indicator-asc 类似，但在列按降序排序时使用。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: tabulated-list-tty-sort-indicator-asc ¶
+</pre></div>
+<p>与 tabulated-list-gui-sort-indicator-asc 类似，但用于文本模式框架。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: tabulated-list-tty-sort-indicator-desc ¶
+</pre></div>
+<p>与 tabulated-list-tty-sort-indicator-asc 类似，但在列按降序排序时使用。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: tabulated-list-format ¶
+</pre></div>
+<p>此缓冲区局部变量指定列表数据的格式。它的值应该是一个向量。向量的每个元素代表一个数据列，并且应该是一个列表（名称宽度排序），其中
+</p>
+<p>name 是列的名称（字符串）。
+width 是为列保留的宽度（整数）。这对于运行到每行末尾的最后一列是没有意义的。
+sort 指定如何按列对条目进行排序。如果为 nil，则该列不能用于排序。如果为 t，则通过比较字符串值对列进行排序。否则，这应该是排序的谓词函数（请参阅重新排列列表的函数），它接受与表格列表条目的元素形式相同的两个参数（见下文）。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: tabulated-list-entries ¶
+</pre></div>
+<p>此缓冲区局部变量指定列表缓冲区中显示的条目。它的值应该是一个列表或一个函数。
+</p>
+<p>如果值是一个列表，每个列表元素对应一个条目，并且应该有形式（id 内容），其中
+</p>
+<p>id 要么是 nil，要么是一个标识条目的 Lisp 对象。如果是后者，则在重新排序条目时，光标将停留在同一条目上。比较是用相等的。
+contents 是一个向量，其元素数量与 tabulated-list-format 相同。每个向量元素要么是一个字符串，它按原样插入缓冲区，要么是一个列表（label .properties），这意味着通过调用 insert-text-button 以标签和属性作为参数来插入一个文本按钮（参见制作纽扣）。
+</p>
+<p>这些字符串中的任何一个都不应有换行符。
+</p>
+<p>否则，该值应该是一个函数，该函数在不带参数调用时返回上述形式的列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: tabulated-list-revert-hook ¶
+</pre></div>
+<p>这个正常的钩子在恢复列表缓冲区之前运行。派生模式可以向此挂钩添加一个函数以重新计算表格列表条目。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: tabulated-list-printer ¶
+</pre></div>
+<p>这个变量的值是被调用来插入一个条目的函数，包括它的终止换行符。该函数应接受两个参数，id 和 contents，其含义与 tabulated-list-entries 中的含义相同。默认值是一个以直接方式插入条目的函数；  以更复杂的方式使用列表模式的模式可以指定另一个功能。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: tabulated-list-sort-key ¶
+</pre></div>
+<p>此变量的值指定列表缓冲区的当前排序键。如果为 nil，则不进行排序。否则，它应该具有 (name .flip) 形式，其中 name 是与 tabulated-list-format 中的列名之一匹配的字符串，并且如果非 nil，则翻转表示反转排序顺序。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: tabulated-list-init-header ¶
+</pre></div>
+<p>此函数计算并设置列表缓冲区的标题行格式（请参阅窗口标题行），并为标题行分配一个键盘映射，以允许通过单击列标题对条目进行排序。
+</p>
+<p>来自 Tabulated List 模式的模式应该在设置上述变量后调用它（特别是，仅在设置 tabulated-list-format 之后）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: tabulated-list-print &amp;optional remember-pos update ¶
+</pre></div>
+<p>此函数使用条目填充当前缓冲区。它应该由列表命令调用。它擦除缓冲区，根据 tabulated-list-sort-key 对 tabulated-list-entries 指定的条目进行排序，然后调用 tabulated-list-printer 指定的函数插入每个条目。
+</p>
+<p>如果可选参数 remember-pos 不为零，则此函数在当前行查找 id 元素（如果有），并在（重新）插入所有条目后尝试移动到该条目。
+</p>
+<p>如果可选参数 update 不为零，则此函数将仅删除或添加自上次打印以来已更改的条目。如果自上次调用此函数以来大多数条目没有更改，则速度会快几倍。结果的唯一区别是通过 tabulated-list-put-tag 放置的标签不会从未更改的条目中删除（通常所有标签都被删除）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: tabulated-list-delete-entry ¶
+</pre></div>
+<p>此函数删除点处的条目。
+</p>
+<p>它返回一个列表（id cols），其中 id 是已删除条目的 ID，而 cols 是其列描述符的向量。它将点移动到当前行的开头。如果该点没有条目，则返回 nil。
+</p>
+<p>请注意，此函数仅更改缓冲区内容；  它不会改变表格列表条目。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: tabulated-list-get-id &amp;optional pos ¶
+</pre></div>
+<p>这个 defsubst 从 tabulated-list-entries（如果它是一个列表）或从 tabulated-list-entries 返回的列表（如果它是一个函数）返回 ID 对象。如果省略或为零，则 pos 默认为点。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: tabulated-list-get-entry &amp;optional pos ¶
+</pre></div>
+<p>这个 defsubst 从 tabulated-list-entries （如果它是一个列表）或从 tabulated-list-entries 返回的列表（如果它是一个函数）返回条目对象。这将是 pos 处 ID 的向量。如果 pos 处没有条目，则函数返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: tabulated-list-header-overlay-p &amp;optional POS ¶
+</pre></div>
+<p>如果 pos 处有假头，则此 defsubst 返回非 nil。如果 tabulated-list-use-header-line 为 nil，则使用假标题将列名放在缓冲区的开头。如果省略或为零，则 pos 默认为 point-min。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: tabulated-list-put-tag tag &amp;optional advance ¶
+</pre></div>
+<p>该函数将标签放在当前行的填充区域。填充区域可以是行首的空白区域，其宽度由 tabulated-list-padding 控制。tag 应该是一个字符串，长度小于或等于 tabulated-list-padding。如果Advance 不为零，则此函数逐行前进。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: tabulated-list-clear-all-tags ¶
+</pre></div>
+<p>此函数清除当前缓冲区中填充区域的所有标签。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: tabulated-list-set-col col desc &amp;optional change-entry-data ¶
+</pre></div>
+<p>此函数在点更改列表条目，将 col 设置为 desc。col 是要更改的列号，或要更改的列的名称。desc 是新的列描述符，它是通过 tabulated-list-print-col 插入的。
+</p>
+<p>如果 change-entry-data 不为零，则此函数通过将向量的列描述符设置为 desc 来修改底层数据（通常是列表 tabulated-list-entries 中的列描述符）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="24.2.8_通用模式.html">通用模式</a>, Previous: <a href="24.2.6_模式挂钩.html">模式挂钩</a>, Up: <a href="24.2_主要模式.html">主要模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

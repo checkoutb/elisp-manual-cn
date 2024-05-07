@@ -1,0 +1,41 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.16.2 指定空间</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.16.2 指定空间</h3>
+<div class="nav-panel"><p>Next: <a href="40.16.3_空间的像素规范.html">空间的像素规范</a>, Previous: <a href="40.16.1_替换文本的显示规范.html">替换文本的显示规范</a>, Up: <a href="40.16_display财产.html">display财产.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>要显示指定宽度和/或高度的空间，请使用格式为 (space.props) 的显示规范，其中 props 是属性列表（交替的属性和值的列表）。您可以将此属性放在一个或多个连续字符上；  显示指定高度和宽度的空格来代替所有这些字符。这些是您可以在 props 中使用的属性来指定空间的权重：
+</p>
+<div class="lisp">
+<pre class="lisp">:width width
+</pre></div>
+<p>如果宽度是一个数字，它指定空间宽度应该是宽度乘以正常字符宽度。width 也可以是像素宽度规范（请参阅空格的像素规范）。
+</p><div class="lisp">
+<pre class="lisp">:relative-width factor
+</pre></div>
+<p>指定应从具有相同显示属性的连续字符组中的第一个字符计算拉伸的宽度。空格宽度是该字符的像素宽度乘以因子。（在文本模式终端上，字符的 <code>像素宽度</code> 通常为 1，但对于制表符和双宽 CJK 字符可能更大。）
+</p><div class="lisp">
+<pre class="lisp">:align-to hpos
+</pre></div>
+<p>指定空间应该足够宽以达到 hpos。如果 hpos 是一个数字，它以正常字符宽度为单位进行测量。hpos 也可以是像素宽度规范（请参阅空间的像素规范）。
+</p>
+<p>您应该使用上述属性中的一个且仅一个。您还可以使用以下属性指定空间的高度：
+</p>
+<div class="lisp">
+<pre class="lisp">You should use one and only one of the above properties. You can also specify the height of the space, with these properties:
+</pre></div>
+<p>指定空间的高度。如果 height 是一个数字，它指定空间高度应该是高度乘以正常字符高度。高度也可以是像素高度规范（请参阅空间的像素规范）。
+</p><div class="lisp">
+<pre class="lisp">:height height
+</pre></div>
+<p>指定空间的高度，将具有此显示规范的文本的普通高度乘以因子。
+</p><div class="lisp">
+<pre class="lisp">:relative-height factor
+</pre></div>
+<p>如果 ascent 的值是不大于 100 的非负数，则指定空间高度的上升百分比应视为空间的上升——即基线以上的部分。上升也可以使用像素上升规范以像素单位指定（请参阅空间的像素规范）。
+</p>
+<p>不要同时使用 :height 和 :relative-height 。
+</p>
+<div class="lisp">
+<pre class="lisp">:ascent ascent
+</pre></div>
+<p>请注意，空格属性被视为段落分隔符，以便对双向文本进行重新排序以进行显示。有关详细信息，请参阅双向显示。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.16.3_空间的像素规范.html">空间的像素规范</a>, Previous: <a href="40.16.1_替换文本的显示规范.html">替换文本的显示规范</a>, Up: <a href="40.16_display财产.html">display财产.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

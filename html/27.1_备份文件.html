@@ -1,0 +1,10 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>27.1 备份文件</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">27.1 备份文件</h2>
+<div class="nav-panel"><p>Next: <a href="27.1.1_制作备份文件.html">制作备份文件</a>, Previous: <a href="27_备份和自动保存.html">备份和自动保存</a>, Up: <a href="27_备份和自动保存.html">备份和自动保存.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>备份文件是您正在编辑的文件的旧内容的副本。Emacs 会在您第一次将缓冲区保存到其访问的文件中时创建一个备份文件。因此，通常，备份文件包含当前编辑会话之前的文件内容。备份文件的内容一旦存在通常保持不变。
+</p>
+<p>通常通过将访问的文件重命名为新名称来进行备份。或者，您可以指定应通过复制访问的文件来制作备份文件。这种选择对于具有多个名称的文件会有所不同；  它还可以影响编辑后的文件是由原始所有者拥有还是由编辑它的用户拥有。
+</p>
+<p>默认情况下，Emacs 为每个编辑的文件创建一个备份文件。您也可以请求编号备份；  然后每个新的备份文件都有一个新名称。当您不再需要旧编号备份时，您可以删除它们，或者 Emacs 可以自动删除它们。
+</p>
+<p>出于性能考虑，操作系统可能不会立即将备份文件的内容写入辅助存储，或者可能会将备份数据与原始数据混为一谈，直到稍后修改其中一个或另一个。请参阅文件和辅助存储。
+</p>
+<div class="nav-panel"><p>Next: <a href="27.1.1_制作备份文件.html">制作备份文件</a>, Previous: <a href="27_备份和自动保存.html">备份和自动保存</a>, Up: <a href="27_备份和自动保存.html">备份和自动保存.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

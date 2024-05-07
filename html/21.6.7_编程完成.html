@@ -1,0 +1,80 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>21.6.7 编程完成</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">21.6.7 编程完成</h3>
+<div class="nav-panel"><p>Next: <a href="21.6.8_在普通缓冲区中完成.html">在普通缓冲区中完成</a>, Previous: <a href="21.6.6_完成变量.html">完成变量</a>, Up: <a href="21.6_完成.html">完成.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>有时，提前创建包含所有预期可能完成的 alist 或 obarray 是不可能或不方便的。在这种情况下，您可以提供自己的函数来计算给定字符串的完成。这称为程序完成。Emacs 在完成文件名时使用程序完成（参见文件名完成），以及许多其他情况。
+</p>
+<p>要使用此功能，请将函数作为集合参数传递给完成读取。complete-read 函数安排将您的完成函数传递给 try-completion、all-completions 和其他基本完成函数，然后让您的函数完成所有工作。
+</p>
+<p>完成函数应该接受三个参数：
+</p>
+<p>要完成的字符串。
+一个谓词函数，用于过滤可能的匹配项，如果没有，则为 nil。该函数应该为每个可能的匹配调用谓词，如果谓词返回 nil，则忽略匹配。
+指定要执行的完成操作类型的标志；  有关这些操作的详细信息，请参阅基本完成功能。此标志可能是以下值之一。
+</p>
+<div class="lisp">
+<pre class="lisp">nil
+</pre></div>
+<p>这指定了一个尝试完成操作。如果没有匹配项，该函数应返回 nil；  如果指定的字符串是唯一且完全匹配的，它应该返回 t；  否则它应该返回所有匹配项中最长的公共前缀子字符串。
+</p><div class="lisp">
+<pre class="lisp">t
+</pre></div>
+<p>这指定了一个全部完成操作。该函数应返回指定字符串的所有可能完成的列表。
+</p><div class="lisp">
+<pre class="lisp">lambda
+</pre></div>
+<p>这指定了一个测试完成操作。如果指定的字符串与某个完成选项完全匹配，则该函数应返回 t；  否则为零。
+</p><div class="lisp">
+<pre class="lisp">(boundaries . suffix)
+</pre></div>
+<p>这指定了完成边界操作。该函数应返回 (boundaries start . end)，其中 start 是指定字符串中开始边界的位置，end 是后缀中结束边界的位置。
+</p>
+<p>如果 Lisp 程序返回非平凡边界，它应该确保所有完成操作与它们一致。all-completion 返回的完成应该只与完成边界覆盖的前缀和后缀有关。有关完成边界的精确预期语义，请参见基本完成函数。
+</p><div class="lisp">
+<pre class="lisp">metadata
+</pre></div>
+<p>这指定了对有关当前完成状态的信息的请求。返回值应采用 (metadata .alist) 形式，其中 alist 是一个 alist，其元素如下所述。
+</p>
+<p>如果标志有任何其他值，完成函数应该返回 nil。
+</p>
+<p>以下是完成函数响应元数据标志参数可能返回的元数据条目列表：
+</p>
+<div class="lisp">
+<pre class="lisp">category
+</pre></div>
+<p>该值应该是描述完成函数试图完成的文本类型的符号。如果符号匹配completion-category-overrides 中的键之一，则覆盖通常的完成行为。请参阅完成变量。
+</p><div class="lisp">
+<pre class="lisp">annotation-function
+</pre></div>
+<p>该值应该是用于注释完成的函数。该函数应该接受一个参数，字符串，这是一个可能的完成。它应该返回一个字符串，该字符串显示在 <strong>Completions</strong> 缓冲区中的完成字符串之后。除非此函数将自己的面放在注释后缀字符串上，否则默认情况下会将完成注释面添加到该字符串中。
+</p><div class="lisp">
+<pre class="lisp">affixation-function
+</pre></div>
+<p>该值应该是为完成添加前缀和后缀的函数。该函数应该有一个参数，completions，它是一个可能的完成列表。它应该返回这样一个完成列表，其中每个元素都包含三个元素的列表：一个完成，在 <strong>Completions</strong> 缓冲区中显示在完成字符串之前的前缀，以及在完成字符串之后显示的后缀。此功能优先于注释功能。
+</p><div class="lisp">
+<pre class="lisp">group-function
+</pre></div>
+<p>该值应该是用于对完成候选进行分组的函数。该函数必须接受两个参数，completion，它是一个完成候选和 transform，它是一个布尔标志。如果 transform 为 nil，该函数必须返回候选人所属组的组标题。返回的标题也可以为 nil。否则，该函数必须返回转换后的候选者。例如，转换可以删除显示在组标题中的冗余前缀。
+</p><div class="lisp">
+<pre class="lisp">display-sort-function
+</pre></div>
+<p>该值应该是用于对完成进行排序的函数。该函数应该接受一个参数，完成字符串列表，并返回完成字符串的排序列表。允许破坏性地改变输入列表。
+</p><div class="lisp">
+<pre class="lisp">cycle-sort-function
+</pre></div>
+<p>该值应该是用于对完成进行排序的函数，当完成循环阈值不为零并且用户正在循环完成选项时。请参阅 GNU Emacs 手册中的完成选项。它的参数列表和返回值与 display-sort-function 相同。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: completion-table-dynamic function &amp;optional switch-buffer ¶
+</pre></div>
+<p>此函数是编写可充当编程完成函数的函数的便捷方式。参数函数应该是一个函数，它接受一个参数，一个字符串，并返回一个包含所有可能完成的完成表（参见基本完成函数）。函数返回的表还可以包含与字符串参数不匹配的元素；  它们会被完成表动态自动过滤掉。特别是，函数可以忽略其参数并返回所有可能完成的完整列表。您可以将完成表动态视为函数和编程完成函数的接口之间的转换器。
+</p>
+<p>如果可选参数 switch-buffer 不为零，并且在 minibuffer 中执行完成，则将调用函数并将当前缓冲区设置为进入 minibuffer 的缓冲区。
+</p>
+<p>completion-table-dynamic 的返回值是一个函数，可以用作 try-completion 和 all-completion 的第二个参数。请注意，此函数将始终返回空元数据和微不足道的边界。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: completion-table-with-cache function &amp;optional ignore-case ¶
+</pre></div>
+<p>这是完成表动态的包装器，它保存最后一个参数结果对。这意味着具有相同参数的多个查找只需要调用一次函数。当涉及缓慢的操作时，这可能很有用，例如调用外部进程。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="21.6.8_在普通缓冲区中完成.html">在普通缓冲区中完成</a>, Previous: <a href="21.6.6_完成变量.html">完成变量</a>, Up: <a href="21.6_完成.html">完成.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>32.8 区域</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">32.8 区域</h2>
+<div class="nav-panel"><p>Next: <a href="33_文本.html">文本</a>, Previous: <a href="32.7_标记.html">标记</a>, Up: <a href="32_标记.html">标记.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>点和标记之间的文本称为区域。各种功能对由点和标记分隔的文本进行操作，但这里只描述与区域本身特别相关的那些功能。
+</p>
+<p>如果标记没有指向任何地方，则接下来的两个函数会发出错误信号。如果启用了 Transient Mark 模式并且 mark-even-if-inactive 为 nil，则如果标记处于非活动状态，它们也会发出错误信号。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: region-beginning ¶
+</pre></div>
+<p>此函数返回区域开始的位置（作为整数）。这是点或标记的位置，以较小者为准。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: region-end ¶
+</pre></div>
+<p>此函数返回区域结束的位置（作为整数）。这是点或标记的位置，以较大者为准。
+</p>
+<p>而不是使用 region-beginning 和 region-end ，设计用于在区域上操作的命令通常应该使用与 ’r’ 规范交互来查找区域的开始和结束。这让其他 Lisp 程序可以明确指定边界作为参数。请参阅代码字符以进行交互。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: use-region-p ¶
+</pre></div>
+<p>如果启用了瞬态标记模式、标记处于活动状态并且缓冲区中有有效区域，则此函数返回 t。当标记处于活动状态时，此功能旨在由在区域上操作的命令使用，而不是在点附近的文本上。
+</p>
+<p>如果区域的大小不为零，或者用户选项 use-empty-active-region 为非 nil（默认情况下为 nil），则该区域是有效的。功能 region-active-p 类似于 use-region-p，但认为所有区域都是有效的。在大多数情况下，您不应该使用 region-active-p，因为如果区域为空，则通常更适合在点上操作。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="33_文本.html">文本</a>, Previous: <a href="32.7_标记.html">标记</a>, Up: <a href="32_标记.html">标记.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

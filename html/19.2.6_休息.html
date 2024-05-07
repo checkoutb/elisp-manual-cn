@@ -1,0 +1,77 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>19.2.6 休息</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">19.2.6 休息</h3>
+<div class="nav-panel"><p>Next: <a href="19.2.7_捕获错误.html">捕获错误</a>, Previous: <a href="19.2.5_其他_Edebug_命令.html">其他_Edebug_命令</a>, Up: <a href="19.2_调试.html">调试.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Edebug 的步进模式在到达下一个停止点时停止执行。一旦 Edebug 开始执行，还有其他三种方法可以停止它：断点、全局断点条件和源断点。
+</p>
+<ol>
+<li>
+19.2.6.1 调试断点
+
+
+<p>在使用 Edebug 时，您可以在您正在测试的程序中指定断点：这些是应该停止执行的地方。您可以在任何停止点设置断点，如使用 Edebug 中所定义。对于设置和取消设置断点，受影响的停止点是源代码缓冲区中的第一个或之后的停止点。以下是断点的 Edebug 命令：
+</p>
+<div class="lisp">
+<pre class="lisp">b
+</pre></div>
+<p>在点处或之后的停止点处设置断点 (edebug-set-breakpoint)。如果使用前缀参数，断点是临时的——它在第一次停止程序时关闭。具有 edebug-enabled-breakpoint 或 edebug-disabled-breakpoint 面的覆盖被放置在断点处。
+</p><div class="lisp">
+<pre class="lisp">u
+</pre></div>
+<p>在点 (edebug-unset-breakpoint) 处或之后的停止点处取消设置断点（如果有）。
+</p><div class="lisp">
+<pre class="lisp">U
+</pre></div>
+<p>取消设置当前表单中的任何断点 (edebug-unset-breakpoints)。
+</p><div class="lisp">
+<pre class="lisp">D
+</pre></div>
+<p>切换是否禁用点附近的断点 (edebug-toggle-disable-breakpoint)。如果断点是有条件的并且需要一些工作来重新创建条件，则此命令非常有用。
+</p><div class="lisp">
+<pre class="lisp">x condition RET
+</pre></div>
+<p>设置一个条件断点，仅当评估条件产生非零值时才停止程序（edebug-set-conditional-breakpoint）。使用前缀参数，断点是临时的。
+</p><div class="lisp">
+<pre class="lisp">B
+</pre></div>
+<p>将点移动到当前定义中的下一个断点 (edebug-next-breakpoint)。
+</p>
+<p>在 Edebug 中，您可以使用 b 设置断点并使用 u 取消设置。首先将点移动到您选择的 Edebug 停止点，然后键入 b 或 u 在此处设置或取消设置断点。取消设置没有设置的断点无效。
+</p>
+<p>重新评估或重新配置定义会删除其所有先前的断点。
+</p>
+<p>每次程序到达那里时，条件断点都会测试一个条件。由于评估条件而发生的任何错误都将被忽略，就好像结果为零一样。要设置条件断点，请使用 x，并在 minibuffer 中指定条件表达式。在具有先前建立的条件断点的停止点处设置条件断点会将先前的条件表达式放在迷你缓冲区中，以便您可以对其进行编辑。
+</p>
+<p>您可以通过在命令中使用前缀参数来设置条件断点或无条件断点以设置断点。当临时断点停止程序时，它会自动取消设置。
+</p>
+<p>Edebug 总是在断点处停止或暂停，除非 Edebug 模式是 Go-nonstop。在这种模式下，它完全忽略断点。
+</p>
+<p>要找出断点的位置，请使用 B 命令，该命令将点移动到同一函数内的下一个断点，如果没有后续断点，则移动到第一个断点。该命令不会继续执行——它只是在缓冲区中移动点。
+</p>
+</li><li>
+19.2.6.2 全局中断条件
+
+
+<p>全局中断条件在满足指定条件时停止执行，无论发生在何处。Edebug 在每个停止点评估全局中断条件；  如果它的计算结果为非零值，则执行停止或暂停，具体取决于执行模式，就好像遇到了断点一样。如果评估条件出错，则执行不会停止。
+</p>
+<p>条件表达式存储在 edebug-global-break-condition 中。您可以在 Edebug 处于活动状态时使用源代码缓冲区中的 X 命令指定新表达式，或者只要加载了 Edebug (edebug-set-global-break-condition)，就可以随时从任何缓冲区中使用 Cx XX。
+</p>
+<p>全局中断条件是查找代码中某个事件发生位置的最简单方法，但它会使代码运行得更慢。所以你应该在不使用它时将条件重置为零。
+</p>
+</li><li>
+19.2.6.3 源断点
+
+
+<p>每次重新设置定义时，都会忘记定义中的所有断点。如果你想创建一个不会被遗忘的断点，你可以编写一个源断点，它只是在你的源代码中调用函数 edebug。当然，您可以将这样的调用设为有条件的。例如，在 fac 函数中，您可以如下所示插入第一行，以在参数达到零时停止：
+</p>
+<div class="lisp">
+<pre class="lisp">(defun fac (n)
+  (if (= n 0) (edebug))
+  (if (&lt; 0 n)
+      (* n (fac (1- n)))
+    1))
+</pre></div>
+<p>当检测 fac 定义并调用函数时，对 edebug 的调用充当断点。根据执行模式，Edebug 会在那里停止或暂停。
+</p>
+<p>如果调用 edebug 时没有执行任何检测代码，则该函数调用 debug。
+</p></li></ol>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="19.2.7_捕获错误.html">捕获错误</a>, Previous: <a href="19.2.5_其他_Edebug_命令.html">其他_Edebug_命令</a>, Up: <a href="19.2_调试.html">调试.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>39.1 创建子进程的函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">39.1 创建子进程的函数</h2>
+<div class="nav-panel"><p>Next: <a href="39.2_Shell_参数.html">Shell_参数</a>, Previous: <a href="39_进程.html">进程</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>有三个原语创建了一个新的子进程来运行程序。其中之一，make-process，创建一个异步进程并返回一个进程对象（请参阅创建异步进程）。另外两个，call-process 和 call-process-region，创建一个同步进程并且不返回一个进程对象（参见创建一个同步进程）。有各种高级函数利用这些原语来运行特定类型的进程。
+</p>
+<p>同步和异步进程将在以下部分进行说明。由于这三个函数都以类似的方式调用，因此这里描述了它们的共同参数。
+</p>
+<p>在所有情况下，函数指定要运行的程序。如果找不到文件或无法执行文件，则会发出错误信号。如果文件名是相对的，则变量 exec-path 包含要搜索的目录列表。Emacs 在启动时根据环境变量 PATH 的值初始化 exec-path。标准文件名结构 <code>~</code> 、 <code>.</code> 和 <code>..</code> 在 exec-path 中照常解释，但无法识别环境变量替换（ <code>$HOME</code> 等）；  使用替换文件名来执行它们（请参阅扩展文件名的函数）。此列表中的 nil 指的是默认目录。
+</p>
+<p>执行程序也可以尝试给指定名称加后缀：
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: exec-suffixes ¶
+</pre></div>
+<p>此变量是一个后缀（字符串）列表，可尝试添加到指定的程序文件名。如果您希望完全按照指定的名称尝试该名称，则该列表应包含 ~~ 。默认值取决于系统。
+</p>
+<p>请注意：参数 program 仅包含程序文件的名称；  它可能不包含任何命令行参数。您必须使用单独的参数 args 来提供这些参数，如下所述。
+</p>
+<p>每个创建子进程的函数都有一个缓冲区或名称参数，用于指定程序的输出将去往何处。它应该是一个缓冲区或缓冲区名称；  如果它是一个缓冲区名称，如果它不存在，它将创建缓冲区。它也可以是 nil，表示丢弃输出，除非自定义过滤器函数处理它。（请参阅进程过滤器函数，以及读取和打印 Lisp 对象。）通常，您应该避免让多个进程将输出发送到同一个缓冲区，因为它们的输出会随机混合。对于同步进程，您可以将输出发送到文件而不是缓冲区（因此相应的参数更适合称为目标）。默认情况下，标准输出和标准错误流都去同一个目的地，但是所有 3 个原语都允许选择性地将标准错误流导向不同的目的地。
+</p>
+<p>所有三个子进程创建函数都允许为要运行的进程指定命令行参数。对于 call-process 和 call-process-region，它们以 &amp;rest 参数 args 的形式出现。对于 make-process，要运行的程序及其命令行参数都被指定为字符串列表。命令行参数必须都是字符串，并且它们作为单独的参数字符串提供给程序。通配符和其他 shell 结构在这些字符串中没有特殊含义，因为这些字符串直接传递给指定的程序。
+</p>
+<p>子进程从 Emacs 继承其环境，但您可以使用 process-environment 为其指定覆盖。请参阅操作系统环境。子进程从 default-directory 的值中获取其当前目录。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: exec-directory ¶
+</pre></div>
+<p>该变量的值是一个字符串，一个目录的名称，其中包含 GNU Emacs 附带的程序，并打算供 Emacs 调用。movemail 程序就是这种程序的一个例子。Rmail 使用它从收件箱中获取新邮件。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: exec-path ¶
+</pre></div>
+<p>此变量的值是用于搜索要在子进程中运行的程序的目录列表。每个元素要么是目录的名称（即字符串），要么是 nil，它代表默认目录（即 default-directory 的值）。有关此搜索的详细信息，请参见可执行文件查找。
+</p>
+<p>当程序参数不是绝对文件名时，调用进程和启动进程使用 exec-path 的值。
+</p>
+<p>通常，您不应直接修改 exec-path。相反，请确保在启动 Emacs 之前正确设置了 PATH 环境变量。尝试独立于 PATH 修改 exec-path 可能会导致令人困惑的结果。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: exec-path ¶
+</pre></div>
+<p>此函数是变量 exec-path 的扩展。如果 default-directory 指示远程目录，则此函数返回用于在相应远程主机上搜索程序的目录列表。在本地默认目录的情况下，该函数仅返回变量 exec-path 的值。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="39.2_Shell_参数.html">Shell_参数</a>, Previous: <a href="39_进程.html">进程</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

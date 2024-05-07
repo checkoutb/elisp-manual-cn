@@ -1,0 +1,28 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>D.4 快速编译代码的技巧</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">D.4 快速编译代码的技巧</h2>
+<div class="nav-panel"><p>Next: <a href="0D.5_避免编译器警告的技巧.html">避免编译器警告的技巧</a>, Previous: <a href="0D.3_Emacs_编程技巧.html">Emacs_编程技巧</a>, Up: <a href="附录_D_提示和约定.html">D_提示和约定.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>以下是提高字节编译 Lisp 程序执行速度的方法。
+</p>
+<ul>
+<li>
+分析你的程序，找出时间花在哪里。请参阅分析。
+</li><li>
+尽可能使用迭代而不是递归。Emacs Lisp 中的函数调用很慢，即使一个编译函数正在调用另一个编译函数。
+</li><li>
+使用原始列表搜索函数 memq、member、assq 或 assoc 甚至比显式迭代更快。重新排列数据结构以便可以使用这些原始搜索功能之一是值得的。
+</li><li>
+某些内置函数在字节编译代码中进行了特殊处理，从而避免了对普通函数调用的需要。使用这些功能而不是替代品是个好主意。要查看函数是否由编译器专门处理，请检查其字节编译属性。如果该属性不为 nil，则对该函数进行特殊处理。
+
+</li><li>
+例如，以下输入将显示 aref 是专门编译的（请参阅对数组进行操作的函数）：
+
+<div class="lisp">
+<pre class="lisp">(get 'aref 'byte-compile)
+     ⇒ byte-compile-two-args
+
+</pre></div>
+<p>请注意，在这种情况下（以及许多其他情况），您必须首先加载定义 byte-compile 属性的 bytecomp 库。
+</p></li><li>
+如果调用一个小函数占了程序运行时间的很大一部分，则使该函数内联。这消除了函数调用开销。由于使函数内联会降低更改程序的灵活性，因此不要这样做，除非它以足够慢的速度让用户关心速度，否则可以明显加快速度。请参阅内联函数。
+</li></ul>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="0D.5_避免编译器警告的技巧.html">避免编译器警告的技巧</a>, Previous: <a href="0D.3_Emacs_编程技巧.html">Emacs_编程技巧</a>, Up: <a href="附录_D_提示和约定.html">D_提示和约定.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

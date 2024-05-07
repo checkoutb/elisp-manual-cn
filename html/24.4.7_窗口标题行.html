@@ -1,0 +1,18 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.4.7 窗口标题行</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">24.4.7 窗口标题行</h3>
+<div class="nav-panel"><p>Next: <a href="24.4.8_模拟模式行格式.html">模拟模式行格式</a>, Previous: <a href="24.4.6_模式行中的属性.html">模式行中的属性</a>, Up: <a href="24.4_模式线格式.html">模式线格式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>一个窗口可以在顶部有一个标题行，就像它可以在底部有一个模式行一样。标题行功能就像模式行功能一样，除了它由标题行格式控制：
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: header-line-format ¶
+</pre></div>
+<p>这个变量，在每个缓冲区中都是本地的，指定如何显示标题行，用于显示缓冲区的窗口。该值的格式与模式行格式相同（请参阅模式行的数据结构）。它通常为 nil，因此普通缓冲区没有标题行。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-header-line-height &amp;optional window ¶
+</pre></div>
+<p>此函数返回窗口标题行的高度（以像素为单位）。window 必须是活动窗口，并且默认为选定的窗口。
+</p>
+<p>只有一行高的窗口永远不会显示标题行。两行高的窗口不能同时显示模式行和标题行；  如果它有一个模式行，那么它不显示标题行。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="24.4.8_模拟模式行格式.html">模拟模式行格式</a>, Previous: <a href="24.4.6_模式行中的属性.html">模式行中的属性</a>, Up: <a href="24.4_模式线格式.html">模式线格式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

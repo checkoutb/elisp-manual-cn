@@ -1,0 +1,42 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>31.2.7 跳过字符</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">31.2.7 跳过字符</h3>
+<div class="nav-panel"><p>Next: <a href="31.3_远足.html">远足</a>, Previous: <a href="31.2.6_移动平衡表达式.html">移动平衡表达式</a>, Up: <a href="31.2_运动.html">运动.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>以下两个函数将点移动到指定的字符集上。例如，它们通常用于跳过空格。有关相关功能，请参阅 Motion 和 Syntax。
+</p>
+<p>如果缓冲区是多字节的，这些函数将设置的字符串转换为多字节，如果缓冲区是单字节的，它们会将其转换为单字节，就像搜索函数一样（请参阅搜索和匹配）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: skip-chars-forward character-set &amp;optional limit ¶
+</pre></div>
+<p>此函数向前移动当前缓冲区中的点，跳过给定的字符集。它检查点后面的字符，如果字符匹配字符集，则前进点。这一直持续到它到达一个不匹配的字符。该函数返回移动的字符数。
+</p>
+<p>参数字符集是一个字符串，就像正则表达式中的 ’[…]’ 的内部，除了 ’]’ 不会终止它，并且 ’\’ 引用 ’^’、’-’ 或 ’\’。因此， <code>a-zA-Z</code> 跳过所有字母，在第一个非字母之前停止，而 <code>^a-zA-Z</code> 跳过在第一个字母之前停止的非字母（参见正则表达式）。也可以使用字符类，例如 <code>[:alnum:]</code> （参见字符类）。
+</p>
+<p>如果提供了限制（它必须是数字或标记），则它指定缓冲区中可以跳过该点的最大位置。点将在限制处或之前停止。
+</p>
+<p>在以下示例中，点最初直接位于 <code>T</code> 之前。评估表单后，point 位于该行的末尾（在 ’hat’ 的 ’t’ 和换行符之间）。该函数跳过所有字母和空格，但不跳过换行符。
+</p><div class="lisp">
+<pre class="lisp">
+
+---------- Buffer: foo ----------
+I read "∗The cat in the hat
+comes back" twice.
+---------- Buffer: foo ----------
+
+
+(skip-chars-forward "a-zA-Z ")
+     ⇒ 18
+
+---------- Buffer: foo ----------
+I read "The cat in the hat∗
+comes back" twice.
+---------- Buffer: foo ----------
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: skip-chars-backward character-set &amp;optional limit ¶
+</pre></div>
+<p>此函数向后移动点，跳过匹配字符集的字符，直到限制。除了运动方向之外，它就像向前跳过字符。
+</p>
+<p>返回值表示行进的距离。它是一个小于或等于 0 的整数。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="31.3_远足.html">远足</a>, Previous: <a href="31.2.6_移动平衡表达式.html">移动平衡表达式</a>, Up: <a href="31.2_运动.html">运动.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>12.7 访问变量值</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">12.7 访问变量值</h2>
+<div class="nav-panel"><p>Next: <a href="12.8_设置变量值.html">设置变量值</a>, Previous: <a href="12.6_稳健定义变量的技巧.html">稳健定义变量的技巧</a>, Up: <a href="12_变量.html">变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>引用变量的常用方法是编写命名它的符号。请参阅符号形式。
+</p>
+<p>有时，您可能希望引用仅在运行时确定的变量。在这种情况下，您不能在程序文本中指定变量名称。您可以使用符号值函数来提取值。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: symbol-value symbol ¶
+</pre></div>
+<p>此函数返回存储在符号值单元格中的值。这是存储变量当前（动态）值的地方。如果变量没有本地绑定，这只是它的全局值。如果变量为 void，则会发出 void-variable 错误信号。
+</p>
+<p>如果变量是词法绑定的，则 symbol-value 报告的值不一定与变量的词法值相同，这是由词法环境而不是符号的值单元格决定的。请参阅变量绑定的范围规则。
+</p><div class="lisp">
+<pre class="lisp">(setq abracadabra 5)
+     ⇒ 5
+
+(setq foo 9)
+     ⇒ 9
+
+
+;; Here the symbol abracadabra
+;;   is the symbol whose value is examined.
+(let ((abracadabra 'foo))
+  (symbol-value 'abracadabra))
+     ⇒ foo
+
+
+;; Here, the value of abracadabra,
+;;   which is foo,
+;;   is the symbol whose value is examined.
+(let ((abracadabra 'foo))
+  (symbol-value abracadabra))
+     ⇒ 9
+
+
+(symbol-value 'abracadabra)
+     ⇒ 5
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="12.8_设置变量值.html">设置变量值</a>, Previous: <a href="12.6_稳健定义变量的技巧.html">稳健定义变量的技巧</a>, Up: <a href="12_变量.html">变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

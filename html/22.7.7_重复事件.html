@@ -1,0 +1,41 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.7.7 重复事件</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">22.7.7 重复事件</h3>
+<div class="nav-panel"><p>Next: <a href="22.7.8_运动事件.html">运动事件</a>, Previous: <a href="22.7.6_按钮按下事件.html">按钮按下事件</a>, Up: <a href="22.7_输入事件.html">输入事件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>如果您在不移动鼠标的情况下快速连续多次按下相同的鼠标按钮，Emacs 会为第二次和后续按下生成特殊的重复鼠标事件。
+</p>
+<p>最常见的重复事件是双击事件。当你点击一个按钮两次时，Emacs 会产生一个双击事件；  该事件在您释放按钮时发生（对于所有单击事件都是正常的）。
+</p>
+<p>双击事件的事件类型包含前缀’double-’。因此，在按住 meta 的情况下双击鼠标的第二个按钮会进入 Lisp 程序，即 M-double-mouse-2。如果双击事件没有绑定，则使用对应的普通点击事件的绑定来执行。因此，除非您真的想要，否则您无需注意双击功能。
+</p>
+<p>当用户执行双击时，Emacs 首先生成一个普通的单击事件，然后是一个双击事件。因此，必须设计双击事件的命令绑定，假设单击命令已经运行。它必须从单击的结果开始产生所需的双击结果。
+</p>
+<p>这很方便，如果双击的含义以某种方式建立在单击的含义之上——这是推荐的双击用户界面设计实践。
+</p>
+<p>如果您单击一个按钮，然后再次按下它并在按住该按钮的情况下开始移动鼠标，那么当您最终释放该按钮时会收到一个双击事件。它的事件类型包含 <code>双拖动</code> 而不是 <code>拖动</code> 。如果一个双拖事件没有绑定，Emacs 会寻找一个替代的绑定，就好像这个事件是一个普通的拖拽一样。
+</p>
+<p>在双击或双击事件之前，当用户第二次按下按钮时，Emacs 会生成一个双击事件。它的事件类型包含’double-down’ 而不仅仅是’down’。如果双击事件没有绑定，Emacs 会寻找替代绑定，就好像该事件是普通的按钮按下事件一样。如果它也没有以这种方式找到绑定，则忽略 double-down 事件。
+</p>
+<p>总而言之，当你点击一个按钮然后马上再次按下它时，Emacs 会生成一个向下事件和一个第一次单击的单击事件，当你再次按下按钮时会生成一个双击事件，最后是双击或双拖事件。
+</p>
+<p>如果您单击一个按钮两次然后再次按下它，所有这些都是快速连续的，Emacs 会生成一个三下事件，然后是三下单击或三次拖动。这些事件的事件类型包含 <code>triple</code> 而不是 <code>double</code> 。如果任何三重事件没有绑定，Emacs 将使用它将用于相应的双事件的绑定。
+</p>
+<p>如果您单击一个按钮三次或更多次，然后再次按下该按钮，则超过第三次的按下事件都是三重事件。Emacs 没有针对四元组、五元组等事件的单独事件类型。但是，您可以查看事件列表以准确了解按下按钮的次数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: event-click-count event ¶
+</pre></div>
+<p>此函数返回导致事件的连续按下按钮的次数。如果 event 是双击、双击或双击事件，则值为 2。如果 event 是三重事件，则值为 3 或更大。如果 event 是普通的鼠标事件（不是重复事件），则值为 1。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: double-click-fuzz ¶
+</pre></div>
+<p>要生成重复事件，连续按下鼠标按钮必须在大致相同的屏幕位置。double-click-fuzz 的值指定鼠标在两次连续单击之间可以移动（水平或垂直）以进行双击的最大像素数。
+</p>
+<p>该变量也是鼠标移动算作拖动的阈值。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: double-click-time ¶
+</pre></div>
+<p>要生成重复事件，连续按下按钮之间的毫秒数必须小于双击时间的值。将双击时间设置为 nil 会完全禁用多击检测。将其设置为 t 会删除时间限制；  然后，Emacs 仅按位置检测多次点击。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.7.8_运动事件.html">运动事件</a>, Previous: <a href="22.7.6_按钮按下事件.html">按钮按下事件</a>, Up: <a href="22.7_输入事件.html">输入事件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

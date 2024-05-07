@@ -1,0 +1,39 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.25 工具提示</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">40.25 工具提示</h2>
+<div class="nav-panel"><p>Next: <a href="40.26_双向显示.html">双向显示</a>, Previous: <a href="40.24_窗户系统.html">窗户系统</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>工具提示是特殊的框架（请参阅框架），用于显示与鼠标指针当前位置相关的有用提示（也称为 <code>提示</code> ）。Emacs 使用工具提示来显示有关文本活动部分的帮助字符串（请参阅具有特殊含义的属性）和各种 UI 元素，例如菜单项（请参阅扩展菜单项）和工具栏按钮（请参阅工具栏）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: tooltip-mode ¶
+</pre></div>
+<p>工具提示模式是一种允许显示工具提示的次要模式。关闭此模式会导致工具提示显示在回显区域中。在文本模式（又名 <code>TTY</code> ）框架上，工具提示始终显示在回显区域中。
+</p>
+<p>当 Emacs 使用 GTK+ 支持构建时，它默认使用 GTK+ 函数显示工具提示，然后工具提示的外观由 GTK+ 设置控制。可以通过将变量 x-gtk-use-system-tooltips 的值更改为 nil 来禁用 GTK+ 工具提示。本小节的其余部分描述了如何控制 Emacs 本身提供的非 GTK+ 工具提示。
+</p>
+<p>工具提示显示在称为工具提示框架的特殊框架中，这些框架具有自己的框架参数（请参阅框架参数）。与其他框架不同，工具提示框架的默认参数存储在一个特殊变量中。
+</p>
+<div class="lisp">
+<pre class="lisp">
+User Option: tooltip-frame-parameters ¶
+</pre></div>
+<p>此可自定义选项包含用于显示工具提示的默认框架参数。任何字体和颜色参数都将被忽略，而使用工具提示面的相应属性。如果包含 left 或 top 参数，它们将用作应显示工具提示的绝对帧相对坐标。（工具提示的鼠标相对位置可以使用 GNU Emacs 手册中工具提示中描述的变量进行自定义。）请注意，如果存在 left 和 top 参数，则会覆盖鼠标相对偏移的值。
+</p>
+<p>工具提示面决定了工具提示中显示的文本的外观。它通常应使用大小最好小于默认框架字体的可变间距字体。
+</p>
+<div class="lisp">
+<pre class="lisp">
+Variable: tooltip-functions ¶
+</pre></div>
+<p>这个异常钩子是 Emacs 需要显示工具提示时调用的函数列表。每个函数都使用单个参数事件调用，该事件是最后一个鼠标移动事件的副本。如果此列表中的函数实际显示工具提示，它应该返回非 nil，然后将不会调用其余函数。该变量的默认值是单个函数 tooltip-help-tips。
+</p>
+<p>如果您编写自己的函数以放入工具提示功能列表中，您可能需要知道触发工具提示显示的鼠标事件的缓冲区。以下函数提供了该信息。
+</p>
+<div class="lisp">
+<pre class="lisp">
+Function: tooltip-event-buffer event ¶
+</pre></div>
+<p>此函数返回发生事件的缓冲区。使用来自 tooltip-functions 的函数参数调用它，以获取其文本触发工具提示的缓冲区。请注意，事件可能不会发生在缓冲区上（例如，在工具栏上），在这种情况下，此函数将返回 nil。
+</p>
+<p>工具提示显示的其他方面由几个可自定义的设置控制；  请参阅 GNU Emacs 手册中的工具提示。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.26_双向显示.html">双向显示</a>, Previous: <a href="40.24_窗户系统.html">窗户系统</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

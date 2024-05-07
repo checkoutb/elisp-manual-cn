@@ -1,0 +1,15 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>19 调试 Lisp 程序</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h1 class="chapter">19 调试 Lisp 程序</h1>
+<div class="nav-panel"><p>Next: <a href="19.1_Lisp_调试器.html">Lisp_调试器</a>, Previous: <a href="18.2_本机编译变量.html">本机编译变量</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>有几种方法可以查找和调查 Emacs Lisp 程序中的问题。
+</p>
+<p>如果在运行程序时出现问题，您可以使用内置的 Emacs Lisp 调试器来暂停 Lisp 求值器，并检查和/或更改其内部状态。
+您可以使用 Edebug，它是 Emacs Lisp 的源代码级调试器。
+您可以使用 trace.el 包提供的跟踪工具来跟踪问题中涉及的函数的执行。该包提供了用于跟踪函数调用的函数 trace-function-foreground 和 trace-function-background ，以及用于将选择变量的值添加到跟踪中的 trace-values 。有关详细信息，请参阅 trace.el 中这些工具的文档。
+如果语法问题甚至阻止 Lisp 读取程序，您可以使用 Lisp 编辑命令来定位它。
+您可以查看字节编译器在编译程序时产生的错误和警告消息。请参阅编译器错误。
+您可以使用 Testcover 包对程序执行覆盖测试。
+您可以使用 ERT 包为程序编写回归测试。请参阅 ERT 中的 ERT 手册：Emacs Lisp 回归测试。
+您可以分析程序以获取有关如何提高效率的提示。
+</p>
+<p>调试输入和输出问题的其他有用工具是 dribble 文件（参见终端输入）和 open-termscript 函数（参见终端输出）。
+</p>
+<div class="nav-panel"><p>Next: <a href="19.1_Lisp_调试器.html">Lisp_调试器</a>, Previous: <a href="18.2_本机编译变量.html">本机编译变量</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

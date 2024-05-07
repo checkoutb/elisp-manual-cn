@@ -1,0 +1,16 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>2 Lisp 数据类型</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h1 class="chapter">2 Lisp 数据类型</h1>
+<div class="nav-panel"><p>Next: <a href="02.1_打印表示和读取语法.html">打印表示和读取语法</a>, Previous: <a href="01.5_致谢.html">致谢</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Lisp 对象是 Lisp 程序使用和操作的一段数据。对于我们的目的，类型或数据类型是一组可能的对象。
+</p>
+<p>每个对象至少属于一种类型。相同类型的对象具有相似的结构，通常可以在相同的上下文中使用。类型可以重叠，对象可以属于两种或多种类型。因此，我们可以询问对象是否属于特定类型，但不能询问对象的类型。
+</p>
+<p>Emacs 中内置了一些基本的对象类型。这些，所有其他类型的构造，被称为原始类型。每个对象都属于一种且仅一种原始类型。这些类型包括 integer、float、cons、symbol、string、vector、hash-table、subr、byte-code function 和 record，以及与编辑相关的几种特殊类型，如缓冲区。（请参阅编辑类型。）
+</p>
+<p>每个原始类型都有一个相应的 Lisp 函数，用于检查对象是否是该类型的成员。
+</p>
+<p>Lisp 与许多其他语言的不同之处在于它的对象是自类型化的：每个对象的原始类型都隐含在对象本身中。例如，如果一个对象是一个向量，那么没有任何东西可以将它视为一个数字；  Lisp 知道它是一个向量，而不是一个数字。
+</p>
+<p>在大多数语言中，程序员必须声明每个变量的数据类型，并且类型是编译器知道的，但不会在数据中表示出来。Emacs Lisp 中不存在这样的类型声明。Lisp 变量可以具有任何类型的值，并且它会记住您存储在其中的任何值，类型和所有内容。（实际上，少数 Emacs Lisp 变量只能接受某种类型的值。请参阅带限制值的变量。）
+</p>
+<p>本章描述了 GNU Emacs Lisp 中每种标准类型的用途、打印表示和阅读语法。关于如何使用这些类型的详细信息可以在后面的章节中找到。
+</p>
+<div class="nav-panel"><p>Next: <a href="02.1_打印表示和读取语法.html">打印表示和读取语法</a>, Previous: <a href="01.5_致谢.html">致谢</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

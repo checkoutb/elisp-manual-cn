@@ -1,0 +1,43 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>19.2.4 跳跃</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">19.2.4 跳跃</h3>
+<div class="nav-panel"><p>Next: <a href="19.2.5_其他_Edebug_命令.html">其他_Edebug_命令</a>, Previous: <a href="19.2.3_Edebug_执行模式.html">Edebug_执行模式</a>, Up: <a href="19.2_调试.html">调试.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节中描述的命令会一直执行，直到它们到达指定的位置。除了我做一个临时断点来建立停止的地方，然后切换到 go 模式。在预期停止点之前到达的任何其他断点也将停止执行。有关断点的详细信息，请参阅 Edebug Breakpoints。
+</p>
+<p>在非本地退出的情况下，这些命令可能无法按预期工作，因为这可以绕过您希望程序停止的临时断点。
+</p>
+<div class="lisp">
+<pre class="lisp">h
+</pre></div>
+<p>前往点所在位置附近的停止点 (edebug-goto-here)。
+</p><div class="lisp">
+<pre class="lisp">f
+</pre></div>
+<p>为一个表达式运行程序 (edebug-forward-sexp)。
+</p><div class="lisp">
+<pre class="lisp">o
+</pre></div>
+<p>运行程序直到包含的 sexp 结束（edebug-step-out）。
+</p><div class="lisp">
+<pre class="lisp">i
+</pre></div>
+<p>点后单步执行表单调用的函数或宏（edebug-step-in）。
+</p>
+<p>h 命令使用临时断点继续到点的当前位置或之后的停止点。
+</p>
+<p>f 命令在一个表达式上向前运行程序。更准确地说，它在 forward-sexp 将到达的位置设置一个临时断点，然后在 go 模式下执行，以便程序将在断点处停止。
+</p>
+<p>使用前缀参数 n，临时断点放置在点外 n 秒。如果包含列表在 n 多个元素之前结束，则停止位置在包含表达式之后。
+</p>
+<p>您必须检查 forward-sexp 找到的位置是否是程序真正到达的位置。例如，在条件下，这可能不是真的。
+</p>
+<p>为灵活起见， f 命令从 point 开始执行 forward-sexp，而不是在 stop 点。如果要从当前停止点执行一个表达式，首先键入 w (edebug-where) 将点移动到那里，然后键入 f。
+</p>
+<p>o 命令从表达式继续。它在 sexp 包含点的末尾放置一个临时断点。如果包含的 sexp 本身是一个函数定义，则 o 会一直持续到定义中的最后一个 sexp 之前。如果那是您现在所在的位置，它会从函数返回然后停止。换句话说，该命令不会退出当前正在执行的函数，除非您位于最后一个 sexp 之后。
+</p>
+<p>通常，h、f 和 o 命令会显示 <code>Break</code> 并暂停 edebug-sit-for-seconds，然后再显示刚刚评估的表单的结果。您可以通过将 edebug-sit-on-break 设置为 nil 来避免这种暂停。请参阅 Edebug 选项。
+</p>
+<p>i 命令在点之后进入由列表形式调用的函数或宏，并在其第一个停止点停止。请注意，表格不必是即将被评估的表格。但是如果表单是一个即将被评估的函数调用，请记住在评估任何参数之前使用此命令，否则为时已​​晚。
+</p>
+<p>i 命令检测它应该进入的函数或宏，如果它还没有检测的话。这很方便，但请记住，除非您明确安排对它进行取消检测，否则该函数或宏将保持检测。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="19.2.5_其他_Edebug_命令.html">其他_Edebug_命令</a>, Previous: <a href="19.2.3_Edebug_执行模式.html">Edebug_执行模式</a>, Up: <a href="19.2_调试.html">调试.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

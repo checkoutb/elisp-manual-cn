@@ -1,0 +1,61 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.11 退出</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">22.11 退出</h2>
+<div class="nav-panel"><p>Next: <a href="22.12_前缀命令参数.html">前缀命令参数</a>, Previous: <a href="22.10_等待经过时间或输入.html">等待经过时间或输入</a>, Up: <a href="22_命令循环.html">命令循环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在 Lisp 函数运行时键入 Cg 会导致 Emacs 退出它正在执行的任何操作。这意味着控制返回到最里面的活动命令循环。
+</p>
+<p>在命令循环等待键盘输入时键入 Cg 不会导致退出；  它充当普通输入字符。在最简单的情况下，你是看不出区别的，因为 Cg 通常会运行命令 keyboard-quit，其效果是退出。但是，当 Cg 跟随前缀键时，它们组合起来形成一个未定义的键。效果是取消前缀键以及任何前缀参数。
+</p>
+<p>在 minibuffer 中，Cg 有不同的定义：它中止出 minibuffer。这实际上意味着它退出了 minibuffer，然后退出。（简单地退出会返回到 minibuffer 中的命令循环。） Cg 在命令阅读器读取输入时不直接退出的原因是，它的含义可以通过这种方式在 minibuffer 中重新定义。跟随前缀键的 Cg 不会在 minibuffer 中重新定义，它具有取消前缀键和前缀参数的正常效果。如果 Cg 总是直接退出，这也是不可能的。
+</p>
+<p>当 Cg 直接退出时，它通过将变量 quit-flag 设置为 t 来实现。Emacs 在适当的时候检查这个变量，如果它不是 nil 就退出。以任何方式设置 quit-flag 非 nil 都会导致退出。
+</p>
+<p>在 C 代码级别，退出不可能发生在任何地方。仅在检查退出标志的特殊地方。原因是在其他地方退出可能会导致 Emacs 内部状态不一致。因为退出被延迟到安全的地方，所以退出不会让 Emacs 崩溃。
+</p>
+<p>某些函数，如 read-key-sequence 或 read-quoted-char 会完全阻止退出，即使它们等待输入。Cg 不是退出，而是作为请求的输入。在 read-key-sequence 的情况下，这有助于在命令循环中带来 Cg 的特殊行为。在 read-quoted-char 的情况下，这是为了让 Cq 可以用来引用 Cg。
+</p>
+<p>您可以通过将变量 inhibitor-quit 绑定到非 nil 值来防止退出 Lisp 函数的一部分。然后，尽管 Cg 仍然像往常一样将 quit-flag 设置为 t，但通常的结果 - 退出 - 被阻止了。最终，inhibit-quit 将再次变为 nil，例如当它的绑定在 let 形式结束时展开。此时，如果 quit-flag 仍为非 nil，则请求的退出立即发生。当您希望确保退出不会发生在程序的关键部分时，此行为是理想的。
+</p>
+<p>在某些函数（例如 read-quoted-char）中，Cg 以不涉及退出的特殊方式处理。这是通过在禁止退出绑定到 t 的情况下读取输入并在禁止退出再次变为 nil 之前将退出标志设置为 nil 来完成的。这段 read-quoted-char 定义的摘录显示了这是如何完成的；  它还表明在输入的第一个字符之后允许正常退出。
+</p>
+<div class="lisp">
+<pre class="lisp">(defun read-quoted-char (&amp;optional prompt)
+  "…documentation…"
+  (let ((message-log-max nil) done (first t) (code 0) char)
+    (while (not done)
+      (let ((inhibit-quit first)
+            …)
+        (and prompt (message "%s-" prompt))
+        (setq char (read-event))
+        (if inhibit-quit (setq quit-flag nil)))
+      …set the variable code…)
+    code))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Variable: quit-flag ¶
+</pre></div>
+<p>如果这个变量不为 nil，那么 Emacs 会立即退出，除非 inhibitor-quit 不为 nil。键入 Cg 通常会设置退出标志非零，而不管禁止退出。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: inhibit-quit ¶
+</pre></div>
+<p>此变量确定当 quit-flag 设置为 nil 以外的值时 Emacs 是否应该退出。如果 inhibitor-quit 为非 nil，则 quit-flag 没有特殊效果。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: with-local-quit body… ¶
+</pre></div>
+<p>此宏按顺序执行主体形式，但允许在主体内至少局部退出，即使在此构造之外禁止退出非零。它返回正文中最后一个表单的值，除非通过退出退出，在这种情况下它返回 nil。
+</p>
+<p>如果在进入 with-local-quit 时禁止退出为 nil，它只执行主体，设置退出标志会导致正常退出。但是，如果禁止退出是非零，从而延迟普通退出，则非零退出标志会触发一种特殊的本地退出。这将结束 body 的执行并退出 with-local-quit 主体，而 quit-flag 仍然非 nil，因此一旦允许就会发生另一个（普通）退出。如果在 body 的开头 quit-flag 已经是非 nil，则本地退出立即发生，并且 body 根本不执行。
+</p>
+<p>该宏主要用于可以从计时器、进程过滤器、进程哨兵、命令前挂钩、命令后挂钩和其他通常与 t 绑定的地方调用的函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: keyboard-quit ¶
+</pre></div>
+<p>该函数用 (signal ’quit nil) 表示退出条件。这和戒烟一样。（参见错误中的信号。）
+</p>
+<p>要在不中止键盘宏定义或执行的情况下退出，您可以发出 minibuffer-quit 条件信号。这与退出条件几乎相同，只是命令循环中的错误处理在不退出键盘宏定义或执行的情况下对其进行处理。
+</p>
+<p>您可以指定 Cg 以外的字符用于退出。请参阅输入模式中的函数 set-input-mode。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.12_前缀命令参数.html">前缀命令参数</a>, Previous: <a href="22.10_等待经过时间或输入.html">等待经过时间或输入</a>, Up: <a href="22_命令循环.html">命令循环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

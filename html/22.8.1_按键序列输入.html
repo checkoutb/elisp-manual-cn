@@ -1,0 +1,62 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.8.1 按键序列输入</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">22.8.1 按键序列输入</h3>
+<div class="nav-panel"><p>Next: <a href="22.8.2_读取一个事件.html">读取一个事件</a>, Previous: <a href="22.8_读数输入.html">读数输入</a>, Up: <a href="22.8_读数输入.html">读数输入.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>命令循环通过调用 read-key-sequence 一次读取输入一个键序列。Lisp 程序也可以调用这个函数；  例如， describe-key 使用它来读取要描述的键。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: read-key-sequence prompt &amp;optional continue-echo dont-downcase-last switch-frame-ok command-loop ¶
+</pre></div>
+<p>此函数读取一个键序列并将其作为字符串或向量返回。它不断读取事件，直到它积累了一个完整的键序列；  也就是说，足以使用当前活动的键盘映射指定非前缀命令。（请记住，以鼠标事件开始的键序列是使用鼠标所在窗口中缓冲区的键映射读取的，而不是当前缓冲区。）
+</p>
+<p>如果事件都是字符并且都可以放入字符串中，则 read-key-sequence 返回字符串（请参阅将键盘事件放入字符串中）。否则，它返回一个向量，因为一个向量可以包含所有类型的事件——字符、符号和列表。字符串或向量的元素是键序列中的事件。
+</p>
+<p>读取键序列包括以各种方式翻译事件。请参阅用于翻译事件序列的键映射。
+</p>
+<p>参数提示要么是在回显区域中作为提示显示的字符串，要么是 nil，表示不显示提示。参数 continue-echo 如果不是 nil，则表示将此键回显为前一个键的延续。
+</p>
+<p>通常，如果原始事件未定义且小写等效项已定义，则任何大写事件都会转换为小写。参数 dont-downcase-last，如果非零，则表示不将最后一个事件转换为小写。这适用于读取要定义的键序列。
+</p>
+<p>参数 switch-frame-ok，如果非 nil，则意味着如果用户在输入任何内容之前切换帧，则此函数应处理 switch-frame 事件。如果用户在按键序列的中间或序列开始时切换帧但 switch-frame-ok 为 nil，则事件将推迟到当前按键序列之后。
+</p>
+<p>参数命令循环，如果非零，意味着这个键序列正在被一个接一个地读取命令的东西读取。如果调用者只读取一个键序列，则它应该为 nil。
+</p>
+<p>在以下示例中，Emacs 显示提示符 <code>？</code>   在回声区域，然后用户键入 Cx Cf。
+</p><div class="lisp">
+<pre class="lisp">(read-key-sequence "?")
+
+---------- Echo Area ----------
+?C-x C-f
+---------- Echo Area ----------
+
+     ⇒ "^X^F"
+</pre></div>
+<p>函数 read-key-sequence 抑制退出：使用此函数读取时键入的 Cg 与任何其他字符一样工作，并且不设置退出标志。请参阅退出。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: read-key-sequence-vector prompt &amp;optional continue-echo dont-downcase-last switch-frame-ok command-loop ¶
+</pre></div>
+<p>这与 read-key-sequence 类似，只是它始终将键序列作为向量返回，而不是作为字符串返回。请参阅将键盘事件放入字符串中。
+</p>
+<p>如果输入字符是大写的（或具有 shift 修饰符）并且没有键绑定，但它的小写等效项有一个，则 read-key-sequence 将字符转换为小写。请注意，lookup-key 不会以这种方式执行大小写转换。
+</p>
+<p>当读取输入导致这种移位翻译时，Emacs 将变量 this-command-keys-shift-translated 设置为非零值。如果 Lisp 程序在被移位转换键调用时需要修改其行为，则可以检查此变量。例如，函数句柄移位选择检查此变量的值以确定如何激活或停用该区域（请参阅句柄移位选择）。
+</p>
+<p>函数 read-key-sequence 也转换了一些鼠标事件。它将未绑定的拖动事件转换为单击事件，并完全丢弃未绑定的按钮按下事件。它还重新调整焦点事件和杂项窗口事件，使它们永远不会与任何其他事件一起出现在键序列中。
+</p>
+<p>当鼠标事件发生在窗口或框架的特殊部分（例如模式行或滚动条）时，事件类型没有什么特别之处——它与通常表示鼠标按钮和修改键组合的符号相同。关于窗口部分的信息保存在事件的其他地方——坐标中。但是 read-key-sequence 将这些信息翻译成虚构的前缀键，所有这些都是符号：tab-line，header-line，horizo​​ntal-scroll-bar，menu-bar，tab-bar，mode-line，vertical-line，垂直滚动条、左边距、右边距、左边缘、右边缘、右分隔线和底部分隔线。您可以通过使用这些虚构的前缀键定义键序列来定义特殊窗口部分中鼠标单击的含义。
+</p>
+<p>例如，如果您调用 read-key-sequence 然后在窗口的模式行上单击鼠标，您会得到两个事件，如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(read-key-sequence "Click on the mode line: ")
+     ⇒ [mode-line
+         (mouse-1
+          (#&lt;window 6 on NEWS&gt; mode-line
+           (40 . 63) 5959987))]
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Variable: num-input-keys ¶
+</pre></div>
+<p>这个变量的值是到目前为止在这个 Emacs 会话中处理的键序列的数量。这包括从终端读取的键序列和从正在执行的键盘宏中读取的键序列。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.8.2_读取一个事件.html">读取一个事件</a>, Previous: <a href="22.8_读数输入.html">读数输入</a>, Up: <a href="22.8_读数输入.html">读数输入.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

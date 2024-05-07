@@ -1,0 +1,6 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>5.6 修改现有列表结构</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">5.6 修改现有列表结构</h2>
+<div class="nav-panel"><p>Next: <a href="05.6.1_改变列表元素_setcar.html">改变列表元素_setcar</a>, Previous: <a href="05.5_修改列表变量.html">修改列表变量</a>, Up: <a href="05_列表.html">列表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>您可以使用原语 setcar 和 setcdr 修改 cons 单元的 CAR 和 CDR 内容。这些是破坏性操作，因为它们改变了现有的列表结构。破坏性操作应仅应用于可变列表，即通过 cons、list 或类似操作构造的列表。通过引用创建的列表是程序的一部分，不应被破坏性操作更改。请参阅可变性。
+</p>
+<p>Common Lisp 注意：Common Lisp 使用函数 rplaca 和 rplacd 来改变列表结构；  它们改变结构的方式与 setcar 和 setcdr 相同，但 Common Lisp 函数返回 cons 单元，而 setcar 和 setcdr 返回新的 CAR 或 CDR。
+</p>
+<div class="nav-panel"><p>Next: <a href="05.6.1_改变列表元素_setcar.html">改变列表元素_setcar</a>, Previous: <a href="05.5_修改列表变量.html">修改列表变量</a>, Up: <a href="05_列表.html">列表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

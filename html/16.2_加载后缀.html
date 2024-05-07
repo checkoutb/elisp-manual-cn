@@ -1,0 +1,30 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>16.2 加载后缀</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">16.2 加载后缀</h2>
+<div class="nav-panel"><p>Next: <a href="16.3_库搜索.html">库搜索</a>, Previous: <a href="16.1_程序如何加载.html">程序如何加载</a>, Up: <a href="16_加载.html">加载.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>我们现在描述一些关于加载尝试的确切后缀的技术细节。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: load-suffixes ¶
+</pre></div>
+<p>这是一个后缀列表，表示（编译的或源代码的）Emacs Lisp 文件。它不应包含空字符串。load 在将 Lisp 后缀附加到指定文件名时按顺序使用这些后缀。标准值是 (".elc" ".el")，它产生上一节中描述的行为。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: load-file-rep-suffixes ¶
+</pre></div>
+<p>这是表示同一文件的表示的后缀列表。此列表通常应以空字符串开头。当 load 搜索文件时，它会在此列表中按顺序将后缀附加到文件名，然后再搜索另一个文件。
+</p>
+<p>启用自动压缩模式会将 jka-compr-load-suffixes 中的后缀附加到此列表中，禁用自动压缩模式会再次删除它们。如果禁用自动压缩模式，则 load-file-rep-suffixes 的标准值为 ("")。鉴于 jka-compr-load-suffixes 的标准值为 (".gz")，如果启用 Auto Compression 模式，则 load-file-rep-suffixes 的标准值为 ("" ".gz")。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: get-load-suffixes ¶
+</pre></div>
+<p>当它的 must-suffix 参数为非 nil 时，此函数按顺序返回加载应尝试的所有后缀的列表。这同时考虑了加载后缀和加载文件代表后缀。如果 load-suffixes、jka-compr-load-suffixes 和 load-file-rep-suffixes 都有其标准值，则此函数返回 (".elc" ".elc.gz" ".el" ".el.gz" ) 如果启用自动压缩模式，如果禁用自动压缩模式 (".elc" ".el")。
+</p>
+<p>总而言之，加载通常首先尝试 (get-load-suffixes) 值中的后缀，然后是 load-file-rep-suffixes 中的后缀。如果 nosuffix 为非 nil，则跳过前一组，如果 must-suffix 为非 nil，则跳过后一组。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: load-prefer-newer ¶
+</pre></div>
+<p>如果此选项不为 nil，则不要在存在的第一个后缀处停止，而是对它们进行全部负载测试，并使用最新的文件。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="16.3_库搜索.html">库搜索</a>, Previous: <a href="16.1_程序如何加载.html">程序如何加载</a>, Up: <a href="16_加载.html">加载.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

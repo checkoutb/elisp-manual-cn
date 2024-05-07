@@ -1,0 +1,46 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.10 维护撤销列表</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">33.10 维护撤销列表</h2>
+<div class="nav-panel"><p>Next: <a href="33.11_填充.html">填充</a>, Previous: <a href="33.9_撤消.html">撤消</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍如何启用和禁用给定缓冲区的撤消信息。它还解释了撤消列表是如何自动截断的，因此它不会变得太大。
+</p>
+<p>在新创建的缓冲区中记录撤消信息通常可以开始；  但如果缓冲区名称以空格开头，则撤销记录最初是禁用的。您可以使用以下两个函数显式启用或禁用撤消记录，或者自己设置 buffer-undo-list。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: buffer-enable-undo &amp;optional buffer-or-name ¶
+</pre></div>
+<p>该命令允许记录缓冲区缓冲区或名称的撤消信息，以便可以撤消后续更改。如果没有提供参数，则使用当前缓冲区。如果缓冲区中已启用撤消记录，则此函数不执行任何操作。它返回零。
+</p>
+<p>在交互式调用中，buffer-or-name 是当前缓冲区。您不能指定任何其他缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: buffer-disable-undo &amp;optional buffer-or-name ¶
+</pre></div>
+<p>该函数丢弃缓冲区或名称的撤消列表，并禁止进一步记录撤消信息。因此，不再可能撤消先前的更改或任何后续更改。如果 buffer-or-name 的 undo 列表已经被禁用，则此功能无效。
+</p>
+<p>在交互式调用中，BUFFER-OR-NAME 是当前缓冲区。您不能指定任何其他缓冲区。此函数返回零。
+</p>
+<p>随着编辑的继续，撤消列表变得越来越长。为了防止它们用完所有可用的内存空间，垃圾收集会将它们修剪回您可以设置的大小限制。（为此，撤消列表的大小衡量构成列表的 cons 单元格以及已删除文本的字符串。）三个变量控制可接受的大小范围：undo-limit、undo-strong-limit 和 undo-外限。在这些变量中，大小被计算为占用的字节数，包括保存的文本和其他数据。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: undo-limit ¶
+</pre></div>
+<p>这是撤消列表可接受大小的软限制。超出此大小的更改组是最后保留的更改组。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: undo-strong-limit ¶
+</pre></div>
+<p>这是撤消列表可接受大小的上限。超出此大小的更改组本身（连同所有较旧的更改组）将被丢弃。有一个例外：最新的更改组仅在超过 undo-outer-limit 时才会被丢弃。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: undo-outer-limit ¶
+</pre></div>
+<p>如果在垃圾收集时，当前命令的撤消信息超过了这个限制，Emacs 会丢弃该信息并显示警告。这是防止内存溢出的最后一道防线。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: undo-ask-before-discard ¶
+</pre></div>
+<p>如果这个变量不为nil，当undo info 超过undo-outer-limit 时，Emacs 会在echo 区域询问是否丢弃该信息。默认值为 nil，表示自动丢弃。
+</p>
+<p>此选项主要用于调试。询问问题时禁止垃圾收集，这意味着如果用户在回答问题之前等待太久，Emacs 可能会泄漏内存。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.11_填充.html">填充</a>, Previous: <a href="33.9_撤消.html">撤消</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

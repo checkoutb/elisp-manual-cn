@@ -1,0 +1,123 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>29.13.3 缓冲区显示的动作列表</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">29.13.3 缓冲区显示的动作列表</h3>
+<div class="nav-panel"><p>Next: <a href="29.13.4_显示缓冲区的附加选项.html">显示缓冲区的附加选项</a>, Previous: <a href="29.13.2_缓冲区显示的动作函数.html">缓冲区显示的动作函数</a>, Up: <a href="29.13_在合适的窗口中显示缓冲区.html">在合适的窗口中显示缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>动作列表是一个关联列表，将动作函数识别的预定义符号映射到这些函数应该相应解释的值。在每次调用中，display-buffer 都会构造一个新的、可能为空的 action alist，并将整个列表传递给它调用的任何 action 函数。
+</p>
+<p>按照设计，动作函数在解释动作列表条目时是自由的。事实上，像allow-no-window 或previous-window 这样的条目只对一个或几个动作函数有意义，其余的都忽略了。其他条目，如禁止相同窗口或窗口参数，应该受到大多数动作函数的尊重，包括应用程序和外部包提供的那些。
+</p>
+<p>在前面的小节中，我们详细描述了各个动作函数如何解释他们关心的动作列表条目。在这里，我们根据其符号提供所有已知动作列表条目的参考列表，以及它们的值和识别它们的动作函数（请参阅缓冲区显示的动作函数）。在整个列表中，术语 <code>buffer</code> 指的是缓冲区 display-buffer 应该显示的， <code>value</code> 指的是条目的值。
+</p>
+<div class="lisp">
+<pre class="lisp">inhibit-same-window
+</pre></div>
+<p>如果该值为非零，这表示所选窗口不得用于显示缓冲区。所有（重新）使用现有窗口的操作函数都应该尊重这个条目。
+</p><div class="lisp">
+<pre class="lisp">previous-window
+</pre></div>
+<p>该值必须指定一个以前可能已显示缓冲区的窗口。display-buffer-in-previous-window 将优先考虑这样的窗口，前提是它仍然是活动的并且不专用于另一个缓冲区。
+</p><div class="lisp">
+<pre class="lisp">mode
+</pre></div>
+<p>该值是主要模式或主要模式列表。只要此条目指定的值与该窗口缓冲区的主要模式匹配，display-buffer-reuse-mode-window 就可以重用一个窗口。其他操作函数会忽略此类条目。
+</p><div class="lisp">
+<pre class="lisp">frame-predicate
+</pre></div>
+<p>该值必须是一个带有一个参数（一帧）的函数，如果该帧是显示缓冲区的候选者，则应该返回非零。此条目由 display-buffer-use-some-frame 使用。
+</p><div class="lisp">
+<pre class="lisp">reusable-frames
+</pre></div>
+<p>该值指定用于搜索可重复使用的窗口的帧集，因为它已经显示了缓冲区。可以如下设置：
+</p>
+<p>nil 表示只考虑选定 <code>帧</code> ( <code>frame</code> )上的窗口。（实际上，使用的最后一帧不是 minibuffer-only 帧。）
+t 表示考虑所有 <code>帧</code> ( <code>frame</code> )上的窗口。
+可见意味着考虑所有可见 <code>帧</code> ( <code>frame</code> )上的窗口。
+0 表示考虑所有可见或图标化 <code>帧</code> ( <code>frame</code> )上的窗口。
+ <code>帧</code> ( <code>frame</code> )意味着仅考虑该 <code>帧</code> ( <code>frame</code> )上的窗口。
+</p>
+<p>请注意，nil 的含义与 next-window 的 all-frames 参数的含义略有不同（请参阅 Windows 的循环排序）。
+</p>
+<p>它的一个主要客户端是 display-buffer-reuse-window，但所有其他尝试重用窗口的操作函数也会受到影响。display-buffer-in-previous-window 在搜索先前在另一帧上显示缓冲区的窗口时会查询它。
+</p><div class="lisp">
+<pre class="lisp">inhibit-switch-frame
+</pre></div>
+<p>如果 display-buffer 选择的窗口显示在那里，则非 nil 值可防止引发或选择另一个帧。主要受此影响的是 display-buffer-use-some-frame 和 display-buffer-reuse-window。理想情况下，display-buffer-pop-up-frame 也应该受到影响，但不能保证窗口管理器会遵守。
+</p><div class="lisp">
+<pre class="lisp">window-parameters
+</pre></div>
+<p>该值指定了一个窗口参数列表，以提供所选窗口。所有选择一个窗口的动作函数都应该处理这个条目。
+</p><div class="lisp">
+<pre class="lisp">window-min-height
+</pre></div>
+<p>该值指定使用的窗口的最小高度，以行为单位。如果窗口没有或不能达到此条目指定的高度，则不考虑使用该窗口。此条目的唯一客户端当前是 display-buffer-below-selected。
+</p>
+<p>请注意，仅提供此类条目并不一定会使窗口与其值指定的一样高。要实际调整现有窗口的大小或使新窗口与该值指定的一样高，还应提供指定该值的窗口高度条目。然而，这样的窗口高度条目可以指定一个完全不同的值或要求窗口高度适合其缓冲区的高度，在这种情况下，窗口最小高度条目提供所用窗口的保证最小高度。
+</p><div class="lisp">
+<pre class="lisp">window-height
+</pre></div>
+<p>该值指定是否以及如何调整所选窗口的高度，可以是以下之一：
+</p>
+<p>nil 表示不考虑所选窗口的高度。
+整数指定所选窗口的所需总高度（以行为单位）。
+浮点数指定所选窗口的所需总高度相对于其 <code>帧</code> ( <code>frame</code> )根窗口的总高度的比例。
+如果该值指定了一个函数，则该函数将使用一个参数调用 - 所选窗口。该功能应该调整窗口的高度；  它的返回值被忽略。合适的函数是 fit-window-to-buffer 和 shrink-window-if-larger-than-buffer，请参阅调整窗口大小。
+</p>
+<p>按照惯例，仅当窗口是垂直组合的一部分时才调整所选窗口的高度（请参阅窗口和 <code>帧</code> ( <code>frame</code> )），以避免更改其他不相关窗口的高度。此外，仅在此列表正下方指定的某些条件下才应处理此条目。
+</p><div class="lisp">
+<pre class="lisp">window-width
+</pre></div>
+<p>此条目类似于前面描述的 window-height 条目，但用于调整所选窗口的宽度。该值可以是以下之一：
+</p>
+<p>nil 表示不保留所选窗口的宽度。
+一个整数指定所选窗口的所需总宽度（以列为单位）。
+浮点数指定所选窗口的所需总宽度相对于 <code>帧</code> ( <code>frame</code> )根窗口的总宽度的比例。
+如果该值指定了一个函数，则该函数将使用一个参数调用 - 所选窗口。该功能应该调整窗口的宽度；  它的返回值被忽略。
+</p>
+<p>按照惯例，仅当窗口是水平组合的一部分时才调整所选窗口的宽度（请参阅窗口和 <code>帧</code> ( <code>frame</code> )），以避免更改其他不相关窗口的宽度。此外，仅应在此列表正下方指定的某些条件下处理此条目。
+</p><div class="lisp">
+<pre class="lisp">dedicated
+</pre></div>
+<p>如果非零，则此类条目会告诉 display-buffer 将其创建的任何窗口标记为专用于其缓冲区（请参阅专用窗口）。它通过调用 set-window-dedicated-p 来实现，其中选择的窗口作为第一个参数，条目的值作为第二个参数。默认情况下，侧窗专用于值侧（（请参阅侧窗选项和功能）。
+</p><div class="lisp">
+<pre class="lisp">preserve-size
+</pre></div>
+<p>如果非 nil，这样的条目会告诉 Emacs 保留所选窗口的大小（请参阅保留窗口大小）。该值应该是 (t . nil) 以保留窗口的宽度， (nil . t) 以保留其高度或 (t . t) 以保留其宽度和高度。仅在此列表之后指定的某些条件下才应处理此条目。
+</p><div class="lisp">
+<pre class="lisp">pop-up-frame-parameters
+</pre></div>
+<p>该值指定了一个 <code>帧</code> ( <code>frame</code> )参数列表，以提供一个新 <code>帧</code> ( <code>frame</code> )（如果已创建）。display-buffer-pop-up-frame 是它唯一的收件人。
+</p><div class="lisp">
+<pre class="lisp">parent-frame
+</pre></div>
+<p>该值指定当缓冲区显示在子 <code>帧</code> ( <code>frame</code> )上时要使用的父 <code>帧</code> ( <code>frame</code> )。此条目仅由 display-buffer-in-child-frame 使用。
+</p><div class="lisp">
+<pre class="lisp">child-frame-parameters
+</pre></div>
+<p>该值指定当缓冲区显示在子 <code>帧</code> ( <code>frame</code> )上时要使用的 <code>帧</code> ( <code>frame</code> )参数列表。此条目仅由 display-buffer-in-child-frame 使用。
+</p><div class="lisp">
+<pre class="lisp">side
+</pre></div>
+<p>该值表示应创建显示缓冲区的新窗口的 <code>帧</code> ( <code>frame</code> )或窗口的一侧。此条目由 display-buffer-in-side-window 用于指示应放置新侧窗的 <code>帧</code> ( <code>frame</code> )的一侧（请参阅在侧窗中显示缓冲区）。display-buffer-in-atom-window 也使用它来指示新窗口应位于的现有窗口的一侧（请参阅原子窗口）。
+</p><div class="lisp">
+<pre class="lisp">slot
+</pre></div>
+<p>如果非零，则该值指定应该显示缓冲区的侧窗口的插槽。此条目仅由 display-buffer-in-side-window 使用。
+</p><div class="lisp">
+<pre class="lisp">direction
+</pre></div>
+<p>该值指定了一个方向，该方向与窗口条目一起允许 display-buffer-in-direction 确定窗口的位置以显示缓冲区。
+</p><div class="lisp">
+<pre class="lisp">window
+</pre></div>
+<p>该值指定一个窗口，该窗口在某种程度上与 display-buffer 选择的窗口相关。此条目当前由 display-buffer-in-atom-window 用于指示应在其一侧创建新窗口的窗口。display-buffer-in-direction 也使用它来指定结果窗口应出现在哪一侧的参考窗口。
+</p><div class="lisp">
+<pre class="lisp">allow-no-window
+</pre></div>
+<p>如果该值为非 nil，则 display-buffer 不一定必须显示缓冲区并且调用者准备接受它。此条目不适用于用户自定义，因为无法保证 display-buffer 的任意调用者能够处理没有窗口将显示缓冲区的情况。display-buffer-no-window 是唯一关心这个条目的动作函数。
+</p><div class="lisp">
+<pre class="lisp">body-function
+</pre></div>
+<p>该值必须是一个接受一个参数的函数（显示的窗口）。此函数可用于用可能取决于显示窗口尺寸的一些内容填充显示窗口的主体。它在显示缓冲区之后调用，在应用条目窗口高度、窗口宽度和保留大小之前，可以调整窗口大小以适应插入的内容。
+</p>
+<p>按照惯例，window-height、window-width 和 preserve-size 条目是在设置了所选窗口的缓冲区之后并且当且仅当该窗口之前从未显示过另一个缓冲区时才应用的。更准确地说，后者意味着该窗口必须是由当前 display-buffer 调用创建的，或者该窗口是由 display-buffer 较早创建的以显示缓冲区，并且在被当前重用之前从未用于显示另一个缓冲区调用显示缓冲区。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="29.13.4_显示缓冲区的附加选项.html">显示缓冲区的附加选项</a>, Previous: <a href="29.13.2_缓冲区显示的动作函数.html">缓冲区显示的动作函数</a>, Up: <a href="29.13_在合适的窗口中显示缓冲区.html">在合适的窗口中显示缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

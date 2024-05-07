@@ -1,0 +1,127 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>39.19 与串口通信</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">39.19 与串口通信</h2>
+<div class="nav-panel"><p>Next: <a href="39.20_打包和解包字节数组.html">打包和解包字节数组</a>, Previous: <a href="39.18_其他网络设施.html">其他网络设施</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 可以与串口通信。为了交互使用，Mx serial-term 打开一个终端窗口。在 Lisp 程序中，make-serial-process 创建一个进程对象。
+</p>
+<p>串行端口可以在运行时进行配置，而无需关闭并重新打开它。函数 serial-process-configure 允许您更改速度、字节大小和其他参数。在 serial-term 创建的终端窗口中，您可以单击模式行进行配置。
+</p>
+<p>串行连接由一个进程对象表示，它可以以类似于子进程或网络进程的方式使用。您可以发送和接收数据，并配置串口。然而，串行进程对象没有进程ID，您不能向它发送信号，并且状态代码与其他类型的进程不同。进程对象上的 delete-process 或进程缓冲区上的 kill-buffer 关闭连接，但这不会影响连接到串口的设备。
+</p>
+<p>函数 process-type 为表示串行端口连接的进程对象返回符号 serial。
+</p>
+<p>串行端口可用于 GNU/Linux、Unix 和 MS Windows 系统。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: serial-term port speed &amp;optional line-mode ¶
+</pre></div>
+<p>为新缓冲区中的串行端口启动终端仿真器。port 是要连接的串行端口的名称。例如，这可能是 Unix 上的 /dev/ttyS0。在 MS Windows 上，这可能是 COM1 或 \\.10（Lisp 字符串中的双反斜杠）。
+</p>
+<p>speed 是串行端口的速度，以比特/秒为单位。9600 是一个常见的值。缓冲区处于 Term 模式；  请参阅 The GNU Emacs Manual 中的 Term Mode，了解在该缓冲区中使用的命令。您可以在模式行菜单中更改速度和配置。如果 line-mode 不是 nil，则使用 term-line-mode；  否则使用术语原始模式。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-serial-process &amp;rest args ¶
+</pre></div>
+<p>该函数创建一个进程和一个缓冲区。参数被指定为关键字/参数对。这是有意义的关键字列表，前两个（端口和速度）是强制性的：
+</p>
+<div class="lisp">
+<pre class="lisp">:port port
+</pre></div>
+<p>这是串行端口的名称。在 Unix 和 GNU 系统上，这是一个文件名，例如 /dev/ttyS0。在 Windows 上，这可能是 COM1，或者 \\.10 表示高于 COM9 的端口（Lisp 字符串中的反斜杠的两倍）。
+</p><div class="lisp">
+<pre class="lisp">:speed speed
+</pre></div>
+<p>串行端口的速度，以比特/秒为单位。该函数调用serial-process-configure来处理速度；  有关更多详细信息，请参阅该函数的以下文档。
+</p><div class="lisp">
+<pre class="lisp">:name name
+</pre></div>
+<p>进程的名称。如果没有给出名称，端口也将作为进程名称。
+</p><div class="lisp">
+<pre class="lisp">:buffer buffer
+</pre></div>
+<p>与进程关联的缓冲区。该值可以是缓冲区或命名缓冲区的字符串。除非您指定输出流或过滤器函数来处理输出，否则进程输出将位于该缓冲区的末尾。如果没有给出缓冲区，则进程缓冲区的名称取自 :name 关键字的值。
+</p><div class="lisp">
+<pre class="lisp">:coding coding
+</pre></div>
+<p>如果coding 是一个符号，它指定了用于该过程的读写的编码系统。如果coding是一个cons(decoding.encoding)，decode用于读取，encoding用于写入。如果未指定，则默认是根据数据本身确定编码系统。
+</p><div class="lisp">
+<pre class="lisp">:noquery query-flag
+</pre></div>
+<p>将进程查询标志初始化为query-flag。请参阅退出前查询。如果未指定，标志默认为 nil。
+</p><div class="lisp">
+<pre class="lisp">:stop bool
+</pre></div>
+<p>如果 bool 为非零，则以停止状态启动进程。在停止状态下，串行进程不接受传入数据，但可以发送传出数据。停止状态由 continue-process 清除并由 stop-process 设置。
+</p><div class="lisp">
+<pre class="lisp">:filter filter
+</pre></div>
+<p>安装过滤器作为过程过滤器。
+</p><div class="lisp">
+<pre class="lisp">:sentinel sentinel
+</pre></div>
+<p>安装哨兵作为进程哨兵。
+</p><div class="lisp">
+<pre class="lisp">:plist plist
+</pre></div>
+<p>安装 plist 作为进程的初始 plist。
+</p><div class="lisp">
+<pre class="lisp">:bytesize
+</pre></div>
+<div class="lisp">
+<pre class="lisp">:parity
+</pre></div>
+<div class="lisp">
+<pre class="lisp">:stopbits
+</pre></div>
+<div class="lisp">
+<pre class="lisp">:flowcontrol
+</pre></div>
+<p>这些由 make-serial-process 调用的 serial-process-configure 处理。
+</p>
+<p>原始参数列表（可能由以后的配置修改）可通过函数 process-contact 获得。
+</p>
+<p>这是一个例子：
+</p><div class="lisp">
+<pre class="lisp">(make-serial-process :port "/dev/ttyS0" :speed 9600)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: serial-process-configure &amp;rest args ¶
+</pre></div>
+<p>此函数配置串行端口连接。参数被指定为关键字/参数对。未给出的属性从进程的当前配置（可通过函数 process-contact 获得）重新初始化，或设置为合理的默认值。定义了以下参数：
+</p>
+<div class="lisp">
+<pre class="lisp">:process process
+</pre></div>
+<div class="lisp">
+<pre class="lisp">:name name
+</pre></div>
+<div class="lisp">
+<pre class="lisp">:buffer buffer
+</pre></div>
+<div class="lisp">
+<pre class="lisp">:port port
+</pre></div>
+<p>可以给出这些参数中的任何一个来标识要配置的进程。如果没有给出这些参数，则使用当前缓冲区的进程。
+</p><div class="lisp">
+<pre class="lisp">:speed speed
+</pre></div>
+<p>串行端口的速度（以每秒位数为单位），即波特率。该值可以是任何数字，但大多数串行端口仅在 1200 和 115200 之间的几个定义值下工作，其中 9600 是最常见的值。如果 speed 为 nil，该函数将忽略所有其他参数并且不配置端口。这可能对特殊的串行端口有用，例如蓝牙到串行转换器，只能通过通过连接发送的 <code>AT</code> 命令进行配置。速度的 nil 值仅对先前调用 make-serial-process 或 serial-term 已打开的连接有效。
+</p><div class="lisp">
+<pre class="lisp">:bytesize bytesize
+</pre></div>
+<p>每个字节的位数，可以是 7 或 8。如果未给定字节大小或为 nil，则默认为 8。
+</p><div class="lisp">
+<pre class="lisp">:parity parity
+</pre></div>
+<p>该值可以是 nil（不使用奇偶校验）、符号奇数（使用奇校验）或偶数符号（使用偶校验）。如果没有给出奇偶校验，则默认为无奇偶校验。
+</p><div class="lisp">
+<pre class="lisp">:stopbits stopbits
+</pre></div>
+<p>用于终止每个字节传输的停止位的数量。stopbits 可以是 1 或 2。如果 stopbits 没有给出或为零，则默认为 1。
+</p><div class="lisp">
+<pre class="lisp">:flowcontrol flowcontrol
+</pre></div>
+<p>用于此连接的流控类型，可以是 nil（不使用流控）、符号 hw（使用 RTS/CTS 硬件流控）或符号 sw（使用 XON/XOFF 软件流控） .  如果没有给出流量控制，则默认为无流量控制。
+</p>
+<p>在内部，make-serial-process 调用 serial-process-configure 进行串口的初始配置。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="39.20_打包和解包字节数组.html">打包和解包字节数组</a>, Previous: <a href="39.18_其他网络设施.html">其他网络设施</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

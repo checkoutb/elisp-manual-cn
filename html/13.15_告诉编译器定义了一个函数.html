@@ -1,0 +1,36 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>13.15 告诉编译器定义了一个函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">13.15 告诉编译器定义了一个函数</h2>
+<div class="nav-panel"><p>Next: <a href="13.16_判断一个函数是否可以安全调用.html">判断一个函数是否可以安全调用</a>, Previous: <a href="13.14_declare形式.html">declare形式</a>, Up: <a href="13_函数.html">函数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>字节编译文件通常会产生有关编译器不知道的函数的警告（请参阅编译器错误）。有时这表明一个真正的问题，但通常有问题的函数是在其他文件中定义的，如果该代码运行，这些文件将被加载。例如，字节编译 simple.el 用于警告：
+</p>
+<div class="lisp">
+<pre class="lisp">simple.el:8727:1:Warning: the function ‘shell-mode’ is not known to be
+    defined.
+</pre></div>
+<p>实际上，shell-mode 只在调用 shell-mode 之前执行（需要 ’shell）的函数中使用，因此 shell-mode 将在运行时正确定义。当您知道这样的警告并不表示真正的问题时，最好抑制警告。这使得可能意味着实际问题的新警告更加明显。你可以用声明函数来做到这一点。
+</p>
+<p>您需要做的就是在第一次使用相关函数之前添加一个 declare-function 语句：
+</p>
+<div class="lisp">
+<pre class="lisp">(declare-function shell-mode "shell" ())
+</pre></div>
+<p>这表示 shell 模式是在 shell.el 中定义的（ <code>.el</code> 可以省略）。编译器理所当然地认为该文件确实定义了函数，并且不检查。
+</p>
+<p>可选的第三个参数指定 shell-mode 的参数列表。在这种情况下，它不接受任何参数（nil 与不指定值不同）。在其他情况下，这可能类似于（文件和可选覆盖）。您不必指定参数列表，但如果您这样做，字节编译器可以检查调用是否与声明匹配。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: declare-function function file &amp;optional arglist fileonly ¶
+</pre></div>
+<p>告诉字节编译器假设函数是在文件文件中定义的。可选的第三个参数 arglist 要么是 t，即未指定参数列表，要么是与 defun 样式相同的形式参数列表。省略的 arglist 默认为 t，而不是 nil；  这是省略参数的非典型行为，这意味着要提供第四个但不提供第三个参数，必须为第三个参数占位符指定 t 而不是通常的 nil。可选的第四个参数 fileonly non-nil 表示只检查该文件是否存在，而不是它实际上定义了函数。
+</p>
+<p>要验证这些函数是否确实在 declare-function 所说的位置声明，请使用 check-declare-file 检查一个源文件中的所有 declare-function 调用，或使用 check-declare-directory 检查某个文件中和下的所有文件目录。
+</p>
+<p>这些命令使用locate-library查找应该包含函数定义的文件；  如果没有找到文件，它们会扩展相对于包含声明函数调用的文件目录的定义文件名。
+</p>
+<p>您还可以通过指定以 <code>.c</code> 或 <code>.m</code> 结尾的文件名来将函数称为原语。这仅在您调用仅在某些系统上定义的原语时才有用。大多数原语总是被定义的，所以它们永远不会给你警告。
+</p>
+<p>有时文件会选择性地使用外部包中的函数。如果在 declare-function 语句中的文件名前加上 ’ext:’ ，则将检查是否找到，否则跳过而不会出错。
+</p>
+<p>有一些’check-declare’ 不理解的函数定义（例如，defstruct 和其他一些宏）。在这种情况下，您可以将一个非零的 fileonly 参数传递给 declare-function，这意味着只检查文件是否存在，而不是它实际定义了函数。请注意，要在不必指定参数列表的情况下执行此操作，您应该将 arglist 参数设置为 t（因为 nil 表示空参数列表，而不是未指定的）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="13.16_判断一个函数是否可以安全调用.html">判断一个函数是否可以安全调用</a>, Previous: <a href="13.14_declare形式.html">declare形式</a>, Up: <a href="13_函数.html">函数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

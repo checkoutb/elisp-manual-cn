@@ -1,0 +1,47 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>29.6 保留窗口大小</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">29.6 保留窗口大小</h2>
+<div class="nav-panel"><p>Next: <a href="29.7_分割窗口.html">分割窗口</a>, Previous: <a href="29.5_调整窗口大小.html">调整窗口大小</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>可以通过使用上一节中的函数之一显式或隐式调整窗口的大小，例如，在调整相邻窗口的大小时、拆分或删除窗口时（请参阅拆分窗口，请参阅删除窗口）或调整窗口 <code>帧</code> ( <code>frame</code> )的大小时 (见帧大小）。
+</p>
+<p>当同一帧上有一个或多个其他可调整大小的窗口时，可以避免隐式调整特定窗口的大小。为此，必须建议 Emacs 保留该窗口的大小。有两种基本方法可以做到这一点。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: window-size-fixed ¶
+</pre></div>
+<p>如果此缓冲区局部变量不为 nil，则显示缓冲区的任何窗口的大小通常都无法更改。如果别无选择，删除窗口或更改 <code>帧</code> ( <code>frame</code> )大小仍可能更改窗口大小。
+</p>
+<p>如果值为高度，则只有窗口的高度是固定的；  如果值为宽度，则只有窗口的宽度是固定的。任何其他非零值都固定宽度和高度。
+</p>
+<p>如果此变量为零，这并不一定意味着任何显示缓冲区的窗口都可以在所需方向上调整大小。要确定这一点，请使用函数 window-resizable。请参阅调整窗口大小。
+</p>
+<p>通常 window-size-fixed 过于激进，因为它也禁止任何显式调整或拆分受影响窗口的尝试。这甚至可能在隐式调整窗口大小后发生，例如，在删除相邻窗口或调整窗口 <code>帧</code> ( <code>frame</code> )大小时。下面的函数尽量避免显式地禁止调整窗口大小：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-preserve-size &amp;optional window horizontal preserve ¶
+</pre></div>
+<p>此函数（取消）将窗口窗口的高度标记为保留以供将来调整大小操作。window 必须是活动窗口，并且默认为选定的窗口。如果可选参数水平非零，它（取消）将窗口的宽度标记为保留。
+</p>
+<p>如果可选参数 preserve 是 t，这意味着保留窗口主体的当前高度/宽度。只有当 Emacs 没有更好的选择时，窗口的高度/宽度才会改变。调整此函数保留高度/宽度的窗口大小不会引发错误。
+</p>
+<p>如果 preserve 为 nil，这意味着停止保留窗口的高度/宽度，解除由先前调用此函数为窗口引起的任何相应限制。使用 window 作为参数调用放大窗口、缩小窗口或适合窗口到缓冲区也可以删除相应的约束。
+</p>
+<p>window-preserve-size 当前由以下函数调用：
+</p>
+<div class="lisp">
+<pre class="lisp">display-buffer
+</pre></div>
+<p>如果该函数的可选参数保留大小（请参阅调整窗口大小）为非零，则保留该函数建立的大小。
+</p><div class="lisp">
+<pre class="lisp">fit-window-to-buffer
+</pre></div>
+<p>如果该函数的 alist 参数（请参阅选择用于显示缓冲区的窗口）包含一个保留大小条目，则保留该函数生成的窗口的大小。
+</p>
+<p>window-preserve-size 安装一个名为 window-preserved-size 的窗口参数（请参阅窗口参数），窗口大小调整函数会参考该参数。当窗口显示另一个缓冲区而不是调用 window-preserve-size 时的缓冲区或此后其大小发生变化时，此参数不会阻止调整窗口大小。
+</p>
+<p>以下函数可用于检查特定窗口的高度是否保留：
+</p>
+<p>功能：window-preserved-size &amp;可选窗口水平¶
+</p>
+<p>此函数返回窗口窗口的保留高度（以像素为单位）。window 必须是活动窗口，并且默认为选定的窗口。如果可选参数水平非零，它返回窗口的保留宽度。如果未保留窗口大小，则返回 nil。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="29.7_分割窗口.html">分割窗口</a>, Previous: <a href="29.5_调整窗口大小.html">调整窗口大小</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

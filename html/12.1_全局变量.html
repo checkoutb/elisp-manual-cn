@@ -1,0 +1,32 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>12.1 全局变量</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">12.1 全局变量</h2>
+<div class="nav-panel"><p>Next: <a href="12.2_永不改变的变量.html">永不改变的变量</a>, Previous: <a href="12_变量.html">变量</a>, Up: <a href="12_变量.html">变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>使用变量的最简单方法是全局。这意味着该变量一次只有一个值，并且该值在整个 Lisp 系统中都有效（至少目前是这样）。在您指定新值之前，该值一直有效。当新值替换旧值时，变量中不会留下旧值的痕迹。
+</p>
+<p>您可以使用 setq 为符号指定一个值。例如，
+</p>
+<div class="lisp">
+<pre class="lisp">(setq x '(a b))
+</pre></div>
+<p>给变量 x 赋值 (ab)。注意 setq 是一种特殊形式（见特殊形式）；  它不会评估它的第一个参数，即变量的名称，但它会评估第二个参数，即新值。
+</p>
+<p>一旦变量有了值，您就可以通过使用符号本身作为表达式来引用它。因此，
+</p>
+<div class="lisp">
+<pre class="lisp">x ⇒ (a b)
+</pre></div>
+<p>假设上面显示的 setq 形式已经被执行。
+</p>
+<p>如果您再次设置相同的变量，新值将替换旧值：
+</p>
+<div class="lisp">
+<pre class="lisp">x
+     ⇒ (a b)
+
+(setq x 4)
+     ⇒ 4
+
+x
+     ⇒ 4
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="12.2_永不改变的变量.html">永不改变的变量</a>, Previous: <a href="12_变量.html">变量</a>, Up: <a href="12_变量.html">变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

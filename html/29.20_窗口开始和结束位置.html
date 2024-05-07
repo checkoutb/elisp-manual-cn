@@ -1,0 +1,123 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>29.20 窗口开始和结束位置</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">29.20 窗口开始和结束位置</h2>
+<div class="nav-panel"><p>Next: <a href="29.21_文本滚动.html">文本滚动</a>, Previous: <a href="29.19_窗口和点.html">窗口和点</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>每个窗口都维护一个标记，用于跟踪缓冲区位置，该位置指定缓冲区显示应从何处开始。这个位置称为窗口的显示开始位置（或只​​是开始）。此位置之后的字符是出现在窗口左上角的字符。它通常但并非不可避免地位于文本行的开头。
+</p>
+<p>在切换窗口或缓冲区之后，以及在某些其他情况下，如果窗口开始位于行的中间，Emacs 会将窗口开始调整到行的开头。这可以防止某些操作使窗口从一行中的无意义点开始。此功能可能会干扰使用 Lisp 模式的命令执行某些 Lisp 代码来测试它，因为它们会触发这种重新调整。要测试此类代码，请将其放入命令并将命令绑​​定到键。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-start &amp;optional window ¶
+</pre></div>
+<p>该函数返回窗口窗口的显示开始位置。如果 window 为 nil，则使用选定的窗口。
+</p>
+<p>当您创建一个窗口或在其中显示不同的缓冲区时，显示开始位置设置为最近用于同一缓冲区的显示开始位置，或者如果缓冲区没有任何缓冲区，则设置为 point-min。
+</p>
+<p>重新显示会更新窗口起始位置（如果自上次重新显示后您没有明确指定它）— 以确保点出现在屏幕上。除了重新显示之外，没有什么会自动更改窗口开始位置；  如果您移动点，请不要期望窗口开始位置会在下一次重新显示之前响应更改。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-group-start &amp;optional window ¶
+</pre></div>
+<p>这个函数和window-start类似，只是当window是一组窗口的一部分时（见Window Group），window-group-start返回整个组的起始位置。当缓冲区局部变量 window-group-start-function 设置为函数时，此条件成立。在这种情况下，window-group-start 使用单个参数 window 调用该函数，然后返回其结果。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-end &amp;optional window update ¶
+</pre></div>
+<p>此函数返回其缓冲区显示在窗口中结束的位置。窗口的默认值是选定的窗口。
+</p>
+<p>简单地更改缓冲区文本或移动点不会更新 window-end 返回的值。仅当 Emacs 重新显示并且重新显示完成而不被抢占时，才会更新该值。
+</p>
+<p>如果最后一次重新显示窗口被抢占，并且没有完成，Emacs 不知道显示结束在该窗口中的位置。在这种情况下，此函数返回 nil。
+</p>
+<p>如果 update 不为零，则 window-end 始终根据当前 window-start 值返回显示结束位置的最新值。如果先前保存的该位置的值仍然有效，则 window-end 返回该值；  否则它通过扫描缓冲区文本来计算正确的值。
+</p>
+<p>即使更新不为零，如果点已移出屏幕，window-end 也不会尝试滚动显示，就像真正的重新显示一样。它不会改变窗口开始值。实际上，如果不需要滚动，它会报告显示的文本将在哪里结束。请注意，它返回的位置可能只是部分可见。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-group-end &amp;optional window update ¶
+</pre></div>
+<p>此函数与 window-end 类似，不同之处在于当 window 是一组窗口的一部分时（参见 Window Group），window-group-end 返回整个组的结束位置。当缓冲区局部变量 window-group-end-function 设置为函数时，此条件成立。在这种情况下，window-group-end 使用两个参数 window 和 update 调用该函数，然后返回其结果。参数 update 与 window-end 中的含义相同。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-window-start window position &amp;optional noforce ¶
+</pre></div>
+<p>此函数将窗口的显示开始位置设置为窗口缓冲区中的位置。它返回位置。
+</p>
+<p>显示例程坚持在显示缓冲区时点的位置是可见的。通常，他们根据其内部逻辑选择显示开始位置（并在必要时滚动窗口）以使点可见。但是，如果您使用 nil 为 noforce 指定此函数的开始位置，则意味着您希望显示从位置开始，即使这会使点的位置远离屏幕。如果这确实将点放置在屏幕外，则显示例程会尝试将点移动到窗口中线的左边距。
+</p>
+<p>例如，如果 point 为 1 并且您将窗口的起点设置为 37，则下一行的起点将位于窗口顶部的上方。重新显示时显示程序会自动移动点，如果它仍然是 1。这是一个例子：
+</p><div class="lisp">
+<pre class="lisp">
+
+;; Here is what ‘foo’ looks like before executing
+;;   the set-window-start expression.
+
+
+---------- Buffer: foo ----------
+∗This is the contents of buffer foo.
+2
+3
+4
+5
+6
+---------- Buffer: foo ----------
+
+
+(set-window-start
+ (selected-window)
+ (save-excursion
+   (goto-char 1)
+   (forward-line 1)
+   (point)))
+⇒ 37
+
+
+;; Here is what ‘foo’ looks like after executing
+;;   the set-window-start expression.
+---------- Buffer: foo ----------
+2
+3
+∗4
+5
+6
+---------- Buffer: foo ----------
+</pre></div>
+<p>如果尝试使点可见（即，在完全可见的屏幕行中）失败，则显示例程将忽略请求的窗口开始位置并无论如何计算一个新位置。因此，为了获得可靠的结果，调用此函数的 Lisp 程序应该总是将点移动到显示开始于位置的窗口内。
+</p>
+<p>如果 noforce 不为零，并且 position 将在下一次重新显示时将点置于屏幕外，则重新显示会计算一个新的窗口开始位置，该位置与点配合得很好，因此不使用位置。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-window-group-start window position &amp;optional noforce ¶
+</pre></div>
+<p>这个函数和 set-window-start 类似，只是当 window 是一组窗口的一部分时（参见 Window Group），set-window-group-start 设置整个组的开始位置。当缓冲区局部变量 set-window-group-start-function 设置为函数时，此条件成立。在这种情况下，set-window-group-start 使用三个参数 window、position 和 noforce 调用该函数，然后返回其结果。此函数中的参数 position 和 noforce 与 set-window-start 中的含义相同。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: pos-visible-in-window-p &amp;optional position window partially ¶
+</pre></div>
+<p>如果位置在 window 屏幕上当前可见的文本范围内，则此函数返回非 nil。如果位置垂直滚动到视图之外，则返回 nil。除非部分为非零，否则部分被遮挡的位置不被视为可见。参数位置默认为窗口中点的当前位置；  窗口默认为选定的窗口。如果位置是 t，这意味着检查窗口中最后一个屏幕行的第一个可见位置，或缓冲区结束位置，以先到者为准。
+</p>
+<p>此函数仅考虑垂直滚动。如果仅因为窗口已水平滚动而无法查看位置，则 pos-visible-in-window-p 无论如何都会返回非零。请参阅水平滚动。
+</p>
+<p>如果位置可见，则 pos-visible-in-window-p 如果部分为 nil，则返回 t；  如果 partial 为非 nil，并且跟随位置的字符完全可见，则返回 (xy) 形式的列表，其中 x 和 y 是相对于窗口左上角的像素坐标；  否则返回格式为 (xy rtop rbot rowh vpos) 的扩展列表，其中 rtop 和 rbot 指定位置所在行的顶部和底部的窗口外像素数，rowh 指定该行的可见高度，以及vpos 指定该行的垂直位置（从零开始的行号）。
+</p>
+<p>这是一个例子：
+</p><div class="lisp">
+<pre class="lisp">;; If point is off the screen now, recenter it now.
+(or (pos-visible-in-window-p
+     (point) (selected-window))
+    (recenter 0))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: pos-visible-in-window-group-p &amp;optional position window partially ¶
+</pre></div>
+<p>这个函数和 pos-visible-in-window-p 类似，只是当 window 是一组窗口的一部分时（参见 Window Group），pos-visible-in-window-group-p 测试 pos 在整个组，而不仅仅是在单个窗口中。当缓冲区局部变量 pos-visible-in-window-group-p-function 设置为函数时，此条件成立。在这种情况下，pos-visible-in-window-group-p 使用三个参数位置、窗口和部分调用函数，然后返回其结果。参数 position 和 partial 与 pos-visible-in-window-p 中的含义相同。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-line-height &amp;optional line window ¶
+</pre></div>
+<p>该函数返回窗口中文本行的高度。如果 line 是 header-line 或 mode-line 之一，则 window-line-height 返回有关窗口相应行的信息。否则，line 是从 0 开始的文本行号。负数从窗口末尾开始计数。line 的默认值是 window 中的当前行；  窗口的默认值是选定的窗口。
+</p>
+<p>如果显示不是最新的，window-line-height 返回 nil。在这种情况下，可以使用 pos-visible-in-window-p 来获取相关信息。
+</p>
+<p>如果没有与指定行对应的行，则 window-line-height 返回 nil。否则，它返回一个列表（height vpos ypos offbot），其中 height 是行的可见部分的高度（以像素为单位），vpos 和 ypos 是行的垂直位置和行的像素相对于第一个文本的顶部行，offbot 是文本行底部的窗口外像素数。如果（第一）文本行顶部有窗口外像素，则 ypos 为负。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="29.21_文本滚动.html">文本滚动</a>, Previous: <a href="29.19_窗口和点.html">窗口和点</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

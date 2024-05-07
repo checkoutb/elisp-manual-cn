@@ -1,0 +1,63 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>3.2 浮点基础</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">3.2 浮点基础</h2>
+<div class="nav-panel"><p>Next: <a href="03.3_数字的类型谓词.html">数字的类型谓词</a>, Previous: <a href="03.1_整数基础.html">整数基础</a>, Up: <a href="03_数字.html">数字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>浮点数对于表示非整数的数字很有用。浮点数的范围与您使用的机器上的 C 数据类型 double 的范围相同。在 Emacs 支持的所有计算机上，这是 IEEE binary64 浮点格式，由 IEEE Std 754-2019 标准化，并在 David Goldberg 的论文~ What Every Computer Scientist Should Know About Floating-Point Arithmetic~ 中进一步讨论。在现代平台上，浮点运算严格遵循 IEEE-754 标准；  然而，在一些过时的平台上，结果并不总是正确四舍五入，尤其是 32 位 x86。
+</p>
+<p>浮点数的读取语法需要小数点、指数或两者。可选符号（~ +~ 或~ -~ ）位于数字及其指数之前。例如’1500.0’, ’+15e2’, ’15.0e+2’, ’+1500000e-3’, ’.15e4’ 是浮点数1500的五种写法，它们都是等价的.  与 Common Lisp 一样，Emacs Lisp 要求在没有指数的浮点数中小数点后至少有一位数字；  ~ 1500。~   是整数，而不是浮点数。
+</p>
+<p>Emacs Lisp 将 -0.0 视为在数值上等于普通的零，对于像 = 这样的数值比较。这遵循 IEEE 浮点标准，即 -0.0 和 0.0 在数值上相等，即使其他操作可以区分它们。
+</p>
+<p>IEEE 浮点标准支持正无穷大和负无穷大作为浮点值。它还提供了一类称为 NaN 或~ 非数字~ 的值；  在没有正确答案的情况下，数值函数会返回此类值。例如，(/0.0 0.0) 返回一个 NaN。NaN 在数值上永远不等于任何值，甚至不等于它自己。NaN 带有一个符号和一个有效数字，非数字函数在两个 NaN 的符号和有效数字一致时将其视为相等。NaN 的有效位是机器相关的，它们的字符串表示中的数字也是如此。
+</p>
+<p>当涉及到 NaN 和有符号零时，诸如 eql、equal、sxhash-eql、sxhash-equal 和 gethash 之类的非数字函数确定值是否不可区分，而不是它们在数值上是否相等。例如，当 x 和 y 是相同的 NaN 时，(equal xy) 返回 t，而 (= xy) 使用数值比较并返回 nil；  相反，(equal 0.0 -0.0) 返回 nil，而 (= 0.0 -0.0) 返回 t。
+</p>
+<p>以下是这些特殊浮点值的读取语法：
+</p>
+<div class="lisp">
+<pre class="lisp">infinity
+</pre></div>
+<p>~ 1.0e+INF~ 和~ -1.0e+IN~ F
+</p>
+<div class="lisp">
+<pre class="lisp">not-a-number
+</pre></div>
+<p>~ 0.0e+NaN~ 和~ -0.0e+Na~ N
+</p>
+<p>以下函数专门用于处理浮点数：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: isnan x
+</pre></div>
+<p>如果它的浮点参数是 NaN，则此谓词返回 t，否则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: frexp x
+</pre></div>
+<p>此函数返回一个 cons 单元格 (s . e)，其中 s 和 e 分别是浮点数 x 的有效数和指数。
+</p>
+<p>如果 x 是有限的，则 s 是介于 0.5（含）和 1.0（不含）之间的浮点数，e 是整数，x = s * 2**e。如果 x 为零或无穷大，则 s 与 x 相同。如果 x 是 NaN，则 s 也是 NaN。如果 x 为零，则 e 为 0。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ldexp s e
+</pre></div>
+<p>给定一个数字有效数 s 和一个整数指数 e，此函数返回浮点数 s * 2**e。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: copysign x1 x2
+</pre></div>
+<p>此函数将 x2 的符号复制到 x1 的值，并返回结果。x1 和 x2 必须是浮点数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: logb x
+</pre></div>
+<p>此函数返回 x 的二进制指数。更准确地说，如果 x 是有限且非零的，则该值是 |x| 的以 2 为底的对数，向下舍入为整数。如果 x 为零或无穷大，则值为无穷大；  如果 x 是 NaN，则值为 NaN。
+</p>
+<div class="lisp">
+<pre class="lisp">(logb 10)
+     ⇒ 3
+(logb 10.0e20)
+     ⇒ 69
+(logb 0)
+     ⇒ -1.0e+INF
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="03.3_数字的类型谓词.html">数字的类型谓词</a>, Previous: <a href="03.1_整数基础.html">整数基础</a>, Up: <a href="03_数字.html">数字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

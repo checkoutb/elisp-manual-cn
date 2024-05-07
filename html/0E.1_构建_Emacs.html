@@ -1,0 +1,88 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>E.1 构建 Emacs</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">E.1 构建 Emacs</h2>
+<div class="nav-panel"><p>Next: <a href="0E.10_C_整数类型.html">C_整数类型</a>, Previous: <a href="附录_E_GNU_Emacs内部结构.html">E_GNU_Emacs内部结构</a>, Up: <a href="附录_E_GNU_Emacs内部结构.html">E_GNU_Emacs内部结构.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍构建 Emacs 可执行文件所涉及的步骤。您不必知道这些材料来构建和安装 Emacs，因为 makefile 会自动完成所有这些事情。此信息与 Emacs 开发人员相关。
+</p>
+<p>构建 Emacs 需要 GNU Make 版本 3.81 或更高版本。
+</p>
+<p>编译 src 目录中的 C 源文件会生成一个名为 temacs 的可执行文件，也称为裸非纯 Emacs。它包含 Emacs Lisp 解释器和 I/O 例程，但不包含编辑命令。
+</p>
+<p>命令 temacs -l loadup 将运行 temacs 并引导它加载 loadup.el。loadup 库加载了额外的 Lisp 库，这些库设置了正常的 Emacs 编辑环境。在这一步之后，Emacs 可执行文件就不再是裸露的了。
+</p>
+<p>因为加载标准 Lisp 文件需要一些时间，所以 temacs 可执行文件通常不是由用户直接运行的。相反，构建 Emacs 的最后一个步骤是运行命令 <code>temacs -batch -l loadup --temacs=dump-method</code> 。特殊选项 –temacs 告诉 temacs 如何记录所有标准预加载的 Lisp 函数和变量，这样当您随后运行 Emacs 时，它会启动得更快。–temacs 选项需要一个参数 dump-method，它可以是以下之一：
+</p>
+<div class="lisp">
+<pre class="lisp">‘pdump’ ¶
+</pre></div>
+<p>在转储文件中记录预加载的 Lisp 数据。此方法生成一个额外的数据文件，Emacs 将在启动时加载该文件。生成的转储文件通常称为 emacs.pdmp，并安装在 Emacs 执行目录中（请参阅帮助函数）。这种方法是最受欢迎的方法，因为它不需要 Emacs 使用任何特殊的内存分配技术，这可能会妨碍现代系统用于增强安全性和隐私性的各种内存布局技术。
+</p><div class="lisp">
+<pre class="lisp">‘pbootstrap’ ¶
+</pre></div>
+<p>与 ’pdump’ 类似，但在引导 Emacs 时使用，此时没有以前的 Emacs 二进制文件和 *.elc 字节编译的 Lisp 文件可用。在这种情况下，生成的转储文件通常命名为 bootstrap-emacs.pdmp。
+</p><div class="lisp">
+<pre class="lisp">‘dump’ ¶
+</pre></div>
+<p>这种方法会导致 temacs 转储出一个名为 emacs 的可执行程序，该程序已经预加载了所有标准 Lisp 文件。（’-batch’ 参数阻止 temacs 尝试在终端上初始化它的任何数据，从而使转储的 Emacs 中的终端信息表为空。）此方法也称为 unexec，因为它会生成一个程序文件来自正在运行的进程，因此在某种意义上与执行程序以启动进程相反。尽管这种方法是 Emacs 传统上保存其状态的方式，但现在已弃用。
+</p><div class="lisp">
+<pre class="lisp">‘bootstrap’
+</pre></div>
+<p>类似于 ’dump’，但在使用 unexec 方法引导 Emacs 时使用。
+</p>
+<p>转储的 emacs 可执行文件（也称为纯 Emacs）是已安装的。如果使用便携式转储程序构建 Emacs，则 emacs 可执行文件实际上是 temacs 的精确副本，并且还安装了相应的 emacs.pdmp 文件。变量 preloaded-file-list 存储了转储文件或转储的 Emacs 可执行文件中记录的预加载 Lisp 文件的列表。如果您将 Emacs 移植到新的操作系统，并且无法实现任何类型的转储，那么 Emacs 必须在每次启动时加载 loadup.el。
+</p>
+<p>默认情况下，转储的 emacs 可执行文件会记录构建时间和主机名等详细信息。使用 configure 的 –disable-build-details 选项来抑制这些细节，以便从相同的源构建和安装 Emacs 两次更有可能导致 Emacs 的相同副本。
+</p>
+<p>您可以通过编写一个名为 site-load.el 的库来指定要预加载的其他文件。您可能需要使用添加的定义来重建 Emacs
+</p>
+<div class="lisp">
+<pre class="lisp">#define SITELOAD_PURESIZE_EXTRA n
+</pre></div>
+<p>增加 n 个字节的纯空间来保存额外的文件；  参见 src/puresize.h。（尝试增加 20000 的增量，直到它足够大。）但是，随着机器变得更快，预加载附加文件的优势会降低。在现代机器上，通常不建议这样做。
+</p>
+<p>在 loadup.el 读取 site-load.el 后，它通过调用 Snarf-documentation（请参阅访问文档）在文件 etc/DOC 中找到原始和预加载函数（和变量）的文档字符串。
+</p>
+<p>您可以通过将其他 Lisp 表达式放在名为 site-init.el 的库中来指定在转储之前执行的其他 Lisp 表达式。此文件在找到文档字符串后执行。
+</p>
+<p>如果您想预加载函数或变量定义，您可以通过三种方式执行此操作，并在随后运行 Emacs 时使它们的文档字符串可访问：
+</p>
+<ul>
+<li>
+安排在生成 etc/DOC 文件时扫描这些文件，并使用 site-load.el 加载它们。
+</li><li>
+使用 site-init.el 加载文件，然后在安装 Emacs 时将文件复制到 Lisp 文件的安装目录。
+</li><li>
+在每个文件中为 byte-compile-dynamic-docstrings 指定一个 nil 值作为局部变量，并使用 site-load.el 或 site-init.el 加载它们。（此方法的缺点是文档字符串一直占用 Emacs 中的空间。）
+</li></ul>
+<p>不建议在 site-load.el 或 site-init.el 中放置任何会改变用户在普通未修改 Emacs 中期望的任何功能的内容。如果您觉得必须覆盖站点的正常功能，请使用 default.el 执行此操作，以便用户可以根据需要覆盖您的更改。请参阅摘要：启动时的操作顺序。请注意，如果 site-load.el 或 site-init.el 更改了 load-path，则转储后更改将丢失。请参阅图书馆搜索。要永久更改加载路径，请使用配置的 –enable-locallisppath 选项。
+</p>
+<p>在可以预加载的包中，有时有必要（或有用）延迟某些评估，直到 Emacs 随后启动。绝大多数此类情况与可定制变量的值有关。例如，tutorial-directory 是在 startup.el 中定义的变量，它是预加载的。默认值是根据数据目录设置的。该变量需要在 Emacs 启动时访问 data-directory 的值，而不是在转储时，因为 Emacs 可执行文件可能在转储后安装在不同的位置。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: custom-initialize-delay symbol value ¶
+</pre></div>
+<p>该函数将符号的初始化延迟到下一次 Emacs 启动。您通常通过将其指定为可自定义变量的 :initialize 属性来使用此函数。（参数值未使用，仅用于与 Custom 期望的形式兼容。）
+</p>
+<p>万一您需要比 custom-initialize-delay 提供的更通用的功能，您可以使用 before-init-hook（请参阅摘要：启动时的操作序列）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: dump-emacs-portable to-file &amp;optional track-referrers ¶
+</pre></div>
+<p>此函数使用 pdump 方法将 Emacs 的当前状态转储到转储文件到文件中。通常，转储文件称为 emacs-name.dmp，其中 emacs-name 是 Emacs 可执行文件的名称。可选参数 track-referrers，如果非 nil，会导致可移植转储程序保留附加信息，以帮助追踪 pdump 方法尚不支持的对象类型的出处。
+</p>
+<p>尽管可移植的转储程序代码可以在许多平台上运行，但它生成的转储文件是不可移植的——它们只能由转储它们的 Emacs 可执行文件加载。
+</p>
+<p>如果您想在已转储的 Emacs 中使用此功能，则必须使用 <code>-batch</code> 选项运行 Emacs。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: dump-emacs to-file from-file ¶
+</pre></div>
+<p>此函数使用 unexec 方法将 Emacs 的当前状态转储到可执行文件到文件中。它从源文件中获取符号（这通常是可执行文件 temacs）。
+</p>
+<p>此函数不能在已转储的 Emacs 中使用。此函数已弃用，默认情况下 Emacs 构建时不支持 unexec，因此此函数不可用。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: pdumper-stats ¶
+</pre></div>
+<p>如果当前 Emacs 会话从转储文件恢复其状态，则此函数返回有关转储文件的信息以及恢复 Emacs 状态所用的时间。该值是一个alist ((dumped-with-pdumper .t) (load-time .time) (dump-file-name .file))，其中file是转储文件的名称，time是以秒为单位的时间它需要从转储文件中恢复状态。如果当前会话不是从转储文件中恢复的，则该值为 nil。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="0E.10_C_整数类型.html">C_整数类型</a>, Previous: <a href="附录_E_GNU_Emacs内部结构.html">E_GNU_Emacs内部结构</a>, Up: <a href="附录_E_GNU_Emacs内部结构.html">E_GNU_Emacs内部结构.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

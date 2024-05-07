@@ -1,0 +1,92 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.10 显示文本的大小</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">40.10 显示文本的大小</h2>
+<div class="nav-panel"><p>Next: <a href="40.11_行高.html">行高</a>, Previous: <a href="40.9.3_搜索覆盖.html">搜索覆盖</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>由于并非所有字符都具有相同的宽度，因此这些函数可让您检查字符的宽度。有关相关功能，请参阅缩进基元和按屏幕线移动。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: char-width char ¶
+</pre></div>
+<p>如果字符 char 显示在当前缓冲区中，则此函数返回以列为单位的宽度（即，考虑到缓冲区的显示表，如果有的话；请参阅显示表）。制表符的宽度通常是制表符宽度（请参阅通常的显示约定）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: string-width string &amp;optional from to ¶
+</pre></div>
+<p>如果字符串显示在当前缓冲区和选定窗口中，则此函数返回以列为单位的宽度。来自和指定要考虑的字符串的子字符串的可选参数，并被解释为在子字符串中（请参阅创建字符串）。
+</p>
+<p>返回值是一个近似值：它只考虑 char-width 为组成字符返回的值，总是将制表符作为制表符宽度列，忽略显示属性和字体等。出于这些原因，我们建议使用 window -text-pixel-size，如下所述。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: truncate-string-to-width string width &amp;optional start-column padding ellipsis ellipsis-text-property ¶
+</pre></div>
+<p>此函数返回一个新字符串，它是字符串的截断，适合显示的宽度列。
+</p>
+<p>如果字符串比宽度窄，结果等于字符串；  否则结果中会省略多余的字符。如果字符串中的多列字符超过目标宽度，则从结果中省略该字符。因此，结果有时可能会低于宽度，但不能超过它。
+</p>
+<p>可选参数 start-column 指定起始列；  它默认为零。如果这是非零，则从结果中省略字符串的第一个起始列。如果字符串中的一个多列字符跨越列起始列，则省略该字符。
+</p>
+<p>可选参数填充（如果非零）是在结果字符串的开头和结尾添加的填充字符，以将其扩展到精确宽度的列。如果宽度不足，则填充字符将附加在结果的末尾，达到宽度所需的次数。如果字符串中的多列字符跨越列起始列，它也会在结果的开头添加。
+</p>
+<p>如果省略号是非零，它应该是一个字符串，当它被截断时将替换字符串的结尾。在这种情况下，将从字符串中删除更多字符，以便为省略号释放足够的空间以适应宽度列。但是，如果字符串的显示宽度小于省略号的显示宽度，则省略号不会附加到结果中。如果 ellipsis 不是 nil 且不是字符串，则它代表函数 truncate-string-ellipsis 返回的值，如下所述。
+</p>
+<p>可选参数 ellipsis-text-property，如果非 nil，则表示使用显示省略号的显示文本属性（请参阅显示属性）隐藏字符串的多余部分，而不是实际截断字符串。
+</p>
+<div class="lisp">
+<pre class="lisp">(truncate-string-to-width "\tab\t" 12 4)
+     ⇒ "ab"
+(truncate-string-to-width "\tab\t" 12 4 ?\s)
+     ⇒ "    ab  "
+</pre></div>
+<p>该函数使用 string-width 和 char-width 在字符串太宽时找到合适的截断点，因此它遇到与 string-width 相同的基本问题。特别是，当字符组合发生在字符串中时，字符串的显示宽度可能小于组成字符的宽度之和，并且此函数可能返回不准确的结果。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: truncate-string-ellipsis ¶
+</pre></div>
+<p>此函数返回要在 truncate-string-to-width 和其他类似上下文中用作省略号的字符串。该值是变量truncate-string-ellipsis的值，如果它不为nil，则如果该字符可以显示在所选帧上，则为具有单个字符U + 2026 HORIZONTAL ELLIPSIS的字符串，否则为字符串’…’ .
+</p>
+<p>以下函数返回文本的大小（以像素为单位），就好像它显示在给定窗口中一样。fit-window-to-buffer 和 fit-frame-to-buffer 使用此函数（请参阅调整窗口大小）使窗口与它包含的文本一样大。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-text-pixel-size &amp;optional window from to x-limit y-limit mode-lines ¶
+</pre></div>
+<p>此函数返回窗口缓冲区文本的大小（以像素为单位）。window 必须是活动窗口，并且默认为选定的窗口。返回值是任何文本行的最大像素宽度和所有文本行的最大像素高度的组合。此函数的存在是为了允许 Lisp 程序将窗口的尺寸调整为它需要显示的缓冲区文本。
+</p>
+<p>可选参数 from，如果非 nil，指定要考虑的第一个文本位置，默认为缓冲区的最小可访问位置。如果 from 是 t，它代表不是换行符的最小可访问位置。可选参数，如果非零，指定要考虑的最后一个文本位置，默认为缓冲区的最大可访问位置。如果 to 是 t，它代表不是换行符的最大可访问位置。
+</p>
+<p>可选参数 x-limit，如果非 nil，则指定最大 X 坐标，超过该坐标应忽略文本；  因此，它也是函数可以返回的最大像素宽度值。如果 x-limit nil 或省略，则表示使用窗口主体的像素宽度（参见窗口大小）；  此默认值意味着比窗口宽的截断行的文本将被忽略。当调用者不打算更改窗口的宽度时，此默认值很有用。否则，调用者应在此处指定窗口主体可能采用的最大宽度；  特别是，如果需要截断的行并且需要考虑其文本，则应将 x-limit 设置为较大的值。由于计算长线的宽度可能需要一些时间，因此根据需要使这个参数尽可能小总是一个好主意；  特别是，如果缓冲区可能包含无论如何都会被截断的长行。
+</p>
+<p>可选参数 y-limit，如果非零，指定最大 Y 坐标，超过该坐标文本将被忽略；  因此，它也是函数可以返回的最大像素高度。如果 y-limit 为 nil 或省略，则表示考虑所有文本行，直到 to 指定的缓冲区位置。由于计算大缓冲区的像素高度可能需要一些时间，因此指定此参数是有意义的；  特别是，如果调用者不知道缓冲区的大小。
+</p>
+<p>可选参数 mode-lines nil 或省略表示在返回值中不包括窗口的模式行、制表行或标题行的高度。如果它是符号模式行、制表行或标题行，则在返回值中仅包含该行的高度（如果存在）。如果是 t，则在返回值中包含所有这些行的高度（如果存在）。
+</p>
+<p>window-text-pixel-size 将窗口中显示的文本视为一个整体，而不关心各行的大小。下面的函数可以。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-lines-pixel-dimensions &amp;optional window first last body inverse left ¶
+</pre></div>
+<p>此函数计算指定窗口中显示的每一行的像素尺寸。它通过遍历窗口的当前字形矩阵来做到这一点——一个存储当前显示在窗口中的每个缓冲区字符的字形（参见字形）的矩阵。如果成功，它会返回一个 cons 对列表，表示每行最后一个字符的右下角的 x 和 y 坐标。坐标从窗口左上角的原点 (0, 0) 以像素为单位测量。window 必须是活动窗口，并且默认为选定的窗口。
+</p>
+<p>如果可选参数 first 是一个整数，它表示要返回的窗口字形矩阵的第一行的索引（从 0 开始）。请注意，如果窗口有标题行，则索引为 0 的行就是该标题行。如果 first 为 nil，则要考虑的第一行由可选参数 body 的值确定：如果 body 为非 nil，这意味着从窗口主体的第一行开始，跳过任何标题行（如果存在）。否则，此函数将从窗口字形矩阵的第一行开始，可能是标题行。
+</p>
+<p>如果可选参数 last 是一个整数，它表示应返回的窗口字形矩阵的最后一行的索引。如果 last 为 nil，则要考虑的最后一行由 body 的值决定： 如果 body 为非 nil，这意味着使用窗口主体的最后一行，省略窗口的模式行（如果存在）。否则，这意味着使用窗口的最后一行，它可能是模式行。
+</p>
+<p>可选参数 inverse，如果为 nil，则表示为任何行返回的 y 像素值指定从窗口的左边缘（如果 body 为非 nil，则为 body 边缘）到该窗口最后一个字形的右边缘的距离（以像素为单位）线。inverse non-nil 表示为任何行返回的 y 像素值指定从该行的最后一个字形的右边缘到窗口的右边缘（如果 body 为非 nil，则为 body 边缘）的距离（以像素为单位）。这对于确定每行末尾的松弛空间量很有用。
+</p>
+<p>可选参数 left，如果非 nil，则表示返回每行最左边字符的左下角的 x 和 y 坐标。这是应该用于主要从右到左显示文本的窗口的值。
+</p>
+<p>如果 left 为非 nil 且 inverse 为 nil，这意味着为任何行返回的 y 像素值指定从该行的最后一个（最左侧）字形的左边缘到右边缘（如果body 是非 nil) 的窗口。如果 left 和 inverse 都非 nil，则为任何行返回的 y 像素值指定从窗口的左边缘（如果 body 为非 nil，则为 body 边缘）到最后一个（最左边）的左边缘的距离（以像素为单位）那条线的字形。
+</p>
+<p>如果当前窗口的字形矩阵不是最新的，则此函数返回 nil，这通常发生在 Emacs 忙碌时，例如，在处理命令时。该值应该是可检索的，尽管当此函数从一个延迟为零秒的空闲计时器运行时。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: line-pixel-height ¶
+</pre></div>
+<p>此函数返回所选窗口中点的线的高度（以像素为单位）。该值包括行的行距（请参阅行高）。
+</p>
+<p>当缓冲区显示行号时（参见 GNU Emacs 手册中的 Display Custom），有时了解显示行号所采用的宽度很有用。以下函数适用于需要此信息进行布局计算的 Lisp 程序。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: line-number-display-width &amp;optional pixelwise ¶
+</pre></div>
+<p>此函数返回用于在选定窗口中显示行号的宽度。如果可选参数 pixelwise 是符号列，则返回值是帧规范列的浮点数；  如果 pixelwise 是 t 或任何其他非零值，则该值是一个整数，以像素为单位。如果 pixelwise 被省略或为零，则该值是为行号面定义的字体的整数列数，并且不包括用于填充显示数字的 2 列。如果所选窗口中未显示行号，则无论pixelwise 的值如何，该值都为零。如果您需要有关另一个窗口的信息，请使用 with-selected-window（请参阅选择窗口）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.11_行高.html">行高</a>, Previous: <a href="40.9.3_搜索覆盖.html">搜索覆盖</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

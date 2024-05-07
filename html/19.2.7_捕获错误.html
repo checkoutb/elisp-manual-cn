@@ -1,0 +1,10 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>19.2.7 捕获错误</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">19.2.7 捕获错误</h3>
+<div class="nav-panel"><p>Next: <a href="19.2.8_调试视图.html">调试视图</a>, Previous: <a href="19.2.6_休息.html">休息</a>, Up: <a href="19.2_调试.html">调试.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 通常在发出错误信号且未使用条件案例处理时显示错误消息。当 Edebug 处于活动状态并执行检测代码时，它通常会响应所有未处理的错误。您可以使用选项 edebug-on-error 和 edebug-on-quit 自定义它；  请参阅 Edebug 选项。
+</p>
+<p>当 Edebug 响应错误时，它会显示错误之前遇到的最后一个停止点。这可能是调用未检测的函数的位置，并且错误实际发生在该位置。对于未绑定的变量错误，最后一个已知的停止点可能与有问题的变量引用相距甚远。在这种情况下，您可能希望显示完整的回溯（参见 Miscellaneous Edebug Commands）。
+</p>
+<p>如果您在 Edebug 处于活动状态时更改 debug-on-error 或 debug-on-quit，这些更改将在 Edebug 变为非活动状态时被遗忘。此外，在 Edebug 的递归编辑期间，这些变量被绑定到它们在 Edebug 之外的值。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="19.2.8_调试视图.html">调试视图</a>, Previous: <a href="19.2.6_休息.html">休息</a>, Up: <a href="19.2_调试.html">调试.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

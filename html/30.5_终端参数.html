@@ -1,0 +1,46 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>30.5 终端参数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">30.5 终端参数</h2>
+<div class="nav-panel"><p>Next: <a href="30.6_帧标题.html">帧标题</a>, Previous: <a href="30.4.4_几何.html">几何</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>每个终端都有一个相关参数列表。这些终端参数大多是终端局部变量的一种方便的存储方式，但有些终端参数有特殊的含义。
+</p>
+<p>本节介绍读取和更改终端参数值的功能。他们都接受终端或帧作为他们的论据；  后者意味着使用该帧的终端。nil 参数表示所选帧的终端。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: terminal-parameters &amp;optional terminal ¶
+</pre></div>
+<p>此函数返回一个列表，列出终端的所有参数及其值。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: terminal-parameter terminal parameter ¶
+</pre></div>
+<p>该函数返回终端参数参数（一个符号）的值。如果终端没有参数设置，这个函数返回nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-terminal-parameter terminal parameter value ¶
+</pre></div>
+<p>该函数将终端的参数参数设置为指定值，并返回该参数的先前值。
+</p>
+<p>下面列出了一些具有特殊含义的终端参数：
+</p>
+<div class="lisp">
+<pre class="lisp">background-mode
+</pre></div>
+<p>终端背景颜色的分类，浅色或深色。
+</p><div class="lisp">
+<pre class="lisp">normal-erase-is-backspace
+</pre></div>
+<p>值是 1 或 0，具体取决于此终端上的 normal-erase-is-backspace-mode 是打开还是关闭。请参阅 Emacs 手册中的 DEL 不删除。
+</p><div class="lisp">
+<pre class="lisp">terminal-initted
+</pre></div>
+<p>终端初始化后，设置为终端特定的初始化函数。
+</p><div class="lisp">
+<pre class="lisp">tty-mode-set-strings
+</pre></div>
+<p>当存在时，包含 Emacs 将在配置 tty 以进行渲染时输出的转义序列的字符串列表。Emacs 仅在配置终端时发出这些字符串：如果您想在已经处于活动状态的终端上启用模式（例如，在 tty-setup-hook 中），请使用 send-string-to- 显式输出必要的转义序列终端除了将序列添加到 tty-mode-set-strings 之外。
+</p><div class="lisp">
+<pre class="lisp">tty-mode-reset-strings
+</pre></div>
+<p>如果存在，则取消 tty-mode-set-strings 中字符串效果的字符串列表。Emacs 在退出、删除终端或挂起自身时会发出这些字符串。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="30.6_帧标题.html">帧标题</a>, Previous: <a href="30.4.4_几何.html">几何</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

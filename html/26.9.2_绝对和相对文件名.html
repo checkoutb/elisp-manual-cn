@@ -1,0 +1,41 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>26.9.2 绝对和相对文件名</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">26.9.2 绝对和相对文件名</h3>
+<div class="nav-panel"><p>Next: <a href="26.9.3_目录名称.html">目录名称</a>, Previous: <a href="26.9.1_文件名组件.html">文件名组件</a>, Up: <a href="26.9_文件名.html">文件名.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>文件系统中的所有目录从根目录开始形成一棵树。一个文件名可以指定从树根开始的所有目录名；  然后它被称为绝对文件名。或者它可以指定文件在树中相对于默认目录的位置；  然后它被称为相对文件名。在 GNU 和其他类似 POSIX 的系统上，在任何前导 ’~’ 展开后，绝对文件名以 ’<em>’ 开头（参见 abbreviate-file-name），而相对文件名则不然。在 MS-DOS 和 MS-Windows 上，绝对文件名以斜杠或反斜杠开头，或者以驱动器规范 ’x:</em>’ 开头，其中 x 是驱动器号。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-name-absolute-p filename ¶
+</pre></div>
+<p>如果文件 filename 是绝对文件名，此函数返回 t，否则返回 nil。如果文件名的第一个组件是 <code>~</code> ，则文件名被认为是绝对的，或者是 <code>~user</code> ，其中用户是有效的登录名。在以下示例中，假设有一个名为 <code>rms</code> 的用户，但没有名为 <code>nosuchuser</code> 的用户。
+</p>
+<div class="lisp">
+<pre class="lisp">
+
+(file-name-absolute-p "~rms/foo")
+     ⇒ t
+
+(file-name-absolute-p "~nosuchuser/foo")
+     ⇒ nil
+
+(file-name-absolute-p "rms/foo")
+     ⇒ nil
+
+(file-name-absolute-p "/user/rms/foo")
+     ⇒ t
+</pre></div>
+<p>给定一个可能的相对文件名，您可以扩展任何前导 ’~’ 并使用 expand-file-name 将结果转换为绝对名称（请参阅扩展文件名的函数）。此函数将绝对文件名转换为相对名称：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-relative-name filename &amp;optional directory ¶
+</pre></div>
+<p>此函数尝试返回一个与文件名等效的相对名称，假设结果将被解释为相对于目录（绝对目录名称或目录文件名称）。如果 directory 被省略或为零，则默认为当前缓冲区的默认目录。
+</p>
+<p>在某些操作系统上，绝对文件名以设备名开头。在这样的系统上，如果文件名以两个不同的设备名开头，则文件名没有基于目录的相对等价物。在这种情况下，file-relative-name 以绝对形式返回文件名。
+</p>
+<div class="lisp">
+<pre class="lisp">(file-relative-name "/foo/bar" "/foo/")
+     ⇒ "bar"
+(file-relative-name "/foo/bar" "/hack/")
+     ⇒ "../foo/bar"
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="26.9.3_目录名称.html">目录名称</a>, Previous: <a href="26.9.1_文件名组件.html">文件名组件</a>, Up: <a href="26.9_文件名.html">文件名.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

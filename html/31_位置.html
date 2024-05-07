@@ -1,0 +1,8 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>31 位置</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h1 class="chapter">31 位置</h1>
+<div class="nav-panel"><p>Next: <a href="31.1_点.html">点</a>, Previous: <a href="30.25_显示功能测试.html">显示功能测试</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>位置是缓冲区文本中字符的索引。更准确地说，位置标识了两个字符之间的位置（或在第一个字符之前，或在最后一个字符之后），因此我们可以说在给定位置之前或之后的字符。但是，我们经常说 <code>在</code> 一个位置的字符，意思是那个位置之后的字符。
+</p>
+<p>位置通常表示为从 1 开始的整数，但也可以表示为标记 - 插入或删除文本时自动重新定位的特殊对象，以便它们与周围的字符保持一致。期望参数是位置（整数）但接受标记作为替代的函数，通常忽略标记指向的缓冲区；  他们将标记转换为整数，并使用该整数，就像您将整数作为参数传递一样，即使标记指向错误的缓冲区。无处指向的标记无法转换为整数；  使用它而不是整数会导致错误。请参阅标记。
+</p>
+<p>另请参阅字段功能（请参阅定义和使用字段），它提供了许多光标移动命令使用的功能。
+</p>
+<div class="nav-panel"><p>Next: <a href="31.1_点.html">点</a>, Previous: <a href="30.25_显示功能测试.html">显示功能测试</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

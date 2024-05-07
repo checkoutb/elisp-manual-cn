@@ -1,0 +1,163 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>D.6 文档字符串提示</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">D.6 文档字符串提示</h2>
+<div class="nav-panel"><p>Next: <a href="0D.7_撰写注释的技巧.html">撰写注释的技巧</a>, Previous: <a href="0D.5_避免编译器警告的技巧.html">避免编译器警告的技巧</a>, Up: <a href="附录_D_提示和约定.html">D_提示和约定.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>以下是编写文档字符串的一些提示和约定。您可以通过运行命令 Mx checkdoc-minor-mode 来检查其中的许多约定。
+</p>
+<ul>
+<li>
+每个供用户了解的命令、函数或变量都应该有一个文档字符串。
+</li><li>
+Lisp 程序的内部变量或子程序也可能有一个文档字符串。文档字符串在运行的 Emacs 中占用的空间非常小。
+</li><li>
+格式化文档字符串，使其适合 80 列屏幕上的 Emacs 窗口。大多数行不超过 60 个字符是个好主意。第一行不应超过 67 个字符，否则在 apropos 的输出中会显得很糟糕。
+
+</li><li>
+如果看起来不错，您可以填写文本。Emacs Lisp 模式将文档字符串填充到 emacs-lisp-docstring-fill-column 指定的宽度。但是，有时您可以通过小心调整换行符来使文档字符串更具可读性。如果文档字符串很长，请在部分之间使用空行。
+</li><li>
+文档字符串的第一行应包含一个或两个完整的句子，它们独立作为摘要。Mx apropos 仅显示第一行，如果该行的内容不独立，则结果看起来很糟糕。特别是，第一行以大写字母开始，以句点结束。
+
+</li><li>
+对于一个函数，第一行应该简要回答这个问题， <code>这个函数做什么？</code>   对于一个变量，第一行应该简要回答这个问题， <code>这个值是什么意思</code> ？
+
+</li><li>
+不要将文档字符串限制为一行；  使用尽可能多的行来解释如何使用函数或变量的细节。请使用完整的句子来完成文本的其余部分。
+</li><li>
+当用户尝试使用禁用的命令时，Emacs 只显示其文档字符串的第一段——从第一个空行开始的所有内容。如果您愿意，您可以选择在第一个空白行之前包含哪些信息，以使此显示有用。
+</li><li>
+第一行应该提到函数的所有重要参数，并且应该按照它们在函数调用中的编写顺序来提及它们。如果函数有很多参数，那么在第一行全部提到它们是不可行的；  在这种情况下，第一行应该提到前几个论点，包括最重要的论点。
+</li><li>
+当函数的文档字符串提到函数参数的值时，使用大写字母的参数名称，就好像它是该值的名称一样。因此，函数 eval 的文档字符串将其第一个参数称为 <code>FORM</code> ，因为实际的参数名称是 form：
+
+<div class="lisp">
+<pre class="lisp">Evaluate FORM and return its value.
+</pre></div>
+</li><li>
+还要用大写字母写元句法变量，例如当您将列表或向量分解为子单元时，其中一些可能会有所不同。以下示例中的 <code>KEY</code> 和 <code>VALUE</code> 说明了这种做法：
+
+<div class="lisp">
+<pre class="lisp">The argument TABLE should be an alist whose elements
+have the form (KEY . VALUE).  Here, KEY is ...
+</pre></div>
+</li><li>
+当您在文档字符串中提及 Lisp 符号时，切勿更改其大小写。如果符号的名称是 foo，请写 <code>foo</code> ，而不是 <code>Foo</code> （这是一个不同的符号）。
+
+</li><li>
+这似乎与编写函数参数值的策略相矛盾，但并不存在真正的矛盾；  参数值与函数用来保存值的符号不同。
+
+</li><li>
+如果这将一个小写字母放在句子的开头并且让您烦恼，请重写句子，使符号不在它的开头。
+</li><li>
+不要以空格开始或结束文档字符串。
+</li><li>
+不要缩进文档字符串的后续行，以便文本在源代码中与第一行的文本对齐。这在源代码中看起来不错，但在用户查看文档时看起来很奇怪。请记住，起始双引号之前的缩进不是字符串的一部分！
+</li><li>
+当文档字符串引用 Lisp 符号时，按照打印的方式编写（通常表示小写），并用弯曲的单引号 (’..’) 将其括起来。有两个例外：不带标点符号的写 t 和 nil。例如：
+
+<div class="lisp">
+<pre class="lisp">CODE can be ‘lambda’, nil, or t.
+</pre></div>
+</li><li>
+有关如何输入弯曲单引号的信息，请参阅 The GNU Emacs Manual 中的引号。
+
+</li><li>
+文档字符串也可以使用旧的单引号约定，它引用带有重音‘和撇号’的符号：‘like-this’而不是’like-this’。这种较旧的约定是为现已过时的显示器设计的，其中重音和撇号是镜像。使用此约定的文档在复制到帮助缓冲区时会转换为用户的首选格式。请参阅替换文档中的键绑定。
+
+</li><li>
+当文档字符串使用单引号符号名称时，如果符号具有函数或变量定义，帮助模式会自动创建超链接。您无需执行任何特殊操作即可使用此功能。但是，当一个符号同时具有函数定义和变量定义，并且您只想引用其中一个时，您可以通过编写单词 <code>变量</code> 、 <code>选项</code> 、 <code>函数</code> 或’command’，紧接在符号名称之前。（在识别这些指示词时，大小写没有区别。）例如，如果你写
+
+<div class="lisp">
+<pre class="lisp">This function sets the variable `buffer-file-name'.
+</pre></div>
+</li><li>
+那么超链接将仅引用缓冲区文件名的变量文档，而不是其函数文档。
+
+</li><li>
+如果符号具有函数定义和/或变量定义，但与您正在记录的符号的使用无关，您可以在符号名称前写上 <code>符号</code> 或 <code>程序</code> 字样，以防止创建任何超链接.  例如，
+
+<div class="lisp">
+<pre class="lisp">If the argument KIND-OF-RESULT is the symbol `list',
+this function returns a list of all the objects
+that satisfy the criterion.
+</pre></div>
+</li><li>
+没有超链接到与此处无关的函数列表的文档。
+
+</li><li>
+通常，没有变量文档的变量不会创建超链接。您可以通过在它们前面加上 <code>变量</code> 或 <code>选项</code> 之一来强制为这些变量创建超链接。
+
+</li><li>
+仅当人脸名称前面或后面有 <code>人脸</code> 一词时，才会创建人脸的超链接。在这种情况下，即使符号也被定义为变量或函数，也只会显示面部文档。
+
+</li><li>
+要创建指向 Info 文档的超链接，请编写 Info 节点（或锚点）的单引号名称，前面加上 <code>信息节点</code> 、 <code>信息节点</code> 、 <code>信息锚点</code> 或 <code>信息锚点</code> 。Info 文件名默认为 <code>emacs</code> 。例如，
+
+<div class="lisp">
+<pre class="lisp">See Info node `Font Lock' and Info node `(elisp)Font Lock Basics'.
+</pre></div>
+</li><li>
+要创建指向手册页的超链接，请编写手册页的单引号名称，前面加上 <code>手册页</code> 、 <code>手册页</code> 或 <code>手册页</code> 。例如，
+
+<div class="lisp">
+<pre class="lisp">See the man page `chmod(1)' for details.
+</pre></div>
+</li><li>
+Info 文档总是比手册页更可取，因此请务必链接到可用的 Info 手册。例如，chmod 记录在 GNU Coreutils 手册中，因此最好链接到该手册而不是手册页。
+
+</li><li>
+要链接到自定义组，请编写组的单引号名称，前面加上 <code>自定义组</code> （每个单词中的第一个字符不区分大小写）。例如，
+
+<div class="lisp">
+<pre class="lisp">See the customization group `whitespace' for details.
+</pre></div>
+</li><li>
+最后，要创建指向 URL 的超链接，请编写单引号 URL，并在前面加上 <code>URL</code> 。例如，
+
+<div class="lisp">
+<pre class="lisp">The GNU project wesite has more information (see URL
+`https://www.gnu.org/').
+</pre></div>
+</li><li>
+不要直接在文档字符串中编写键序列。相反，使用 ’\\[…]’ 构造来代表它们。例如，不要写 ’C-f’，而是写结构 ’\\[forward-char]’。当 Emacs 显示文档字符串时，它会替换当前绑定到 forward-char 的任何键。（这通常是 ’C-f’，但如果用户移动了键绑定，它可能是其他字符。）请参阅文档中的替换键绑定。
+</li><li>
+在主要模式的文档字符串中，您需要引用该模式的本地映射的键绑定，而不是全局映射。因此，在文档字符串中使用一次构造 ’\\&lt;…&gt;’ 来指定要使用的键映射。在第一次使用 ’\\[…]’ 之前执行此操作。’\\&lt;…&gt;’ 中的文本应该是包含主要模式的本地键盘映射的变量的名称。
+
+</li><li>
+每次使用 ’\\[…]’ 都会稍微减慢文档字符串的显示速度。如果你大量使用它们，这些微小的减速就会加起来，并且可能会变得切实可见，尤其是在慢速系统上。所以我们的建议是不要过度使用它们；  例如，尽量避免在同一个文档字符串中对同一个命令使用多个引用。
+</li><li>
+为保持一致性，将函数文档字符串的第一句中的动词表述为祈使句——例如，使用 <code>Return the cons of A and B</code> 。优先于 <code>返回 A 和 B 的缺点</code> 。通常在第一段的其余部分也这样做看起来不错。如果每个句子都具有指示性并具有适当的主题，则后续段落通常看起来更好。
+</li><li>
+作为是或否谓词的函数的文档字符串应该以诸如 <code>Return t if</code> 之类的词开头，以明确指出什么构成了事实。 <code>return</code> 一词避免了以小写 <code>t</code> 开头的句子，这可能会让人分心。
+</li><li>
+用主动语态而不是被动语态编写文档字符串，并且用现在时而不是将来时。例如，使用 <code>返回包含 A 和 B 的列表</code> 。而不是 <code>将返回包含 A 和 B 的列表</code> 。
+</li><li>
+避免不必要地使用 <code>原因</code> 一词（或其等价词）。而不是 <code>导致 Emacs 以粗体显示文本</code> ，而只写 <code>以粗体显示文本</code> 。
+</li><li>
+避免使用 <code>iff</code> （一个数学术语，意思是 <code>当且仅当</code> ），因为许多人不熟悉它并将其误认为是拼写错误。在大多数情况下，只需 <code>如果</code> 就可以明确含义。否则，请尝试找到传达含义的替代措辞。
+</li><li>
+尽量避免使用诸如 <code>eg</code> （表示 <code>for example</code> ）、 <code>ie</code> （表示 <code>that is</code> ）、 <code>no</code> 之类的缩写。（表示 <code>数字</code> ）、 <code>cf</code> （表示 <code>对比</code> ）和 <code>wrt</code> （表示 <code>相对于</code> ）尽可能多地。阅读扩展版几乎总是更清晰、更容易。 30
+</li><li>
+当命令仅在特定模式或情况下有意义时，请在文档字符串中提及。例如，dired-find-file 的文档是：
+
+<div class="lisp">
+<pre class="lisp">In Dired, visit the file or directory named on this line.
+</pre></div>
+</li><li>
+当您定义一个代表用户可能想要设置的选项的变量时，请使用 defcustom。请参阅定义全局变量。
+</li><li>
+是或否标志的变量的文档字符串应以 <code>Non-nil mean</code> 之类的词开头，以明确所有非 nil 值是等效的，并明确指出 nil 和非 nil 的含义.
+</li><li>
+如果文档字符串中的一行以左括号开头，请考虑在左括号之前写一个反斜杠，如下所示：
+
+<div class="lisp">
+<pre class="lisp">The argument FOO can be either a number
+\(a buffer position) or a string (a file name).
+</pre></div>
+</li><li>
+这避免了早于 27.1 的 Emacs 版本中的错误，其中 ’(’ 被视为 defun 的开头（请参阅 The GNU Emacs Manual 中的 Defuns）。如果您不希望有人使用旧 Emacs 版本编辑您的代码，则有不需要这种解决方法。
+</li></ul>
+<p>脚注
+(30)
+</p>
+<p>我们偶尔会使用这些，但尽量不要过度使用。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="0D.7_撰写注释的技巧.html">撰写注释的技巧</a>, Previous: <a href="0D.5_避免编译器警告的技巧.html">避免编译器警告的技巧</a>, Up: <a href="附录_D_提示和约定.html">D_提示和约定.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

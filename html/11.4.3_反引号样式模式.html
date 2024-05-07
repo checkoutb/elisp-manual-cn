@@ -1,0 +1,82 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>11.4.3 反引号样式模式</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">11.4.3 反引号样式模式</h3>
+<div class="nav-panel"><p>Next: <a href="11.4.4_解构_pcase模式.html">解构_pcase模式</a>, Previous: <a href="11.4.2_扩展_pcase.html">扩展_pcase</a>, Up: <a href="11.4_模式匹配条件.html">模式匹配条件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本小节描述了反引号样式模式，这是一组简化结构匹配的内置模式。有关背景，请参阅模式匹配条件。
+</p>
+<p>反引号样式模式是一组功能强大的 pcase 模式扩展（使用 pcase-defmacro 创建），可以轻松地将 expval 与其结构规范进行匹配。
+</p>
+<p>例如，要匹配 expval 必须是两个元素的列表，其中第一个元素是特定字符串，第二个元素是任何值，您可以编写一个核心模式：
+</p>
+<div class="lisp">
+<pre class="lisp">(and (pred listp)
+     ls
+
+     (guard (= 2 (length ls)))
+     (guard (string= "first" (car ls)))
+     (let second-elem (cadr ls)))
+</pre></div>
+<p>或者您可以编写等效的反引号样式模式：
+</p>
+<div class="lisp">
+<pre class="lisp">`("first" ,second-elem)
+</pre></div>
+<p>反引号样式的模式更简洁，类似于 expval 的结构，并且避免了绑定 ls。
+</p>
+<p>反引号样式的模式具有 ‘qpat 形式，其中 qpat 可以具有以下形式：
+</p>
+<div class="lisp">
+<pre class="lisp">[qpat1 qpat2 … qpatm]
+</pre></div>
+<p>如果 expval 是其 car 与 qpat1 匹配且 cdr 与 qpat2 匹配的 cons 单元格，则匹配。这很容易推广到 (qpat1 qpat2 …) 中的列表。
+</p><div class="lisp">
+<pre class="lisp">symbol
+</pre></div>
+<p>如果 expval 是长度为 m 的向量，其第 0..(m-1) 个元素分别匹配 qpat1、qpat2 … qpatm，则匹配。
+</p><div class="lisp">
+<pre class="lisp">keyword
+</pre></div>
+<div class="lisp">
+<pre class="lisp">number
+</pre></div>
+<div class="lisp">
+<pre class="lisp">string
+</pre></div>
+<p>如果 expval 的对应元素等于指定的文字对象，则匹配。
+</p><div class="lisp">
+<pre class="lisp">,pattern
+</pre></div>
+<p>如果 expval 的相应元素与模式匹配，则匹配。请注意，模式是 pcase 支持的任何类型。（在上面的例子中，second-elem 是一个符号核心模式；因此它匹配任何东西，并且 let-binds second-elem。） 
+</p>
+<p>对应的元素是 expval 中与反引号样式模式中 qpat 的结构位置相同的部分。（在上面的例子中，second-elem 的对应元素是 expval 的第二个元素。）
+</p>
+<p>这是一个使用 pcase 为小表达式语言实现简单解释器的示例（请注意，这需要对 fn 子句中的 lambda 表达式进行词法绑定以正确捕获 body 和 arg（请参阅词法绑定）：
+</p>
+<div class="lisp">
+<pre class="lisp">(defun evaluate (form env)
+  (pcase form
+    (`(add ,x ,y)       (+ (evaluate x env)
+                           (evaluate y env)))
+
+    (`(call ,fun ,arg)  (funcall (evaluate fun env)
+                                 (evaluate arg env)))
+    (`(fn ,arg ,body)   (lambda (val)
+                          (evaluate body (cons (cons arg val)
+                                               env))))
+
+    ((pred numberp)     form)
+    ((pred symbolp)     (cdr (assq form env)))
+    (_                  (error "Syntax error: %S" form))))
+</pre></div>
+<p>前三个子句使用反引号样式的模式。‘(add ,x ,y) 是一种模式，它检查表单是否是以文字符号 add 开头的三元素列表，然后提取第二个和第三个元素并将它们分别绑定到符号 x 和 y。子句主体评估 x 和 y 并添加结果。同样，call 子句实现函数调用，fn 子句实现匿名函数定义。
+</p>
+<p>其余子句使用核心模式。(pred numberp) 如果 form 是数字，则匹配。在比赛中，身体评估它。(pred symbolp) 如果 form 是一个符号，则匹配。匹配时，主体在 env 中查找符号并返回其关联。最后， _ 是匹配任何东西的包罗万象的模式，因此它适用于报告语法错误。
+</p>
+<p>以下是一些用这种小语言编写的示例程序，包括它们的评估结果：
+</p>
+<div class="lisp">
+<pre class="lisp">(evaluate '(add 1 2) nil)                 ⇒ 3
+(evaluate '(add x y) '((x . 1) (y . 2)))  ⇒ 3
+(evaluate '(call (fn x (add 1 x)) 2) nil) ⇒ 3
+(evaluate '(sub 1 2) nil)                 ⇒ error
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="11.4.4_解构_pcase模式.html">解构_pcase模式</a>, Previous: <a href="11.4.2_扩展_pcase.html">扩展_pcase</a>, Up: <a href="11.4_模式匹配条件.html">模式匹配条件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

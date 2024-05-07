@@ -1,0 +1,35 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>37.3 在文件中保存缩写</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">37.3 在文件中保存缩写</h2>
+<div class="nav-panel"><p>Next: <a href="37.4_查找和扩展缩略语.html">查找和扩展缩略语</a>, Previous: <a href="37.2_定义缩写.html">定义缩写</a>, Up: <a href="37_缩写和缩写扩展.html">缩写和缩写扩展.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>保存的缩写定义文件实际上是一个 Lisp 代码文件。缩写以 Lisp 程序的形式保存，以定义具有相同内容的相同缩写表。因此，您可以使用 load 加载文件（请参阅程序如何加载）。但是，作为更方便的接口提供了 quiet-read-abbrev-file 功能。Emacs 在启动时会自动调用这个函数。
+</p>
+<p>用户级工具（例如 save-some-buffers）可以在此处描述的变量控制下自动将缩写保存在文件中。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: abbrev-file-name ¶
+</pre></div>
+<p>这是读取和保存缩写的默认文件名。默认情况下，Emacs 将查找 ~/.emacs.d/abbrev<em>_defs</em>，如果没有找到，则查找 ~/.abbrev<em>_defs</em>；  如果两个文件都不存在，Emacs 将创建 ~/.emacs.d/abbrev<em>_defs</em>。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: quietly-read-abbrev-file &amp;optional filename ¶
+</pre></div>
+<p>此函数从名为 filename 的文件中读取缩写定义，该文件之前使用 write-abbrev-file 编写。如果 filename 省略或为零，则使用 abbrev-file-name 中指定的文件。
+</p>
+<p>顾名思义，此函数不显示任何消息。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: save-abbrevs ¶
+</pre></div>
+<p>save-abbrevs 的非 nil 值意味着 Emacs 应该在保存文件时提供保存缩写（如果有任何更改）。如果值是静默的，Emacs 会保存缩写而不询问用户。abbrev-file-name 指定保存缩写的文件。默认值为 t。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: abbrevs-changed ¶
+</pre></div>
+<p>通过定义或更改任何缩写（系统缩写除外）将此变量设置为非零。这用作各种 Emacs 命令的标志，用于保存您的缩写。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: write-abbrev-file &amp;optional filename ¶
+</pre></div>
+<p>保存所有缩写定义（系统缩写除外），对于 abbrev-table-name-list 中列出的所有缩写表，在文件 filename 中，以 Lisp 程序的形式，在加载时将定义相同的缩写。没有任何要保存的缩写的表将被省略。如果 filename 为 nil 或省略，则使用 abbrev-file-name。此函数返回零。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="37.4_查找和扩展缩略语.html">查找和扩展缩略语</a>, Previous: <a href="37.2_定义缩写.html">定义缩写</a>, Up: <a href="37_缩写和缩写扩展.html">缩写和缩写扩展.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

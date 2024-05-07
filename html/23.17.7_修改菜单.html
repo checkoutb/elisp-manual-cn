@@ -1,0 +1,24 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>23.17.7 修改菜单</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">23.17.7 修改菜单</h3>
+<div class="nav-panel"><p>Next: <a href="23.17.8_简易菜单.html">简易菜单</a>, Previous: <a href="23.17.6_工具栏.html">工具栏</a>, Up: <a href="23.17_菜单键映射.html">菜单键映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在现有菜单中插入新项目时，您可能希望将其放在菜单现有项目中的特定位置。如果您使用define-key 添加项目，它通常位于菜单的前面。要将其放在菜单中的其他位置，请使用 define-key-after：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: define-key-after map key binding &amp;optional after ¶
+</pre></div>
+<p>在 map 中为 key 定义一个绑定，使用 value 绑定，就像 define-key 一样，但是将 map 中的绑定定位在 event 的绑定之后。参数键的长度应该是一——一个只有一个元素的向量或字符串。但是 after 应该是一个单一的事件类型——一个符号或一个字符，而不是一个序列。新绑定在绑定之后进行。如果 after 是 t 或被省略，那么新的绑定在最后，在键映射的末尾。但是，在任何继承的键映射之前添加新的绑定。
+</p>
+<p>这是一个例子：
+</p><div class="lisp">
+<pre class="lisp">(define-key-after my-menu [drink]
+  '("Drink" . drink-command) 'eat)
+</pre></div>
+<p>为假功能键 DRINK 进行绑定，并将其放在 EAT 绑定之后。
+</p>
+<p>以下是如何在 Shell 模式的 <code>信号</code> 菜单中，在项目中断后插入一个名为 <code>工作</code> 的项目：
+</p>
+<div class="lisp">
+<pre class="lisp">(define-key-after shell-mode-map [menu-bar signals work]
+  '("Work" . work-command) 'break)
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="23.17.8_简易菜单.html">简易菜单</a>, Previous: <a href="23.17.6_工具栏.html">工具栏</a>, Up: <a href="23.17_菜单键映射.html">菜单键映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

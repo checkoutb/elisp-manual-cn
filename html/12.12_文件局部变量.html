@@ -1,0 +1,128 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>12.12 文件局部变量</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">12.12 文件局部变量</h2>
+<div class="nav-panel"><p>Next: <a href="12.13_目录局部变量.html">目录局部变量</a>, Previous: <a href="12.11.3_缓冲区局部变量的默认值.html">缓冲区局部变量的默认值</a>, Up: <a href="12_变量.html">变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>文件可以指定局部变量值；  Emacs 使用这些来为访问该文件的缓冲区中的那些变量创建缓冲区本地绑定。有关文件局部变量的基本信息，请参阅 GNU Emacs 手册中的文件中的局部变量。本节介绍影响文件局部变量处理方式的函数和变量。
+</p>
+<p>如果文件局部变量可以指定稍后调用的任意函数或 Lisp 表达式，则访问文件可能会接管您的 Emacs。Emacs 通过仅自动设置那些指定值已知是安全的文件局部变量来防止这种情况发生。只有在用户同意的情况下，才会设置其他文件局部变量。
+</p>
+<p>为了更加安全，当 Emacs 读取文件局部变量时， read-circle 临时绑定为 nil（请参阅输入函数）。这可以防止 Lisp 阅读器识别循环和共享的 Lisp 结构（请参阅循环对象的读取语法）。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: enable-local-variables ¶
+</pre></div>
+<p>此变量控制是否处理文件局部变量。可能的值是：
+</p>
+<div class="lisp">
+<pre class="lisp">t (the default)
+</pre></div>
+<p>设置安全变量，并查询（一次）任何不安全变量。 
+</p><div class="lisp">
+<pre class="lisp">:safe
+</pre></div>
+<p>只设置安全变量，不查询。 
+</p><div class="lisp">
+<pre class="lisp">:all
+</pre></div>
+<p>设置所有变量，不要查询。 
+</p><div class="lisp">
+<pre class="lisp">nil
+</pre></div>
+<p>不要设置任何变量。 
+</p><div class="lisp">
+<pre class="lisp">anything else
+</pre></div>
+<p>查询（一次）所有变量。 
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: inhibit-local-variables-regexps ¶
+</pre></div>
+<p>这是一个正则表达式列表。如果文件的名称与此列表的元素匹配，则不会扫描它以查找任何形式的文件局部变量。有关您可能想要使用它的原因的示例，请参阅 Emacs 如何选择主要模式。 
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: permanently-enabled-local-variables ¶
+</pre></div>
+<p>即使 enable-local-variables 为 nil，默认情况下也会注意某些局部变量设置。默认情况下，这仅适用于词法绑定局部变量设置，但这可以通过使用这个变量来控制，它是一个符号列表。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: hack-local-variables &amp;optional handle-mode ¶
+</pre></div>
+<p>此函数解析、绑定或评估由当前缓冲区的内容指定的任何局部变量。变量 enable-local-variables 在这里起作用。但是，此函数不会在 ’-*-’ 行中查找 ’mode:’ 局部变量。set-auto-mode 会这样做，同时考虑到 enable-local-variables（请参阅 Emacs 如何选择主要模式）。
+</p>
+<p>此函数通过遍历存储在 file-local-variables-alist 中的 alist 并依次应用每个局部变量来工作。它分别在应用变量之前和之后调用 before-hack-local-variables-hook 和 hack-local-variables-hook。如果 alist 不为零，它只会调用前钩子；  它总是调用另一个钩子。如果该函数指定了与缓冲区已有的相同的主模式，则此函数将忽略“模式”元素。
+</p>
+<p>如果可选参数句柄模式是 t，那么这个函数所做的就是返回一个指定主模式的符号，如果’-<strong>-’ 行或局部变量列表指定一个，否则返回 nil。它不设置模式或任何其他文件局部变量。如果handle-mode 具有除nil 或t 以外的任何值，则’-</strong>-’ 行或局部变量列表中的’mode’ 的任何设置都将被忽略，并应用其他设置。如果句柄模式为 nil，则设置所有文件局部变量。 
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: file-local-variables-alist ¶
+</pre></div>
+<p>此缓冲区局部变量保存文件局部变量设置的列表。alist 的每个元素都采用 (var . value) 形式，其中 var 是局部变量的符号，value 是它的值。当 Emacs 访问一个文件时，它首先将所有文件局部变量收集到这个 alist 中，然后 hack-local-variables 函数将它们一一应用。 
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: before-hack-local-variables-hook ¶
+</pre></div>
+<p>Emacs 在应用存储在 file-local-variables-alist 中的文件局部变量之前立即调用此钩子。 
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: hack-local-variables-hook ¶
+</pre></div>
+<p>Emacs 在完成应用存储在 file-local-variables-alist 中的文件局部变量后立即调用此钩子。 
+</p>
+<p>您可以为具有安全局部变量属性的变量指定安全值。该属性必须是一个参数的函数；  如果函数在给定该值的情况下返回非零值，则任何值都是安全的。许多常见的文件变量具有安全局部变量属性；  其中包括填充列、填充前缀和缩进制表符模式。对于安全的布尔值变量，使用 booleanp 作为属性值。
+</p>
+<p>如果要为 C 源代码中定义的变量定义安全局部变量属性，请将这些变量的名称和属性添加到 files.el 的“安全局部变量”部分的列表中。
+</p>
+<p>使用 defcustom 定义用户选项时，您可以通过将参数 :safe 函数添加到 defcustom 来设置其安全本地变量属性（请参阅定义自定义变量）。但是，使用 :safe 定义的安全谓词只有在加载包含 defcustom 的包后才能知道，这通常为时已晚。作为替代方案，您可以使用自动加载 cookie（请参阅 Autoload）为选项分配其安全谓词，如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">;;;###autoload (put 'var 'safe-local-variable 'pred)
+</pre></div>
+<p>使用 autoload 指定的安全值定义被复制到包的 autoloads 文件（大多数与 Emacs 捆绑的包为 loaddefs.el），并且在会话开始时 Emacs 就知道这些定义。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: safe-local-variable-values ¶
+</pre></div>
+<p>此变量提供了另一种将某些变量值标记为安全的方法。它是一个 cons 单元格列表 (var . val)，其中 var 是变量名，val 是对该变量安全的值。
+</p>
+<p>当 Emacs 询问用户是否遵守一组文件局部变量规范时，用户可以选择将它们标记为安全的。这样做会将这些变量/值对添加到安全本地变量值中，并将其保存到用户的自定义文件中。 
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: ignored-local-variable-values ¶
+</pre></div>
+<p>如果您总是想完全忽略特定局部变量的某些值，则可以使用此变量。它的值与 safe-local-variable-values 具有相同的形式；  在处理文件指定的局部变量时，将始终忽略列表中出现的值的文件局部变量设置。与该变量一样，当 Emacs 询问用户是否遵守文件局部变量时，用户可以选择永久忽略它们的特定值，这将更改此变量并将其保存到用户的自定义文件中。此变量中出现的变量值对优先于安全局部变量值中的相同对。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: safe-local-variable-p sym val ¶
+</pre></div>
+<p>如果根据上述标准将值 val 赋予 sym 是安全的，则此函数返回非 nil。 
+</p>
+<p>一些变量被认为是有风险的。如果一个变量有风险，它永远不会自动输入到安全局部变量值中；  Emacs 总是在设置有风险的变量之前进行查询，除非用户通过直接自定义 safe-local-variable-values 明确允许一个值。
+</p>
+<p>任何名称具有非零风险局部变量属性的变量都被认为是有风险的。当您使用 defcustom 定义用户选项时，您可以通过将参数 :risky value 添加到 defcustom 来设置其 risky-local-variable 属性（请参阅定义自定义变量）。此外，任何名称以’-command’、’-frame-alist’、’-function’、’-functions’、’-hook’、’-hooks’、’-form’、’- forms’、’-map’、’-map-alist’、’-mode-alist’、’-program’ 或 ’-predicate’ 被自动认为是有风险的。变量 ’font-lock-keywords’、’font-lock-keywords’ 后跟一个数字和 ’font-lock-syntactic-keywords’ 也被认为是有风险的。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: risky-local-variable-p sym ¶
+</pre></div>
+<p>如果 sym 是一个风险变量，则此函数返回非零，基于上述标准。 
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: ignored-local-variables ¶
+</pre></div>
+<p>该变量包含一个变量列表，这些变量不应被文件赋予本地值。为这些变量之一指定的任何值都将被完全忽略。 
+</p>
+<p>’Eval:’“变量”也是一个潜在的漏洞，所以 Emacs 通常会在处理它之前要求确认。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: enable-local-eval ¶
+</pre></div>
+<p>此变量控制“-*-”行中的“Eval:”或正在访问的文件中的局部变量列表的处理。t 值表示无条件处理它们；  nil 表示忽略它们；  任何其他意味着询问用户对每个文件做什么。默认值为可能。 
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: safe-local-eval-forms ¶
+</pre></div>
+<p>此变量包含一个表达式列表，当在文件局部变量列表中的“Eval:”“变量”中找到时，这些表达式可以安全评估。 
+</p>
+<p>如果表达式是函数调用并且函数具有 safe-local-eval-function 属性，则属性值确定表达式是否可以安全评估。属性值可以是调用以测试表达式的谓词、此类谓词的列表（如果任何谓词成功，则它是安全的）或 t（只要参数是常量，总是安全的）。
+</p>
+<p>文本属性也是潜在的漏洞，因为它们的值可能包含要调用的函数。因此，Emacs 会丢弃为文件局部变量指定的字符串值中的所有文本属性。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="12.13_目录局部变量.html">目录局部变量</a>, Previous: <a href="12.11.3_缓冲区局部变量的默认值.html">缓冲区局部变量的默认值</a>, Up: <a href="12_变量.html">变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

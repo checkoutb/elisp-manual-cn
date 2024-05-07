@@ -1,0 +1,15 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>23.17.3 菜单和键盘</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">23.17.3 菜单和键盘</h3>
+<div class="nav-panel"><p>Next: <a href="23.17.4_菜单示例.html">菜单示例</a>, Previous: <a href="23.17.2_菜单和鼠标.html">菜单和鼠标</a>, Up: <a href="23.17_菜单键映射.html">菜单键映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当以键盘事件（字符或功能键）结尾的前缀键定义为菜单键映射时，键映射作为键盘菜单操作；  用户通过使用键盘选择一个菜单项来指定下一个事件。
+</p>
+<p>Emacs 在回显区域显示带有地图整体提示字符串的键盘菜单，然后是替代项（地图绑定的项目字符串）。如果绑定不能一次全部适合，用户可以键入 SPC 以查看下一行替代项。连续使用 SPC 最终会到达菜单的末尾，然后循环到开头。（变量 menu-prompt-more-char 指定使用哪个字符；SPC 是默认值。）
+</p>
+<p>当用户从菜单中找到所需的替代项时，他或她应该键入相应的字符——其绑定是该替代项的字符。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: menu-prompt-more-char ¶
+</pre></div>
+<p>此变量指定用于请求查看菜单下一行的字符。它的初始值为 32，即 SPC 的代码。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="23.17.4_菜单示例.html">菜单示例</a>, Previous: <a href="23.17.2_菜单和鼠标.html">菜单和鼠标</a>, Up: <a href="23.17_菜单键映射.html">菜单键映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>7.1 记录功能</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">7.1 记录功能</h2>
+<div class="nav-panel"><p>Next: <a href="07.2_向后兼容性.html">向后兼容性</a>, Previous: <a href="07_记录.html">记录</a>, Up: <a href="07_记录.html">记录.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><div class="lisp">
+<pre class="lisp">Function: recordp object
+</pre></div>
+<p>如果 object 是记录，则此函数返回 t。
+</p>
+<div class="lisp">
+<pre class="lisp">(recordp #s(a))
+     ⇒ t
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: record type &amp;rest objects
+</pre></div>
+<p>这个函数创建并返回一个类型为类型的记录，剩余的槽是其余的参数，对象。
+</p>
+<div class="lisp">
+<pre class="lisp">(record 'foo 23 [bar baz] "rats")
+     ⇒ #s(foo 23 [bar baz] "rats")
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: make-record type length object
+</pre></div>
+<p>这个函数返回一个新的记录类型类型和长度更多的槽，每个都初始化为对象。
+</p>
+<div class="lisp">
+<pre class="lisp">(setq sleepy (make-record 'foo 9 'Z))
+     ⇒ #s(foo Z Z Z Z Z Z Z Z Z)
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="07.2_向后兼容性.html">向后兼容性</a>, Previous: <a href="07_记录.html">记录</a>, Up: <a href="07_记录.html">记录.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>32.1 标记概述</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">32.1 标记概述</h2>
+<div class="nav-panel"><p>Next: <a href="32.2_关于标记的谓词.html">关于标记的谓词</a>, Previous: <a href="32_标记.html">标记</a>, Up: <a href="32_标记.html">标记.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>标记指定缓冲区和该缓冲区中的位置。标记可用于表示需要标记的函数中的位置，就像可以使用整数一样。在这种情况下，标记的缓冲区通常会被忽略。当然，以这种方式使用的标记通常指向缓冲区中函数操作的位置，但这完全是程序员的责任。有关职位的完整描述，请参阅职位。
+</p>
+<p>标记具有三个属性：标记位置、标记缓冲区和插入类型。标记位置是一个整数，相当于（在给定时间）作为该缓冲区中位置的标记。但是标记的位置值可能会在标记的生命周期内发生变化，而且经常会发生变化。在缓冲区中插入和删除文本会重新定位标记。这个想法是，尽管在缓冲区中的其他地方插入和删除，位于两个字符之间的标记仍保留在这两个字符之间。重定位会更改标记的整数等效值。
+</p>
+<p>删除标记位置周围的文本会将标记留在已删除文本之前和之后的字符之间。在标记位置插入文本通常会将标记留在新文本之前或之后，具体取决于标记的插入类型（请参阅标记插入类型）——除非插入是使用 insert-before-markers 完成的（请参阅插入文本）。
+</p>
+<p>缓冲区中的插入和删除必须检查所有标记并在必要时重新定位它们。这会减慢具有大量标记的缓冲区中的处理速度。出于这个原因，如果您确定不再需要它，最好不要在任何地方做一个标记点​​。无法再访问的标记最终会被删除（请参阅垃圾收集）。
+</p>
+<p>因为对标记位置执行算术运算很常见，所以大多数这些操作（包括 + 和 -）都接受标记作为参数。在这种情况下，标记代表其当前位置。
+</p>
+<p>以下是创建标记、设置标记和将点移动到标记的示例：
+</p><div class="lisp">
+<pre class="lisp">;; Make a new marker that initially does not point anywhere:
+(setq m1 (make-marker))
+     ⇒ #&lt;marker in no buffer&gt;
+
+
+;; Set m1 to point between the 99th and 100th characters
+;;   in the current buffer:
+(set-marker m1 100)
+     ⇒ #&lt;marker at 100 in markers.texi&gt;
+
+
+;; Now insert one character at the beginning of the buffer:
+(goto-char (point-min))
+     ⇒ 1
+(insert "Q")
+     ⇒ nil
+
+
+;; m1 is updated appropriately.
+m1
+     ⇒ #&lt;marker at 101 in markers.texi&gt;
+
+
+;; Two markers that point to the same position
+;;   are not eq, but they are equal.
+(setq m2 (copy-marker m1))
+     ⇒ #&lt;marker at 101 in markers.texi&gt;
+(eq m1 m2)
+     ⇒ nil
+(equal m1 m2)
+     ⇒ t
+
+
+;; When you are finished using a marker, make it point nowhere.
+(set-marker m1 nil)
+     ⇒ #&lt;marker in no buffer&gt;
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="32.2_关于标记的谓词.html">关于标记的谓词</a>, Previous: <a href="32_标记.html">标记</a>, Up: <a href="32_标记.html">标记.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

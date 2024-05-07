@@ -1,0 +1,188 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>39.4 创建一个异步进程</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">39.4 创建一个异步进程</h2>
+<div class="nav-panel"><p>Next: <a href="39.5_删除进程.html">删除进程</a>, Previous: <a href="39.3_创建同步进程.html">创建同步进程</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在本节中，我们将描述如何创建异步进程。创建异步进程后，它与 Emacs 并行运行，并且 Emacs 可以使用以下部分中描述的功能与它通信（请参阅向进程发送输入，并参阅从进程接收输出）。请注意，进程通信只是部分异步的：Emacs 仅在调用这些函数时向进程发送和接收数据。
+</p>
+<p>异步进程通过 pty（伪终端）或管道进行控制。在创建流程时选择 pty 或 pipe，默认情况下基于变量 process-connection-type 的值（见下文）。如果可用，ptys 通常更适合用户可见的进程，例如在 Shell 模式下，因为它们允许在进程及其子进程之间进行作业控制（ <code>C-c</code> 、Cz 等），并且因为交互式程序将 ptys 视为终端设备，而管道不支持这些功能。然而，对于 Lisp 程序用于内部目的的子进程（即，不需要用户与子进程交互），需要在子进程和 Lisp 程序之间交换大量数据，通常最好使用管道，因为管道效率更高。此外，pty 的总数在许多系统上是有限的，最好不要不必要地浪费它们。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-process &amp;rest args ¶
+</pre></div>
+<p>此函数是启动异步子进程的基本低级原语。它返回一个代表子流程的流程对象。与下面描述的更高级的启动进程相比，它采用关键字参数，更灵活，并允许在单个调用中指定进程过滤器和哨兵。
+</p>
+<p>参数 args 是关键字/参数对的列表。省略关键字始终等同于使用值 nil 指定它。以下是有意义的关键字：
+</p>
+<div class="lisp">
+<pre class="lisp">:name name
+</pre></div>
+<p>使用字符串名称作为进程名称；  如果已存在具有此名称的进程，则将名称修改（通过附加 <code>&lt;1&gt;</code> 等）使其唯一。
+</p><div class="lisp">
+<pre class="lisp">:buffer buffer
+</pre></div>
+<p>使用缓冲区作为进程缓冲区。如果值为 nil，则子进程不与任何缓冲区关联。
+</p><div class="lisp">
+<pre class="lisp">:command command
+</pre></div>
+<p>使用 command 作为进程的命令行。该值应该是一个以程序的可执行文件名开头的列表，后跟作为参数提供给程序的字符串。如果列表的第一个元素为 nil，则 Emacs 会打开一个新的伪终端（pty）并将其输入和输出与缓冲区相关联，而不实际运行任何程序；  在这种情况下，其余的列表元素将被忽略。
+</p><div class="lisp">
+<pre class="lisp">:coding coding
+</pre></div>
+<p>如果编码是一个符号，它指定用于从连接读取和向连接写入数据的编码系统。如果 encoding 是一个 cons 单元（解码.编码），那么解码将用于读取和编码用于写入。用于对写入程序的数据进行编码的编码系统也用于对命令行参数进行编码（但不是程序本身，其文件名被编码为任何其他文件名；请参阅文件名编码系统）。
+</p>
+<p>如果 coding 为 nil，则将应用查找编码系统的默认规则。请参阅默认编码系统。
+</p><div class="lisp">
+<pre class="lisp">:connection-type type
+</pre></div>
+<p>初始化用于与子进程通信的设备类型。可能的值是使用 pty 的 pty、使用管道的 pipe 或使用从 process-connection-type 变量的值派生的默认值的 nil。如果为 :stderr 参数指定了非 nil 值，则忽略此参数和 process-connection-type 的值；  在这种情况下，类型将始终是管道。在 pty 不可用的系统 (MS-Windows) 上，此参数同样被忽略，并且无条件使用管道。
+</p><div class="lisp">
+<pre class="lisp">:noquery query-flag
+</pre></div>
+<p>将进程查询标志初始化为query-flag。请参阅退出前查询。
+</p><div class="lisp">
+<pre class="lisp">:stop stopped
+</pre></div>
+<p>如果提供，stopped 必须为零；  使用任何非零值都是错误的。:stop 键在其他情况下会被忽略并保留以与其他进程类型（例如管道进程）兼容。异步子进程永远不会在停止状态下启动。
+</p><div class="lisp">
+<pre class="lisp">:filter filter
+</pre></div>
+<p>初始化流程过滤器进行过滤。如果未指定，将提供默认过滤器，稍后可以覆盖该过滤器。请参阅处理过滤器函数。
+</p><div class="lisp">
+<pre class="lisp">:sentinel sentinel
+</pre></div>
+<p>初始化进程哨兵到哨兵。如果未指定，将使用默认哨兵，以后可以覆盖。请参阅 Sentinels：检测进程状态更改。
+</p><div class="lisp">
+<pre class="lisp">:stderr stderr
+</pre></div>
+<p>将 stderr 与流程的标准错误相关联。非零值应该是缓冲区或使用 make-pipe-process 创建的管道进程，如下所述。如果 stderr 为 nil，则标准错误与标准输出混合，两者都被发送到缓冲区或过滤器。
+</p>
+<p>如果 stderr 是一个缓冲区，Emacs 将创建一个管道进程，即标准错误进程。该进程将具有默认过滤器（参见进程过滤器功能）、哨兵（参见哨兵：检测进程状态更改）和编码系统（参见默认编码系统）。另一方面，它将使用 query-flag 作为退出时的查询标志（请参阅退出前的查询）。它将与 stderr 缓冲区相关联（请参阅进程缓冲区）并将其输出（这是主进程的标准错误）发送到那里。要获取标准错误进程的进程对象，请将 stderr 缓冲区传递给 get-buffer-process。
+</p>
+<p>如果 stderr 是一个管道进程，Emacs 会将它用作新进程的标准错误进程。
+</p><div class="lisp">
+<pre class="lisp">:file-handler file-handler
+</pre></div>
+<p>如果 file-handler 不为 nil，则为当前缓冲区的默认目录查找文件名处理程序，并调用该文件名处理程序来创建进程。如果没有这样的处理程序，就好像文件处理程序是 nil 一样继续。
+</p>
+<p>使用实际连接信息修改的原始参数列表可通过过程联系功能获得。
+</p>
+<p>如果子进程的当前工作目录是本地的（由 unhandled-file-name-directory 确定），则将其设置为当前缓冲区的 default-directory 值，否则设置为 ~。如果要在远程目录中运行进程，请将 :file-handler t 传递给 make-process。在这种情况下，当前工作目录是 default-directory 的本地名称组件（由 file-local-name 确定）。
+</p>
+<p>根据文件名处理程序的实现，可能无法将过滤器或哨兵应用于生成的进程对象。:stderr 参数不能是管道进程，文件名处理程序不支持管道进程。接受作为 :stderr 参数的缓冲区，其内容在不使用管道进程的情况下显示。请参阅流程过滤器函数、哨兵：检测流程状态更改和接受流程的输出。
+</p>
+<p>某些文件名处理程序可能不支持 make-process。在这种情况下，这个函数什么都不做并且返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-pipe-process &amp;rest args ¶
+</pre></div>
+<p>此函数创建一个可以附加到子进程的双向管道。这对 make-process 的 :stderr 关键字很有用。该函数返回一个进程对象。
+</p>
+<p>参数 args 是关键字/参数对的列表。省略关键字始终等同于使用值 nil 指定它。
+</p>
+<p>以下是有意义的关键字：
+</p>
+<div class="lisp">
+<pre class="lisp">:name name
+</pre></div>
+<p>使用字符串名称作为进程名称。与 make-process 一样，如果需要，它会被修改以使其唯一。
+</p><div class="lisp">
+<pre class="lisp">:buffer buffer
+</pre></div>
+<p>使用缓冲区作为进程缓冲区。
+</p><div class="lisp">
+<pre class="lisp">:coding coding
+</pre></div>
+<p>如果编码是一个符号，它指定用于从连接读取和向连接写入数据的编码系统。如果 encoding 是一个 cons 单元（解码.编码），那么解码将用于读取和编码用于写入。
+</p>
+<p>如果 coding 为 nil，则将应用查找编码系统的默认规则。请参阅默认编码系统。
+</p><div class="lisp">
+<pre class="lisp">:noquery query-flag
+</pre></div>
+<p>将进程查询标志初始化为query-flag。请参阅退出前查询。
+</p><div class="lisp">
+<pre class="lisp">:stop stopped
+</pre></div>
+<p>如果stopped 不为零，则在stopped 状态下启动进程。在停止状态下，管道进程不接受传入数据，但可以发送传出数据。停止状态由 stop-process 设置并由 continue-process 清除（请参阅向进程发送信号）。
+</p><div class="lisp">
+<pre class="lisp">:filter filter
+</pre></div>
+<p>初始化流程过滤器进行过滤。如果未指定，将提供默认过滤器，以后可以更改。请参阅处理过滤器函数。
+</p><div class="lisp">
+<pre class="lisp">:sentinel sentinel
+</pre></div>
+<p>初始化进程哨兵到哨兵。如果未指定，将使用默认哨兵，以后可以更改。请参阅 Sentinels：检测进程状态更改。
+</p>
+<p>使用实际连接信息修改的原始参数列表可通过过程联系功能获得。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: start-process name buffer-or-name program &amp;rest args ¶
+</pre></div>
+<p>这个函数是 make-process 的一个更高级别的包装器，它暴露了一个类似于 call-process 的接口。它创建一个新的异步子进程并启动在其中运行的指定程序。它返回一个进程对象，它代表 Lisp 中的新子进程。参数名称指定进程对象的名称；  与 make-process 一样，如有必要，它会被修改以使其唯一。缓冲区 buffer-or-name 是与进程关联的缓冲区。
+</p>
+<p>如果 program 为 nil，Emacs 会打开一个新的伪终端（pty）并将其输入和输出与缓冲区或名称相关联，而不创建子进程。在这种情况下，其余参数 args 将被忽略。
+</p>
+<p>其余的 args 是为子进程指定命令行参数的字符串。
+</p>
+<p>在下面的示例中，第一个进程启动并运行（而不是休眠）100 秒（立即创建输出缓冲区 <code>foo</code> ）。同时，启动第二个进程，为唯一起见，将其命名为 <code>my-process&lt;1&gt;</code> 。在第一个进程完成之前，它将目录列表插入到缓冲区 <code>foo</code> 的末尾。然后它完成，并且在缓冲区中插入一条具有该效果的消息。很久以后，第一个进程完成，另一个消息被插入到它的缓冲区中。
+</p><div class="lisp">
+<pre class="lisp">
+
+(start-process "my-process" "foo" "sleep" "100")
+     ⇒ #&lt;process my-process&gt;
+
+
+(start-process "my-process" "foo" "ls" "-l" "/bin")
+     ⇒ #&lt;process my-process&lt;1&gt;&gt;
+
+---------- Buffer: foo ----------
+total 8336
+-rwxr-xr-x 1 root root 971384 Mar 30 10:14 bash
+-rwxr-xr-x 1 root root 146920 Jul  5  2011 bsd-csh
+…
+-rwxr-xr-x 1 root root 696880 Feb 28 15:55 zsh4
+
+Process my-process&lt;1&gt; finished
+
+Process my-process finished
+---------- Buffer: foo ----------
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: start-file-process name buffer-or-name program &amp;rest args ¶
+</pre></div>
+<p>与 start-process 一样，该函数在其中启动一个新的异步子进程运行程序，并返回其进程对象。
+</p>
+<p>与 start-process 不同的是，该函数可以根据 default-directory 的值调用文件名处理程序。这个处理程序应该运行程序，可能在本地主机上，可能在对应于默认目录的远程主机上。在后一种情况下，default-directory 的本地部分成为进程的工作目录。
+</p>
+<p>此函数不会尝试为程序或其余 args 调用文件名处理程序。因此，如果程序或任何 args 使用远程文件语法（请参阅使某些文件名 <code>魔术</code> ），则必须将它们转换为相对于默认目录的文件名，或者转换为在本地标识文件的名称远程主机，通过文件本地名称运行它们。
+</p>
+<p>根据文件名处理程序的实现，可能无法将 process-filter 或 process-sentinel 应用于生成的进程对象。请参阅进程过滤器函数和哨兵：检测进程状态更改。
+</p>
+<p>某些文件名处理程序可能不支持 start-file-process（例如函数 ange-ftp-hook-function）。在这种情况下，这个函数什么都不做并且返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: start-process-shell-command name buffer-or-name command ¶
+</pre></div>
+<p>这个函数类似于 start-process，只是它使用一个 shell 来执行指定的命令。参数 command 是一个 shell 命令字符串。变量 shell-file-name 指定使用哪个 shell。
+</p>
+<p>通过 shell 而不是直接使用 make-process 或 start-process 运行程序的目的是，您可以在参数中使用通配符等 shell 功能。因此，如果您在命令中包含任何用户指定的任意参数，您应该首先用 shell-quote-argument 引用它们，以便任何特殊的 shell 字符没有它们特殊的 shell 含义。请参阅 Shell 参数。当然，在基于用户输入执行命令时，您还应该考虑安全隐患。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: start-file-process-shell-command name buffer-or-name command ¶
+</pre></div>
+<p>此功能类似于 start-process-shell-command，但在内部使用 start-file-process。因此，命令也可以在远程主机上执行，具体取决于默认目录。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: process-connection-type ¶
+</pre></div>
+<p>此变量控制用于与异步子进程通信的设备类型。如果它不是 nil，则在可用时使用 pty。否则，使用管道。
+</p>
+<p>process-connection-type 的值在调用 make-process 或 start-process 时生效。因此，您可以通过将变量绑定到对这些函数的调用来指定如何与一个子进程通信。
+</p>
+<p>请注意，当使用 :stderr 参数的非零值调用 make-process 时，将忽略此变量的值；  在这种情况下，Emacs 将使用管道与进程通信。如果 ptys 不可用（MS-Windows），它也会被忽略。
+</p>
+<div class="lisp">
+<pre class="lisp">(let ((process-connection-type nil))  ; use a pipe
+  (start-process …))
+</pre></div>
+<p>要确定给定的子进程实际上是否获得了管道或 pty，请使用函数 process-tty-name（请参阅进程信息）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="39.5_删除进程.html">删除进程</a>, Previous: <a href="39.3_创建同步进程.html">创建同步进程</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

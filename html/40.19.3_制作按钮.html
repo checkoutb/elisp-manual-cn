@@ -1,0 +1,39 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.19.3 制作按钮</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.19.3 制作按钮</h3>
+<div class="nav-panel"><p>Next: <a href="40.19.4_操作按钮.html">操作按钮</a>, Previous: <a href="40.19.2_按钮类型.html">按钮类型</a>, Up: <a href="40.19_按钮.html">按钮.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>按钮与文本区域相关联，使用覆盖或文本属性来保存特定于按钮的信息，所有这些信息都是从按钮的类型（默认为内置按钮类型按钮）初始化的。像所有 Emacs 文本一样，按钮的外观由 face 属性控制；  默认情况下（通过从按钮 button-type 继承的 face 属性）这是一个简单的下划线，就像典型的网页链接一样。
+</p>
+<p>为方便起见，有两种按钮创建函数，一种是向缓冲区的现有区域添加按钮属性，称为 make-…button，另一种是插入按钮文本，称为 insert-…button .
+</p>
+<p>按钮创建函数都采用 &amp;rest 参数属性，它应该是一系列属性值对，指定要添加到按钮的属性；  请参阅按钮属性。此外，关键字参数 :type 可用于指定继承其他属性的按钮类型；  请参阅按钮类型。在创建期间未明确指定的任何属性都将从按钮的类型继承（如果类型定义了此类属性）。
+</p>
+<p>以下函数使用覆盖添加按钮（请参阅覆盖）来保存按钮属性：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-button beg end &amp;rest properties ¶
+</pre></div>
+<p>这会在当前缓冲区中创建一个从请求到结束的按钮，然后返回它。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: insert-button label &amp;rest properties ¶
+</pre></div>
+<p>这将插入一个带有标签标签的按钮，并将其返回。
+</p>
+<p>以下功能类似，但使用文本属性（请参阅文本属性）来保存按钮属性。此类按钮不会向缓冲区添加标记，因此如果按钮数量非常多，缓冲区中的编辑不会减慢速度。但是，如果文本上存在现有的面文本属性（例如，由字体锁定模式指定的面），则按钮面可能不可见。这两个函数都返回新按钮的起始位置。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-text-button beg end &amp;rest properties ¶
+</pre></div>
+<p>这使得按钮在当前缓冲区中从请求到结束，使用文本属性。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: insert-text-button label &amp;rest properties ¶
+</pre></div>
+<p>这将使用文本属性插入一个带有标签标签的按钮。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: button-buttonize string callback &amp;optional data ¶
+</pre></div>
+<p>有时将字符串制作成按钮而不立即将其插入缓冲区会更方便，例如，在创建稍后可能插入缓冲区的数据结构时。该函数将字符串变成这样的字符串，当用户点击按钮时会调用回调。调用回调时，可选的数据参数将用作参数。如果为 nil，则将按钮用作参数。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.19.4_操作按钮.html">操作按钮</a>, Previous: <a href="40.19.2_按钮类型.html">按钮类型</a>, Up: <a href="40.19_按钮.html">按钮.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

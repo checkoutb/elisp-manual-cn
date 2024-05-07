@@ -1,0 +1,41 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.12.6 处理面的函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.12.6 处理面的函数</h3>
+<div class="nav-panel"><p>Next: <a href="40.12.7_自动面分配.html">自动面分配</a>, Previous: <a href="40.12.5_面重映射.html">面重映射</a>, Up: <a href="40.12_面.html">面.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>以下是用于创建和使用面的附加功能。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: face-list ¶
+</pre></div>
+<p>此函数返回所有已定义面名称的列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: face-id face ¶
+</pre></div>
+<p>该函数返回面的面编号。这是一个在 Emacs 中唯一标识低级别面的数字。很少需要通过面号来引用面。但是，操纵字形的函数，例如 make-glyph-code 和 glyph-face（请参阅 Glyphs）在内部访问面数。请注意，面编号存储为面符号的面属性值，因此我们建议不要将该面属性设置为您自己的任何值。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: face-documentation face ¶
+</pre></div>
+<p>此函数返回 face face 的文档字符串，如果没有指定，则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: face-equal face1 face2 &amp;optional frame ¶
+</pre></div>
+<p>如果面 face1 和 face2 具有相同的显示属性，则返回 t。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: face-differs-from-default-p face &amp;optional frame ¶
+</pre></div>
+<p>如果面显示与默认面不同，则返回非零。
+</p>
+<p>面别名为面提供等效名称。您可以通过为别名符号赋予 face-alias 属性来定义面别名，其值为目标面名称。以下示例使 modeline 成为 mode-line 面的别名。
+</p>
+<div class="lisp">
+<pre class="lisp">(put 'modeline 'face-alias 'mode-line)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Macro: define-obsolete-face-alias obsolete-face current-face when ¶
+</pre></div>
+<p>该宏将obsolete-face定义为current-face的别名，同时也将其标记为obsolete，表示将来可能会被移除。when 应该是一个字符串，指示 obsolete-face 何时被废弃（通常是版本号字符串）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.12.7_自动面分配.html">自动面分配</a>, Previous: <a href="40.12.5_面重映射.html">面重映射</a>, Up: <a href="40.12_面.html">面.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

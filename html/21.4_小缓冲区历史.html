@@ -1,0 +1,113 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>21.4 小缓冲区历史</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">21.4 小缓冲区历史</h2>
+<div class="nav-panel"><p>Next: <a href="21.5_初始输入.html">初始输入</a>, Previous: <a href="21.3_用_Minibuffer_读取_Lisp_对象.html">用_Minibuffer_读取_Lisp_对象</a>, Up: <a href="21_小缓冲区.html">小缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>minibuffer 历史列表记录以前的 minibuffer 输入，以便用户可以方便地重用它们。它是一个变量，其值是字符串列表（以前的输入），最近的在前。
+</p>
+<p>有许多单独的 minibuffer 历史列表，用于不同类型的输入。为每次使用 minibuffer 指定正确的历史列表是 Lisp 程序员的工作。
+</p>
+<p>您可以使用可选的 history 参数指定一个 minibuffer 历史列表来读取 minibuffer 或完成读取。以下是它的可能值：
+</p>
+<div class="lisp">
+<pre class="lisp">variable
+</pre></div>
+<p>使用变量（符号）作为历史列表。
+</p><div class="lisp">
+<pre class="lisp">(variable . startpos)
+</pre></div>
+<p>使用变量（符号）作为历史列表，并假设初始历史位置为 startpos（非负整数）。
+</p>
+<p>为 startpos 指定 0 等同于仅指定符号变量。previous-history-element 将显示 minibuffer 中历史列表的最新元素。如果你指定一个正的 startpos，minibuffer 历史函数的行为就好像 (elt variable (1- startpos)) 是当前显示在 minibuffer 中的历史元素。
+</p>
+<p>为了保持一致性，您还应该使用 minibuffer 输入函数的初始参数将历史元素指定为初始 minibuffer 内容（请参阅初始输入）。
+</p>
+<p>如果您不指定历史，则使用默认历史列表 minibuffer-history。有关其他标准历史列表，请参见下文。您还可以创建自己的历史列表变量；  只需在第一次使用之前将其初始化为零。如果变量是本地缓冲区，那么每个缓冲区都有自己的输入历史列表。
+</p>
+<p>read-from-minibuffer 和 complete-read 都会自动将新元素添加到历史列表中，并提供命令以允许用户重用列表中的项目。程序使用历史列表唯一需要做的就是初始化它，并在需要时将其名称传递给输入函数。但是当 minibuffer 输入函数不使用它时，手动修改列表是安全的。
+</p>
+<p>如果列表太长，将新元素添加到历史列表的 Emacs 函数也可以删除旧元素。变量 history-length 指定大多数历史列表的最大长度。要为特定历史列表指定不同的最大长度，请将长度放在历史列表符号的 history-length 属性中。变量 history-delete-duplicates 指定是否删除历史记录中的重复项。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: add-to-history history-var newelt &amp;optional maxelt keep-all ¶
+</pre></div>
+<p>该函数将一个新元素 newelt（如果它不是空字符串）添加到存储在变量 history-var 中的历史列表中，并返回更新后的历史列表。它将列表长度限制为 maxelt（如果非零）或历史长度（如下所述）的值。maxelt 的可能值与 history-length 的值具有相同的含义。history-var 不能引用词法变量。
+</p>
+<p>通常，如果 history-delete-duplicates 不为零，则 add-to-history 会从历史列表中删除重复的成员。但是，如果 keep-all 不为零，则表示不删除重复项，并且即使 newelt 为空，也要将其添加到列表中。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: history-add-new-input ¶
+</pre></div>
+<p>如果此变量的值为 nil，则从 minibuffer 读取的标准函数不会将新元素添加到历史列表中。这让 Lisp 程序可以使用 add-to-history 显式地管理输入历史。默认值为 t。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: history-length ¶
+</pre></div>
+<p>此变量的值指定所有未指定其最大长度的历史列表的最大长度。如果值为 t，则表示没有最大值（不要删除旧元素）。如果历史列表变量的交易品种具有非零历史长度属性，它将覆盖该特定历史列表的变量。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: history-delete-duplicates ¶
+</pre></div>
+<p>如果这个变量的值为 t，这意味着当添加一个新的历史元素时，所有以前的相同元素都被删除。
+</p>
+<p>以下是一些标准的 minibuffer 历史列表变量：
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: minibuffer-history ¶
+</pre></div>
+<p>minibuffer 历史输入的默认历史列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: query-replace-history ¶
+</pre></div>
+<p>查询替换参数的历史列表（以及其他命令的类似参数）。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: file-name-history ¶
+</pre></div>
+<p>文件名参数的历史列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: buffer-name-history ¶
+</pre></div>
+<p>缓冲区名称参数的历史列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: regexp-history ¶
+</pre></div>
+<p>正则表达式参数的历史列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: extended-command-history ¶
+</pre></div>
+<p>作为扩展命令名称的参数的历史列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: shell-command-history ¶
+</pre></div>
+<p>作为 shell 命令的参数的历史列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: read-expression-history ¶
+</pre></div>
+<p>作为要评估的 Lisp 表达式的参数的历史列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: face-name-history ¶
+</pre></div>
+<p>作为面孔的参数的历史列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: custom-variable-history ¶
+</pre></div>
+<p>由 read-variable 读取的变量名参数的历史列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: read-number-history ¶
+</pre></div>
+<p>由 read-number 读取的数字的历史列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: goto-line-history ¶
+</pre></div>
+<p>goto-line 参数的历史列表。通过自定义用户选项 goto-line-history-local，可以使该变量在每个缓冲区中成为本地变量。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="21.5_初始输入.html">初始输入</a>, Previous: <a href="21.3_用_Minibuffer_读取_Lisp_对象.html">用_Minibuffer_读取_Lisp_对象</a>, Up: <a href="21_小缓冲区.html">小缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>20.5 输出函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">20.5 输出函数</h2>
+<div class="nav-panel"><p>Next: <a href="20.6_影响输出的变量.html">影响输出的变量</a>, Previous: <a href="20.4_输出流.html">输出流</a>, Up: <a href="20_阅读和打印_Lisp_对象.html">阅读和打印_Lisp_对象.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节描述了用于打印 Lisp 对象的 Lisp 函数——将对象转换为它们的打印表示。
+</p>
+<p>一些 Emacs 打印功能在必要时会在输出中添加引号字符，以便可以正确读取。使用的引用字符是 ’"’ 和 ’\’；它们将字符串与符号区分开来，并防止在读取时将字符串和符号中的标点符号作为分隔符。有关完整详细信息，请参阅印刷表示和读取语法。您指定引用或没有引用打印功能的选择。
+</p>
+<p>如果要将文本读回 Lisp，则应使用引号字符打印以避免歧义。同样，如果目的是为 Lisp 程序员清楚地描述 Lisp 对象。但是，如果输出的目的是为了让人类看起来不错，那么通常最好在不引用的情况下打印。
+</p>
+<p>Lisp 对象可以引用自己。以正常方式打印自引用对象将需要无限量的文本，并且尝试可能会导致无限递归。Emacs 检测到这种递归并打印 ’#level’ 而不是递归打印已经打印的对象。例如，这里的 ’#0’ 表示对当前打印操作级别 0 的对象的递归引用：
+</p>
+<div class="lisp">
+<pre class="lisp">(setq foo (list nil))
+     ⇒ (nil)
+(setcar foo foo)
+     ⇒ (#0)
+</pre></div>
+<p>在下面的函数中，stream 代表输出流。（有关输出流的描述，请参见上一节。另请参见 external-debugging-output，这是一个对调试有用的流值。）如果 stream 为 nil 或省略，则默认为标准输出的值。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: print object &amp;optional stream ¶
+</pre></div>
+<p>打印功能是一种方便的打印方式。它将对象的打印表示输出到流中，在对象之前打印一个换行符，在它之后打印另一个换行符。使用引号字符。打印返回对象。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">(progn (print 'The\ cat\ in)
+       (print "the hat")
+       (print " came back"))
+     -|
+     -| The\ cat\ in
+     -|
+     -| "the hat"
+     -|
+     -| " came back"
+     ⇒ " came back"
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: prin1 object &amp;optional stream ¶
+</pre></div>
+<p>此函数将对象的打印表示输出到流。它不像 print 那样打印换行符来分隔输出，但它确实像 print 一样使用引号字符。它返回对象。
+</p>
+<div class="lisp">
+<pre class="lisp">(progn (prin1 'The\ cat\ in)
+       (prin1 "the hat")
+       (prin1 " came back"))
+     -| The\ cat\ in"the hat"" came back"
+     ⇒ " came back"
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: princ object &amp;optional stream ¶
+</pre></div>
+<p>此函数将对象的打印表示输出到流。它返回对象。
+</p>
+<p>此函数旨在生成人们可读的输出，而不是通过阅读，因此它不会插入引号字符，也不会在字符串内容周围放置双引号。它不会在调用之间添加任何间距。
+</p><div class="lisp">
+<pre class="lisp">(progn
+  (princ 'The\ cat)
+  (princ " in the \"hat\""))
+     -| The cat in the "hat"
+     ⇒ " in the \"hat\""
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: terpri &amp;optional stream ensure ¶
+</pre></div>
+<p>此函数输出换行符以进行流式传输。该名称代表 <code>终止打印</code> 。如果 ensure 不为零，则如果流已经在行首，则不打印换行符。请注意，在这种情况下，流不能是函数，如果是，则会发出错误信号。如果打印了换行符，此函数返回 t。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: write-char character &amp;optional stream ¶
+</pre></div>
+<p>此函数将字符输出到流。它返回字符。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: prin1-to-string object &amp;optional noescape ¶
+</pre></div>
+<p>此函数返回一个字符串，其中包含 prin1 为相同参数打印的文本。
+</p><div class="lisp">
+<pre class="lisp">(prin1-to-string 'foo)
+     ⇒ "foo"
+
+(prin1-to-string (mark-marker))
+     ⇒ "#&lt;marker at 2773 in strings.texi&gt;"
+</pre></div>
+<p>如果 noescape 不为零，则禁止在输出中使用引号字符。（此参数在 Emacs 版本 19 及更高版本中受支持。）
+</p>
+<div class="lisp">
+<pre class="lisp">(prin1-to-string "foo")
+     ⇒ "\"foo\""
+
+(prin1-to-string "foo" t)
+     ⇒ "foo"
+</pre></div>
+<p>有关将 Lisp 对象的打印表示形式获取为字符串的其他方法，请参见格式化字符串中的格式。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: with-output-to-string body… ¶
+</pre></div>
+<p>此宏执行带有标准输出设置的正文表单，以将输出输入字符串。然后它返回该字符串。
+</p>
+<p>例如，如果当前缓冲区名称是 ’foo’，
+</p><div class="lisp">
+<pre class="lisp">(with-output-to-string
+  (princ "The buffer is ")
+  (princ (buffer-name)))
+</pre></div>
+<p>返回 <code>缓冲区是 foo</code> 。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: pp object &amp;optional stream ¶
+</pre></div>
+<p>该函数将对象输出到流中，就像 prin1 一样，但以更漂亮的方式执行。也就是说，它会缩进并填充对象以使其对人类更具可读性。
+</p>
+<p>如果您需要在批处理模式下使用二进制 I/O，例如，使用本节中描述的函数写出任意二进制数据或避免在非 POSIX 主机上转换换行符，请参阅 set-binary-mode。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="20.6_影响输出的变量.html">影响输出的变量</a>, Previous: <a href="20.4_输出流.html">输出流</a>, Up: <a href="20_阅读和打印_Lisp_对象.html">阅读和打印_Lisp_对象.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

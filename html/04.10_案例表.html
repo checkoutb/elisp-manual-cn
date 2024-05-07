@@ -1,0 +1,92 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>4.10 案例表</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">4.10 案例表</h2>
+<div class="nav-panel"><p>Next: <a href="05_列表.html">列表</a>, Previous: <a href="04.9_Lisp_中的大小写转换.html">Lisp_中的大小写转换</a>, Up: <a href="04_字符串和字.html">字符串和字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>您可以通过安装特殊案例表来自定义案例转换。大小写表指定大写和小写字母之间的映射。它影响 Lisp 对象的大小写转换函数（参见上一节）和应用于缓冲区中文本的那些（参见大小写更改）。每个缓冲区都有一个案例表；  还有一个标准案例表，用于初始化新缓冲区的案例表。
+</p>
+<p>案例表是一个字符表（参见 Char-Tables），其子类型是案例表。此字符表将每个字符映射到相应的小写字符。它有三个额外的插槽，其中包含相关的表：
+</p>
+<div class="lisp">
+<pre class="lisp">upcase
+</pre></div>
+<p>大写表将每个字符映射到相应的大写字符。
+</p><div class="lisp">
+<pre class="lisp">canonicalize
+</pre></div>
+<p>canonicalize 表将所有与大小写相关的字符集映射到该集的特定成员中。
+</p><div class="lisp">
+<pre class="lisp">equivalences
+</pre></div>
+<p>等价表将一组与大小写相关的字符中的每个字符映射到该集中的下一个字符。
+</p>
+<p>在简单的情况下，您只需要指定小写的映射即可；  三个相关的表格将根据该表格自动计算。
+</p>
+<p>对于某些语言，大小写字母不是一一对应的。可能有两个不同的小写字母具有相同的大写字母。在这些情况下，您需要为小写和大写指定映射。
+</p>
+<p>额外的表 canonicalize 将每个字符映射到一个规范等效项；  通过大小写转换相关的任何两个字符都具有相同的规范等效字符。例如，由于 ’a’ 和 ’A’ 通过大小写转换相关，因此它们应该具有相同的规范等效字符（它们应该是 ’a’ 或者它们都应该是 ’A’）。
+</p>
+<p>额外的表等价是一个循环置换每个等价类（具有相同规范等价的字符）的映射。（对于普通的 ASCII，这会将 <code>a</code> 映射到 <code>A</code> ，将 <code>A</code> 映射到 <code>a</code> ，对于每组等效字符也是如此。）
+</p>
+<p>构造案例表时，可以为canonicalize提供nil；  然后 Emacs 从小写和大写映射中填充这个槽。您还可以为等价提供 nil ；  然后 Emacs 从 canonicalize 填充这个槽。在实际使用的案例表中，这些组件是非零的。不要试图在没有指定规范化的情况下指定等价。
+</p>
+<p>以下是处理案例表的函数：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: case-table-p object
+</pre></div>
+<p>如果 object 是有效的 case 表，则此谓词返回非 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-standard-case-table table
+</pre></div>
+<p>此函数使 table 成为标准案例表，因此它将在随后创建的任何缓冲区中使用。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: standard-case-table
+</pre></div>
+<p>这将返回标准案例表。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: current-case-table
+</pre></div>
+<p>此函数返回当前缓冲区的案例表。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-case-table table
+</pre></div>
+<p>这会将当前缓冲区的案例表设置为表。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: with-case-table table body
+</pre></div>
+<p>with-case-table 宏保存当前 case 表，使 table 成为当前 case 表，评估 body 形式，最后恢复 case 表。返回值是正文中最后一个表单的值。即使在通过 throw 或 error 异常退出的情况下也会恢复 case 表（请参阅非本地退出）。
+</p>
+<p>一些语言环境修改了 ASCII 字符的大小写转换；  例如，在土耳其语环境中，ASCII 大写字母 I 被缩减为土耳其语无点 i (’ı’)。这可能会干扰需要普通 ASCII 大小写转换的代码，例如基于 ASCII 的网络协议的实现。在这种情况下，请使用带有变量 ascii-case-table 的 with-case-table 宏，该变量存储 ASCII 字符集的未修改大小写表。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: ascii-case-table
+</pre></div>
+<p>ASCII 字符集的大小写表。这不应被任何语言环境设置修改。
+</p>
+<p>以下三个函数是定义非 ASCII 字符集的包的方便子例程。他们修改指定的案例表case-table；  他们还修改了标准语法表。请参阅语法表。通常您会使用这些函数来更改标准案例表。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-case-syntax-pair uc lc case-table
+</pre></div>
+<p>该函数指定一对对应的字母，一个大写一个小写。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-case-syntax-delims l r case-table
+</pre></div>
+<p>此函数使字符 l 和 ra 匹配一对不改变大小写的分隔符。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-case-syntax char syntax case-table
+</pre></div>
+<p>此函数使 char 不区分大小写，具有语法语法。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: describe-buffer-case-table
+</pre></div>
+<p>此命令显示当前缓冲区的案例表内容的描述。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="05_列表.html">列表</a>, Previous: <a href="04.9_Lisp_中的大小写转换.html">Lisp_中的大小写转换</a>, Up: <a href="04_字符串和字.html">字符串和字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

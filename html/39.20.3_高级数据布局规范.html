@@ -1,0 +1,48 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>39.20.3 高级数据布局规范</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">39.20.3 高级数据布局规范</h3>
+<div class="nav-panel"><p>Next: <a href="40_Emacs显示.html">Emacs显示</a>, Previous: <a href="39.20.2_解包和打包字节的函数.html">解包和打包字节的函数</a>, Up: <a href="39.20_打包和解包字节数组.html">打包和解包字节数组.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Bindat 类型表达式不限于前面描述的类型。它们也可以是返回 Bindat 类型表达式的任意 Lisp 形式。例如，下面的类型描述了可以包含 24 位错误代码或字节向量的数据：
+</p>
+<div class="lisp">
+<pre class="lisp">(bindat-type
+  (len      u8)
+  (payload  . (if (zerop len) (uint 24) (vec (1- len)))))
+</pre></div>
+<p>此外，虽然复合类型通常解包到关联列表（并从关联列表中打包），但可以通过使用以下特殊关键字参数来更改：
+</p>
+<p>:unpack-val exp
+</p>
+<p>    当字段列表以此关键字参数结尾时，解包时返回的值是 exp 的值，而不是标准的 alist。exp 可以通过名称引用所有先前的字段。
+:pack-val exp
+</p>
+<p>    如果字段的类型后跟此关键字参数，则打包到此字段中的值由 exp 返回，而不是从 alist 中提取。
+:pack-var 名称
+</p>
+<p>如果字段列表前面有这个关键字参数，那么所有后续的 :pack-val 参数都可以通过名为 name 的变量引用要打包到此复合类型中的整体值。
+</p>
+<p>例如，可以如下描述一个 16 位有符号整数：
+</p>
+<div class="lisp">
+<pre class="lisp">(defconst sint16-bindat-spec
+  (let* ((max (ash 1 15))
+         (wrap (+ max max)))
+    (bindat-type :pack-var v
+                 (n uint 16 :pack-val (if (&lt; v 0) (+ v wrap) v))
+                 :unpack-val (if (&gt;= n max) (- n wrap) n))))
+</pre></div>
+<p>然后其行为如下：
+</p><div class="lisp">
+<pre class="lisp">(bindat-pack sint16-bindat-spec -8)
+     ⇒ "\377\370"
+
+(bindat-unpack sint16-bindat-spec "\300\100")
+     ⇒ -16320
+</pre></div>
+<p>最后，您可以使用 bindat-defmacro 定义新的 Bindat 类型表单以在 Bindat 类型表达式中使用：
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: bindat-defmacro name args &amp;rest body ¶
+</pre></div>
+<p>定义一个名为 name 并采用参数 args 的新 Bindat 类型表达式。它的行为遵循 defmacro 的行为，重要的区别是新形式只能在 Bindat 类型表达式中使用。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="40_Emacs显示.html">Emacs显示</a>, Previous: <a href="39.20.2_解包和打包字节的函数.html">解包和打包字节的函数</a>, Up: <a href="39.20_打包和解包字节数组.html">打包和解包字节数组.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

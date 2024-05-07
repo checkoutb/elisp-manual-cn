@@ -1,0 +1,6 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>16.5.1 按前缀自动加载</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">16.5.1 按前缀自动加载</h3>
+<div class="nav-panel"><p>Next: <a href="16.5.2_何时使用自动加载.html">何时使用自动加载</a>, Previous: <a href="16.5_自动加载.html">自动加载</a>, Up: <a href="16.5_自动加载.html">自动加载.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在命令 describe-variable 和 describe-function 完成期间，Emacs 将尝试加载可能包含与正在完成的前缀匹配的定义的文件。变量定义前缀包含一个哈希表，它将前缀映射到相应的文件列表以为其加载。此映射的条目是通过调用由 update-file-autoloads 生成的 register-definition-prefixes 添加的（请参阅 Autoload）。不包含任何值得加载的定义的文件（例如测试文件）应将 autoload-compute-prefixes 设置为 nil 作为文件局部变量。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="16.5.2_何时使用自动加载.html">何时使用自动加载</a>, Previous: <a href="16.5_自动加载.html">自动加载</a>, Up: <a href="16.5_自动加载.html">自动加载.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

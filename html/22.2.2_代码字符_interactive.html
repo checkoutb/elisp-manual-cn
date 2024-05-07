@@ -1,0 +1,172 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.2.2 代码字符 interactive</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">22.2.2 代码字符 interactive</h3>
+<div class="nav-panel"><p>Next: <a href="22.2.3_使用示例_interactive.html">使用示例_interactive</a>, Previous: <a href="22.2.1_使用_interactive.html">使用_interactive</a>, Up: <a href="22.2_定义命令.html">定义命令.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>下面的代码字符描述包含一些关键词，这里定义如下：
+</p>
+<div class="lisp">
+<pre class="lisp">Completion ¶
+</pre></div>
+<p>提供完成。TAB、SPC 和 RET 执行名称完成，因为参数是使用完成读取（请参阅完成）读取的。?  显示可能完成的列表。
+</p><div class="lisp">
+<pre class="lisp">Existing
+</pre></div>
+<p>需要现有对象的名称。不接受无效名称；  如果当前输入无效，则退出 minibuffer 的命令不会退出。
+</p><div class="lisp">
+<pre class="lisp">Default ¶
+</pre></div>
+<p>如果用户在 minibuffer 中没有输入文本，则使用某种默认值。默认值取决于代码字符。
+</p><div class="lisp">
+<pre class="lisp">No I/O
+</pre></div>
+<p>此代码字母在不读取任何输入的情况下计算参数。因此，它不使用提示字符串，并且您提供的任何提示字符串都将被忽略。
+</p>
+<p>即使代码字母不使用提示字符串，如果它不是字符串中的最后一个代码字符，则必须在其后加上换行符。
+</p><div class="lisp">
+<pre class="lisp">Prompt
+</pre></div>
+<p>提示符紧跟在代码字符之后。提示以字符串结尾或换行符结束。
+</p><div class="lisp">
+<pre class="lisp">Special
+</pre></div>
+<p>此代码字符仅在交互式字符串的开头有意义，它不寻找提示符或换行符。它是一个单一的、孤立的角色。
+</p>
+<p>以下是用于交互的代码字符描述：
+</p>
+<div class="lisp">
+<pre class="lisp">‘*’
+</pre></div>
+<p>如果当前缓冲区是只读的，则发出错误信号。特别的。
+</p><div class="lisp">
+<pre class="lisp">‘@’
+</pre></div>
+<p>在调用此命令的按键序列中选择第一个鼠标事件中提到的窗口。特别的。
+</p><div class="lisp">
+<pre class="lisp">‘^’
+</pre></div>
+<p>如果命令是通过 shift-translation 调用的，则在命令运行之前设置标记并临时激活该区域，或者扩展一个已经处于活动状态的区域。如果在没有移位转换的情况下调用了该命令，并且该区域暂时处于活动状态，请在运行该命令之前停用该区域。特别的。
+</p><div class="lisp">
+<pre class="lisp">‘a’
+</pre></div>
+<p>函数名（即满足 fboundp 的符号）。现有，完成，提示。
+</p><div class="lisp">
+<pre class="lisp">‘b’
+</pre></div>
+<p>现有缓冲区的名称。默认情况下，使用当前缓冲区的名称（请参阅缓冲区）。现有、完成、默认、提示。
+</p><div class="lisp">
+<pre class="lisp">‘B’
+</pre></div>
+<p>缓冲区名称。缓冲区不需要存在。默认情况下，使用最近使用的缓冲区的名称，而不是当前缓冲区。完成，默认，提示。
+</p><div class="lisp">
+<pre class="lisp">‘c’
+</pre></div>
+<p>一个人物。光标不会移动到回波区域。迅速的。
+</p><div class="lisp">
+<pre class="lisp">‘C’
+</pre></div>
+<p>命令名称（即满足 commandp 的符号）。现有，完成，提示。
+</p><div class="lisp">
+<pre class="lisp">‘d’ ¶
+</pre></div>
+<p>点的位置，作为整数（请参阅点）。没有 I/O。
+</p><div class="lisp">
+<pre class="lisp">‘D’
+</pre></div>
+<p>一个目录。默认值是当前缓冲区的当前默认目录，default-directory（请参阅扩展文件名的函数）。现有、完成、默认、提示。
+</p><div class="lisp">
+<pre class="lisp">‘e’
+</pre></div>
+<p>调用命令的键序列中的第一个或下一个非键盘事件。更准确地说，’e’ 获取列表事件，因此您可以查看列表中的数据。请参阅输入事件。没有 I/O。
+</p>
+<p>您将 <code>e</code> 用于鼠标事件和特殊系统事件（请参阅其他系统事件）。命令接收的事件列表取决于事件。请参阅输入事件，其中描述了相应小节中每个事件的列表形式。
+</p>
+<p>您可以在单个命令的交互式规范中多次使用 <code>e</code> 。如果调用命令的键序列有 n 个列表事件，则第 n 个 <code>e</code> 提供第 n 个此类事件。不是列表的事件，例如功能键和 ASCII 字符，在涉及 ’e’ 的地方不计算在内。
+</p><div class="lisp">
+<pre class="lisp">‘f’
+</pre></div>
+<p>现有文件的文件名（请参阅文件名）。默认目录是默认目录。现有、完成、默认、提示。
+</p><div class="lisp">
+<pre class="lisp">‘F’
+</pre></div>
+<p>一个文件名。该文件不必存在。完成，默认，提示。
+</p><div class="lisp">
+<pre class="lisp">‘G’
+</pre></div>
+<p>一个文件名。该文件不必存在。如果用户只输入一个目录名，那么该值就是那个目录名，没有添加目录中的文件名。完成，默认，提示。
+</p><div class="lisp">
+<pre class="lisp">‘i’
+</pre></div>
+<p>一个无关紧要的论点。此代码始终提供 nil 作为参数的值。没有 I/O。
+</p><div class="lisp">
+<pre class="lisp">‘k’
+</pre></div>
+<p>键序列（请参阅键序列）。这会一直读取事件，直到在当前键映射中找到命令（或未定义的命令）。键序列参数表示为字符串或向量。光标不会移动到回波区域。迅速的。
+</p>
+<p>如果 <code>k</code> 读取了一个以向下事件结尾的键序列，它也会读取并丢弃随后的向上事件。您可以使用 <code>U</code> 代码字符访问该向上事件。
+</p>
+<p>这种输入由 describe-key 和 global-set-key 等命令使用。
+</p><div class="lisp">
+<pre class="lisp">‘K’
+</pre></div>
+<p>表单上的键序列，可用作定义键等函数的输入。这类似于 <code>k</code> ，除了它对于键序列中的最后一个输入事件抑制了通常用于（必要时）将未定义键转换为已定义键（请参阅键序列输入）的转换，所以这个form 通常在提示输入要绑定到命令的新键序列时使用。
+</p><div class="lisp">
+<pre class="lisp">‘m’ ¶
+</pre></div>
+<p>标记的位置，以整数形式。没有 I/O。
+</p><div class="lisp">
+<pre class="lisp">‘M’
+</pre></div>
+<p>任意文本，使用当前缓冲区的输入方法在 minibuffer 中读取，并以字符串形式返回（参见 GNU Emacs 手册中的输入方法）。迅速的。
+</p><div class="lisp">
+<pre class="lisp">‘n’
+</pre></div>
+<p>一个数字，用 minibuffer 读取。如果输入不是数字，则用户必须重试。’n’ 从不使用前缀参数。迅速的。
+</p><div class="lisp">
+<pre class="lisp">‘N’
+</pre></div>
+<p>数字前缀参数；  但如果没有前缀参数，则读取与 n 相同的数字。该值始终是一个数字。请参阅前缀命令参数。迅速的。
+</p><div class="lisp">
+<pre class="lisp">‘p’ ¶
+</pre></div>
+<p>数字前缀参数。（请注意，这个 <code>p</code> 是小写的。）无 I/O。
+</p><div class="lisp">
+<pre class="lisp">‘P’ ¶
+</pre></div>
+<p>原始前缀参数。（请注意，这个 <code>P</code> 是大写的。）无 I/O。
+</p><div class="lisp">
+<pre class="lisp">‘r’ ¶
+</pre></div>
+<p>点和标记，作为两个数字参数，最小的在前。这是唯一指定两个连续参数而不是一个的代码字母。如果在调用命令时当前的缓冲区中没有设置标记，这将发出错误信号。如果 Transient Mark 模式打开（参见 The Mark）——默认情况下——并且用户选项 mark-even-if-inactive 为 nil，即使设置了标记，Emacs 也会发出错误信号，但处于非活动状态。没有 I/O。
+</p><div class="lisp">
+<pre class="lisp">‘s’
+</pre></div>
+<p>任意文本，在 minibuffer 中读取并作为字符串返回（请参阅Reading Text Strings with the Minibuffer）。使用 Cj 或 RET 终止输入。（Cq 可用于在输入中包含这些字符中的任何一个。） 提示。
+</p><div class="lisp">
+<pre class="lisp">‘S’
+</pre></div>
+<p>在 minibuffer 中读取其名称的实习符号。使用 Cj 或 RET 终止输入。通常终止符号的其他字符（例如，空格、括号和方括号）在此不这样做。迅速的。
+</p><div class="lisp">
+<pre class="lisp">‘U’
+</pre></div>
+<p>一个键序列或零。可以在 <code>k</code> 或 <code>K</code> 参数之后使用，以获取在 <code>k</code> 或 <code>K</code> 读取向下事件后丢弃的向上事件（如果有）。如果没有丢弃任何向上事件，则 <code>U</code> 提供 nil 作为参数。没有 I/O。
+</p><div class="lisp">
+<pre class="lisp">‘v’
+</pre></div>
+<p>声明为用户选项的变量（即满足谓词 custom-variable-p）。这使用 read-variable 读取变量。请参阅读变量的定义。现有，完成，提示。
+</p><div class="lisp">
+<pre class="lisp">‘x’
+</pre></div>
+<p>一个 Lisp 对象，以其读取语法指定，以 Cj 或 RET 终止。不评估对象。请参阅使用 Minibuffer 读取 Lisp 对象。迅速的。
+</p><div class="lisp">
+<pre class="lisp">‘X’ ¶
+</pre></div>
+<p>Lisp 表单的值。’X’ 和 ’x’ 一样读取，然后计算表单，使其值成为命令的参数。迅速的。
+</p><div class="lisp">
+<pre class="lisp">‘z’
+</pre></div>
+<p>编码系统名称（符号）。如果用户输入 null 输入，则参数值为 nil。请参阅编码系统。完成，现有，提示。
+</p><div class="lisp">
+<pre class="lisp">‘Z’
+</pre></div>
+<p>编码系统名称（符号）——但仅当此命令具有前缀参数时。没有前缀参数，’Z’ 提供 nil 作为参数值。完成，现有，提示。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.2.3_使用示例_interactive.html">使用示例_interactive</a>, Previous: <a href="22.2.1_使用_interactive.html">使用_interactive</a>, Up: <a href="22.2_定义命令.html">定义命令.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

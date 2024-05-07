@@ -1,0 +1,117 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>13.5 调用函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">13.5 调用函数</h2>
+<div class="nav-panel"><p>Next: <a href="13.6_映射函数.html">映射函数</a>, Previous: <a href="13.4_定义函数.html">定义函数</a>, Up: <a href="13_函数.html">函数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>定义功能只是成功的一半。函数在您调用它们之前不会做任何事情，即告诉它们运行。调用函数也称为调用。
+</p>
+<p>调用函数的最常见方法是评估列表。例如，评估列表 (concat "a" "b") 调用带有参数 "a" 和 "b" 的函数 concat。有关评估的说明，请参阅评估。
+</p>
+<p>当您在程序中将列表编写为表达式时，您可以在程序的文本中指定要调用的函数以及要为其提供多少参数。通常这正是你想要的。有时您需要在运行时计算要调用的函数。为此，请使用函数 funcall。当您还需要在运行时确定要传递多少个参数时，请使用 apply。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: funcall function &amp;rest arguments ¶
+</pre></div>
+<p>funcall 使用参数调用函数，并返回函数返回的任何内容。
+</p>
+<p>由于 funcall 是一个函数，因此它的所有参数，包括函数，都会在调用 funcall 之前进行评估。这意味着您可以使用任何表达式来获取要调用的函数。这也意味着 funcall 不会看到您为参数编写的表达式，而只会看到它们的值。在调用函数的行为中，这些值不会被第二次评估；  funcall 的操作就像调用函数的正常过程一样，一旦它的参数已经被评估。
+</p>
+<p>参数函数必须是 Lisp 函数或原始函数。不允许使用特殊形式和宏，因为它们只有在给定未计算的参数表达式时才有意义。funcall 无法提供这些，因为正如我们在上面看到的，它从一开始就永远不知道它们。
+</p>
+<p>如果您需要使用 funcall 来调用命令并使其表现得像交互式调用一样，请使用 funcall-interactively（请参阅交互式调用）。
+</p>
+<div class="lisp">
+<pre class="lisp">
+
+(setq f 'list)
+     ⇒ list
+
+(funcall f 'x 'y 'z)
+     ⇒ (x y z)
+
+(funcall f 'x 'y '(z))
+     ⇒ (x y (z))
+
+(funcall 'and t nil)
+error→ Invalid function: #&lt;subr and&gt;
+</pre></div>
+<p>将这些示例与 apply 的示例进行比较。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: apply function &amp;rest arguments ¶
+</pre></div>
+<p>apply 使用参数调用函数，就像 funcall 但有一个区别：最后一个参数是对象列表，它们作为单独的参数而不是单个列表传递给函数。我们说 apply 扩展这个列表，以便每个单独的元素成为一个参数。
+</p>
+<p>带有单个参数的 apply 是特殊的：参数的第一个元素必须是一个非空列表，它作为一个函数调用，其余元素作为单独的参数。传递两个或更多参数会更快。
+</p>
+<p>apply 返回调用函数的结果。与 funcall 一样，函数必须是 Lisp 函数或原始函数；  特殊形式和宏在 apply 中没有意义。
+</p><div class="lisp">
+<pre class="lisp">(setq f 'list)
+     ⇒ list
+
+(apply f 'x 'y 'z)
+error→ Wrong type argument: listp, z
+
+(apply '+ 1 2 '(3 4))
+     ⇒ 10
+
+(apply '+ '(1 2 3 4))
+     ⇒ 10
+
+
+(apply 'append '((a b c) nil (x y z) nil))
+     ⇒ (a b c x y z)
+
+
+(apply '(+ 3 4))
+     ⇒ 7
+</pre></div>
+<p>有关使用 apply 的有趣示例，请参阅 mapcar 的定义。
+</p>
+<p>有时将函数的某些参数固定为某些值是很有用的，而将其余参数留给函数实际调用时使用。固定一些函数参数的行为称为函数的部分应用。结果是一个新函数，它接受其余参数并调用原始函数并将所有参数组合在一起。
+</p>
+<p>以下是如何在 Emacs Lisp 中执行部分应用程序：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: apply-partially func &amp;rest args ¶
+</pre></div>
+<p>此函数返回一个新函数，当调用该函数时，将调用 func 并使用由 args 和调用时指定的附加参数组成的参数列表。如果 func 接受 n 个参数，那么使用 m &lt;= n 个参数调用 apply-partially 将产生一个具有 n - m 个参数的新函数12。
+</p>
+<p>下面是我们如何定义内置函数 1+，如果它不存在，使用 apply-partially 和 +，另一个内置函数 13：
+</p><div class="lisp">
+<pre class="lisp">(defalias '1+ (apply-partially '+ 1)
+  "Increment argument by one.")
+
+(1+ 10)
+     ⇒ 11
+</pre></div>
+<p>Lisp 函数通常接受函数作为参数或在数据结构中找到它们（尤其是在钩子变量和属性列表中）并使用 funcall 或 apply 调用它们。接受函数参数的函数通常称为函数。
+</p>
+<p>有时，当您调用函数时，提供一个无操作函数作为参数很有用。这里有两种不同的无操作函数：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: identity argument ¶
+</pre></div>
+<p>此函数返回参数并且没有副作用。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ignore &amp;rest arguments ¶
+</pre></div>
+<p>此函数忽略任何参数并返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: always &amp;rest arguments ¶
+</pre></div>
+<p>此函数忽略任何参数并返回 t。
+</p>
+<p>有些函数是用户可见的命令，可以交互调用（通常通过按键序列）。通过使用 call-interactively 函数，可以完全调用这样的命令，就好像它被交互式调用一样。请参阅交互式呼叫。
+脚注
+(11)
+</p>
+<p>这与 currying 相关但不同，currying 将接受多个参数的函数转换为可以作为函数链调用的函数，每个函数都有一个参数。
+(12)
+</p>
+<p>如果 func 可以接受的参数数量是无限的，那么新函数也将接受无限数量的参数，因此在这种情况下 apply-partially 不会减少新函数可以接受的参数数量。
+(13)
+</p>
+<p>请注意，与内置函数不同，此版本接受任意数量的参数。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="13.6_映射函数.html">映射函数</a>, Previous: <a href="13.4_定义函数.html">定义函数</a>, Up: <a href="13_函数.html">函数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

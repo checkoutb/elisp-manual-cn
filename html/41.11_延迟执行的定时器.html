@@ -1,0 +1,91 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>41.11 延迟执行的定时器</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">41.11 延迟执行的定时器</h2>
+<div class="nav-panel"><p>Next: <a href="41.12_空闲定时器.html">空闲定时器</a>, Previous: <a href="41.10_时间计算.html">时间计算</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>您可以设置一个计时器，以在指定的未来时间或一定时间的空闲时间后调用函数。计时器是一个特殊的对象，它存储有关下一次调用时间和要调用的函数的信息。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: timerp object ¶
+</pre></div>
+<p>如果 object 是计时器，则此谓词函数返回非 nil。
+</p>
+<p>Emacs 不能在 Lisp 程序的任意点运行计时器；  只有当 Emacs 可以接受来自子进程的输出时，它才能运行它们：即，在等待时或在某些可以等待的原始函数（如坐席或读取事件）内。因此，如果 Emacs 忙，计时器的执行可能会延迟。但是，如果 Emacs 空闲，则执行时间非常精确。
+</p>
+<p>Emacs 在调用定时器函数之前将禁止退出绑定到 t，因为退出许多定时器函数会使事物处于不一致的状态。这通常是没有问题的，因为大多数计时器功能不会做很多工作。实际上，对于一个需要大量时间来运行的函数来说，一个计时器可能会很烦人。如果一个定时器函数需要允许退出，它应该使用 with-local-quit（参见 Quitting）。例如，如果一个计时器函数调用accept-process-output 来接收来自外部进程的输出，那么该调用应该包含在with-local-quit 中，以确保在外部进程挂起时Cg 可以正常工作。
+</p>
+<p>定时器函数更改缓冲区内容通常是个坏主意。当他们这样做时，他们通常应该在更改缓冲区之前和之后调用 undo-boundary，以将计时器的更改与用户命令的更改分开，并防止单个撤消条目变得非常大。
+</p>
+<p>定时器函数还应该避免调用导致 Emacs 等待的函数，例如坐等（请参阅等待经过的时间或输入）。这可能会导致不可预知的效果，因为其他计时器（甚至同一个计时器）可以在等待时运行。如果一个定时器函数需要在某个时间过去后执行一个动作，它可以通过调度一个新的定时器来完成。
+</p>
+<p>如果定时器函数执行远程文件操作，它可能与同一连接的已经运行的远程文件操作发生冲突。检测到此类冲突，它们会导致远程文件错误错误（请参阅标准错误）。这应该通过将定时器函数体包装起来来保护
+</p>
+<div class="lisp">
+<pre class="lisp">(ignore-error 'remote-file-error
+  …)
+</pre></div>
+<p>如果计时器函数调用可以更改匹配数据的函数，它应该保存和恢复匹配数据。请参阅保存和恢复匹配数据。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: run-at-time time repeat function &amp;rest args ¶
+</pre></div>
+<p>这设置了一个计时器，该计时器在时间时间调用带有参数 args 的函数函数。如果repeat 是一个数字（整数或浮点数），则定时器计划在time 之后每隔repeat 秒再次运行。如果repeat 为nil，则定时器只运行一次。
+</p>
+<p>time 可以指定绝对时间或相对时间。
+</p>
+<p>绝对时间可以使用具有有限多种格式的字符串来指定，并且被认为是今天的时间，即使已经在过去。可识别的形式为 <code>xxxx</code> 、 <code>x:xx</code> 或 <code>xx:xx</code> （军用时间），以及 <code>xxam</code> 、 <code>xxAM</code> 、 <code>xxpm</code> 、 <code>xxPM</code> 、 <code>xx:xxam</code> 、 <code>xx</code>  :xxAM’、’xx:xxpm’ 或 ’xx:xxPM’。可以使用句点代替冒号来分隔小时和分钟部分。
+</p>
+<p>要将相对时间指定为字符串，请使用数字后跟单位。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">‘1 min’
+</pre></div>
+<p>表示从现在开始 1 分钟。
+</p><div class="lisp">
+<pre class="lisp">‘1 min 5 sec’
+</pre></div>
+<p>表示从现在起 65 秒。
+</p><div class="lisp">
+<pre class="lisp">‘1 min 2 sec 3 hour 4 day 5 week 6 fortnight 7 month 8 year’
+</pre></div>
+<p>正好表示从现在开始的 103 个月、123 天和 10862 秒。
+</p>
+<p>对于相对时间值，Emacs 认为一个月正好是 30 天，而一年正好是 365.25 天。
+</p>
+<p>并非所有方便的格式都是字符串。如果 time 是一个数字（整数或浮点），则指定以秒为单位的相对时间。encode-time 的结果也可以用来指定时间的绝对值。
+</p>
+<p>在大多数情况下，重复对第一次调用发生的时间没有影响——只有时间指定了这一点。有一个例外：如果时间是 t，那么只要时间是 epoch 后重复秒数的倍数，计时器就会运行。这对于显示时间等功能很有用。
+</p>
+<p>如果 Emacs 在定时器运行时没有获得任何 CPU 时间（例如，如果系统正忙于运行另一个进程，或者计算机正在睡眠或处于挂起状态），则定时器将在 Emacs 恢复时立即运行，并且闲。
+</p>
+<p>run-at-time 函数返回一个计时器值，该值标识特定的计划未来操作。您可以使用此值来调用取消计时器（见下文）。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: run-with-timer secs repeat function &amp;rest args ¶
+</pre></div>
+<p>这与 run-at-time 完全相同（请参阅该定义以了解参数的说明；secs 作为时间传递给该函数），但应在以秒为单位指定延迟时使用。
+</p>
+<p>重复计时器名义上应该每隔重复秒运行一次，但请记住，计时器的任何调用都可能延迟。一次重复的迟到对下一次重复的预定时间没有影响。例如，如果 Emacs 忙于计算足够长的时间以覆盖定时器的三个计划重复，然后开始等待，它会立即连续调用定时器函数 3 次（假设在它们之前或它们之间没有其他定时器触发）。如果您希望计时器在上次调用后不少于 n 秒再次运行，请不要使用 repeat 参数。相反，定时器函数应该显式地重新调度定时器。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: timer-max-repeats ¶
+</pre></div>
+<p>此变量的值指定在许多先前计划的调用不可避免地延迟时，连续重复调用计时器函数的最大次数。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: with-timeout (seconds timeout-forms…) body… ¶
+</pre></div>
+<p>执行身体，但在几秒钟后放弃。如果 body 在时间结束之前完成，with-timeout 返回 body 中最后一个表单的值。但是，如果 body 的执行被超时中断，那么 with-timeout 会执行所有的 timeout-forms 并返回它们中最后一个的值。
+</p>
+<p>这个宏的工作原理是设置一个计时器在几秒后运行。如果 body 在此时间之前完成，它将取消计时器。如果计时器实际运行，它会终止 body 的执行，然后执行 timeout-forms。
+</p>
+<p>由于计时器只能在程序调用可以等待的原语时在 Lisp 程序中运行，所以 with-timeout 不能在计算过程中停止执行主体——只有当它调用这些原语之一时。因此，with-timeout 只能用于等待输入的主体，而不是进行长时间计算的主体。
+</p>
+<p>函数 y-or-np-with-timeout 提供了一种使用计时器的简单方法，以避免等待太久才能得到答案。请参阅是或否查询。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: cancel-timer timer ¶
+</pre></div>
+<p>这取消了计时器的请求操作，它应该是一个计时器——通常是之前由 run-at-time 或 run-with-idle-timer 返回的计时器。这取消了对这些函数之一的调用的效果；  指定时间的到来不会导致任何特别的事情发生。
+</p>
+<p>list-timers 命令列出所有当前活动的计时器。命令 c (timer-list-cancel) 将取消点下行的计时器。您可以使用命令 S (tabulated-list-sort) 按列对列表进行排序。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="41.12_空闲定时器.html">空闲定时器</a>, Previous: <a href="41.10_时间计算.html">时间计算</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

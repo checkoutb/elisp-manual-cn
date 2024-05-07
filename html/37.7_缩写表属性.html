@@ -1,0 +1,38 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>37.7 缩写表属性</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">37.7 缩写表属性</h2>
+<div class="nav-panel"><p>Next: <a href="38_线程.html">线程</a>, Previous: <a href="37.6_缩写属性.html">缩写属性</a>, Up: <a href="37_缩写和缩写扩展.html">缩写和缩写扩展.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>与缩写一样，缩写表也有一些属性，其中一些会影响它们的工作方式。您可以将它们作为参数提供给 define-abbrev-table，并使用以下函数操作它们：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: abbrev-table-put table prop val ¶
+</pre></div>
+<p>将 abbrev table table 的 property prop 设置为 value val。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: abbrev-table-get table prop ¶
+</pre></div>
+<p>返回 abbrev table table 的属性 prop，如果 table 没有这样的属性，则返回 nil。
+</p>
+<p>以下属性具有特殊含义：
+</p><div class="lisp">
+<pre class="lisp">:enable-function
+</pre></div>
+<p>这类似于 :enable-function abbrev 属性，只是它适用于表中的所有缩写。它甚至在尝试查找点之前的缩写之前使用，因此它可以动态修改缩写表。
+</p><div class="lisp">
+<pre class="lisp">:case-fixed
+</pre></div>
+<p>这类似于 :case-fixed abbrev 属性，只是它适用于表中的所有缩写词。
+</p><div class="lisp">
+<pre class="lisp">:regexp
+</pre></div>
+<p>如果非零，则此属性是一个正则表达式，指示如何在点之前提取缩写的名称，然后在表中查找它。当正则表达式在点之前匹配时，缩写名称应在子匹配1中。如果此属性为nil，则默认使用backward-word和forward-word查找名称。此属性允许使用名称中包含非单词语法字符的缩写。
+</p><div class="lisp">
+<pre class="lisp">:parents
+</pre></div>
+<p>此属性包含要从中继承其他缩写的表的列表。
+</p><div class="lisp">
+<pre class="lisp">:abbrev-table-modiff
+</pre></div>
+<p>每次向表中添加新的缩写时，此属性都会增加一个计数器。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="38_线程.html">线程</a>, Previous: <a href="37.6_缩写属性.html">缩写属性</a>, Up: <a href="37_缩写和缩写扩展.html">缩写和缩写扩展.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

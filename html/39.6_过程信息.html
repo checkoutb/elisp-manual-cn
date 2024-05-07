@@ -1,0 +1,203 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>39.6 过程信息</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">39.6 过程信息</h2>
+<div class="nav-panel"><p>Next: <a href="39.7_向进程发送输入.html">向进程发送输入</a>, Previous: <a href="39.5_删除进程.html">删除进程</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>几个函数返回有关进程的信息。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: list-processes &amp;optional query-only buffer ¶
+</pre></div>
+<p>此命令显示所有活动进程的列表。此外，它最终会删除任何状态为 <code>已退出</code> 或 <code>已发出信号</code> 的进程。它返回零。
+</p>
+<p>进程显示在名为 <strong>Process List</strong> 的缓冲区中（除非您使用可选参数缓冲区另外指定），其主要模式是进程菜单模式。
+</p>
+<p>如果 query-only 为非 nil，它只列出查询标志为非 nil 的进程。请参阅退出前查询。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: process-list ¶
+</pre></div>
+<p>此函数返回所有尚未删除的进程的列表。
+</p>
+<div class="lisp">
+<pre class="lisp">(process-list)
+     ⇒ (#&lt;process display-time&gt; #&lt;process shell&gt;)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: num-processors &amp;optional query ¶
+</pre></div>
+<p>该函数返回处理器的数量，一个正整数。每个可用的线程执行单元都算作一个处理器。默认情况下，计数包括可用处理器的数量，您可以通过设置 OpenMP 的 OMP<em>_NUM</em><em>_THREADS</em> 环境变量来覆盖它。如果可选参数查询是当前的，则此函数忽略 OMP<em>_NUM</em><em>_THREADS</em>；  如果查询是全部，则此函数还计算系统上但当前进程不可用的处理器。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: get-process name ¶
+</pre></div>
+<p>此函数返回名为 name 的进程（一个字符串），如果没有则返回 nil。参数名称也可以是一个进程对象，在这种情况下它被返回。
+</p><div class="lisp">
+<pre class="lisp">(get-process "shell")
+     ⇒ #&lt;process shell&gt;
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: process-command process ¶
+</pre></div>
+<p>此函数返回为启动进程而执行的命令。这是一个字符串列表，第一个字符串是执行的程序，其余的字符串是给程序的参数。对于网络、串行或管道连接，这要么是 nil，这意味着进程正在运行，要么是 t（进程已停止）。
+</p>
+<div class="lisp">
+<pre class="lisp">(process-command (get-process "shell"))
+     ⇒ ("bash" "-i")
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: process-contact process &amp;optional key no-block ¶
+</pre></div>
+<p>此函数返回有关如何设置网络、串行或管道连接的信息。当 key 为 nil 时，它为网络连接返回 (hostname service)，为串行连接返回 (port speed)，为管道连接返回 t。对于一个普通的子进程，这个函数在使用 nil 键调用时总是返回 t。
+</p>
+<p>如果key为t，则value为连接、服务器、串口或管道的完整状态信息；  即在 make-network-process、make-serial-process 或 make-pipe-process 中指定的关键字和值的列表，除了某些值表示当前状态而不是您指定的状态。
+</p>
+<p>对于网络进程，这些值包括（请参阅 make-network-process 以获取完整列表）：
+</p>
+<div class="lisp">
+<pre class="lisp">:buffer
+</pre></div>
+<p>关联的值是进程缓冲区。
+</p><div class="lisp">
+<pre class="lisp">:filter
+</pre></div>
+<p>关联的值是过程过滤器功能。请参阅处理过滤器函数。
+</p><div class="lisp">
+<pre class="lisp">:sentinel
+</pre></div>
+<p>关联的值是进程哨兵函数。请参阅 Sentinels：检测进程状态更改。
+</p><div class="lisp">
+<pre class="lisp">:remote
+</pre></div>
+<p>在连接中，远程对等点的内部格式的地址。
+</p><div class="lisp">
+<pre class="lisp">:local
+</pre></div>
+<p>本地地址，采用内部格式。
+</p><div class="lisp">
+<pre class="lisp">:service
+</pre></div>
+<p>在服务器中，如果您为服务指定了 t，则此值是实际的端口号。
+</p>
+<p>:local 和 :remote 包括在内，即使它们没有在 make-network-process 中明确指定。
+</p>
+<p>对于串行连接，请参阅 make-serial-process 和 serial-process-configure 以获取密钥列表。对于管道连接，请参阅 make-pipe-process 以获取键列表。
+</p>
+<p>如果 key 是关键字，则函数返回与该关键字对应的值。
+</p>
+<p>如果进程是尚未完全设置的非阻塞网络流，则此函数将阻塞直到发生。如果给定可选的 no-block 参数，此函数将返回 nil 而不是阻塞。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: process-id process ¶
+</pre></div>
+<p>该函数返回进程的PID。这是一个整数，用于将进程进程与当前在同一台计算机上运行的所有其他进程区分开来。进程的 PID 在进程启动时由操作系统内核选择，并且只要进程存在就保持不变。对于网络、串行和管道连接，此函数返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: process-name process ¶
+</pre></div>
+<p>此函数以字符串形式返回进程的名称。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: process-status process-name ¶
+</pre></div>
+<p>此函数将进程名称的状态作为符号返回。参数 process-name 必须是进程、缓冲区或进程名称（字符串）。
+</p>
+<p>实际子流程的可能值为：
+</p>
+<div class="lisp">
+<pre class="lisp">run
+</pre></div>
+<p>对于正在运行的进程。
+</p><div class="lisp">
+<pre class="lisp">stop
+</pre></div>
+<p>对于已停止但可继续的过程。
+</p><div class="lisp">
+<pre class="lisp">exit
+</pre></div>
+<p>对于已退出的进程。
+</p><div class="lisp">
+<pre class="lisp">signal
+</pre></div>
+<p>对于已收到致命信号的进程。
+</p><div class="lisp">
+<pre class="lisp">open
+</pre></div>
+<p>用于打开的网络、串行或管道连接。
+</p><div class="lisp">
+<pre class="lisp">closed
+</pre></div>
+<p>对于已关闭的网络、串行或管道连接。连接关闭后，您将无法重新打开它，但您可能可以打开与同一位置的新连接。
+</p><div class="lisp">
+<pre class="lisp">connect
+</pre></div>
+<p>对于等待完成的非阻塞连接。
+</p><div class="lisp">
+<pre class="lisp">failed
+</pre></div>
+<p>对于未能完成的非阻塞连接。
+</p><div class="lisp">
+<pre class="lisp">listen
+</pre></div>
+<p>对于正在侦听的网络服务器。
+</p><div class="lisp">
+<pre class="lisp">nil
+</pre></div>
+<p>如果 process-name 不是现有进程的名称。
+</p><div class="lisp">
+<pre class="lisp">(process-status (get-buffer "*shell*"))
+     ⇒ run
+</pre></div>
+<p>对于网络、串行或管道连接，process-status 返回符号打开、停止或关闭之一。后者意味着对方关闭了连接，或者Emacs做了delete-process。值 stop 表示在连接上调用了 stop-process。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: process-live-p process ¶
+</pre></div>
+<p>如果进程处于活动状态，则此函数返回非零。如果进程的状态为运行、打开、侦听、连接或停止，则认为进程处于活动状态。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: process-type process ¶
+</pre></div>
+<p>此函数返回符号 network 表示网络连接或服务器，serial 表示串行端口连接，pipe 表示管道连接，或 real 表示为运行程序而创建的子进程。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: process-exit-status process ¶
+</pre></div>
+<p>此函数返回进程的退出状态或杀死它的信号号。（使用 process-status 的结果来确定它是哪一个。）如果进程尚未终止，则值为 0。对于已经关闭的网络、串行和管道连接，值为 0 或 256，取决于连接是正常关闭还是异常关闭。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: process-tty-name process ¶
+</pre></div>
+<p>此函数返回进程用于与 Emacs 通信的终端名称——如果它使用管道而不是 pty，则返回 nil（请参阅创建异步进程中的 process-connection-type）。如果 process 表示在远程主机上运行的程序，则远程主机上该程序使用的终端名称作为进程属性 remote-tty 提供。如果 process 表示网络、串行或管道连接，则值为 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: process-coding-system process ¶
+</pre></div>
+<p>此函数返回一个 cons 单元（decode .encode），描述用于对进程的输出进行解码和对进程的输入进行编码的编码系统（请参阅编码系统）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-process-coding-system process &amp;optional decoding-system encoding-system ¶
+</pre></div>
+<p>此函数指定用于后续输出和输入到处理的编码系统。它将使用解码系统对子进程输出进行解码，并使用编码系统对子进程输入进行编码。
+</p>
+<p>每个进程还有一个属性列表，您可以使用它来存储与进程关联的杂项值。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: process-get process propname ¶
+</pre></div>
+<p>此函数返回 process 的 propname 属性的值。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: process-put process propname value ¶
+</pre></div>
+<p>此函数将 process 的 propname 属性的值设置为 value。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: process-plist process ¶
+</pre></div>
+<p>该函数返回进程的进程plist。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-process-plist process plist ¶
+</pre></div>
+<p>该函数将进程的进程plist设置为plist。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="39.7_向进程发送输入.html">向进程发送输入</a>, Previous: <a href="39.5_删除进程.html">删除进程</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

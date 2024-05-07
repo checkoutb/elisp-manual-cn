@@ -1,0 +1,17 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>14.1 一个简单的宏例子</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">14.1 一个简单的宏例子</h2>
+<div class="nav-panel"><p>Next: <a href="14.2_宏调用的扩展.html">宏调用的扩展</a>, Previous: <a href="14_宏.html">宏</a>, Up: <a href="14_宏.html">宏.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>假设我们想定义一个 Lisp 结构来增加一个变量值，就像 C 中的 + 运算符一样。我们想写 (inc x) 并具有 (setq x (1 x)) 的效果。这是一个完成这项工作的宏定义：
+</p>
+<div class="lisp">
+<pre class="lisp">(defmacro inc (var)
+   (list 'setq var (list '1+ var)))
+</pre></div>
+<p>当使用 (inc x) 调用 this 时，参数 var 是符号 x——而不是 x 的值，就像在函数中那样。宏的主体使用它来构造展开式，即 (setq x (1+ x))。一旦宏定义返回这个展开式，Lisp 就会继续计算它，从而增加 x。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: macrop object ¶
+</pre></div>
+<p>该谓词测试其参数是否为宏，如果是则返回 t，否则返回 nil。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="14.2_宏调用的扩展.html">宏调用的扩展</a>, Previous: <a href="14_宏.html">宏</a>, Up: <a href="14_宏.html">宏.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

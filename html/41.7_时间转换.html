@@ -1,0 +1,150 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>41.7 时间转换</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">41.7 时间转换</h2>
+<div class="nav-panel"><p>Next: <a href="41.8_解析和格式化时间.html">解析和格式化时间</a>, Previous: <a href="41.6_时区规则.html">时区规则</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这些函数将时间值（参见时间）转换为 Lisp 时间戳，或转换为日历信息，反之亦然。
+</p>
+<p>许多 32 位操作系统仅限于在其秒组件中包含 32 位信息的系统时间；  这些系统通常只处理从 1901-12-13 20:45:52 到 2038-01-19 03:14:07 世界时的时间。但是，64 位和一些 32 位操作系统具有更大的秒组件，并且可以表示过去或未来的时间。
+</p>
+<p>日历转换函数始终使用公历，即使对于引入公历之前的日期也是如此。年份数字计算自公元前 1 年以来的年数，并且不要像传统的公历年份那样跳过零；  例如，年份数字 -37 表示公历 38 BC。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: time-convert time &amp;optional form ¶
+</pre></div>
+<p>此函数将时间值转换为 Lisp 时间戳。
+</p>
+<p>可选形式参数指定要返回的时间戳形式。如果 form 是符号整数，则此函数返回以秒为单位的整数计数。如果form是一个正整数，它指定一个时钟频率并且这个函数返回一个整数对时间戳（ticks .form）。28如果form是t，这个函数把它当作一个正整数来表示时间戳；  例如，如果时间为零并且平台时间戳具有纳秒分辨率，则将其视为 1000000000。如果form是list，这个函数返回一个整数列表（高低微微微）。尽管当前省略或 nil 形式的行为类似于列表，但计划在未来的 Emacs 版本中进行更改，因此需要列表时间戳的调用者应显式传递列表。
+</p>
+<p>如果时间是无限的或 NaN，则此函数会发出错误信号。否则，如果无法准确表示时间，则转换会将其截断为负无穷大。当form为t时，转换总是精确的，不会发生截断，返回的时钟分辨率不小于时间。相比之下，float-time 可以转换任何 Lisp 时间值而不会发出错误信号，尽管结果可能不准确。请参阅一天中的时间。
+</p>
+<p>为了提高效率，这个函数可能返回一个与时间相等的值，或者与时间共享结构的值。
+</p>
+<p>虽然 (time-convert nil nil) 等价于 (current-time)，但后者可能会快一点。
+</p><div class="lisp">
+<pre class="lisp">
+
+(setq a (time-convert nil t))
+⇒ (1564826753904873156 . 1000000000)
+
+(time-convert a 100000)
+⇒ (156482675390487 . 100000)
+
+(time-convert a 'integer)
+⇒ 1564826753
+
+(time-convert a 'list)
+⇒ (23877 23681 904873 156000)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: decode-time &amp;optional time zone form ¶
+</pre></div>
+<p>此函数将时间值转换为日历信息。如果您不指定时间，它会解码当前时间，并且类似地，区域默认为当前时区规则。请参阅时区规则。操作系统限制时间和区域值的范围。
+</p>
+<p>form 参数控制返回的 seconds 元素的形式，如下所述。返回值是九个元素的列表，如下：
+</p>
+<div class="lisp">
+<pre class="lisp">(seconds minutes hour day month year dow dst utcoff)
+</pre></div>
+<p>以下是元素的含义：
+</p>
+<div class="lisp">
+<pre class="lisp">seconds
+</pre></div>
+<p>分钟后的秒数，格式如下所述。
+</p><div class="lisp">
+<pre class="lisp">minutes
+</pre></div>
+<p>一小时后的分钟数，为 0 到 59 之间的整数。
+</p><div class="lisp">
+<pre class="lisp">hour
+</pre></div>
+<p>一天中的小时，为 0 到 23 之间的整数。
+</p><div class="lisp">
+<pre class="lisp">day
+</pre></div>
+<p>月份中的日期，为 1 到 31 之间的整数。
+</p><div class="lisp">
+<pre class="lisp">month
+</pre></div>
+<p>一年中的月份，为 1 到 12 之间的整数。
+</p><div class="lisp">
+<pre class="lisp">year
+</pre></div>
+<p>年份，通常大于 1900 的整数。
+</p><div class="lisp">
+<pre class="lisp">dow
+</pre></div>
+<p>星期几，0 到 6 之间的整数，其中 0 代表星期日。
+</p><div class="lisp">
+<pre class="lisp">dst
+</pre></div>
+<p>t 如果夏令时有效，nil 如果无效，-1 如果此信息不可用。
+</p><div class="lisp">
+<pre class="lisp">utcoff
+</pre></div>
+<p>一个整数，表示以秒为单位的世界时偏移量，即格林威治以东的秒数。
+</p>
+<p>seconds 元素是一个非负数且小于 61 的 Lisp 时间戳；  它小于 60，除非在正闰秒期间（假设操作系统支持闰秒）。如果可选的表单参数是 t，秒使用与时间相同的精度；  如果 form 是整数，秒被截断为整数。例如，如果 time 是时间戳 (1566009571321 . 1000)，它在缺少闰秒的典型系统上表示 2019-08-17 02:39:31.321 UTC，则 (decode-time time tt) 返回 ((31321 . 1000) 39 2 17 8 2019 6 nil 0)，而 (decode-time time t ’integer) 返回 (31 39 2 17 8 2019 6 nil 0)。如果 form 被省略或为零，它当前默认为整数，但此默认值可能会在未来的 Emacs 版本中更改，因此需要特定表单的调用者应指定 form。
+</p>
+<p>Common Lisp 注意：Common Lisp 对于 dow 和 utcoff 有不同的含义，它的第二个是 0 到 59 之间的整数。
+</p>
+<p>要访问（或更改）时间值中的元素，解码时间-秒、解码时间-分钟、解码时间-小时、解码时间-日、解码时间-月、解码时间-年，可以使用decoded-time-weekday、decoded-time-dst 和decoded-time-zone 访问器。
+</p>
+<p>例如，要在解码时间内增加年份，您可以说：
+</p><div class="lisp">
+<pre class="lisp">(setf (decoded-time-year decoded-time)
+      (+ (decoded-time-year decoded-time) 4))
+</pre></div>
+<p>另请参阅以下功能。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: decoded-time-add time delta ¶
+</pre></div>
+<p>此函数采用解码的时间结构并向其添加 delta（也是解码的时间结构）。delta 中为 nil 的元素将被忽略。
+</p>
+<p>例如，如果你想要 <code>下个月的同一时间</code> ，你可以说：
+</p>
+<div class="lisp">
+<pre class="lisp">(let ((time (decode-time nil nil t))
+      (delta (make-decoded-time :month 2)))
+   (encode-time (decoded-time-add time delta)))
+</pre></div>
+<p>如果此日期不存在（例如，如果您在 1 月 31 日运行此日期），则日期将向后移动，直到您获得有效日期（取决于 2 月 28 日或 29 日）。
+</p>
+<p>字段按最重要到最不重要的顺序添加，因此如果发生上述调整，则在添加天、小时、分钟或秒之前发生。
+</p>
+<p>delta 中的值可以是负数来减去值。
+</p>
+<p>返回值是一个解码的时间结构。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-decoded-time &amp;key second minute hour day month year dst zone ¶
+</pre></div>
+<p>返回一个解码的时间结构，只填写给定的关键字，其余的为零。例如，要获得一个表示 <code>两个月</code> 的结构，您可以说：
+</p>
+<div class="lisp">
+<pre class="lisp">(make-decoded-time :month 2)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: encode-time time &amp;rest obsolescent-arguments ¶
+</pre></div>
+<p>此函数将时间转换为 Lisp 时间戳。它可以作为解码时间的倒​​数。
+</p>
+<p>通常，第一个参数是一个列表（第二分钟小时日月年忽略 dst 区域），它以 decode-time 的样式指定解码时间，因此 (encode-time (decode-time …)) 有效。这些列表成员的含义见decode-time下的表格。
+</p>
+<p>作为一个过时的调用约定，这个函数可以有六个或更多的参数。前六个参数 second、minute、hour、day、month 和 year 指定解码时间的大部分组成部分。如果有超过六个参数，则最后一个参数用作区域，并且任何其他额外参数都将被忽略，因此 (apply #’encode-time (decode-time …)) 有效。在这个过时的约定中，区域默认为当前时区规则（请参阅时区规则），并且 dst 被视为 -1。
+</p>
+<p>小于 100 的年份不作特殊处理。如果您希望它们代表 1900 年以上或 2000 年以上的年份，您必须在调用编码时间之前自己更改它们。操作系统限制时间和区域值的范围。
+</p>
+<p>编码时间函数作为解码时间的粗略逆。例如，您可以将后者的输出传递给前者，如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(encode-time (decode-time …))
+</pre></div>
+<p>您可以通过使用超出范围的秒、分、小时、日和月值来执行简单的日期算术；  例如，第 0 天表示给定月份的前一天。
+</p>
+<p>脚注
+(28)
+</p>
+<p>目前，如果返回值旨在提供给期望 Lisp 时间戳的标准函数，则正整数形式应至少为 65536。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="41.8_解析和格式化时间.html">解析和格式化时间</a>, Previous: <a href="41.6_时区规则.html">时区规则</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

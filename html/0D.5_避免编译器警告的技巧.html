@@ -1,0 +1,34 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>D.5 避免编译器警告的技巧</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">D.5 避免编译器警告的技巧</h2>
+<div class="nav-panel"><p>Next: <a href="0D.6_文档字符串提示.html">文档字符串提示</a>, Previous: <a href="0D.4_快速编译代码的技巧.html">快速编译代码的技巧</a>, Up: <a href="附录_D_提示和约定.html">D_提示和约定.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><ul>
+<li>
+尝试通过为这些变量添加虚拟 defvar 定义来避免关于未定义的自由变量的编译器警告，如下所示：
+
+<div class="lisp">
+<pre class="lisp">(defvar foo)
+</pre></div>
+</li><li>
+这样的定义除了告诉编译器不要警告该文件中变量 foo 的使用外，没有任何作用。
+</li><li>
+同样，为避免编译器警告您知道将要定义的未定义函数，请使用 declare-function 语句（请参阅告诉编译器已定义函数）。
+</li><li>
+如果您使用某个文件中的许多函数、宏和变量，您可以为该包添加一个 require（请参阅 require）以避免对它们产生编译警告，如下所示：
+
+<div class="lisp">
+<pre class="lisp">(require 'foo)
+</pre></div>
+</li></ul>
+<ul>
+<li>
+如果您只需要某个文件中的宏，则可以仅在编译时需要它（请参阅编译期间的评估）。例如，
+<div class="lisp">
+<pre class="lisp">(eval-when-compile
+  (require 'foo))
+</pre></div>
+</li><li>
+如果您在一个函数中绑定一个变量，并在另一个函数中使用或设置它，编译器会警告后一个函数，除非该变量有定义。但是如果变量有一个短名称，添加一个定义是不干净的，因为 Lisp 包不应该定义短变量名称。正确的做法是重命名此变量，以用于包中其他函数和变量的名称前缀开头。
+</li><li>
+避免警告的最后手段，当你想做一些通常是错误但你知道在你的使用中没有错误的事情时，就是把它放在没有警告的地方。请参阅编译器错误。
+</li></ul>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="0D.6_文档字符串提示.html">文档字符串提示</a>, Previous: <a href="0D.4_快速编译代码的技巧.html">快速编译代码的技巧</a>, Up: <a href="附录_D_提示和约定.html">D_提示和约定.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

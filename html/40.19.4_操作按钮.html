@@ -1,0 +1,68 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.19.4 操作按钮</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.19.4 操作按钮</h3>
+<div class="nav-panel"><p>Next: <a href="40.19.5_按钮缓冲区命令.html">按钮缓冲区命令</a>, Previous: <a href="40.19.3_制作按钮.html">制作按钮</a>, Up: <a href="40.19_按钮.html">按钮.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这些是用于获取和设置按钮属性的函数。通常这些被按钮的调用函数用来确定要做什么。
+</p>
+<p>如果指定了按钮参数，则表示引用特定按钮的对象，可以是覆盖（用于覆盖按钮），也可以是缓冲区位置或标记（用于文本属性按钮）。这样的对象在被调用时作为第一个参数传递给按钮的调用函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: button-start button ¶
+</pre></div>
+<p>返回按钮开始的位置。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: button-end button ¶
+</pre></div>
+<p>返回按钮结束的位置。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: button-get button prop ¶
+</pre></div>
+<p>获取名为 prop 的按钮按钮的属性。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: button-put button prop val ¶
+</pre></div>
+<p>将按钮的 prop 属性设置为 val。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: button-activate button &amp;optional use-mouse-action ¶
+</pre></div>
+<p>调用按钮的动作属性（即调用作为该属性值的函数，将单个参数按钮传递给它）。如果 use-mouse-action 不是 nil，尝试调用按钮的 mouse-action 属性而不是 action；  如果按钮没有鼠标动作属性，则正常使用动作。如果 button-data 属性存在于 button 中，则将其用作 action 函数的参数，而不是 button。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: button-label button ¶
+</pre></div>
+<p>返回按钮的文本标签。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: button-type button ¶
+</pre></div>
+<p>返回按钮的按钮类型。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: button-has-type-p button type ¶
+</pre></div>
+<p>如果按钮具有按钮类型类型或类型的子类型之一，则返回 t。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: button-at pos ¶
+</pre></div>
+<p>返回当前缓冲区中位置 pos 处的按钮，或 nil。如果 pos 处的按钮是文本属性按钮，则返回值是指向 pos 的标记。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: button-type-put type prop val ¶
+</pre></div>
+<p>将 button-type 类型的 prop 属性设置为 val。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: button-type-get type prop ¶
+</pre></div>
+<p>获取名为 prop 的按钮类型的属性。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: button-type-subtype-p type supertype ¶
+</pre></div>
+<p>如果按钮类型类型是超类型的子类型，则返回 t。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.19.5_按钮缓冲区命令.html">按钮缓冲区命令</a>, Previous: <a href="40.19.3_制作按钮.html">制作按钮</a>, Up: <a href="40.19_按钮.html">按钮.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

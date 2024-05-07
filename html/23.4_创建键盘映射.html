@@ -1,0 +1,57 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>23.4 创建键盘映射</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">23.4 创建键盘映射</h2>
+<div class="nav-panel"><p>Next: <a href="23.5_继承和键映射.html">继承和键映射</a>, Previous: <a href="23.3_键盘映射格式.html">键盘映射格式</a>, Up: <a href="23_键盘映射.html">键盘映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在这里，我们描述了创建键盘映射的功能。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-sparse-keymap &amp;optional prompt ¶
+</pre></div>
+<p>此函数创建并返回一个没有条目的新稀疏键盘映射。（稀疏键映射是您通常想要的那种键映射。）与 make-keymap 不同，新的键映射不包含字符表，并且不绑定任何事件。
+</p>
+<div class="lisp">
+<pre class="lisp">(make-sparse-keymap)
+    ⇒ (keymap)
+</pre></div>
+<p>如果您指定提示，它将成为键盘映射的整体提示字符串。您应该只为菜单键映射指定此项（请参阅定义菜单）。具有整体提示字符串的键盘映射将始终显示鼠标菜单或键盘菜单，如果它处于活动状态以查找下一个输入事件。不要为主要或次要模式的主映射指定整体提示字符串，因为这会导致命令循环每次都显示键盘菜单。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-keymap &amp;optional prompt ¶
+</pre></div>
+<p>此函数创建并返回一个新的完整键盘映射。该键映射包含一个字符表（请参阅字符表），其中包含所有字符的插槽，没有修饰符。新的键盘映射最初将所有这些字符绑定到 nil，并且不绑定任何其他类型的事件。参数 prompt 指定一个提示字符串，如 make-sparse-keymap 中一样。
+</p>
+<div class="lisp">
+<pre class="lisp">(make-keymap)
+    ⇒ (keymap #^[nil nil keymap nil nil nil …])
+</pre></div>
+<p>当拥有大量绑定时，完整的键映射比稀疏键映射更有效；  对于少数人来说，稀疏键映射更好。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: copy-keymap keymap ¶
+</pre></div>
+<p>此函数返回键盘映射的副本。这几乎不需要。如果您想要一个与另一个类似但有一些更改的键映射，您应该使用映射继承而不是复制。即，类似：
+</p>
+<div class="lisp">
+<pre class="lisp">(let ((map (make-sparse-keymap)))
+  (set-keymap-parent map &lt;theirmap&gt;)
+  (define-key map ...)
+  ...)
+</pre></div>
+<p>执行复制键映射时，任何直接作为绑定出现在键映射中的键映射也被递归地复制，依此类推到任意数量的级别。但是，当字符的定义是一个符号，其功能定义是一个键映射时，递归复制不会发生；  相同的符号出现在新副本中。
+</p><div class="lisp">
+<pre class="lisp">(setq map (copy-keymap (current-local-map)))
+⇒ (keymap
+
+     ;; (This implements meta characters.)
+     (27 keymap
+         (83 . center-paragraph)
+         (115 . center-line))
+     (9 . tab-to-tab-stop))
+
+
+(eq map (current-local-map))
+    ⇒ nil
+
+(equal map (current-local-map))
+    ⇒ t
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="23.5_继承和键映射.html">继承和键映射</a>, Previous: <a href="23.3_键盘映射格式.html">键盘映射格式</a>, Up: <a href="23_键盘映射.html">键盘映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

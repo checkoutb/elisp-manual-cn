@@ -1,0 +1,13 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>13.16 判断一个函数是否可以安全调用</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">13.16 判断一个函数是否可以安全调用</h2>
+<div class="nav-panel"><p>Next: <a href="13.17_其他与函数相关的话题.html">其他与函数相关的话题</a>, Previous: <a href="13.15_告诉编译器定义了一个函数.html">告诉编译器定义了一个函数</a>, Up: <a href="13_函数.html">函数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>一些主要模式，例如 SES，调用存储在用户文件中的函数。（有关 SES 的更多信息，请参阅 (ses)Simple Emacs 电子表格。）用户文件的谱系有时很差——您可以从刚认识的人那里获得电子表格，也可以通过从未见过的人的电子邮件获得电子表格.  因此，在您确定它是安全的之前，调用其源代码存储在用户文件中的函数是有风险的。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: unsafep form &amp;optional unsafep-vars ¶
+</pre></div>
+<p>如果 form 是一个安全的 Lisp 表达式，则返回 nil，或者返回一个描述它可能不安全的原因的列表。参数 unsafep-vars 是一个已知在此时具有临时绑定的符号列表；  它主要用于内部递归调用。当前缓冲区是一个隐式参数，它提供了缓冲区本地绑定的列表。
+</p>
+<p>由于快速而简单，unsafep 进行了非常简单的分析，并拒绝了许多实际上是安全的 Lisp 表达式。没有已知的情况下 unsafep 为不安全的表达式返回 nil。但是，一个安全的 Lisp 表达式可以返回一个带有 display 属性的字符串，其中包含一个关联的 Lisp 表达式，该表达式将在字符串插入缓冲区后执行。这种相关的表达可以是病毒。为了安全起见，您必须先从用户代码计算的所有字符串中删除属性，然后再将它们插入缓冲区。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="13.17_其他与函数相关的话题.html">其他与函数相关的话题</a>, Previous: <a href="13.15_告诉编译器定义了一个函数.html">告诉编译器定义了一个函数</a>, Up: <a href="13_函数.html">函数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

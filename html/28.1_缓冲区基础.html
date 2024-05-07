@@ -1,0 +1,19 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>28.1 缓冲区基础</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">28.1 缓冲区基础</h2>
+<div class="nav-panel"><p>Next: <a href="28.2_当前缓冲区.html">当前缓冲区</a>, Previous: <a href="28_缓冲区.html">缓冲区</a>, Up: <a href="28_缓冲区.html">缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>缓冲区是包含要编辑的文本的 Lisp 对象。缓冲区用于保存正在访问的文件的内容；  也可能存在未访问文件的缓冲区。尽管通常存在多个缓冲区，但在任何时候只有一个缓冲区被指定为当前缓冲区。大多数编辑命令作用于当前缓冲区的内容。每个缓冲区，包括当前缓冲区，可能会或可能不会显示在任何窗口中。
+</p>
+<p>Emacs 编辑中的缓冲区是具有不同名称并保存可编辑文本的对象。缓冲区对于 Lisp 程序来说是一种特殊的数据类型。您可以将缓冲区的内容视为可以扩展的字符串；  插入和删除可能发生在缓冲区的任何部分。见文本。
+</p>
+<p>Lisp 缓冲区对象包含大量信息。程序员可以通过变量直接访问其中的一些信息，而其他信息只能通过专用函数访问。例如，访问的文件名可以通过变量直接访问，而点的值只能通过原始函数访问。
+</p>
+<p>可直接访问的特定于缓冲区的信息存储在缓冲区局部变量绑定中，这些绑定是仅在特定缓冲区中有效的变量值。此功能允许每个缓冲区覆盖某些变量的值。大多数主要模式都以这种方式覆盖变量，例如填充列或注释列。有关缓冲区局部变量及其相关函数的更多信息，请参阅缓冲区局部变量。
+</p>
+<p>有关访问缓冲区中文件的相关函数和变量，请参阅访问文件和保存缓冲区。有关在窗口中显示缓冲区的相关函数和变量，请参阅缓冲区和窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: bufferp object ¶
+</pre></div>
+<p>如果 object 是缓冲区，则此函数返回 t，否则返回 nil。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="28.2_当前缓冲区.html">当前缓冲区</a>, Previous: <a href="28_缓冲区.html">缓冲区</a>, Up: <a href="28_缓冲区.html">缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

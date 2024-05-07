@@ -1,0 +1,50 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>30 帧</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h1 class="chapter">30 帧</h1>
+<div class="nav-panel"><p>Next: <a href="30.1_创建帧.html">创建帧</a>, Previous: <a href="29.28_窗口滚动和改变的钩子.html">窗口滚动和改变的钩子</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>帧是包含一个或多个 Emacs 窗口的屏幕对象（请参阅 Windows）。它是一种在图形环境术语中称为 <code>窗口</code> 的对象；  但我们不能在这里称它为 <code>窗口</code> ，因为 Emacs 以不同的方式使用这个词。在 Emacs Lisp 中，一个帧对象是一个 Lisp 对象，它表示屏幕上的一个帧。请参见帧类型。
+</p>
+<p>一帧最初包含一个主窗口和/或一个小缓冲区窗口；  您可以将主窗口垂直或水平细分为较小的窗口。请参阅拆分窗口。
+</p>
+<p>终端是能够显示一个或多个 Emacs 帧的显示设备。在 Emacs Lisp 中，终端对象是表示终端的 Lisp 对象。请参阅终端类型。
+</p>
+<p>有两类终端：文本终端和图形终端。文本终端是不支持图形的显示器，包括 xterm 和其他终端仿真器。在文本终端上，每个 Emacs 帧占据终端的整个屏幕；  尽管您可以创建额外的帧并在它们之间切换，但终端一次只显示一帧。另一方面，图形终端由图形显示系统管理，例如 X Window System，它允许 Emacs 在同一显示器上同时显示多个帧。
+</p>
+<p>在 GNU 和 Unix 系统上，无论 Emacs 是在文本终端还是图形终端上启动，您都可以在单个 Emacs 会话中在任何可用终端上创建额外的帧。Emacs 可以同时显示在图形和文本终端上。例如，当您从多个远程位置连接到同一个会话时，这会派上用场。请参阅多个终端。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: framep object ¶
+</pre></div>
+<p>如果 object 是一个帧，则此谓词返回一个非 nil 值，否则返回 nil。对于一个帧，该值指示该帧使用哪种显示方式：
+</p>
+<div class="lisp">
+<pre class="lisp">t
+</pre></div>
+<p>帧显示在文本终端上。
+</p><div class="lisp">
+<pre class="lisp">x
+</pre></div>
+<p>帧显示在 X 图形终端上。
+</p><div class="lisp">
+<pre class="lisp">w32
+</pre></div>
+<p>帧显示在 MS-Windows 图形终端上。
+</p><div class="lisp">
+<pre class="lisp">ns
+</pre></div>
+<p>帧显示在 GNUstep 或 Macintosh Cocoa 图形终端上。
+</p><div class="lisp">
+<pre class="lisp">pc
+</pre></div>
+<p>该帧显示在 MS-DOS 终端上。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: frame-terminal &amp;optional frame ¶
+</pre></div>
+<p>该函数返回显示帧的终端对象。如果 frame 为 nil 或未指定，则默认为选定的帧。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: terminal-live-p object ¶
+</pre></div>
+<p>如果 object 是活动的终端（即未删除），则此谓词返回非 nil 值，否则返回 nil。对于直播终端，返回值表示在该终端上显示什么样的帧；  可能值的列表与上面的 framep 相同。
+</p>
+<p>在图形终端上，我们区分两种类型的帧： 普通的顶级帧是其窗口系统窗口是该终端的窗口系统根窗口的子窗口的帧。子帧是一个帧，其窗口系统窗口是另一个 Emacs 帧的窗口系统窗口的子窗口。请参阅子帧。
+</p>
+<div class="nav-panel"><p>Next: <a href="30.1_创建帧.html">创建帧</a>, Previous: <a href="29.28_窗口滚动和改变的钩子.html">窗口滚动和改变的钩子</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

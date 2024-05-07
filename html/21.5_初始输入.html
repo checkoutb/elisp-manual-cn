@@ -1,0 +1,18 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>21.5 初始输入</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">21.5 初始输入</h2>
+<div class="nav-panel"><p>Next: <a href="21.6_完成.html">完成</a>, Previous: <a href="21.4_小缓冲区历史.html">小缓冲区历史</a>, Up: <a href="21_小缓冲区.html">小缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>用于 minibuffer 输入的几个函数有一个称为 initial 的参数。这是一个主要被弃用的功能，用于指定 minibuffer 应该以某些文本开始，而不是像往常一样为空。
+</p>
+<p>如果 initial 是一个字符串，当用户开始编辑文本时，minibuffer 开始包含字符串的文本，点在末尾。如果用户简单地键入 RET 以退出 minibuffer，它将使用初始输入字符串来确定要返回的值。
+</p>
+<p>我们不鼓励对初始值使用非零值，因为初始输入是一个侵入式接口。历史列表和默认值提供了一种更方便的方法来为用户提供有用的默认输入。
+</p>
+<p>只有一种情况您应该为初始参数指定一个字符串。这是当您为历史参数指定一个 cons 单元格时。请参阅小缓冲区历史记录。
+</p>
+<p>initial 也可以是形式的 cons 单元格（字符串 . 位置）。这意味着在 minibuffer 中插入字符串，但将点放在字符串文本中的位置。
+</p>
+<p>作为一个历史偶然，不同职能部门的立场不一致。在完成读取中，位置的值被解释为原点零；  也就是说，值 0 表示字符串的开头，1 表示在第一个字符之后，等等。在 read-minibuffer 和其他支持此参数的非完成 minibuffer 输入函数中，1 表示字符串的开头， 2 表示在第一个字符之后，依此类推。
+</p>
+<p>不推荐使用 cons 单元格作为初始参数的值。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="21.6_完成.html">完成</a>, Previous: <a href="21.4_小缓冲区历史.html">小缓冲区历史</a>, Up: <a href="21_小缓冲区.html">小缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

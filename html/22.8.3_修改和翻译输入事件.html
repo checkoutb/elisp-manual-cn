@@ -1,0 +1,45 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.8.3 修改和翻译输入事件</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">22.8.3 修改和翻译输入事件</h3>
+<div class="nav-panel"><p>Next: <a href="22.8.4_调用输入法.html">调用输入法</a>, Previous: <a href="22.8.2_读取一个事件.html">读取一个事件</a>, Up: <a href="22.8_读数输入.html">读数输入.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 根据额外的键盘修饰符修改它读取的每个事件，然后通过键盘翻译表（如果适用）翻译它，然后从读取事件返回它。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: extra-keyboard-modifiers ¶
+</pre></div>
+<p>这个变量让 Lisp 程序 <code>按下</code> 键盘上的修饰键。值是一个字符。只有角色的修饰符很重要。每次用户键入键盘键时，它都会改变，就好像这些修饰键被按住一样。例如，如果将 extra-keyboard-modifiers 绑定到 ?-，那么在绑定范围内键入的所有键盘输入字符都将应用 control 和 meta 修饰符。字符 ?-@，相当于整数 0，在此目的中不算作控制字符，而是作为没有修饰符的字符。因此，将 extra-keyboard-modifiers 设置为零会取消任何修改。
+</p>
+<p>当使用窗口系统时，程序可以通过这种方式按下任何修饰键。否则，只能虚拟按下 CTL 和 META 键。
+</p>
+<p>请注意，此变量仅适用于真正来自键盘的事件，对鼠标事件或任何其他事件没有影响。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: keyboard-translate-table ¶
+</pre></div>
+<p>这个终端本地变量是键盘字符的翻译表。它使您可以在不更改任何命令绑定的情况下重新调整键盘上的键。它的值通常是一个字符表，否则为零。（它也可以是字符串或向量，但这被认为是过时的。）
+</p>
+<p>如果keyboard-translate-table 是一个char-table（参见Char-Tables），那么从键盘读取的每个字符都会在这个char-table 中查找。如果找到的值不是 nil，则使用它来代替实际输入的字符。
+</p>
+<p>请注意，此翻译是从终端读取字符后发生的第一件事。记录保存功能，如最近键和运球文件记录翻译后的字符。
+</p>
+<p>另请注意，此翻译是在将字符提供给输入法之前完成的（请参阅输入法）。如果要在输入法操作后翻译字符，请使用 translation-table-for-input（请参阅字符翻译）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: keyboard-translate from to ¶
+</pre></div>
+<p>此函数修改keyboard-translate-table 将字符代码从转换为字符代码。如有必要，它会创建键盘翻译表。
+</p>
+<p>下面是一个使用keyboard-translate-table让Cx、Cc和Cv执行剪切、复制和粘贴操作的例子：
+</p>
+<div class="lisp">
+<pre class="lisp">(keyboard-translate ?\C-x 'control-x)
+(keyboard-translate ?\C-c 'control-c)
+(keyboard-translate ?\C-v 'control-v)
+(global-set-key [control-x] 'kill-region)
+(global-set-key [control-c] 'kill-ring-save)
+(global-set-key [control-v] 'yank)
+</pre></div>
+<p>在支持扩展 ASCII 输入的图形终端上，您仍然可以通过使用 shift 键键入其中一个字符来获得标准 Emacs 含义。就键盘翻译而言，这使其成为不同的字符，但具有相同的通常含义。
+</p>
+<p>有关在 read-key-sequence 级别翻译事件序列的机制，请参阅用于翻译事件序列的键映射。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.8.4_调用输入法.html">调用输入法</a>, Previous: <a href="22.8.2_读取一个事件.html">读取一个事件</a>, Up: <a href="22.8_读数输入.html">读数输入.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

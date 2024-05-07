@@ -1,0 +1,41 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>34.3 转换文本表示</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">34.3 转换文本表示</h2>
+<div class="nav-panel"><p>Next: <a href="34.4_选择表示.html">选择表示</a>, Previous: <a href="34.2_禁用多字节字符.html">禁用多字节字符</a>, Up: <a href="34_非ASCII字符.html">非ASCII字符.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 可以将单字节文本转换为多字节；  它还可以将多字节文本转换为单字节，前提是多字节文本仅包含 ASCII 和 8 位原始字节。通常，这些转换发生在将文本插入缓冲区或将多个字符串中的文本放在一个字符串中时。您还可以将字符串的内容显式转换为任一表示形式。
+</p>
+<p>Emacs 根据构造字符串的文本选择字符串的表示形式。一般规则是在将单字节文本与其他多字节文本组合时将其转换为多字节文本，因为多字节表示更通用并且可以容纳单字节文本具有的任何字符。
+</p>
+<p>将文本插入缓冲区时，Emacs 将文本转换为缓冲区的表示形式，由该缓冲区中的 enable-multibyte-characters 指定。特别是，当您将多字节文本插入单字节缓冲区时，Emacs 会将文本转换为单字节，即使这种转换通常不能保留多字节文本中可能存在的所有字符。另一种自然的选择是将缓冲区内容转换为多字节，这是不可接受的，因为缓冲区的表示是用户做出的无法自动覆盖的选择。
+</p>
+<p>将单字节文本转换为多字节文本保持 ASCII 字符不变，并将代码 128 到 255 的字节转换为原始 8 位字节的多字节表示。
+</p>
+<p>将多字节文本转换为单字节会将所有 ASCII 和 8 位字符转换为其单字节形式，但会丢失非 ASCII 字符的信息，因为它会丢弃每个字符代码点的低 8 位以外的所有信息。将单字节文本转换为多字节并转换回单字节会再现原始单字节文本。
+</p>
+<p>接下来的两个函数要么返回参数字符串，要么返回一个新创建的没有文本属性的字符串。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: string-to-multibyte string ¶
+</pre></div>
+<p>此函数返回一个多字节字符串，其中包含与字符串相同的字符序列。如果 string 是多字节字符串，则原样返回。该函数假定字符串仅包含 ASCII 字符和原始 8 位字节；  后者被转换为对应于代码点 #x3FFF80 到 #x3FFFFF 的多字节表示，包括（参见代码点）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: string-to-unibyte string ¶
+</pre></div>
+<p>此函数返回一个包含与字符串相同的字符序列的单字节字符串。如果字符串包含非 ASCII 字符，它会发出错误信号。如果 string 是单字节字符串，则原样返回。将此函数用于仅包含 ASCII 和八位字符的字符串参数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: byte-to-string byte ¶
+</pre></div>
+<p>此函数返回一个单字节字符串，其中包含单个字节的字符数据字节。如果 byte 不是 0 到 255 之间的整数，则会发出错误信号。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: multibyte-char-to-unibyte char ¶
+</pre></div>
+<p>这会将多字节字符 char 转换为单字节字符，并返回该字符。如果 char 既不是 ASCII 也不是八位，则函数返回 -1。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: unibyte-char-to-multibyte char ¶
+</pre></div>
+<p>这会将单字节字符 char 转换为多字节字符，假设 char 是 ASCII 或原始 8 位字节。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="34.4_选择表示.html">选择表示</a>, Previous: <a href="34.2_禁用多字节字符.html">禁用多字节字符</a>, Up: <a href="34_非ASCII字符.html">非ASCII字符.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

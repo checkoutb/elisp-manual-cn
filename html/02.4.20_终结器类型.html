@@ -1,0 +1,13 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>2.4.20 终结器类型</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">2.4.20 终结器类型</h3>
+<div class="nav-panel"><p>Next: <a href="02.5_编辑类型.html">编辑类型</a>, Previous: <a href="02.4.19_自动加载类型.html">自动加载类型</a>, Up: <a href="02.4_编程类型.html">编程类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>终结器对象帮助 Lisp 代码在不再需要的对象之后进行清理。终结器拥有一个 Lisp 函数对象。当垃圾回收通过后终结器对象变得不可访问时，Emacs 调用终结器的关联函数对象。在决定终结器是否可访问时，Emacs 不会计算来自终结器对象本身的引用，从而允许您使用终结器而不必担心意外捕获对终结器本身的引用。
+</p>
+<p>终结器中的错误会打印到 *Messages*。Emacs 只运行给定终结器对象的关联函数一次，即使该函数失败。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-finalizer function
+</pre></div>
+<p>制作一个将运行函数的终结器。当返回的终结器对象变得无法访问时，将在垃圾回收后调用函数。如果终结器对象只能通过来自终结器对象的引用来访问，则在决定是否运行函数时，它不算是可达的。函数将为每个终结器对象运行一次。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="02.5_编辑类型.html">编辑类型</a>, Previous: <a href="02.4.19_自动加载类型.html">自动加载类型</a>, Up: <a href="02.4_编程类型.html">编程类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

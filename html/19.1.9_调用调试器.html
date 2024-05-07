@@ -1,0 +1,56 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>19.1.9 调用调试器</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">19.1.9 调用调试器</h3>
+<div class="nav-panel"><p>Next: <a href="19.1.10_调试器的内部结构.html">调试器的内部结构</a>, Previous: <a href="19.1.8_调试器命令.html">调试器命令</a>, Up: <a href="19.1_Lisp_调试器.html">Lisp_调试器.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在这里，我们将详细描述用于调用调试器的函数 debug。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: debug &amp;rest debugger-args ¶
+</pre></div>
+<p>该函数进入调试器。它将缓冲区切换到名为 <strong>Backtrace</strong> 的缓冲区（或 *Backtrace*&lt;2&gt;，如果它是调试器的第二个递归条目，等等），并用有关 Lisp 函数调用堆栈的信息填充它。然后它进入递归编辑，在调试器模式下显示回溯缓冲区。
+</p>
+<p>Debugger模式c、d、j、r命令退出递归编辑；  然后调试切换回前一个缓冲区并返回到任何称为调试的地方。这是函数调试可以返回给它的调用者的唯一方式。
+</p>
+<p>debugger-args 的用途是 debug 将其余参数显示在 <strong>Backtrace</strong> 缓冲区的顶部，以便用户可以看到它们。除下文所述外，这是使用这些参数的唯一方式。
+</p>
+<p>但是，要调试的第一个参数的某些值具有特殊意义。（通常，这些值仅由 Emacs 内部使用，而不是由调用 debug 的程序员使用。）下面是这些特殊值的表：
+</p>
+<div class="lisp">
+<pre class="lisp">lambda ¶
+</pre></div>
+<p>lambda 的第一个参数表示当 debug-on-next-call 为非 nil 时，由于进入函数而调用了调试。调试器在缓冲区顶部将 <code>已输入调试器--输入函数：</code> 显示为一行文本。
+</p><div class="lisp">
+<pre class="lisp">debug
+</pre></div>
+<p>debug 作为第一个参数意味着调试被调用是因为进入了一个设置为在进入时调试的函数。调试器显示字符串 <code>调试器输入-输入函数：</code> ，就像在 lambda 情况下一样。它还标记该函数的堆栈帧，以便在退出时调用调试器。
+</p><div class="lisp">
+<pre class="lisp">t
+</pre></div>
+<p>当第一个参数为 t 时，这表示由于在 debug-on-next-call 为非 nil 时评估函数调用形式而调用 debug。调试器在缓冲区的第一行显示 <code>已进入调试器——开始评估函数调用形式：</code> 。
+</p><div class="lisp">
+<pre class="lisp">exit
+</pre></div>
+<p>当第一个参数为 exit 时，它表示先前标记为在退出时调用调试器的堆栈帧的退出。在这种情况下，给 debug 的第二个参数是从帧返回的值。调试器在缓冲区的第一行显示 <code>调试器输入--返回值：</code> ，然后是返回的值。
+</p><div class="lisp">
+<pre class="lisp">error
+</pre></div>
+<p>当第一个参数是错误时，调试器通过显示 <code>已输入的调试器--Lisp 错误：</code> 后跟发出的错误信号和任何要发出信号的参数来指示它正在进入，因为已发出错误或退出信号但未处理。例如，
+</p>
+<div class="lisp">
+<pre class="lisp">(let ((debug-on-error t))
+  (/ 1 0))
+
+
+------ Buffer: *Backtrace* ------
+Debugger entered--Lisp error: (arith-error)
+  /(1 0)
+...
+------ Buffer: *Backtrace* ------
+
+</pre></div>
+<p>如果发出错误信号，则变量 debug-on-error 可能不为零。如果发出了退出信号，则可能变量 debug-on-quit 为非零。
+</p><div class="lisp">
+<pre class="lisp">nil
+</pre></div>
+<p>当你想显式地进入调试器时，使用 nil 作为调试器参数的第一个。其余的调试器参数打印在缓冲区的顶行。您可以使用此功能来显示消息——例如，提醒自己在哪些条件下调用了调试。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="19.1.10_调试器的内部结构.html">调试器的内部结构</a>, Previous: <a href="19.1.8_调试器命令.html">调试器命令</a>, Up: <a href="19.1_Lisp_调试器.html">Lisp_调试器.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

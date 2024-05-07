@@ -1,0 +1,82 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>11.3 组合条件的构造</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">11.3 组合条件的构造</h2>
+<div class="nav-panel"><p>Next: <a href="11.4_模式匹配条件.html">模式匹配条件</a>, Previous: <a href="11.2_条件.html">条件</a>, Up: <a href="11_控制结构.html">控制结构.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节描述了经常与 if 和 cond 一起使用来表达复杂条件的结构。结构和和或也可以单独用作多种条件结构。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: not condition ¶
+</pre></div>
+<p>此功能测试条件的虚假性。如果条件为 nil，则返回 t，否则返回 nil。函数 not 与 null 相同，如果您正在测试空列表，我们建议使用名称 null。 
+</p>
+<div class="lisp">
+<pre class="lisp">Special Form: and conditions… ¶
+</pre></div>
+<p>和特殊形式测试是否所有条件都为真。它通过按写入的顺序一一评估条件来工作。
+</p>
+<p>如果任何条件的计算结果为 nil，则 and 的结果必须为 nil，而不管其余条件如何；  所以并立即返回 nil ，忽略其余条件。
+</p>
+<p>如果所有条件都非零，那么最后一个条件的值将成为 and 形式的值。Just (and)，没有条件，返回 t，因为所有条件都非零。（想想看，哪个没有？）
+</p>
+<p>这是一个例子。第一个条件返回整数 1，它不是 nil。同样，第二个条件返回整数 2，它不是 nil。第三个条件为 nil，因此永远不会评估剩余的条件。
+</p><div class="lisp">
+<pre class="lisp">(and (print 1) (print 2) nil (print 3))
+     -| 1
+     -| 2
+⇒ nil
+</pre></div>
+<p>这是一个更实际的使用 and 的例子：
+</p>
+<div class="lisp">
+<pre class="lisp">(if (and (consp foo) (eq (car foo) 'x))
+    (message "foo is a list starting with x"))
+</pre></div>
+<p>请注意，如果 (consp foo) 返回 nil，则不执行 (car foo)，从而避免错误。
+</p>
+<p>and 表达式也可以使用 if 或 cond 来编写。就是这样：
+</p><div class="lisp">
+<pre class="lisp">(and arg1 arg2 arg3)
+≡
+(if arg1 (if arg2 arg3))
+≡
+(cond (arg1 (cond (arg2 arg3))))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Special Form: or conditions… ¶
+</pre></div>
+<p>或特殊形式测试至少一个条件是否为真。它通过按写入的顺序一一评估所有条件来工作。
+</p>
+<p>如果任何条件的计算结果为非零值，则 or 的结果必须为非零；  so or 立即返回，忽略其余条件。它返回的值是刚刚评估的条件的非零值。
+</p>
+<p>如果所有条件都为 nil，则 or 表达式返回 nil。Just (or)，没有条件，返回 nil，因为所有条件都变成 nil。（想想看，哪个没有？）
+</p>
+<p>例如，这个表达式测试 x 是 nil 还是整数零：
+</p>
+<div class="lisp">
+<pre class="lisp">(or (eq x nil) (eq x 0))
+</pre></div>
+<p>像 and 构造，or 可以写成 cond。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">(or arg1 arg2 arg3)
+≡
+(cond (arg1)
+      (arg2)
+      (arg3))
+</pre></div>
+<p>你几乎可以用 if 来写或写，但不完全是：
+</p>
+<div class="lisp">
+<pre class="lisp">(if arg1 arg1
+  (if arg2 arg2
+    arg3))
+</pre></div>
+<p>这并不完全等效，因为它可以计算 arg1 或 arg2 两次。相比之下， (或 arg1 arg2 arg3) 从不多次评估任何参数。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: xor condition1 condition2 ¶
+</pre></div>
+<p>此函数返回条件 1 和条件 2 的布尔异或。也就是说，如果两个参数都为 nil，或者两者都不是 nil，则 xor 返回 nil。否则，它返回非零参数的值。
+</p>
+<p>请注意，与 or 相比，两个参数总是被评估。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="11.4_模式匹配条件.html">模式匹配条件</a>, Previous: <a href="11.2_条件.html">条件</a>, Up: <a href="11_控制结构.html">控制结构.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

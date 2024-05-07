@@ -1,0 +1,11 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>10.2.5 函数形式的评估</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">10.2.5 函数形式的评估</h3>
+<div class="nav-panel"><p>Next: <a href="10.2.6_Lisp_宏评估.html">Lisp_宏评估</a>, Previous: <a href="10.2.4_符号函数间接.html">符号函数间接</a>, Up: <a href="10.2_表格种类.html">表格种类.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>如果要评估的列表的第一个元素是 Lisp 函数对象、字节码对象或原始函数对象，则该列表是函数调用。例如，这是对函数 + 的调用：
+</p>
+<div class="lisp">
+<pre class="lisp">(+ 1 x)
+</pre></div>
+<p>评估函数调用的第一步是从左到右评估列表的其余元素。结果是实际的参数值，每个列表元素一个值。下一步是使用此参数列表调用函数，有效地使用函数 apply（请参阅调用函数）。如果函数是用 Lisp 编写的，则参数用于绑定函数的参数变量（参见 Lambda 表达式）；  然后函数体中的形式依次评估，最后一个体形式的值成为函数调用的值。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="10.2.6_Lisp_宏评估.html">Lisp_宏评估</a>, Previous: <a href="10.2.4_符号函数间接.html">符号函数间接</a>, Up: <a href="10.2_表格种类.html">表格种类.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>30.23 文本终端颜色</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">30.23 文本终端颜色</h2>
+<div class="nav-panel"><p>Next: <a href="30.24_X_资源.html">X_资源</a>, Previous: <a href="30.22_颜色名称.html">颜色名称</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>文本终端通常只支持少量的颜色，计算机使用小整数在终端上选择颜色。这意味着计算机无法可靠地判断所选颜色的外观；  相反，您必须通知您的应用程序哪些小整数对应于哪些颜色。但是，Emacs 确实知道标准的颜色集，并且会尝试自动使用它们。
+</p>
+<p>本节中描述的函数控制 Emacs 如何使用终端颜色。
+</p>
+<p>其中一些函数使用或返回 rgb 值，如颜色名称中所述。
+</p>
+<p>这些函数接受显示（帧或终端名称）作为可选参数。我们希望将来让 Emacs 在不同的文本终端上支持不同的颜色；  然后此参数将指定要在哪个终端上进行操作（默认为所选帧的终端；请参阅输入焦点）。但目前，帧参数无效。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: tty-color-define name number &amp;optional rgb frame ¶
+</pre></div>
+<p>该函数将颜色名称名称与终端上的颜色编号相关联。
+</p>
+<p>可选参数 rgb（如果指定）是一个 rgb 值，一个由三个数字组成的列表，用于指定颜色的实际外观。如果不指定 rgb，那么这个颜色不能被 tty-color-approximate 用来逼近其他颜色，因为 Emacs 不会知道它长什么样。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: tty-color-clear &amp;optional frame ¶
+</pre></div>
+<p>此函数清除文本终端的已定义颜色表。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: tty-color-alist &amp;optional frame ¶
+</pre></div>
+<p>此函数返回一个记录文本终端支持的已知颜色的列表。
+</p>
+<p>每个元素的格式为 (name number .rgb) 或 (name number)。这里，name 是颜色名称，number 是用来指定给终端的数字。如果存在，则 rgb 是三个颜色值（红色、绿色和蓝色）的列表，表示颜色的实际外观。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: tty-color-approximate rgb &amp;optional frame ¶
+</pre></div>
+<p>此函数在支持显示的已知颜色中查找与 rgb 值 rgb（颜色值列表）所描述的颜色最接近的颜色。返回值是 tty-color-alist 的一个元素。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: tty-color-translate color &amp;optional frame ¶
+</pre></div>
+<p>此函数在支持显示的已知颜色中找到最接近颜色的颜色，并返回其索引（整数）。如果名称颜色未定义，则值为 nil。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="30.24_X_资源.html">X_资源</a>, Previous: <a href="30.22_颜色名称.html">颜色名称</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

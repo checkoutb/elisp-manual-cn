@@ -1,0 +1,75 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>29.14 窗口历史</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">29.14 窗口历史</h2>
+<div class="nav-panel"><p>Next: <a href="29.15_专用窗口.html">专用窗口</a>, Previous: <a href="29.13.6_缓冲区显示之禅.html">缓冲区显示之禅</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>每个窗口都会在一个列表中记住它之前显示的缓冲区，以及这些缓冲区从其中删除的顺序。例如，replace-buffer-in-windows（请参阅缓冲区和 Windows）和退出窗口时（请参阅退出 Windows）使用此历史记录。该列表由 Emacs 自动维护，但您可以使用以下函数显式检查或更改它：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-prev-buffers &amp;optional window ¶
+</pre></div>
+<p>此函数返回一个列表，指定窗口的先前内容。可选参数窗口应该是一个活动窗口，默认为选定的窗口。
+</p>
+<p>每个列表元素的格式为 (buffer window-start window-pos)，其中 buffer 是先前显示在窗口中的缓冲区，window-start 是上次显示该缓冲区时的窗口开始位置（请参阅窗口开始和结束位置） , window-pos 是该缓冲区最后一次显示在窗口中时的点位置（请参阅 Windows 和 Point）。
+</p>
+<p>该列表是有序的，以便较早的元素对应于最近显示的缓冲区，第一个元素通常对应于最近从窗口中删除的缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-window-prev-buffers window prev-buffers ¶
+</pre></div>
+<p>此函数将窗口的先前缓冲区设置为 prev-buffers 的值。参数窗口必须是活动窗口，并且默认为选定的窗口。参数 prev-buffers 应该是一个与 window-prev-buffers 返回的形式相同的列表。
+</p>
+<p>此外，每个窗口都维护一个下一个缓冲区列表，这是一个由 switch-to-prev-buffer 重新显示的缓冲区列表（见下文）。此列表主要由 switch-to-prev-buffer 和 switch-to-next-buffer 用于选择要切换到的缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-next-buffers &amp;optional window ¶
+</pre></div>
+<p>此函数通过 switch-to-prev-buffer 返回最近在窗口中重新显示的缓冲区列表。window 参数必须表示一个活动窗口或 nil（表示选定的窗口）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-window-next-buffers window next-buffers ¶
+</pre></div>
+<p>该函数将窗口的下一个缓冲区列表设置为下一个缓冲区。window 参数应该是一个活动窗口或 nil（表示选定的窗口）。参数 next-buffers 应该是一个缓冲区列表。
+</p>
+<p>以下命令可用于循环遍历全局缓冲区列表，很像 bury-buffer 和 unbury-buffer。但是，它们根据指定窗口的历史列表循环，而不是全局缓冲区列表。此外，它们恢复特定于窗口的窗口开始和点位置，并且可能显示缓冲区，即使它已经显示在另一个窗口中。特别是 switch-to-prev-buffer 命令被 replace-buffer-in-windows、bury-buffer 和 quit-window 用于查找窗口的替换缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: switch-to-prev-buffer &amp;optional window bury-or-kill ¶
+</pre></div>
+<p>此命令在窗口中显示上一个缓冲区。参数窗口应该是一个活动窗口或零（表示选定的窗口）。如果可选参数 bury-or-kill 不是 nil，这意味着当前显示在 window 中的缓冲区即将被掩埋或杀死，因此不应在将来调用此命令时切换到该缓冲区。
+</p>
+<p>前一个缓冲区通常是在窗口中当前显示的缓冲区之前显示的缓冲区。但是，已被掩埋或杀死的缓冲区，或已通过最近调用 switch-to-prev-buffer 显示的缓冲区不符合先前缓冲区的条件。
+</p>
+<p>如果此命令的重复调用已经显示了以前在窗口中显示的所有缓冲区，则进一步调用将显示来自帧窗口缓冲区列表的缓冲区（请参阅缓冲区列表）。
+</p>
+<p>下面描述的 switch-to-prev-buffer-skip 选项可用于禁止切换到某些缓冲区，例如，切换到已在另一个窗口中显示的缓冲区。此外，如果窗口的 <code>帧</code> ( <code>frame</code> )具有缓冲区谓词参数（请参阅缓冲区参数），则该谓词可能会禁止切换到某些缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: switch-to-next-buffer &amp;optional window ¶
+</pre></div>
+<p>此命令切换到 window 中的下一个缓冲区，从而撤消 window 中最后一个 switch-to-prev-buffer 命令的效果。参数窗口必须是活动窗口，并且默认为选定的窗口。
+</p>
+<p>如果最近没有可以撤消的 switch-to-prev-buffer 调用，则此函数尝试从出现的帧窗口的缓冲区列表中显示一个缓冲区（请参阅缓冲区列表）。
+</p>
+<p>选项 switch-to-prev-buffer-skip 和窗口 <code>帧</code> ( <code>frame</code> )的缓冲区谓词（请参阅缓冲区参数）影响此命令，就像它们对 switch-to-prev-buffer 所做的一样。
+</p>
+<p>默认情况下 switch-to-prev-buffer 和 switch-to-next-buffer 可以切换到已经在另一个窗口中显示的缓冲区。以下选项可用于覆盖此行为。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: switch-to-prev-buffer-skip ¶
+</pre></div>
+<p>如果此变量为 nil，则 switch-to-prev-buffer 可以切换到任何缓冲区，包括已在其他窗口中显示的缓冲区。
+</p>
+<p>如果此变量非零，则 switch-to-prev-buffer 将避免切换到某些缓冲区。可以使用以下值：
+</p>
+<p>这意味着不要切换到显示在承载窗口 switch-to-prev-buffer 的帧上的缓冲区。
+可见意味着不切换到任何可见帧上显示的缓冲区。
+0（数字零）表示不切换到任何可见或图标化 <code>帧</code> ( <code>frame</code> )上显示的缓冲区。
+t 表示不切换到任何实时帧上显示的缓冲区。
+一个接受三个参数的函数——switch-to-prev-buffer 的 window 参数、switch-to-prev-buffer 打算切换到的缓冲区和 switch-to-prev-buffer 的 bury-or-kill 参数。如果该函数返回非零，switch-to-prev-buffer 将避免切换到第二个参数指定的缓冲区。
+</p>
+<p>命令 switch-to-next-buffer 以类似的方式遵循此选项。如果此选项指定了一个函数，switch-to-next-buffer 将调用该函数，第三个参数始终为零。
+</p>
+<p>请注意，由于 bury-buffer、replace-buffer-in-windows 和 quit-restore-window 也会调用 switch-to-prev-buffer，因此自定义此选项也可能会影响 Emacs 在窗口退出或退出时的行为缓冲区被掩埋或杀死。
+</p>
+<p>另请注意，在某些情况下 switch-to-prev-buffer 和 switch-to-next-buffer 可能会忽略此选项，例如，当只剩下一个缓冲区时，这些函数可以切换到。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="29.15_专用窗口.html">专用窗口</a>, Previous: <a href="29.13.6_缓冲区显示之禅.html">缓冲区显示之禅</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

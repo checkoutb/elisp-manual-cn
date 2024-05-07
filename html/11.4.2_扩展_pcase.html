@@ -1,0 +1,27 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>11.4.2 扩展 pcase</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">11.4.2 扩展 pcase</h3>
+<div class="nav-panel"><p>Next: <a href="11.4.3_反引号样式模式.html">反引号样式模式</a>, Previous: <a href="11.4.1_pcase宏.html">pcase宏</a>, Up: <a href="11.4_模式匹配条件.html">模式匹配条件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>pcase 宏支持多种模式（请参阅模式匹配条件）。您可以使用 pcase-defmacro 宏添加对其他类型模式的支持。
+</p>
+<p>宏：pcase-defmacro name args [doc] &amp;rest body ¶
+</p>
+<p>为 pcase 定义一种新的模式，以 (name actual-args) 调用。pcase 宏将此扩展为一个评估 body 的函数调用，它的工作是将调用的模式重写为其他模式，在 args 绑定到实际参数的环境中。
+</p>
+<p>此外，安排与 pcase 的文档字符串一起显示文档。按照惯例，doc 应该使用 EXPVAL 来代表计算表达式的结果（第一个 arg 到 pcase）。 
+</p>
+<p>通常，body 会重写调用的模式以使用更基本的模式。尽管所有的模式最终都归结为核心模式，但身体不需要立即使用核心模式。下面的示例定义了两个模式，分别命名为小于和整数小于。
+</p>
+<div class="lisp">
+<pre class="lisp">(pcase-defmacro less-than (n)
+  "Matches if EXPVAL is a number less than N."
+  `(pred (&gt; ,n)))
+
+
+(pcase-defmacro integer-less-than (n)
+  "Matches if EXPVAL is an integer less than N."
+  `(and (pred integerp)
+        (less-than ,n)))
+</pre></div>
+<p>请注意，文档字符串以通常的方式提到了 args（在这种情况下，只有一个：n），并且按照惯例也提到了 EXPVAL。第一次重写（即，小于的主体）使用一个核心模式：pred。第二种使用两个核心模式：and 和 pred，以及新定义的模式 less-than。两者都使用单个反引号结构（请参阅反引号）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="11.4.3_反引号样式模式.html">反引号样式模式</a>, Previous: <a href="11.4.1_pcase宏.html">pcase宏</a>, Up: <a href="11.4_模式匹配条件.html">模式匹配条件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

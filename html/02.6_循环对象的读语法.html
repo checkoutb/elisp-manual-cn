@@ -1,0 +1,41 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>2.6 循环对象的读语法</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">2.6 循环对象的读语法</h2>
+<div class="nav-panel"><p>Next: <a href="02.7_类型谓词.html">类型谓词</a>, Previous: <a href="02.5.15_字体类型.html">字体类型</a>, Up: <a href="02_Lisp_数据类型.html">Lisp_数据类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>要表示 Lisp 对象复合体中的共享或循环结构，您可以使用阅读器构造 ’#n=’ 和 ’#n#’。
+</p>
+<p>在对象之前使用#n= 标记它以供以后参考；  随后，您可以使用#n# 在另一个地方引用相同的对象。这里，n 是某个整数。例如，这里是如何制作一个列表，其中第一个元素作为第三个元素重复出现：
+</p>
+<div class="lisp">
+<pre class="lisp">(#1=(a) b #1#)
+</pre></div>
+<p>这不同于像这样的普通语法
+</p><div class="lisp">
+<pre class="lisp">((a) b (a))
+</pre></div>
+<p>这将导致列表的第一个和第三个元素看起来相似但不是同一个 Lisp 对象。这显示了差异：
+</p>
+<div class="lisp">
+<pre class="lisp">(prog1 nil
+  (setq x '(#1=(a) b #1#)))
+(eq (nth 0 x) (nth 2 x))
+     ⇒ t
+(setq x '((a) b (a)))
+(eq (nth 0 x) (nth 2 x))
+     ⇒ nil
+</pre></div>
+<p>您还可以使用相同的语法来创建一个循环结构，它作为一个元素出现在其内部。这是一个例子：
+</p>
+<div class="lisp">
+<pre class="lisp">#1=(a #1#)
+</pre></div>
+<p>这将创建一个列表，其第二个元素是列表本身。您可以通过以下方式看到它确实有效：
+</p>
+<div class="lisp">
+<pre class="lisp">(prog1 nil
+  (setq x '#1=(a #1#)))
+(eq x (cadr x))
+     ⇒ t
+</pre></div>
+<p>如果将变量 print-circle 绑定到非零值，Lisp 打印机可以生成此语法来记录 Lisp 对象中的循环和共享结构。请参阅影响输出的变量。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="02.7_类型谓词.html">类型谓词</a>, Previous: <a href="02.5.15_字体类型.html">字体类型</a>, Up: <a href="02_Lisp_数据类型.html">Lisp_数据类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

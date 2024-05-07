@@ -1,0 +1,45 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>27.1.2 重命名备份还是复制备份？</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">27.1.2 重命名备份还是复制备份？</h3>
+<div class="nav-panel"><p>Next: <a href="27.1.3_制作和删除编号备份文件.html">制作和删除编号备份文件</a>, Previous: <a href="27.1.1_制作备份文件.html">制作备份文件</a>, Up: <a href="27.1_备份文件.html">备份文件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 可以通过两种方式制作备份文件：
+</p>
+<p>Emacs 可以重命名原始文件，使其成为备份文件，然后将正在保存的缓冲区写入新文件。在此过程之后，原始文件的任何其他名称（即硬链接）现在都指向备份文件。新文件归进行编辑的用户所有，其组是用户在该目录中写入的新文件的默认组。
+Emacs 可以将原始文件复制到备份文件中，然后用新的内容覆盖原始文件。在此过程之后，原始文件的任何其他名称（即硬链接）继续引用文件的当前（更新）版本。文件的所有者和组将保持不变。
+</p>
+<p>第一种方法，重命名，是默认的。
+</p>
+<p>变量 backup-by-copying，如果非 nil，表示使用第二种方法，即复制原始文件并用新的缓冲区内容覆盖它。变量 file-precious-flag，如果非零，也有这种效果（作为其主要意义的副业）。请参阅保存缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: backup-by-copying ¶
+</pre></div>
+<p>如果这个变量不是 nil，Emacs 总是通过复制来备份文件。默认值为无。
+</p>
+<p>以下三个变量，当非零时，会导致在某些特殊情况下使用第二种方法。它们对不属于特殊情况的文件的处理没有影响。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: backup-by-copying-when-linked ¶
+</pre></div>
+<p>如果这个变量不为 nil，Emacs 会通过复制具有多个名称的文件（硬链接）来进行备份。默认值为无。
+</p>
+<p>仅当按复制备份为 nil 时，此变量才有意义，因为当该变量为非 nil 时始终使用复制。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: backup-by-copying-when-mismatch ¶
+</pre></div>
+<p>如果此变量不为 nil（默认值），Emacs 会通过复制来进行备份，以防重命名会更改文件的所有者或组。
+</p>
+<p>当重命名不会改变文件的所有者或组时，该值无效；  也就是说，对于用户拥有的文件，并且其组与用户在其中创建的新文件的默认值匹配。
+</p>
+<p>仅当按复制备份为 nil 时，此变量才有意义，因为当该变量为非 nil 时始终使用复制。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: backup-by-copying-when-privileged-mismatch ¶
+</pre></div>
+<p>此变量，如果非零，则指定与备份时复制时不匹配时相同的行为，但仅适用于某些用户 ID 和组 ID 值：即小于或等于某个数字的值。您将此变量设置为该数字。
+</p>
+<p>因此，如果您将 backup-by-copying-when-privileged-mismatch 设置为 0，则仅在必要时为超级用户和组 0 执行通过复制进行的备份，以防止更改文件的所有者。
+</p>
+<p>默认值为 200。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="27.1.3_制作和删除编号备份文件.html">制作和删除编号备份文件</a>, Previous: <a href="27.1.1_制作备份文件.html">制作备份文件</a>, Up: <a href="27.1_备份文件.html">备份文件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

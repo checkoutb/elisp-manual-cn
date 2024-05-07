@@ -1,0 +1,78 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>34.7 字符集</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">34.7 字符集</h2>
+<div class="nav-panel"><p>Next: <a href="34.8_扫描字符集.html">扫描字符集</a>, Previous: <a href="34.6_字符属性.html">字符属性</a>, Up: <a href="34_非ASCII字符.html">非ASCII字符.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 字符集或 charset 是一组字符，其中每个字符都分配有一个数字代码点。（Unicode 标准称之为编码字符集。）每个 Emacs 字符集都有一个名称，它是一个符号。单个字符可以属于任意数量的不同字符集，但它通常在每个字符集中具有不同的代码点。字符集的示例包括 ascii、iso-8859-1、greek-iso8859-7 和 windows-1255。分配给字符集中字符的代码点通常不同于其在 Emacs 缓冲区和字符串中使用的代码点。
+</p>
+<p>Emacs 定义了几个特殊字符集。字符集 unicode 包括 Emacs 代码点在 0..#x10FFFF 范围内的所有字符。字符集 emacs 包括所有 ASCII 和非 ASCII 字符。最后，8 位字符集包括 8 位原始字节；  Emacs 使用它来表示文本中遇到的原始字节。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: charsetp object ¶
+</pre></div>
+<p>如果 object 是命名字符集的符号，则返回 t，否则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: charset-list ¶
+</pre></div>
+<p>该值是所有已定义字符集名称的列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: charset-priority-list &amp;optional highestp ¶
+</pre></div>
+<p>此函数返回按优先级排序的所有已定义字符集的列表。如果highestp 不为nil，则函数返回最高优先级的单个字符集。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-charset-priority &amp;rest charsets ¶
+</pre></div>
+<p>此函数使字符集成为最高优先级的字符集。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: char-charset character &amp;optional restriction ¶
+</pre></div>
+<p>该函数返回该字符所属的最高优先级字符集的名称。ASCII 字符是一个例外：对于它们，此函数始终返回 ascii。
+</p>
+<p>如果限制不为零，则它应该是要搜索的字符集列表。或者，它可以是编码系统，在这种情况下，返回的字符集必须由该编码系统支持（请参阅编码系统）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: charset-plist charset ¶
+</pre></div>
+<p>该函数返回字符集字符集的属性列表。虽然 charset 是一个符号，但这与该符号的属性列表不同。字符集属性包括有关字符集的重要信息，例如其文档字符串、短名称等。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: put-charset-property charset propname value ¶
+</pre></div>
+<p>此函数将 charset 的 propname 属性设置为给定值。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: get-charset-property charset propname ¶
+</pre></div>
+<p>此函数返回 charsets 属性 propname 的值。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: list-charset-chars charset ¶
+</pre></div>
+<p>此命令显示字符集 charset 中的字符列表。
+</p>
+<p>Emacs 可以在字符的内部表示和特定字符集中的字符代码点之间进行转换。以下两个函数支持这些转换。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: decode-char charset code-point ¶
+</pre></div>
+<p>此函数将在 charset 中分配了代码点的字符解码为相应的 Emacs 字符，并返回它。如果 charset 不包含该代码点的字符，则值为 nil。
+</p>
+<p>为了向后兼容，如果代码点不适合 Lisp fixnum（请参阅 most-positive-fixnum），可以将其指定为 cons 单元格（high . low），其中 low 是值的低 16 位， high 是高 16 位。这种用法已经过时了。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: encode-char char charset ¶
+</pre></div>
+<p>此函数返回分配给 charset 中字符 char 的代码点。如果 charset 没有 char 的代码点，则值为 nil。
+</p>
+<p>以下函数可用于将某个函数应用于 charset 中的全部或部分字符：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: map-charset-chars function charset &amp;optional arg from-code to-code ¶
+</pre></div>
+<p>字符集中字符的调用函数。使用两个参数调用函数。第一个是一个 cons 单元格（从 .to），其中 from 和 to 表示 charset 中包含的字符范围。传递给函数的第二个参数是 arg，如果省略 arg，则为 nil。
+</p>
+<p>默认情况下，传递给函数的代码点范围包括 charset 中的所有字符，但可选参数 from-code 和 to-code 将其限制为这两个 charset 代码点之间的字符范围。如果其中任何一个为 nil，则分别默认为 charset 的第一个或最后一个代码点。注意 from-code 和 to-code 是 charset 的代码点，而不是 Emacs 的字符代码；  相反，传递给函数的 cons 单元格中的 from 和 to 值是 Emacs 字符代码。这些 Emacs 字符代码要么是 Unicode 代码点，要么是扩展 Unicode 并且超出 Unicode 字符范围 0..#x10FFFF 的 Emacs 内部代码点（请参阅文本表示）。后者很少发生，传统的 CJK 字符集用于字符集的代码点，这些字符集指定尚未与 Unicode 统一的字符。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="34.8_扫描字符集.html">扫描字符集</a>, Previous: <a href="34.6_字符属性.html">字符属性</a>, Up: <a href="34_非ASCII字符.html">非ASCII字符.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

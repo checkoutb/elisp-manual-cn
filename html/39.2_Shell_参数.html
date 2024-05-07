@@ -1,0 +1,55 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>39.2 Shell 参数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">39.2 Shell 参数</h2>
+<div class="nav-panel"><p>Next: <a href="39.3_创建同步进程.html">创建同步进程</a>, Previous: <a href="39.1_创建子进程的函数.html">创建子进程的函数</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Lisp 程序有时需要运行一个 shell 并给它一个包含用户指定文件名的命令。这些程序应该能够支持任何有效的文件名。但是shell对某些字符进行了特殊处理，如果这些字符出现在文件名中，就会混淆shell。要处理这些字符，请使用函数 shell-quote-argument：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: shell-quote-argument argument ¶
+</pre></div>
+<p>此函数返回一个字符串，该字符串以 shell 语法表示一个参数，其实际内容是参数。它应该可靠地将返回值连接到 shell 命令中，然后将其传递给 shell 以执行。
+</p>
+<p>这个函数的确切作用取决于您的操作系统。该函数旨在使用系统标准外壳的语法；  如果您使用不寻常的外壳，则需要重新定义此功能。请参阅安全注意事项。
+</p>
+<div class="lisp">
+<pre class="lisp">;; This example shows the behavior on GNU and Unix systems.
+(shell-quote-argument "foo &gt; bar")
+     ⇒ "foo\\ \\&gt;\\ bar"
+
+;; This example shows the behavior on MS-DOS and MS-Windows.
+(shell-quote-argument "foo &gt; bar")
+     ⇒ "\"foo &gt; bar\""
+</pre></div>
+<p>下面是使用 shell-quote-argument 构造 shell 命令的示例：
+</p><div class="lisp">
+<pre class="lisp">(concat "diff -u "
+        (shell-quote-argument oldfile)
+        " "
+        (shell-quote-argument newfile))
+</pre></div>
+<p>以下两个函数可用于将单独的命令行参数字符串列表组合成单个字符串，并将字符串拆分成单独的命令行参数列表。这些函数主要用于将 minibuffer 中的用户输入（Lisp 字符串）转换为要传递给 make-process、call-process 或 start-process 的字符串参数列表，或将此类参数列表转换为单个 Lisp要在 minibuffer 或 echo 区域中显示的字符串。请注意，如果涉及 shell（例如，如果使用 call-process-shell-command），则参数仍应受 shell-quote-argument 保护；  combine-and-quote-strings 并非旨在保护特殊字符免受 shell 评估。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: split-string-shell-command string ¶
+</pre></div>
+<p>此函数将字符串拆分为子字符串，同时考虑双引号和单引号以及反斜杠引用。
+</p><div class="lisp">
+<pre class="lisp">(split-string-shell-command "ls /tmp/'foo bar'")
+     ⇒ ("ls" "/tmp/foo bar")
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: split-string-and-unquote string &amp;optional separators ¶
+</pre></div>
+<p>此函数在匹配正则表达式分隔符时将字符串拆分为子字符串，就像 split-string 所做的一样（请参阅创建字符串）；  此外，它从子字符串中删除了引号。然后它创建一个子字符串列表并返回它。
+</p>
+<p>如果分隔符被省略或为零，则默认为 <code>\\s-+</code> ，这是一个正则表达式，匹配一个或多个具有空格语法的字符（参见语法类表）。
+</p>
+<p>此函数支持两种类型的引用：将整个字符串括在双引号 "…" 中，以及使用反斜杠转义 ’\’ 引用单个字符。后者也用于 Lisp 字符串，因此该函数也可以处理这些字符串。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: combine-and-quote-strings list-of-strings &amp;optional separator ¶
+</pre></div>
+<p>此函数将字符串列表连接成单个字符串，并根据需要引用每个字符串。它还将分隔字符串粘贴在每对字符串之间；  如果分隔符被省略或为零，则默认为 ~~ 。返回值是结果字符串。
+</p>
+<p>需要引用的字符串列表中的字符串是那些包含分隔符作为其子字符串的字符串。引用字符串会将其括在双引号 <code>...</code> 中。在最简单的情况下，如果您从单个命令行参数中使用命令，则包含嵌入空格的每个参数都将被引用。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="39.3_创建同步进程.html">创建同步进程</a>, Previous: <a href="39.1_创建子进程的函数.html">创建子进程的函数</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

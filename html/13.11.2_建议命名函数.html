@@ -1,0 +1,46 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>13.11.2 建议命名函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">13.11.2 建议命名函数</h3>
+<div class="nav-panel"><p>Next: <a href="13.11.3_编写建议的方法.html">编写建议的方法</a>, Previous: <a href="13.11.1_操纵建议的原语.html">操纵建议的原语</a>, Up: <a href="13.11_建议_Emacs_Lisp_函数.html">建议_Emacs_Lisp_函数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>建议的常见用途是命名函数和宏。您可以只使用 add-function ，如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(add-function :around (symbol-function 'fun) #'his-tracing-function)
+</pre></div>
+<p>但是你应该使用advice-add 和advice-remove 来代替。这组单独的函数用于操作应用于命名函数的建议片段，与 add-function 相比，它们提供了以下额外功能：它们知道如何处理宏和自动加载的函数，它们让 describe-function 保留原始文档字符串和文档添加的建议，它们允许您在定义函数之前添加和删除建议。
+</p>
+<p>建议添加可用于更改对现有函数的现有调用的行为，而无需重新定义整个函数。但是，它可能是错误的来源，因为该函数的现有调用者可能会假定旧的行为，并且当行为被建议更改时无法正常工作。如果进行调试的人没有注意到或记得函数已被建议修改，建议也会导致调试混乱。
+</p>
+<p>由于这些原因，建议应保留在您无法以任何其他方式修改函数行为的情况下。如果可以通过钩子做同样的事情，那是最好的（见钩子）。如果您只是想更改特定键的功能，最好编写一个新命令，并将旧命令的键绑定重新映射到新命令（请参阅重新映射命令）。
+</p>
+<p>如果您正在编写发布代码以供他人使用，请尽量避免在其中包含建议。如果您要建议的函数没有钩子来完成这项工作，请与 Emacs 开发人员讨论添加合适的钩子。特别是，Emacs 自己的源文件不应该对 Emacs 中的函数提供建议。（目前这个约定有一些例外，但我们的目标是纠正它们。）通常在 foo 中创建一个新的钩子，并让 bar 使用该钩子，而不是让 bar 在 foo 中放置建议。
+</p>
+<p>不能建议特殊形式（请参阅特殊形式），但可以建议使用宏，其方式与函数大致相同。当然，这不会影响已经宏扩展的代码，因此您需要确保在宏扩展之前安装了通知。
+</p>
+<p>可以建议一个原语（请参阅什么是函数？），但通常不应该这样做，原因有两个。首先，通知机制使用了一些原语，通知它们可能会导致无限递归。其次，许多原语是直接从 C 中调用的，这样的调用会忽略通知；  因此，最终会陷入一种令人困惑的情况，其中一些调用（来自 Lisp 代码）遵循建议，而其他调用（来自 C 代码）则不遵循。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: define-advice symbol (where lambda-list &amp;optional name depth) &amp;rest body ¶
+</pre></div>
+<p>该宏定义了一条建议并将其添加到名为 symbol 的函数中。如果 name 为 nil 或名为 symbol@name 的函数，则建议是匿名函数。有关其他参数的解释，请参阅advice-add。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: advice-add symbol where function &amp;optional props ¶
+</pre></div>
+<p>将通知函数添加到命名函数符号。where 和 props 与 add-function 的含义相同（请参阅 Primitives 以操作建议）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: advice-remove symbol function ¶
+</pre></div>
+<p>从命名函数符号中删除通知函数。function 也可以是一条建议的名称。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: advice-member-p function symbol ¶
+</pre></div>
+<p>如果通知函数已经在命名函数符号中，则返回非零。function 也可以是一条建议的名称。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: advice-mapc function symbol ¶
+</pre></div>
+<p>为添加到命名函数符号的每条建议调用函数。使用两个参数调用函数：建议函数及其属性。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="13.11.3_编写建议的方法.html">编写建议的方法</a>, Previous: <a href="13.11.1_操纵建议的原语.html">操纵建议的原语</a>, Up: <a href="13.11_建议_Emacs_Lisp_函数.html">建议_Emacs_Lisp_函数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

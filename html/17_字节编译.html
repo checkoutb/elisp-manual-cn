@@ -1,0 +1,12 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>17 字节编译</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h1 class="chapter">17 字节编译</h1>
+<div class="nav-panel"><p>Next: <a href="17.1_字节编译代码的性能.html">字节编译代码的性能</a>, Previous: <a href="16.11_Emacs_动态模块.html">Emacs_动态模块</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs Lisp 有一个编译器，它将用 Lisp 编写的函数翻译成一种称为字节码的特殊表示形式，可以更有效地执行。编译器将 Lisp 函数定义替换为字节码。当调用字节码函数时，其定义由字节码解释器评估。
+</p>
+<p>因为字节编译代码由字节代码解释器评估，而不是由机器硬件直接执行（就像真正的编译代码那样），字节代码完全可以在机器之间传输而无需重新编译。但是，它不如真正的编译代码快。
+</p>
+<p>一般来说，任何版本的 Emacs 都可以运行由最近早期版本的 Emacs 生成的字节编译代码，但反之则不然。
+</p>
+<p>如果您不希望编译 Lisp 文件，请在其中放置一个用于无字节编译的文件局部变量绑定，如下所示：
+</p><div class="lisp">
+<pre class="lisp">;; -*-no-byte-compile: t; -*-
+</pre></div>
+<div class="nav-panel"><p>Next: <a href="17.1_字节编译代码的性能.html">字节编译代码的性能</a>, Previous: <a href="16.11_Emacs_动态模块.html">Emacs_动态模块</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

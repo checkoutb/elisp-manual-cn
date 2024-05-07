@@ -1,0 +1,8 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>19.3 调试无效的 Lisp 语法</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">19.3 调试无效的 Lisp 语法</h2>
+<div class="nav-panel"><p>Next: <a href="19.3.1_多余的开括号.html">多余的开括号</a>, Previous: <a href="19.2.16_调试选项.html">调试选项</a>, Up: <a href="19_调试_Lisp_程序.html">调试_Lisp_程序.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Lisp 阅读器报告无效语法，但不能说出真正的问题在哪里。例如，在评估表达式时出现错误 <code>解析期间文件结束</code> 表示过多的开括号（或方括号）。阅读器在文件末尾检测到这种不平衡，但它无法确定右括号应该在哪里。同样，’Invalid read syntax: ")"’ 表示多余的右括号或缺少左括号，但没有说明缺少的括号所属的位置。那么，如何找到要更改的内容呢？
+</p>
+<p>如果问题不只是括号的不平衡，一个有用的技术是在每个 defun 的开头尝试 CMe（end-of-defun，参见 GNU Emacs 手册中的 Defuns 移动），看看它是否到了那个地方那个defun似乎结束的地方。如果没有，则该 defun 中存在问题。
+</p>
+<p>然而，不匹配的括号是 Lisp 中最常见的语法错误，我们可以针对这些情况提供进一步的建议。（此外，仅在启用 Show Paren 模式的代码中移动点可能会发现不匹配。）
+</p>
+<div class="nav-panel"><p>Next: <a href="19.3.1_多余的开括号.html">多余的开括号</a>, Previous: <a href="19.2.16_调试选项.html">调试选项</a>, Up: <a href="19_调试_Lisp_程序.html">调试_Lisp_程序.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

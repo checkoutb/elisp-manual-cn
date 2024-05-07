@@ -1,0 +1,50 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.17.5 ImageMagick 图像</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.17.5 ImageMagick 图像</h3>
+<div class="nav-panel"><p>Next: <a href="40.17.6_SVG_图像.html">SVG_图像</a>, Previous: <a href="40.17.4_XPM_图像.html">XPM_图像</a>, Up: <a href="40.17_图像.html">图像.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>如果您的 Emacs 构建支持 ImageMagick，您可以使用 ImageMagick 库来加载许多图像格式（请参阅 GNU Emacs 手册中的文件便利）。通过 ImageMagick 加载的图像的图像类型符号是 imagemagick，与实际的底层图像格式无关。
+</p>
+<p>要检查 ImageMagick 支持，请使用以下命令：
+</p>
+<div class="lisp">
+<pre class="lisp">(image-type-available-p 'imagemagick)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: imagemagick-types ¶
+</pre></div>
+<p>此函数返回当前 ImageMagick 安装支持的图像文件扩展名列表。每个列表元素都是一个符号，表示图像类型的内部 ImageMagick 名称，例如 .bmp 图像的 BMP。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: imagemagick-enabled-types ¶
+</pre></div>
+<p>这个变量的值是一个 ImageMagick 图像类型的列表，Emacs 可能会尝试使用 ImageMagick 渲染这些图像类型。每个列表元素应该是 imagemagick-types 返回的列表中的符号之一，或等效的字符串。或者，值 t 为所有可能的图像类型启用 ImageMagick。不管这个变量的值是什么，imagemagick-types-inhibit（见下文）优先。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: imagemagick-types-inhibit ¶
+</pre></div>
+<p>此变量的值列出了永远不应使用 ImageMagick 渲染的 ImageMagick 图像类型，无论 imagemagick-enabled-types 的值如何。t 值完全禁用 ImageMagick。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: image-format-suffixes ¶
+</pre></div>
+<p>此变量是一个将图像类型映射到文件扩展名的列表。Emacs 将它与 :format image 属性（见下文）结合使用，为 ImageMagick 库提供有关图像类型的提示。每个元素都有形式（类型扩展名），其中类型是指定图像内容类型的符号，扩展名是指定相关文件扩展名的字符串。
+</p>
+<p>使用 ImageMagick 加载的图像支持以下附加图像描述符属性：
+</p>
+<div class="lisp">
+<pre class="lisp">:background background
+</pre></div>
+<p>背景，如果非零，应该是一个指定颜色的字符串，如果图像支持透明度，则用作图像的背景颜色。如果值为 nil，则默认为框架的背景颜色。
+</p><div class="lisp">
+<pre class="lisp">:format type
+</pre></div>
+<p>值 type 应该是指定图像数据类型的符号，如 image-format-suffixes 中所示。这在图像没有关联文件名时使用，以向 ImageMagick 提供提示以帮助其检测图像类型。
+</p><div class="lisp">
+<pre class="lisp">:crop geometry
+</pre></div>
+<p>geometry 的值应该是一个形式的列表（宽高 xy）。width 和 height 指定裁剪图像的宽度和高度。如果 x 是正数，则它指定裁剪区域与原始图像左侧的偏移量，如果为负数，则指定从右侧的偏移量。如果 y 是正数，它指定从原始图像顶部的偏移量，如果是负数，则从底部开始。如果 x 或 y 为 nil 或未指定，则裁剪区域将以原始图像为中心。
+</p>
+<p>如果裁剪区域位于图像边缘或与图像边缘重叠，则会缩小以排除图像之外的任何区域。这意味着不能使用 :crop 通过输入较大的宽度或高度值来增加图像的大小。
+</p>
+<p>裁剪在缩放之后但在旋转之前执行。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.17.6_SVG_图像.html">SVG_图像</a>, Previous: <a href="40.17.4_XPM_图像.html">XPM_图像</a>, Up: <a href="40.17_图像.html">图像.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

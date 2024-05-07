@@ -1,0 +1,128 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>26.6.4 文件属性</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">26.6.4 文件属性</h3>
+<div class="nav-panel"><p>Next: <a href="26.6.5_扩展文件属性.html">扩展文件属性</a>, Previous: <a href="26.6.3_真名.html">真名</a>, Up: <a href="26.6_文件信息.html">文件信息.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍获取文件详细信息的函数，包括所有者和组号、名称的数量、inode 号、大小以及访问和修改的次数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-newer-than-file-p filename1 filename2 ¶
+</pre></div>
+<p>如果文件 filename1 比文件 filename2 新，则此函数返回 t。如果 filename1 不存在，则返回 nil。如果 filename1 确实存在，但 filename2 不存在，则返回 t。
+</p>
+<p>在下面的例子中，假设文件 aug-19 写在 19 号，aug-20 写在 20 号，文件 no-file 根本不存在。
+</p><div class="lisp">
+<pre class="lisp">(file-newer-than-file-p "aug-19" "aug-20")
+     ⇒ nil
+
+(file-newer-than-file-p "aug-20" "aug-19")
+     ⇒ t
+
+(file-newer-than-file-p "aug-19" "no-file")
+     ⇒ t
+
+(file-newer-than-file-p "no-file" "aug-19")
+     ⇒ nil
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: file-attributes filename &amp;optional id-format ¶
+</pre></div>
+<p>此函数返回文件 filename 的属性列表。如果指定的文件不存在，则返回 nil。此函数不遵循符号链接。可选参数 id-format 指定 UID 和 GID 属性的首选格式（见下文）——有效值为 ’string 和 ’integer。后者是默认值，但我们计划更改它，因此如果您使用返回的 UID 或 GID，则应为 id-format 指定一个非零值。
+</p>
+<p>在 GNU 平台上操作本地文件时，此函数是原子的：如果文件系统同时被其他进程更改，则此函数在更改之前或之后返回文件的属性。否则，此函数不是原子的，如果它检测到竞争条件，则可能返回 nil，或者可能返回先前和当前文件属性的大杂烩。
+</p>
+<p>提供了访问器函数来访问此列表中的元素。访问器与以下元素的描述一起被提及。
+</p>
+<p>列表的元素按顺序是：
+</p>
+<p>t 表示目录，字符串表示符号链接（链接到的名称），或 nil 表示文本文件（文件属性类型）。
+文件具有的名称数（文件属性链接编号）。可以使用 add-name-to-file 函数创建备用名称，也称为硬链接（请参阅更改文件名和属性）。
+文件的 UID，通常为字符串 (file-attribute-user-id)。但是，如果它不对应于指定用户，则该值为整数。
+文件的 GID，同样是 (file-attribute-group-id)。
+最后一次访问的时间作为 Lisp 时间戳（文件属性访问时间）。时间戳采用当前时间的样式（请参阅时间），并被截断为文件系统的时间戳分辨率；  例如，在某些基于 FAT 的文件系统上，仅记录最后一次访问的日期，因此该时间将始终保持最后一次访问当天的午夜。
+最后修改的时间作为 Lisp 时间戳（文件属性修改时间）。这是文件内容最后一次修改。
+最后状态更改的时间作为 Lisp 时间戳（文件属性状态更改时间）。这是文件的访问模式位、其所有者和组以及文件系统中记录的文件的其他信息的最后更改时间，超出了文件的内容。
+文件的大小（以字节为单位）（file-attribute-size）。
+文件的模式，由十个字母或破折号组成的字符串，如 ’ls -l’ (file-attribute-modes)。
+一个未指定的值，用于向后兼容。
+文件的 inode 号（file-attribute-inode-number），一个非负整数。
+文件所在设备的文件系统编号（file-attribute-device-number），整数。这个元素和文件的 inode 编号一起提供了足够的信息来区分系统上的任何两个文件——没有两个文件可以对这两个编号具有相同的值。
+</p>
+<p>例如，以下是 files.texi 的文件属性：
+</p>
+<div class="lisp">
+<pre class="lisp">(file-attributes "files.texi" 'string)
+     ⇒  (nil 1 "lh" "users"
+          (20614 64019 50040 152000)
+          (20000 23 0 0)
+          (20614 64555 902289 872000)
+          122295 "-rw-rw-rw-"
+          t 6473924464520138
+          1014478468)
+</pre></div>
+<p>以下是结果的解释方式：
+</p>
+<div class="lisp">
+<pre class="lisp">nil
+</pre></div>
+<p>既不是目录也不是符号链接。
+</p><div class="lisp">
+<pre class="lisp">1
+</pre></div>
+<p>只有一个名称（当前默认目录中的名称 files.texi）。
+</p><div class="lisp">
+<pre class="lisp">"lh"
+</pre></div>
+<p>由名为 <code>lh</code> 的用户所有。
+</p><div class="lisp">
+<pre class="lisp">"users"
+</pre></div>
+<p>在名为 <code>用户</code> 的组中。
+</p><div class="lisp">
+<pre class="lisp">(20614 64019 50040 152000)
+</pre></div>
+<p>上次访问时间为 2012 年 10 月 23 日 20:12:03.050040152 UTC。
+</p><div class="lisp">
+<pre class="lisp">(20000 23 0 0)
+</pre></div>
+<p>上次修改时间为 2001 年 7 月 15 日 08:53:43 UTC。
+</p><div class="lisp">
+<pre class="lisp">(20614 64555 902289 872000)
+</pre></div>
+<p>最后一次更改状态是在 2012 年 10 月 23 日 20:20:59.902289872 UTC。
+</p><div class="lisp">
+<pre class="lisp">122295
+</pre></div>
+<p>长度为 122295 字节。（但是，如果某些字节属于多字节序列，并且行尾格式为 CR-LF，则它可能不包含 122295 个字符。）
+</p><div class="lisp">
+<pre class="lisp">"-rw-rw-rw-"
+</pre></div>
+<p>拥有所有者、组和世界的读写访问模式。
+</p><div class="lisp">
+<pre class="lisp">t
+</pre></div>
+<p>只是一个占位符；  它不携带任何信息。
+</p><div class="lisp">
+<pre class="lisp">6473924464520138
+</pre></div>
+<p>inode 编号为 6473924464520138。
+</p><div class="lisp">
+<pre class="lisp">1014478468
+</pre></div>
+<p>位于编号为 1014478468 的文件系统设备上。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-nlinks filename ¶
+</pre></div>
+<p>此函数返回文件 filename 具有的名称（即硬链接）的数量。如果文件不存在，则此函数返回 nil。请注意，符号链接对此函数没有影响，因为它们不被认为是它们链接到的文件的名称。此函数不遵循符号链接。
+</p><div class="example">
+<pre class="example">$ ls -l foo*
+-rw-rw-rw- 2 rms rms 4 Aug 19 01:27 foo
+-rw-rw-rw- 2 rms rms 4 Aug 19 01:27 foo1
+
+
+(file-nlinks "foo")
+     ⇒ 2
+
+(file-nlinks "doesnt-exist")
+     ⇒ nil
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="26.6.5_扩展文件属性.html">扩展文件属性</a>, Previous: <a href="26.6.3_真名.html">真名</a>, Up: <a href="26.6_文件信息.html">文件信息.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

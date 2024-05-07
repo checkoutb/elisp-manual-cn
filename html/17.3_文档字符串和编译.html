@@ -1,0 +1,24 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>17.3 文档字符串和编译</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">17.3 文档字符串和编译</h2>
+<div class="nav-panel"><p>Next: <a href="17.4_单个函数的动态加载.html">单个函数的动态加载</a>, Previous: <a href="17.2_字节编译函数.html">字节编译函数</a>, Up: <a href="17_字节编译.html">字节编译.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当 Emacs 从字节编译文件加载函数和变量时，它通常不会将它们的文档字符串加载到内存中。每个文档字符串仅在需要时从字节编译文件中动态加载。这样可以节省内存，并通过跳过文档字符串的处理来加快加载速度。
+</p>
+<p>此功能有一个缺点：如果您删除、移动或更改已编译的文件（例如通过编译新版本），Emacs 可能不再能够访问先前加载的函数或变量的文档字符串。此类问题通常仅在您自己构建 Emacs 并且碰巧编辑和/或重新编译 Lisp 源文件时才会出现。要解决它，只需在重新编译后重新加载每个文件。
+</p>
+<p>对于每个字节编译文件，在编译时确定从字节编译文件动态加载文档字符串。可以通过选项 byte-compile-dynamic-docstrings 禁用它。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: byte-compile-dynamic-docstrings ¶
+</pre></div>
+<p>如果这是非零，字节编译器生成为动态加载文档字符串而设置的编译文件。
+</p>
+<p>要禁用特定文件的动态加载功能，请在其标题行中将此选项设置为 nil（请参阅 GNU Emacs 手册中的文件中的局部变量），如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">-*-byte-compile-dynamic-docstrings: nil;-*-
+</pre></div>
+<p>这主要在您希望更改文件时很有用，并且您希望已经加载它的 Emacs 会话在文件更改时继续工作。
+</p>
+<p>在内部，文档字符串的动态加载是通过使用特殊的 Lisp 阅读器结构 <code>#@count</code> 编写编译文件来完成的。此构造跳过下一个 count 字符。它还使用代表此文件名称的 <code>#$</code> 构造作为字符串。不要在 Lisp 源文件中使用这些结构；  它们的设计目的不是让阅读文件的人清楚。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="17.4_单个函数的动态加载.html">单个函数的动态加载</a>, Previous: <a href="17.2_字节编译函数.html">字节编译函数</a>, Up: <a href="17_字节编译.html">字节编译.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

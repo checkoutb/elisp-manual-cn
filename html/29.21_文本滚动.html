@@ -1,0 +1,149 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>29.21 文本滚动</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">29.21 文本滚动</h2>
+<div class="nav-panel"><p>Next: <a href="29.22_垂直小数滚动.html">垂直小数滚动</a>, Previous: <a href="29.20_窗口开始和结束位置.html">窗口开始和结束位置</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>文本滚动意味着在窗口中上下移动文本。它通过更改窗口的显示开始位置来工作。它还可以更改 window-point 的值以保持屏幕上的点（请参阅 Windows 和点）。
+</p>
+<p>基本的文本滚动功能是向上滚动（向前滚动）和向下滚动（向后滚动）。在这些函数名称中， <code>向上</code> 和 <code>向下</code> 指的是缓冲区文本相对于窗口的运动方向。想象一下，文本写在一长卷纸上，滚动命令使纸上下移动。因此，如果您正在查看缓冲区的中间并反复调用向下滚动，您最终会看到缓冲区的开头。
+</p>
+<p>不幸的是，这有时会引起混乱，因为有些人倾向于按照相反的约定来思考：他们想象窗口在保留在原处的文本上移动，因此 <code>向下</code> 命令会将您带到缓冲区的末尾。这个约定与这样一个命令绑定到现代键盘上名为 PageDown 的键的事实是一致的。
+</p>
+<p>如果当前缓冲区不是所选窗口中显示的缓冲区，则文本滚动函数（除了 scroll-other-window 之外）会产生不可预知的结果。请参阅当前缓冲区。
+</p>
+<p>如果窗口包含比窗口高度高的行（例如存在大图像时），滚动函数将调整窗口的垂直滚动位置以滚动部分可见的行。Lisp 调用者可以通过将变量 auto-window-vscroll 绑定到 nil 来禁用此功能（请参阅垂直分数滚动）。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: scroll-up &amp;optional count ¶
+</pre></div>
+<p>此功能在所选窗口中按计数行向前滚动。
+</p>
+<p>如果 count 是负数，它会向后滚动。如果 count 为 nil（或省略），则滚动的距离为 next-screen-context-lines lines 小于窗口主体的高度。
+</p>
+<p>如果所选窗口不能再滚动，此函数会发出错误信号。否则，它返回零。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: scroll-down &amp;optional count ¶
+</pre></div>
+<p>此功能在所选窗口中向后滚动计数行。
+</p>
+<p>如果 count 是负数，它会向前滚动。在其他方面，它的行为方式与向上滚动相同。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: scroll-up-command &amp;optional count ¶
+</pre></div>
+<p>这类似于向上滚动，除了如果所选窗口不能再滚动并且变量 scroll-error-top-bottom 的值为 t，它会尝试移动到缓冲区的末尾。如果点已经存在，则表示错误。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: scroll-down-command &amp;optional count ¶
+</pre></div>
+<p>这类似于向下滚动，除了如果所选窗口不能再滚动并且变量 scroll-error-top-bottom 的值为 t，它会尝试移动到缓冲区的开头。如果点已经存在，则表示错误。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: scroll-other-window &amp;optional count ¶
+</pre></div>
+<p>此函数将另一个窗口中的文本向上滚动计数行。count 的负值或 nil 的处理方式与向上滚动相同。
+</p>
+<p>您可以通过将变量 other-window-scroll-buffer 设置为缓冲区来指定要滚动的缓冲区。如果该缓冲区尚未显示，则 scroll-other-window 将其显示在某个窗口中。
+</p>
+<p>When the selected window is the minibuffer, the next window is normally the leftmost one immediately above it.  You can specify a different window to scroll, when the minibuffer is selected, by setting the variable minibuffer-scroll-window.  This variable has no effect when any other window is selected.  当它为非 nil 并且选择了 minibuffer 时，它优先于 other-window-scroll-buffer。请参阅 minibuffer-scroll-window 的定义。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: scroll-other-window-down &amp;optional count ¶
+</pre></div>
+<p>此函数将另一个窗口中的文本向下滚动数行。count 的负值或 nil 的处理方式与向下滚动相同。在其他方面，它的行为方式与 scroll-other-window 相同。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: other-window-scroll-buffer ¶
+</pre></div>
+<p>如果这个变量是非零，它告诉 scroll-other-window 要滚动哪个缓冲区的窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: scroll-margin ¶
+</pre></div>
+<p>此选项指定滚动边距的大小——点与窗口顶部或底部之间的最小行数。每当点进入窗口顶部或底部的这么多行时，重新显示会自动滚动文本（如果可能）以将点移出边缘，更靠近窗口的中心。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: maximum-scroll-margin ¶
+</pre></div>
+<p>此变量将滚动边距的有效值限制为当前窗口行高的一小部分。例如，如果当前窗口有 20 行且最大滚动边距为 0.1，则滚动边距永远不会大于 2 行，无论滚动边距有多大。
+</p>
+<p>maximum-scroll-margin 本身的最大值为 0.5，这允许设置较大的边距以将光标保持在窗口的中间线（如果窗口的行数为偶数，则为两条中间线）。如果将其设置为更大的值（或除介于 0.0 和 0.5 之间的浮点数以外的任何值），则将使用默认值 0.25。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: scroll-conservatively ¶
+</pre></div>
+<p>此变量控制当点移出屏幕（或进入滚动边距）时如何自动滚动。如果该值为正整数 n，则 redisplay 会在任一方向上滚动文本最多 n 行，如果这将使 point 回到正确的视图中。这种行为称为保守滚动。否则，滚动以通常的方式发生，在其他变量的控制下，例如积极向上滚动和积极向下滚动。
+</p>
+<p>默认值为零，这意味着保守滚动永远不会发生。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: scroll-down-aggressively ¶
+</pre></div>
+<p>此变量的值应为 nil 或介于 0 和 1 之间的分数 f。如果是分数，则指定向下滚动时在屏幕上放置点的位置。更准确地说，当一个窗口向下滚动时，因为点在窗口开始上方，新的开始位置被选择为将点 f 从顶部放置窗口高度的一部分。f 越大，滚动越激进。
+</p>
+<p>nil 的值相当于 0.5，因为它的作用是指向中心点。当以任何方式设置时，此变量会自动变为缓冲区本地。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: scroll-up-aggressively ¶
+</pre></div>
+<p>同样，用于向上滚动。值 f 指定点应放置在距窗口底部多远的位置；  因此，与scroll-down-aggressively 一样，较大的值会更积极地滚动。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: scroll-step ¶
+</pre></div>
+<p>此变量是滚动保守的旧变体。不同之处在于，如果它的值为 n，则只允许滚动精确的 n 行，而不是更小的数字。此功能不适用于滚动边距。默认值为零。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: scroll-preserve-screen-position ¶
+</pre></div>
+<p>如果此选项为 t，则每当滚动命令将点移出窗口时，Emacs 都会尝试调整点以将光标保持在窗口中的旧垂直位置，而不是窗口边缘。
+</p>
+<p>如果值不是 nil 而不是 t，Emacs 会调整 point 以使光标保持在相同的垂直位置，即使滚动命令没有将 point 移出窗口。
+</p>
+<p>此选项影响所有具有非零滚动命令符号属性的滚动命令。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: next-screen-context-lines ¶
+</pre></div>
+<p>此变量的值是全屏滚动时要保留的连续行数。例如，使用 nil 参数向上滚动滚动，以便窗口底部的这么多行出现在顶部而不是顶部。默认值为 2。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: scroll-error-top-bottom ¶
+</pre></div>
+<p>如果此选项为 nil（默认值），scroll-up-command 和 scroll-down-command 只会在无法再滚动时发出错误信号。
+</p>
+<p>如果值为 t，这些命令将移动指向缓冲区的开头或结尾（取决于滚动方向）；  只有当点已经在那个位置时，它们才会发出错误信号。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: recenter &amp;optional count redisplay ¶
+</pre></div>
+<p>此函数滚动选定窗口中的文本，以便点显示在窗口内指定的垂直位置。它不会相对于文本移动点。
+</p>
+<p>如果 count 是非负数，则将包含点计数行的行从窗口顶部向下放置。如果 count 是负数，则从窗口底部向上计数，因此 -1 代表窗口中最后一个可用行。
+</p>
+<p>如果 count 为 nil（或非 nil 列表），则 centerer 将包含点的行放在窗口的中间。如果count为nil且redisplay为非nil，该函数可能会根据recenter-redisplay的值重绘帧。因此，省略第二个参数可用于抵消最近重新显示为非零的效果。交互式调用传递非 <code>零</code> 以重新显示。
+</p>
+<p>当以交互方式调用 centerer 时，count 是原始前缀参数。因此，输入 Cu 作为前缀会将 count 设置为非 nil 列表，而输入 Cu 4 会将 count 设置为 4，这会将当前行定位为距顶部四行。
+</p>
+<p>使用零参数，recenterer 将当前行定位在窗口的顶部。命令 centerer-top-bottom 提供了一种更方便的方法来实现这一点。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: recenter-window-group &amp;optional count ¶
+</pre></div>
+<p>此功能就像最近一样，只是当所选窗口是一组窗口的一部分（请参阅窗口组）时，近来的窗口组将整个组滚动。当缓冲区局部变量 centerer-window-group-function 设置为函数时，此条件成立。在这种情况下，recenter-window-group 使用参数 count 调用该函数，然后返回其结果。参数计数与最近的含义相同，但与整个窗口组有关。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: recenter-redisplay ¶
+</pre></div>
+<p>如果此变量不为 nil，则使用 nil count 参数和非 nil redisplay 参数调用 centerer 会重绘帧。默认值为 tty，这意味着只有当它是一个 tty 帧时才重绘该帧。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: recenter-top-bottom &amp;optional count ¶
+</pre></div>
+<p>此命令是 Cl 的默认绑定，它的作用类似于重新定位器，除非在不带参数的情况下调用。在这种情况下，连续调用将根据变量recenter-positions 定义的循环顺序放置点。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: recenter-positions ¶
+</pre></div>
+<p>此变量控制无参数调用时，recenter-top-bottom 的行为方式。默认值为 (middle top bottom)，表示在将点放置在窗口的中间、顶部和底部之间时，连续调用无参数循环的 centerer-top-bottom。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="29.22_垂直小数滚动.html">垂直小数滚动</a>, Previous: <a href="29.20_窗口开始和结束位置.html">窗口开始和结束位置</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

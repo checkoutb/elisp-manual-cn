@@ -1,0 +1,27 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>10.1 评估简介</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">10.1 评估简介</h2>
+<div class="nav-panel"><p>Next: <a href="10.2_表格种类.html">表格种类</a>, Previous: <a href="10_评估.html">评估</a>, Up: <a href="10_评估.html">评估.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Lisp 解释器或评估器是 Emacs 的一部分，它计算给它的表达式的值。当一个用 Lisp 编写的函数被调用时，评估器通过计算函数体中的表达式来计算函数的值。因此，运行任何 Lisp 程序实际上意味着运行 Lisp 解释器。
+</p>
+<p>用于评估的 Lisp 对象称为表单或表达式6。表单是数据对象而不仅仅是文本这一事实是类 Lisp 语言与典型编程语言之间的根本区别之一。可以评估任何对象，但实际上只有数字、符号、列表和字符串会被经常评估。
+</p>
+<p>在随后的部分中，我们将详细描述评估对每种形式的含义。
+</p>
+<p>阅读 Lisp 表单然后评估表单是很常见的，但阅读和评估是独立的活动，两者都可以单独执行。阅读本身不会评估任何东西。它将 Lisp 对象的打印表示转换为对象本身。由 read 的调用者指定此对象是要评估的表单，还是用于某些完全不同的目的。请参阅输入函数。
+</p>
+<p>评估是一个递归过程，评估表单通常涉及评估该表单中的部分。例如，当您评估一个函数调用形式（例如 (car x)）时，Emacs 首先评估参数（子形式 x）。在评估参数之后，Emacs 执行函数 (car)，如果函数是用 Lisp 编写的，则执行通过评估函数体来进行（然而，在这个例子中，car 不是 Lisp 函数；它是一个原始函数在 C) 中实现。有关函数和函数调用的更多信息，请参阅函数。
+</p>
+<p>评估发生在称为环境的上下文中，它由所有 Lisp 变量的当前值和绑定组成（请参阅变量）。7 每当表单引用变量而不为其创建新绑定时，该变量的评估结果为给定的值以目前的环境。评估表单也可以通过绑定变量来临时改变环境（请参阅局部变量）。
+</p>
+<p>评估表单也可能使更改持续存在；  这些变化称为副作用。产生副作用的一个例子是 (setq foo 1)。
+</p>
+<p>不要将评估与命令键解释混淆。编辑器命令循环使用活动键盘映射将键盘输入转换为命令（交互式可调用函数），然后使用交互式调用来执行该命令。如果命令是用 Lisp 编写的，则执行命令通常涉及评估；  但是，此步骤不被视为命令键解释的一部分。请参阅命令循环。
+脚注
+(6)
+</p>
+<p>它有时也称为 S 表达式或 sexp，但我们通常不会在本手册中使用此术语。
+(7)
+</p>
+<p>这个 <code>环境</code> 的定义并不打算包括所有可能影响程序结果的数据。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="10.2_表格种类.html">表格种类</a>, Previous: <a href="10_评估.html">评估</a>, Up: <a href="10_评估.html">评估.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

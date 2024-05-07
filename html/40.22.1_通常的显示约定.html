@@ -1,0 +1,40 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.22.1 通常的显示约定</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.22.1 通常的显示约定</h3>
+<div class="nav-panel"><p>Next: <a href="40.22.2_显示表格.html">显示表格</a>, Previous: <a href="40.22_字符显示.html">字符显示</a>, Up: <a href="40.22_字符显示.html">字符显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>以下是显示每个字符代码的约定（在没有显示表的情况下，可以覆盖这些约定；请参阅显示表）。
+</p>
+<ul>
+<li>
+可打印的 ASCII 字符、字符代码 32 到 126（由数字、英文字母和 <code>#</code> 等符号组成）按字面显示。
+</li><li>
+制表符（字符代码 9）显示为空格，一直延伸到下一个制表位列。请参阅 GNU Emacs 手册中的文本显示。变量 tab-width 控制每个制表位的空格数（见下文）。
+</li><li>
+换行符（字符代码 10）有一个特殊的效果：它结束前一行并开始一个新行。
+</li><li>
+不可打印的 ASCII 控制字符——字符代码 0 到 31，以及 DEL 字符（字符代码 127）——根据变量 ctl-arrow 以两种方式之一显示。如果此变量不为 nil（默认值），则这些字符显示为两个字形的序列，其中第一个字形是 ’^’（显示表可以指定要使用的字形而不是 ’^’）；  例如，DEL 字符显示为 <code>^?</code> 。
+
+</li><li>
+如果 ctl-arrow 为 nil，这些字符将显示为八进制转义符（见下文）。
+
+</li><li>
+如果该字符出现在缓冲区中，此规则也适用于回车（字符代码 13）。但是回车通常不会出现在缓冲区文本中；  它们作为行尾转换的一部分被消除（参见编码系统的基本概念）。
+</li><li>
+原始字节是代码 128 到 255 的非 ASCII 字符（请参阅文本表示）。这些字符显示为八进制转义：四个字形的序列，其中第一个字形是 ’\’ 的 ASCII 代码，其他字符是表示八进制字符代码的数字字符。（显示表可以指定要使用的字形而不是 <code>\</code> 。）
+</li><li>
+如果终端支持，每个代码高于 255 的非 ASCII 字符都会按字面显示。如果终端不支持，则称该字符为无字形，通常使用占位符字形显示。例如，如果图形终端没有字符的字体，Emacs 通常会显示一个包含十六进制字符代码的框。请参阅无字形字符显示。
+</li></ul>
+<p>即使存在显示表，上述显示约定也适用于在活动显示表中的条目为 nil 的任何字符。因此，当您设置显示表时，您只需指定您想要特殊显示行为的字符。
+</p>
+<p>以下变量会影响某些字符在屏幕上的显示方式。由于它们改变了字符占据的列数，它们也会影响缩进功能。它们还会影响模式行的显示方式；  如果您想使用新值强制重新显示模式行，请调用函数 force-mode-line-update（请参阅模式行格式）。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: ctl-arrow ¶
+</pre></div>
+<p>此缓冲区局部变量控制控制字符的显示方式。如果它不是 nil，则它们显示为插入符号，后跟字符：’<em>^A</em>’。如果它是 nil，它们将显示为八进制转义：反斜杠后跟三个八进制数字，如 ’\001’。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: tab-width ¶
+</pre></div>
+<p>这个缓冲区局部变量的值是用于在 Emacs 缓冲区中显示制表符的制表位之间的间距。该值以列为单位，默认值为 8。请注意，此功能完全独立于命令 tab-to-tab-stop 使用的用户可设置的制表位。请参阅可调整的制表位。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.22.2_显示表格.html">显示表格</a>, Previous: <a href="40.22_字符显示.html">字符显示</a>, Up: <a href="40.22_字符显示.html">字符显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,8 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>16.4 加载非 ASCII 字符</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">16.4 加载非 ASCII 字符</h2>
+<div class="nav-panel"><p>Next: <a href="16.5_自动加载.html">自动加载</a>, Previous: <a href="16.3_库搜索.html">库搜索</a>, Up: <a href="16_加载.html">加载.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当 Emacs Lisp 程序包含带有非 ASCII 字符的字符串常量时，这些常量可以在 Emacs 中表示为单字节字符串或多字节字符串（请参阅文本表示）。使用哪种表示取决于如何将文件读入 Emacs。如果通过解码读取成多字节表示，则 Lisp 程序的文本将是多字节文本，其字符串常量将是多字节字符串。如果读取包含 Latin-1 字符（例如）的文件而不进行解码，则程序的文本将是单字节文本，其字符串常量将是单字节字符串。请参阅编码系统。
+</p>
+<p>在大多数 Emacs Lisp 程序中，非 ASCII 字符串是多字节字符串这一事实不应该引起注意，因为将它们插入单字节缓冲区会自动将它们转换为单字节。但是，如果这确实产生了影响，您可以通过在局部变量部分写入 <code>coding: raw-text</code> 来强制将特定的 Lisp 文件解释为单字节文件。使用该指示符，文件将无条件地解释为单字节。这在对写为 ?vliteral 的非 ASCII 字符进行键绑定时可能很重要。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="16.5_自动加载.html">自动加载</a>, Previous: <a href="16.3_库搜索.html">库搜索</a>, Up: <a href="16_加载.html">加载.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

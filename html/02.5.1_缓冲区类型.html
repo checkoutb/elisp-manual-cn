@@ -1,0 +1,34 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>2.5.1 缓冲区类型</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">2.5.1 缓冲区类型</h3>
+<div class="nav-panel"><p>Next: <a href="02.5.2_标记类型.html">标记类型</a>, Previous: <a href="02.5_编辑类型.html">编辑类型</a>, Up: <a href="02.5_编辑类型.html">编辑类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>缓冲区是保存可编辑文本的对象（请参阅缓冲区）。大多数缓冲区保存磁盘文件的内容（请参阅文件），因此可以对其进行编辑，但有些缓冲区用于其他目的。大多数缓冲区也意味着用户可以看到，因此有时会在窗口中显示（参见 Windows）。但是缓冲区不需要显示在任何窗口中。每个缓冲区都有一个称为点的指定位置（请参阅位置）；  大多数编辑命令作用于点附近的当前缓冲区的内容。在任何时候，一个缓冲区都是当前缓冲区。
+</p>
+<p>缓冲区的内容很像字符串，但缓冲区的使用不像 Emacs Lisp 中的字符串，可用的操作也不同。例如，您可以将文本有效地插入现有缓冲区，更改缓冲区的内容，而将文本插入字符串需要连接子字符串，结果是一个全新的字符串对象。
+</p>
+<p>许多标准的 Emacs 函数操作或测试当前缓冲区中的字符；  本手册的一整章专门用于描述这些功能（见正文）。
+</p>
+<p>其他几个数据结构与每个缓冲区相关联：
+</p>
+<ul>
+<li>
+本地语法表（参见语法表）；
+</li><li>
+本地键盘映射（请参阅键盘映射）；  和，
+</li><li>
+缓冲区局部变量绑定列表（请参阅缓冲区局部变量）。
+</li><li>
+叠加（参见叠加）。
+</li><li>
+缓冲区中文本的文本属性（请参阅文本属性）。
+</li></ul>
+<p>本地键映射和变量列表包含单独覆盖全局绑定或值的条目。这些用于自定义不同缓冲区中程序的行为，而无需实际更改程序。
+</p>
+<p>缓冲区可能是间接的，这意味着它共享另一个缓冲区的文本，但呈现方式不同。请参阅间接缓冲区。
+</p>
+<p>缓冲区没有读取语法。它们以哈希表示法打印，显示缓冲区名称。
+</p>
+<div class="lisp">
+<pre class="lisp">(current-buffer)
+       ⇒ #&lt;buffer objects.texi&gt;
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="02.5.2_标记类型.html">标记类型</a>, Previous: <a href="02.5_编辑类型.html">编辑类型</a>, Up: <a href="02.5_编辑类型.html">编辑类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>39.9.4 接受进程的输出</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">39.9.4 接受进程的输出</h3>
+<div class="nav-panel"><p>Next: <a href="39.9.5_进程和线程.html">进程和线程</a>, Previous: <a href="39.9.3_解码过程输出.html">解码过程输出</a>, Up: <a href="39.9_接收进程的输出.html">接收进程的输出.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>异步子进程的输出通常仅在 Emacs 等待某种外部事件（例如经过的时间或终端输入）时到达。有时，在 Lisp 程序中显式允许输出到达特定点或什至等到进程的输出到达时很有用。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: accept-process-output &amp;optional process seconds millisec just-this-one ¶
+</pre></div>
+<p>这个函数允许 Emacs 从进程中读取挂起的输出。将输出提供给它们的过滤器功能。如果 process 不是 nil，那么这个函数不会返回，直到从 process 接收到一些输出或 process 关闭了连接。
+</p>
+<p>参数 seconds 和 millisec 允许您指定超时时间。前者指定以秒为单位的周期，后者指定以毫秒为单位的周期。如此指定的两个时间段相加，即使没有子进程输出，accept-process-output 也会在这段时间后返回。
+</p>
+<p>参数毫秒已过时（不应使用），因为秒可以是浮点数来指定等待的小数秒数。如果秒为 0，则该函数接受任何待处理的输出但不等待。
+</p>
+<p>如果 process 是一个进程，并且参数 just-this-one 不是 nil，则只处理来自该进程的输出，暂停其他进程的输出，直到从该进程接收到一些输出或超时到期。如果 just-this-one 是整数，也禁止运行计时器。通常不建议使用此功能，但对于特定应用程序（例如语音合成）可能是必需的。
+</p>
+<p>如果函数accept-process-output从进程获得输出，则返回非nil，如果进程为nil，则从任何进程获得输出；  如果相应的连接包含缓冲数据，即使在进程退出后也会发生这种情况。如果超时过期或连接在输出到达之前关闭，则该函数返回 nil。
+</p>
+<p>如果来自进程的连接包含缓冲数据，即使在进程退出后，accept-process-output 也可以返回非零。因此，虽然下面的循环：
+</p><div class="lisp">
+<pre class="lisp">;; This loop contains a bug.
+(while (process-live-p process)
+  (accept-process-output process))
+</pre></div>
+<p>通常会从进程读取所有输出，它有一个竞争条件，如果 process-live-p 返回 nil 而连接仍然包含数据，它可能会丢失一些输出。更好的是这样编写循环：
+</p>
+<div class="lisp">
+<pre class="lisp">(while (accept-process-output process))
+</pre></div>
+<p>如果您已将非零标准错误传递给 make-process，它将有一个标准错误过程。请参阅创建异步进程。在这种情况下，等待主进程的进程输出不会等待标准错误进程的输出。为确保您已收到来自进程的所有标准输出和所有标准错误，请使用以下代码：
+</p>
+<div class="lisp">
+<pre class="lisp">(while (accept-process-output process))
+(while (accept-process-output stderr-process))
+</pre></div>
+<p>如果您将缓冲区传递给 make-process 的 stderr 参数，您仍然需要等待标准错误过程，如下所示：
+</p><div class="lisp">
+<pre class="lisp">(let* ((stdout (generate-new-buffer "stdout"))
+       (stderr (generate-new-buffer "stderr"))
+       (process (make-process :name "test"
+                              :command '("my-program")
+                              :buffer stdout
+                              :stderr stderr))
+       (stderr-process (get-buffer-process stderr)))
+  (unless (and process stderr-process)
+    (error "Process unexpectedly nil"))
+  (while (accept-process-output process))
+  (while (accept-process-output stderr-process)))
+</pre></div>
+<p>只有当两个 accept-process-output 表单都返回 nil 时，你才能确定进程已经退出并且 Emacs 已经读取了它的所有输出。
+</p>
+<p>以这种方式无法从远程主机上运行的进程中读取挂起的标准错误。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="39.9.5_进程和线程.html">进程和线程</a>, Previous: <a href="39.9.3_解码过程输出.html">解码过程输出</a>, Up: <a href="39.9_接收进程的输出.html">接收进程的输出.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,12 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>2.5.12 流类型</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">2.5.12 流类型</h3>
+<div class="nav-panel"><p>Next: <a href="02.5.13_键盘映射类型.html">键盘映射类型</a>, Previous: <a href="02.5.11_条件变量类型.html">条件变量类型</a>, Up: <a href="02.5_编辑类型.html">编辑类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>流是可以用作字符源或接收器的对象——既可以为输入提供字符，也可以接受它们作为输出。许多不同的类型可以这样使用：标记、缓冲区、字符串和函数。大多数情况下，输入流（字符源）从键盘、缓冲区或文件中获取字符，而输出流（字符接收器）将字符发送到缓冲区（例如 <strong>Help</strong> 缓冲区）或回显区域。
+</p>
+<p>对象 nil 除了它的其他含义外，还可以用作流。它代表变量标准输入或标准输出的值。此外，作为流的对象 t 指定使用 minibuffer 的输入（请参阅 Minibuffers）或回声区域中的输出（请参阅回声区域）。
+</p>
+<p>流没有特殊的打印表示或读取语法，并且可以打印为任何原始类型。
+</p>
+<p>有关与流相关的函数的描述，包括解析和打印函数，请参阅阅读和打印 Lisp 对象。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="02.5.13_键盘映射类型.html">键盘映射类型</a>, Previous: <a href="02.5.11_条件变量类型.html">条件变量类型</a>, Up: <a href="02.5_编辑类型.html">编辑类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

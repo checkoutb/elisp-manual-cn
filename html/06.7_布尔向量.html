@@ -1,0 +1,93 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>6.7 布尔向量</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">6.7 布尔向量</h2>
+<div class="nav-panel"><p>Next: <a href="06.8_管理固定大小的对象环.html">管理固定大小的对象环</a>, Previous: <a href="06.6_字符表.html">字符表</a>, Up: <a href="06_序列、数组和向量.html">序列、数组和向量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>布尔向量很像向量，只是它只存储值 t 和 nil。如果您尝试将任何非零值存储到布尔向量的元素中，则效果是将 t 存储在那里。与所有数组一样，布尔向量索引从 0 开始，一旦创建布尔向量，长度就不能更改。布尔向量在评估时是常数。
+</p>
+<p>有几个函数专门用于布尔向量；  除此之外，您可以使用与其他类型数组相同的函数来操作它们。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-bool-vector length initial ¶
+</pre></div>
+<p>返回一个新的长度元素的布尔向量，每个元素都初始化为初始值。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: bool-vector &amp;rest objects ¶
+</pre></div>
+<p>这个函数创建并返回一个布尔向量，其元素是参数，对象。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: bool-vector-p object ¶
+</pre></div>
+<p>如果 object 是布尔向量，则返回 t，否则返回 nil。
+</p>
+<p>还有一些 bool-vector 集合操作函数，描述如下：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: bool-vector-exclusive-or a b &amp;optional c ¶
+</pre></div>
+<p>返回布尔向量 a 和 b 的按位异或。如果给定可选参数 c，则此操作的结果将存储到 c 中。所有参数都应该是相同长度的布尔向量。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: bool-vector-union a b &amp;optional c ¶
+</pre></div>
+<p>返回布尔向量 a 和 b 的按位或。如果给定可选参数 c，则此操作的结果将存储到 c 中。所有参数都应该是相同长度的布尔向量。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: bool-vector-intersection a b &amp;optional c ¶
+</pre></div>
+<p>返回布尔向量 a 和 b 的按位与。如果给定可选参数 c，则此操作的结果将存储到 c 中。所有参数都应该是相同长度的布尔向量。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: bool-vector-set-difference a b &amp;optional c ¶
+</pre></div>
+<p>返回 bool 向量 a 和 b 的集合差。如果给定可选参数 c，则此操作的结果将存储到 c 中。所有参数都应该是相同长度的布尔向量。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: bool-vector-not a &amp;optional b ¶
+</pre></div>
+<p>返回 bool 向量 a 的补集。如果给定可选参数 b，则此操作的结果将存储到 b 中。所有参数都应该是相同长度的布尔向量。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: bool-vector-subsetp a b ¶
+</pre></div>
+<p>如果 a 中的每个 t 值也是 b 中的 t，则返回 t，否则返回 nil。所有参数都应该是相同长度的布尔向量。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: bool-vector-count-consecutive a b i ¶
+</pre></div>
+<p>返回从 i 开始的相等 b 中连续元素的数量。a 是一个布尔向量，b 是 t 或 nil，而 i 是 a 的索引。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: bool-vector-count-population a ¶
+</pre></div>
+<p>返回布尔向量 a 中为 t 的元素的数量。
+</p>
+<p>打印出来的表格最多可将 8 个布尔值表示为单个字符：
+</p>
+<div class="lisp">
+<pre class="lisp">(bool-vector t nil t nil)
+     ⇒ #&amp;4"^E"
+(bool-vector)
+     ⇒ #&amp;0""
+</pre></div>
+<p>您可以使用 vconcat 像其他向量一样打印布尔向量：
+</p>
+<div class="lisp">
+<pre class="lisp">(vconcat (bool-vector nil t nil t))
+     ⇒ [nil t nil t]
+</pre></div>
+<p>这是另一个创建、检查和更新布尔向量的示例：
+</p>
+<div class="lisp">
+<pre class="lisp">(setq bv (make-bool-vector 5 t))
+     ⇒ #&amp;5"^_"
+(aref bv 1)
+     ⇒ t
+(aset bv 3 nil)
+     ⇒ nil
+bv
+     ⇒ #&amp;5"^W"
+</pre></div>
+<p>这些结果是有意义的，因为 control-_ 和 control-W 的二进制代码分别是 11111 和 10111。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="06.8_管理固定大小的对象环.html">管理固定大小的对象环</a>, Previous: <a href="06.6_字符表.html">字符表</a>, Up: <a href="06_序列、数组和向量.html">序列、数组和向量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

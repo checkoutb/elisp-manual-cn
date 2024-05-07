@@ -1,0 +1,33 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>E.9 对象内部</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">E.9 对象内部</h2>
+<div class="nav-panel"><p>Next: <a href="附录_F_标准错误.html">F_标准错误</a>, Previous: <a href="0E.8.5_模块中的非本地出口.html">模块中的非本地出口</a>, Up: <a href="附录_E_GNU_Emacs内部结构.html">E_GNU_Emacs内部结构.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs Lisp 提供了一组丰富的数据类型。其中一些，如 cons 单元格、整数和字符串，几乎是所有 Lisp 方言所共有的。其他一些，如标记和缓冲区，非常特殊，需要为在 Lisp 中编写编辑器命令提供基本支持。为了实现如此多种对象类型并提供一种在解释器的子系统之间传递对象的有效方式，有一组 C 数据结构和一种特殊类型来表示指向所有这些对象的指针，称为标记指针.
+</p>
+<p>在 C 中，标记指针是 Lisp_Object 类型的对象。这种类型的任何已初始化变量始终保存以下基本数据类型之一的值：整数、符号、字符串、cons 单元格、浮点数或矢量对象。这些数据类型中的每一种都有相应的标签值。所有标签都由 enum Lisp_Type 枚举并放入 Lisp_Object 的 3 位位域中。其余位是值本身。整数是直接的，即直接由那些值位表示，而所有其他对象都由指向从堆中分配的相应对象的 C 指针表示。Lisp_Object 的宽度取决于平台和配置：通常它等于底层平台指针的宽度（即，在 32 位机器上为 32 位，在 64 位机器上为 64 位），但也存在是一种特殊的配置，其中 Lisp_Object 是 64 位的，但所有指针都是 32 位的。后一个技巧旨在通过对 Lisp_Object 使用 64 位 long long 类型来克服 32 位系统上 Lisp 整数值的有限范围。
+</p>
+<p>lisp.h 中定义了以下 C 数据结构，以表示整数以外的基本数据类型：
+</p>
+<div class="lisp">
+<pre class="lisp">struct Lisp_Cons
+</pre></div>
+<p>Cons cell，用于构造列表的对象。
+</p><div class="lisp">
+<pre class="lisp">struct Lisp_String
+</pre></div>
+<p>String，表示字符序列的基本对象。
+</p><div class="lisp">
+<pre class="lisp">struct Lisp_Vector
+</pre></div>
+<p>数组，一组固定大小的 Lisp 对象，可以通过索引访问。
+</p><div class="lisp">
+<pre class="lisp">struct Lisp_Symbol
+</pre></div>
+<p>符号，通常用作标识符的唯一命名实体。
+</p><div class="lisp">
+<pre class="lisp">struct Lisp_Float
+</pre></div>
+<p>浮点值。
+</p>
+<p>这些类型是内部类型系统的一等公民。由于标签空间有限，所有其他类型都是 Lisp_Vectorlike 的子类型。向量子类型由 enum pvec_type 枚举，几乎所有复杂的对象，如窗口、缓冲区、帧和进程都属于这一类。
+</p>
+<p>下面是 Lisp_Vectorlike 的几个子类型的描述。Buffer 对象表示要显示和编辑的文本。窗口是显示结构的一部分，它显示缓冲区或用作容器以递归地将其他窗口放置在同一帧上。（不要将 Emacs Lisp 窗口对象与作为 X 一样由用户界面系统管理的实体的窗口混淆；在 Emacs 术语中，后者称为框架。）最后，进程对象用于管理子进程。
+</p>
+<div class="nav-panel"><p>Next: <a href="附录_F_标准错误.html">F_标准错误</a>, Previous: <a href="0E.8.5_模块中的非本地出口.html">模块中的非本地出口</a>, Up: <a href="附录_E_GNU_Emacs内部结构.html">E_GNU_Emacs内部结构.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

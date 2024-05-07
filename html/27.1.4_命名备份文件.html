@@ -1,0 +1,79 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>27.1.4 命名备份文件</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">27.1.4 命名备份文件</h3>
+<div class="nav-panel"><p>Next: <a href="27.2_自动保存.html">自动保存</a>, Previous: <a href="27.1.3_制作和删除编号备份文件.html">制作和删除编号备份文件</a>, Up: <a href="27.1_备份文件.html">备份文件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>记录本节中的功能主要是因为您可以通过重新定义备份文件来自定义它们的命名约定。如果你改变一个，你可能需要改变其余的。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: backup-file-name-p filename ¶
+</pre></div>
+<p>如果 filename 是备份文件的可能名称，则此函数返回非零值。它只是检查名称，而不是名称为 filename 的文件是否存在。
+</p>
+<div class="lisp">
+<pre class="lisp">(backup-file-name-p "foo")
+     ⇒ nil
+
+(backup-file-name-p "foo~")
+     ⇒ 3
+</pre></div>
+<p>该函数的标准定义如下：
+</p><div class="lisp">
+<pre class="lisp">(defun backup-file-name-p (file)
+  "Return non-nil if FILE is a backup file \
+name (numeric or not)..."
+  (string-match "~\\'" file))
+</pre></div>
+<p>因此，如果文件名以 <code>~</code> 结尾，则该函数返回一个非零值。（我们使用反斜杠将文档字符串的第一行拆分为文本中的两行，但在字符串本身中只生成一行。）
+</p>
+<p>这个简单的表达式被放置在一个单独的函数中，以便于重新定义以进行定制。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-backup-file-name filename ¶
+</pre></div>
+<p>此函数返回一个字符串，该字符串是用于文件 filename 的非编号备份文件的名称。在 Unix 上，这只是附加了波浪号的文件名。
+</p>
+<p>在大多数操作系统上，该函数的标准定义如下：
+</p><div class="lisp">
+<pre class="lisp">(defun make-backup-file-name (file)
+  "Create the non-numeric backup file name for FILE..."
+  (concat file "~"))
+</pre></div>
+<p>您可以通过重新定义此函数来更改备份文件命名约定。以下示例重新定义 make-backup-file-name 以添加一个 ’.’  除了附加波浪号：
+</p>
+<div class="lisp">
+<pre class="lisp">(defun make-backup-file-name (filename)
+  (expand-file-name
+    (concat "." (file-name-nondirectory filename) "~")
+    (file-name-directory filename)))
+
+
+(make-backup-file-name "backups.texi")
+     ⇒ ".backups.texi~"
+</pre></div>
+<p>Emacs 的某些部分，包括一些 Dired 命令，假定备份文件名以 <code>~</code> 结尾。如果您不遵循该约定，它不会导致严重的问题，但这些命令可能会产生不太理想的结果。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: find-backup-file-name filename ¶
+</pre></div>
+<p>此函数计算文件名的新备份文件的文件名。它还可能建议删除某些现有的备份文件。find-backup-file-name 返回一个列表，其 CAR 是新备份文件的名称，其 CDR 是建议删除的备份文件的列表。该值也可以为 nil，表示不进行备份。
+</p>
+<p>两个变量，保留旧版本和保留新版本，确定应保留哪些备份版本。此函数通过从值的 CDR 中排除这些版本来保留这些版本。请参阅制作和删除编号备份文件。
+</p>
+<p>在此示例中，该值表示 <code>rms/foo.~5</code> 是用于新备份文件的名称，而 <code>rms/foo.~3</code> 是调用者现在应该考虑删除的多余版本。
+</p>
+<div class="lisp">
+<pre class="lisp">(find-backup-file-name "~rms/foo")
+     ⇒ ("~rms/foo.~5~" "~rms/foo.~3~")
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: file-backup-file-names filename ¶
+</pre></div>
+<p>此函数返回文件名的所有备份文件名的列表，如果没有，则返回 nil。文件按修改时间降序排列，最新的文件排在第一位。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-newest-backup filename ¶
+</pre></div>
+<p>此函数返回由 file-backup-file-names 返回的列表的第一个元素。
+</p>
+<p>一些文件比较命令使用此功能，以便它们可以自动将文件与其最近的备份进行比较。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="27.2_自动保存.html">自动保存</a>, Previous: <a href="27.1.3_制作和删除编号备份文件.html">制作和删除编号备份文件</a>, Up: <a href="27.1_备份文件.html">备份文件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.22.4 字形</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.22.4 字形</h3>
+<div class="nav-panel"><p>Next: <a href="40.22.5_无字形字符显示.html">无字形字符显示</a>, Previous: <a href="40.22.3_活动显示表.html">活动显示表</a>, Up: <a href="40.22_字符显示.html">字符显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>字形是在屏幕上占据单个字符位置的图形符号。每个字形在 Lisp 中都表示为一个字形代码，它指定一个字符和一个可选的面来显示它（参见面）。字形代码的主要用途是作为显示表的条目（参见显示表）。以下函数用于操作字形代码：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-glyph-code char &amp;optional face ¶
+</pre></div>
+<p>此函数返回一个字形代码，表示 char char 和 face face。如果 face 被省略或 nil，则字形使用默认面；  在这种情况下，字形代码是一个整数。如果 face 不为零，则字形代码不一定是整数对象。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: glyph-char glyph ¶
+</pre></div>
+<p>该函数返回字形代码字形的字符。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: glyph-face glyph ¶
+</pre></div>
+<p>此函数返回字形代码字形的面，如果字形使用默认面，则返回 nil。
+</p>
+<p>您可以设置字形表来更改字形代码在文本终端上的实际显示方式。此功能已过时；  改用 glyphless-char-display（请参阅 Glyphless Character Display）。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: glyph-table ¶
+</pre></div>
+<p>此变量的值，如果非零，则为当前字形表。只对字符终端生效；  在图形显示上，所有字形都按字面显示。字形表应该是一个向量，其第 g 个元素指定如何显示字形代码 g，其中 g 是未指定面的字形的字形代码。每个元素应该是以下之一：
+</p>
+<div class="lisp">
+<pre class="lisp">nil
+</pre></div>
+<p>逐字显示此字形。
+</p><div class="lisp">
+<pre class="lisp">a string
+</pre></div>
+<p>通过将指定的字符串发送到终端来显示此字形。
+</p><div class="lisp">
+<pre class="lisp">a glyph code
+</pre></div>
+<p>改为显示指定的字形代码。
+</p>
+<p>任何大于或等于字形表长度的整数字形代码都会按字面显示。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.22.5_无字形字符显示.html">无字形字符显示</a>, Previous: <a href="40.22.3_活动显示表.html">活动显示表</a>, Up: <a href="40.22_字符显示.html">字符显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

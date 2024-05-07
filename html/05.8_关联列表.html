@@ -1,0 +1,236 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>5.8 关联列表</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">5.8 关联列表</h2>
+<div class="nav-panel"><p>Next: <a href="05.9_属性列表.html">属性列表</a>, Previous: <a href="05.7_使用列表作为集合.html">使用列表作为集合</a>, Up: <a href="05_列表.html">列表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>关联列表，或简称为 alist，记录了从键到值的映射。它是一个 cons 单元的列表，称为关联：每个 cons 单元的 CAR 是 key，CDR 是关联的 value.5
+</p>
+<p>这是一个alist的例子。键松树与值锥相关联；  关键橡木与橡子有关；  关键枫树与种子相关联。
+</p>
+<div class="lisp">
+<pre class="lisp">((pine . cones)
+ (oak . acorns)
+ (maple . seeds))
+</pre></div>
+<p>alist 中的值和键都可以是任何 Lisp 对象。例如，在下面的 alist 中，符号 a 与数字 1 相关联，字符串 <code>b</code> 与列表 (2 3) 相关联，即 alist 元素的 CDR：
+</p>
+<div class="lisp">
+<pre class="lisp">((a . 1) ("b" 2 3))
+</pre></div>
+<p>有时最好设计一个alist来将关联的值存储在元素的CDR的CAR中。以下是此类 alist 的示例：
+</p>
+<div class="lisp">
+<pre class="lisp">((rose red) (lily white) (buttercup yellow))
+</pre></div>
+<p>在这里，我们将红色视为与玫瑰相关的值。这种列表的一个优点是您可以在 CDR 的 CDR 中存储其他相关信息——甚至是其他项目的列表。一个缺点是您不能使用 rassq（见下文）来查找包含给定值的元素。当这些考虑都不重要时，选择是一个品味问题，只要您对任何给定的列表保持一致即可。
+</p>
+<p>上面显示的相同 alist 可以认为在元素的 CDR 中具有关联值；  与玫瑰相关的值将是列表（红色）。
+</p>
+<p>关联列表通常用于记录您可能会保留在堆栈中的信息，因为可以轻松地将新关联添加到列表的前面。在关联列表中搜索与给定键的关联时，如果有多个，则返回找到的第一个。
+</p>
+<p>在 Emacs Lisp 中，如果关联列表的元素不是 cons 单元格，则不会出错。alist 搜索功能只是忽略这些元素。在这种情况下，许多其他版本的 Lisp 都会发出错误信号。
+</p>
+<p>请注意，属性列表在几个方面类似于关联列表。属性列表的行为类似于关联列表，其中每个键只能出现一次。有关属性列表和关联列表的比较，请参见属性列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: assoc key alist &amp;optional testfn ¶
+</pre></div>
+<p>此函数返回 alist 中 key 的第一个关联，如果 key 是函数，则使用 testfn 将 key 与 alist 元素进行比较，否则相等（请参阅相等谓词）。如果 testfn 是一个函数，则使用两个参数调用它：来自 alist 的元素的 CAR 和 key。如果 alist 中没有关联的 CAR 等于 key，则该函数返回 nil，如 testfn 所测试。例如：
+</p><div class="lisp">
+<pre class="lisp">(setq trees '((pine . cones) (oak . acorns) (maple . seeds)))
+     ⇒ ((pine . cones) (oak . acorns) (maple . seeds))
+(assoc 'oak trees)
+     ⇒ (oak . acorns)
+(cdr (assoc 'oak trees))
+     ⇒ acorns
+(assoc 'birch trees)
+     ⇒ nil
+</pre></div>
+<p>这是另一个示例，其中键和值不是符号：
+</p>
+<div class="lisp">
+<pre class="lisp">(setq needles-per-cluster
+      '((2 "Austrian Pine" "Red Pine")
+        (3 "Pitch Pine")
+        (5 "White Pine")))
+
+(cdr (assoc 3 needles-per-cluster))
+     ⇒ ("Pitch Pine")
+(cdr (assoc 2 needles-per-cluster))
+     ⇒ ("Austrian Pine" "Red Pine")
+</pre></div>
+<p>函数 assoc-string 很像 assoc，只是它忽略了字符串之间的某些差异。请参阅字符和字符串的比较。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: rassoc value alist ¶
+</pre></div>
+<p>此函数返回与 alist 中值 value 的第一个关联。如果 alist 中没有关联的 CDR 等于 value，则返回 nil。
+</p>
+<p>rassoc 与 assoc 类似，只是它比较每个 alist 关联的 CDR 而不是 CAR。您可以将其视为反向关联，查找给定值的键。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: assq key alist ¶
+</pre></div>
+<p>这个函数与 assoc 类似，它返回 alist 中 key 的第一个关联，但它使用 eq 进行比较。如果 alist 中没有关联具有 CAR eq 键，则 assq 返回 nil。这个函数比 assoc 更常用，因为 eq 比 equal 更快，而且大多数 alists 使用符号作为键。请参见等式谓词。
+</p>
+<div class="lisp">
+<pre class="lisp">(setq trees '((pine . cones) (oak . acorns) (maple . seeds)))
+     ⇒ ((pine . cones) (oak . acorns) (maple . seeds))
+(assq 'pine trees)
+     ⇒ (pine . cones)
+</pre></div>
+<p>另一方面， assq 通常在键可能不是符号的列表中没有用：
+</p>
+<div class="lisp">
+<pre class="lisp">(setq leaves
+      '(("simple leaves" . oak)
+        ("compound leaves" . horsechestnut)))
+
+(assq "simple leaves" leaves)
+     ⇒ Unspecified; might be nil or ("simple leaves" . oak).
+(assoc "simple leaves" leaves)
+     ⇒ ("simple leaves" . oak)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: alist-get key alist &amp;optional default remove testfn ¶
+</pre></div>
+<p>这个函数类似于 assq。它通过将 key 与 alist 元素进行比较来找到第一个关联（key . value），如果找到，则返回该关联的值。如果未找到关联，则该函数返回默认值。key 与 alist 元素的比较使用 testfn 指定的函数，默认为 eq。
+</p>
+<p>这是一个广义变量（参见广义变量），可用于使用 setf 更改值。使用它设置值时，可选参数 remove non-nil 表示如果新值 eql 为默认值，则从 alist 中删除键的关联。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: rassq value alist ¶
+</pre></div>
+<p>此函数返回与 alist 中值 value 的第一个关联。如果 alist 中没有关联具有 CDR eq 值，则返回 nil。
+</p>
+<p>rassq 与 assq 类似，只是它比较每个 alist 关联的 CDR 而不是 CAR。您可以将其视为反向 assq，查找给定值的键。
+</p>
+<p>例如：
+</p>
+<div class="lisp">
+<pre class="lisp">(setq trees '((pine . cones) (oak . acorns) (maple . seeds)))
+
+(rassq 'acorns trees)
+     ⇒ (oak . acorns)
+(rassq 'spores trees)
+     ⇒ nil
+
+</pre></div>
+<p>rassq 无法搜索存储在元素 CDR 的 CAR 中的值：
+</p>
+<div class="lisp">
+<pre class="lisp">(setq colors '((rose red) (lily white) (buttercup yellow)))
+
+(rassq 'white colors)
+     ⇒ nil
+</pre></div>
+<p>在这种情况下，关联的 CDR（百合白）不是符号白色，而是列表（白色）。如果关联是用点对表示法编写的，这会变得更清楚：
+</p>
+<div class="lisp">
+<pre class="lisp">(lily white) ≡ (lily . (white))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: assoc-default key alist &amp;optional test default ¶
+</pre></div>
+<p>此函数在 alist 中搜索 key 的匹配项。对于 alist 的每个元素，它通过使用两个参数调用 test 将元素（如果它是原子）或元素的 CAR（如果它是 cons）与键进行比较：元素或其 CAR 和键。参数按该顺序传递，以便您可以使用字符串匹配和包含正则表达式的列表获得有用的结果（请参阅正则表达式搜索）。如果 test 被省略或为零，则使用相等进行比较。
+</p>
+<p>如果 alist 元素通过此条件与 key 匹配，则 assoc-default 根据此元素返回一个值。如果元素是 cons，则值是元素的 CDR。否则，返回值为默认值。
+</p>
+<p>如果没有 alist 元素与 key 匹配，则 assoc-default 返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: copy-alist alist ¶
+</pre></div>
+<p>此函数返回 alist 的两级深层副本：它为每个关联创建一个新副本，以便您可以更改新 alist 的关联而不更改旧 alist。
+</p>
+<div class="lisp">
+<pre class="lisp">
+
+(setq needles-per-cluster
+      '((2 . ("Austrian Pine" "Red Pine"))
+        (3 . ("Pitch Pine"))
+
+        (5 . ("White Pine"))))
+⇒
+((2 "Austrian Pine" "Red Pine")
+ (3 "Pitch Pine")
+ (5 "White Pine"))
+
+(setq copy (copy-alist needles-per-cluster))
+⇒
+((2 "Austrian Pine" "Red Pine")
+ (3 "Pitch Pine")
+ (5 "White Pine"))
+
+(eq needles-per-cluster copy)
+     ⇒ nil
+(equal needles-per-cluster copy)
+     ⇒ t
+(eq (car needles-per-cluster) (car copy))
+     ⇒ nil
+(cdr (car (cdr needles-per-cluster)))
+     ⇒ ("Pitch Pine")
+
+(eq (cdr (car (cdr needles-per-cluster)))
+    (cdr (car (cdr copy))))
+     ⇒ t
+
+</pre></div>
+<p>这个例子展示了 copy-alist 如何在不影响另一个副本的情况下更改一个副本的关联：
+</p>
+<div class="lisp">
+<pre class="lisp">(setcdr (assq 3 copy) '("Martian Vacuum Pine"))
+(cdr (assq 3 needles-per-cluster))
+     ⇒ ("Pitch Pine")
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: assq-delete-all key alist ¶
+</pre></div>
+<p>此函数从 alist 中删除所有 CAR 为 eq to key 的元素，就像您使用 delq 将每个这样的元素一个一个删除一样。它返回缩短的 alist，并经常修改 alist 的原始列表结构。要获得正确的结果，请使用 assq-delete-all 的返回值，而不是查看 alist 的保存值。
+</p>
+<div class="lisp">
+<pre class="lisp">(setq alist (list '(foo 1) '(bar 2) '(foo 3) '(lose 4)))
+     ⇒ ((foo 1) (bar 2) (foo 3) (lose 4))
+(assq-delete-all 'foo alist)
+     ⇒ ((bar 2) (lose 4))
+alist
+     ⇒ ((foo 1) (bar 2) (lose 4))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: assoc-delete-all key alist &amp;optional test ¶
+</pre></div>
+<p>这个函数类似于 assq-delete-all，除了它接受一个可选参数 test，一个用于比较 alist 中键的谓词函数。如果省略或为零，则测试默认为相等。如 assq-delete-all，这个函数经常修改 alist 原有的列表结构。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: rassq-delete-all value alist ¶
+</pre></div>
+<p>此函数从 alist 中删除 CDR 为 eq to value 的所有元素。它返回缩短的 alist，并经常修改 alist 的原始列表结构。rassq-delete-all 与 assq-delete-all 类似，只是它比较每个 alist 关联的 CDR 而不是 CAR。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: let-alist alist body ¶
+</pre></div>
+<p>为用作关联列表 alist 的键的每个符号创建一个绑定，以点为前缀。这在访问同一个关联列表中的多个项目时很有用，最好通过一个简单的示例来理解：
+</p>
+<div class="lisp">
+<pre class="lisp">(setq colors '((rose . red) (lily . white) (buttercup . yellow)))
+(let-alist colors
+  (if (eq .rose 'red)
+      .lily))
+     ⇒ white
+</pre></div>
+<p>在编译时检查正文，并且仅检查正文中带有 <code>。</code> 的符号 因为符号名称中的第一个字符将被绑定。查找键是使用 assq 完成的，并将这个 assq 的返回值的 cdr 分配为绑定的值。
+</p>
+<p>支持嵌套关联列表：
+</p>
+<div class="lisp">
+<pre class="lisp">(setq colors '((rose . red) (lily (belladonna . yellow) (brindisi . pink))))
+(let-alist colors
+  (if (eq .rose 'red)
+      .lily.belladonna))
+     ⇒ yellow
+</pre></div>
+<p>允许将 let-alist 相互嵌套，但内部 let-alist 中的代码无法访问外部 let-alist 绑定的变量。
+</p>
+<p>脚注 (5)
+</p>
+<p><code>键</code> 的这种用法与 <code>键序列</code> 一词无关；  它表示用于在表中查找项目的值。在这种情况下，表是 alist，而 alist 关联是项目。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="05.9_属性列表.html">属性列表</a>, Previous: <a href="05.7_使用列表作为集合.html">使用列表作为集合</a>, Up: <a href="05_列表.html">列表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

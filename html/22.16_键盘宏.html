@@ -1,0 +1,43 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.16 键盘宏</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">22.16 键盘宏</h2>
+<div class="nav-panel"><p>Next: <a href="23_键盘映射.html">键盘映射</a>, Previous: <a href="22.15_命令历史.html">命令历史</a>, Up: <a href="22_命令循环.html">命令循环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>键盘宏是输入事件的固定序列，可以将其视为命令并定义键。键盘宏的 Lisp 表示是包含事件的字符串或向量。不要将键盘宏与 Lisp 宏混淆（参见宏）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: execute-kbd-macro kbdmacro &amp;optional count loopfunc ¶
+</pre></div>
+<p>此函数将 kbdmacro 作为一系列事件执行。如果 kbdmacro 是一个字符串或向量，那么其中的事件将完全按照用户输入的方式执行。该序列不应是单个键序列；  通常，键盘宏定义由多个连接的键序列组成。
+</p>
+<p>如果 kbdmacro 是一个符号，则使用它的函数定义代替 kbdmacro。如果那是另一个符号，则重复此过程。最终结果应该是一个字符串或向量。如果结果不是符号、字符串或向量，则会发出错误信号。
+</p>
+<p>参数计数是重复计数；  kbdmacro 执行了很多次。如果 count 被省略或为零，kbdmacro 将执行一次。如果为 0，kbdmacro 会反复执行，直到遇到错误或搜索失败。
+</p>
+<p>如果 loopfunc 不是 nil，它是一个在宏的每次迭代之前被调用的函数，没有参数。如果 loopfunc 返回 nil，则停止执行宏。
+</p>
+<p>有关使用 execute-kbd-macro 的示例，请参阅阅读一个事件。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: executing-kbd-macro ¶
+</pre></div>
+<p>此变量包含定义当前正在执行的键盘宏的字符串或向量。如果当前没有宏正在执行，则为 nil。命令可以测试此变量，以便在从执行宏运行时表现不同。不要自己设置这个变量。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: defining-kbd-macro ¶
+</pre></div>
+<p>当且仅当定义了键盘宏时，此变量才非零。一个命令可以测试这个变量，以便在定义宏时表现不同。该值在附加到现有宏的定义时附加。命令 start-kbd-macro、kmacro-start-macro 和 end-kbd-macro 设置这个变量——不要自己设置。
+</p>
+<p>该变量始终是当前终端的本地变量，并且不能是缓冲区本地的。请参阅多个终端。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: last-kbd-macro ¶
+</pre></div>
+<p>这个变量是最近定义的键盘宏的定义。它的值是一个字符串或向量，或 nil。
+</p>
+<p>该变量始终是当前终端的本地变量，并且不能是缓冲区本地的。请参阅多个终端。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: kbd-macro-termination-hook ¶
+</pre></div>
+<p>这个正常的钩子在键盘宏终止时运行，不管是什么导致它终止（到达宏结束或过早结束宏的错误）。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="23_键盘映射.html">键盘映射</a>, Previous: <a href="22.15_命令历史.html">命令历史</a>, Up: <a href="22_命令循环.html">命令循环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

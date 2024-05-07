@@ -1,0 +1,146 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>26.12 使某些文件名神奇</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">26.12 使某些文件名神奇</h2>
+<div class="nav-panel"><p>Next: <a href="26.13_文件格式转换.html">文件格式转换</a>, Previous: <a href="26.11_创建、复制和删除目录.html">创建、复制和删除目录</a>, Up: <a href="26_文件.html">文件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>您可以对某些文件名实施特殊处理。这被称为让这些名字变得神奇。此功能的主要用途是实现对远程文件的访问（请参阅 GNU Emacs 手册中的远程文件）。
+</p>
+<p>要定义一种魔术文件名，您必须提供一个正则表达式来定义名称类（所有匹配正则表达式的名称），以及一个处理程序，该处理程序为匹配的文件名实现所有原始 Emacs 文件操作。
+</p>
+<p>变量 file-name-handler-alist 包含一个处理程序列表，以及确定何时应用每个处理程序的正则表达式。每个元素都有这种形式：
+</p>
+<div class="lisp">
+<pre class="lisp">(regexp . handler)
+</pre></div>
+<p>所有用于文件访问和文件名转换的 Emacs 原语都会根据 file-name-handler-alist 检查给定的文件名。如果文件名与正则表达式匹配，则原语通过调用处理程序来处理该文件。
+</p>
+<p>给 handler 的第一个参数是原语的名称，作为一个符号；  其余参数是传递给该原语的参数。（这些参数中的第一个通常是文件名本身。）例如，如果您这样做：
+</p>
+<div class="lisp">
+<pre class="lisp">(file-exists-p filename)
+</pre></div>
+<p>并且文件名有处理程序处理程序，然后处理程序被这样调用：
+</p><div class="lisp">
+<pre class="lisp">(expand-file-name filename dirname)
+</pre></div>
+<p>当一个函数接受两个或多个必须是文件名的参数时，它会检查每个名称以查找处理程序。例如，如果您这样做：
+</p>
+<div class="lisp">
+<pre class="lisp">(funcall handler 'file-exists-p filename)
+</pre></div>
+<p>然后它检查文件名的处理程序，然后检查目录名的处理程序。在任何一种情况下，处理程序的调用方式如下：
+</p>
+<div class="lisp">
+<pre class="lisp">(funcall handler 'expand-file-name filename dirname)
+</pre></div>
+<p>然后处理程序需要确定是处理文件名还是目录名。
+</p>
+<p>如果指定的文件名匹配多个处理程序，则匹配文件名中最后一个开始的处理程序优先。选择此规则是为了首先处理解压缩等作业的处理程序，然后处理远程文件访问等作业的处理程序。
+</p>
+<p>以下是魔术文件名处理程序要处理的操作：
+</p>
+<p>访问文件，添加名称到文件，字节编译器基础文件名，
+复制目录，复制文件，删除目录，删除文件，差异最新备份文件，目录文件名，目录文件，目录文件和属性，dired-compress-file，dired-取消缓存，执行路径，扩展文件名，
+文件可访问目录-p、文件-acl、文件属性、文件目录-p、文件相等-p、文件可执行文件-p、文件存在-p、文件在目录-p、文件-本地复制，文件锁定-p，文件模式，文件名所有完成，文件名作为目录，文件名不区分大小写-p，文件名完成，文件名-目录、文件名非目录、文件名无版本、文件比文件-p、文件通知添加监视、文件通知-rm-监视、文件通知有效-p、文件所有权保留-p，文件可读-p，文件-常规-p，文件-远程-p，文件-selinux-context，文件-符号链接-p，文件-系统信息，文件-真名，文件-可写-p，查找备份文件名，
+获取文件缓冲区、插入目录、插入文件内容、
+加载，锁定文件，生成自动保存文件名，生成目录，生成目录内部，生成锁定文件名，生成附近临时文件，生成过程，生成符号-关联，
+进程文件，重命名文件，设置文件 acl，设置文件模式，设置文件 selinux 上下文，设置文件时间，设置访问文件修改时间，shell 命令，启动文件-进程，替代文件名，
+临时文件目录、未处理文件名目录、解锁文件、vc 注册、验证访问文件修改时间、
+写区域。
+</p>
+<p>如果访问参数为非零，则插入文件内容的处理程序通常需要使用 (set-buffer-modified-p nil) 清除缓冲区的修改标志。如果缓冲区被锁定，这也具有解锁缓冲区的效果。
+</p>
+<p>处理程序函数必须处理所有上述操作，以及将来可能添加的其他操作。它不需要自己实现所有这些操作——当它对某个操作没有什么特别的事情时，它可以重新调用原语，以通常的方式处理该操作。它应该始终为它无法识别的操作重新调用原语。这是执行此操作的一种方法：
+</p>
+<div class="lisp">
+<pre class="lisp">(defun my-file-handler (operation &amp;rest args)
+  ;; First check for the specific operations
+  ;; that we have special handling for.
+  (cond ((eq operation 'insert-file-contents) …)
+        ((eq operation 'write-region) …)
+        …
+        ;; Handle any operation we don’t know about.
+        (t (let ((inhibit-file-name-handlers
+                  (cons 'my-file-handler
+                        (and (eq inhibit-file-name-operation operation)
+                             inhibit-file-name-handlers)))
+                 (inhibit-file-name-operation operation))
+             (apply operation args)))))
+</pre></div>
+<p>当一个处理函数决定为手头的操作调用普通的 Emacs 原语时，它需要防止原语再次调用相同的处理程序，从而导致无限递归。上面的示例显示了如何使用变量禁止文件名处理程序和禁止文件名操作来执行此操作。小心使用它们，如上所示；  在多个处理程序的情况下，细节对于正确的行为至关重要，对于具有两个文件名的操作，每个文件名可能都有处理程序。
+</p>
+<p>对文件的实际访问没有真正做任何特殊处理的处理程序——例如为远程文件名实现主机名完成的处理程序——应该有一个非零安全魔法属性。例如，Emacs 通常会保护它在 PATH 中找到的目录名称不会变成魔法，如果它们看起来像魔法文件名，则会通过在它们前面加上 ’/:’ 前缀。但是，如果将用于它们的处理程序具有非零安全魔术属性，则不会添加 <code>/：</code> 。
+</p>
+<p>文件名处理程序可以有一个操作属性来声明它以一种重要的方式处理哪些操作。如果这个属性有一个非零值，它应该是一个操作列表；  那么只有那些操作会调用处理程序。这避免了效率低下，但它的主要目的是用于自动加载的处理程序函数，以便它们不会被加载，除非它们有真正的工作要做。
+</p>
+<p>简单地将所有操作推迟到通常的原语是行不通的。例如，如果文件名处理程序适用于 file-exists-p，那么它必须自己处理加载，因为在这种情况下，通常的加载代码将无法正常工作。但是，如果处理程序使用操作属性说它不处理文件存在-p，那么它不需要处理负载。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: inhibit-file-name-handlers ¶
+</pre></div>
+<p>此变量包含一个处理程序列表，当前禁止使用这些处理程序进行某个操作。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: inhibit-file-name-operation ¶
+</pre></div>
+<p>当前禁止某些处理程序的操作。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: find-file-name-handler file operation ¶
+</pre></div>
+<p>此函数返回文件名 file 的处理函数，如果没有则返回 nil。参数操作应该是对文件执行的操作——当您调用它时，您将作为第一个参数传递给处理程序的值。如果 operation 等于 inhibitor-file-name-operation，或者如果在处理程序的操作属性中找不到它，则此函数返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-local-copy filename ¶
+</pre></div>
+<p>此函数将文件 filename 复制到本地计算机上的普通非魔术文件（如果它不在本地计算机上）。如果魔术文件名引用其他机器上的文件，则应处理文件本地复制操作。用于远程文件访问以外的其他目的的魔术文件名不应处理文件本地复制；  那么这个函数会将文件视为本地文件。
+</p>
+<p>如果文件名是本地的，无论是否魔法，这个函数什么都不做并且返回 nil。否则返回本地复制文件的文件名。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-remote-p filename &amp;optional identification connected ¶
+</pre></div>
+<p>此函数测试文件名是否为远程文件。如果文件名是本地的（不是远程的），则返回值为 nil。如果文件名确实是远程的，则返回值是一个标识远程系统的字符串。
+</p>
+<p>此标识符字符串可以包括主机名和用户名，以及指定用于访问远程系统的方法的字符。例如，文件名 /sudo::/some/file 的远程标识符字符串是 /sudo:root@localhost:。
+</p>
+<p>如果 file-remote-p 为两个不同的文件名返回相同的标识符，这意味着它们存储在同一个文件系统上，并且可以在本地相互访问。例如，这意味着可以启动同时访问两个文件的远程进程。文件名处理程序的实现者需要确保这个原则是有效的。
+</p>
+<p>标识指定标识符的哪一部分应作为字符串返回。标识可以是符号方法、用户或主机；  任何其他值都像 nil 一样处理，意味着返回完整的标识符字符串。在上面的示例中，远程用户标识符字符串将是 root。
+</p>
+<p>如果 connected 不是 nil，即使文件名是远程的，如果 Emacs 没有到它的主机的网络连接，这个函数也会返回 nil。当您想避免在连接不存在时建立连接的延迟时，这很有用。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: unhandled-file-name-directory filename ¶
+</pre></div>
+<p>这个函数返回一个非魔法目录的名称。对于非魔术文件名，它返回相应的目录名（请参阅目录名）。对于魔术文件名，它调用文件名处理程序，因此决定返回什么值。如果本地进程无法访问文件名，则文件名处理程序应通过返回 nil 来指示。
+</p>
+<p>这对于运行子进程很有用；  每个子进程都必须有一个非魔法目录作为其当前目录，这个函数是一个很好的方法。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-local-name filename ¶
+</pre></div>
+<p>此函数返回文件名的本地部分。这是文件名中在远程主机上标识它的部分，通常通过从远程文件名中删除指定远程主机和访问它的方法的部分来获得。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">(file-local-name "/ssh:user@host:/foo/bar")
+     ⇒ "/foo/bar"
+</pre></div>
+<p>对于远程文件名，此函数返回一个文件名，该文件名可以直接用作远程进程的参数（请参阅创建异步进程和创建同步进程），也可以作为在远程主机上运行的程序。如果文件名是本地的，则此函数将其原封不动地返回。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: remote-file-name-inhibit-cache ¶
+</pre></div>
+<p>可以缓存远程文件的属性以获得更好的性能。如果它们在 Emacs 的控制之外被更改，缓存的值将变为无效，并且必须重新读取。
+</p>
+<p>当此变量设置为 nil 时，缓存值永不过期。谨慎使用此设置，仅当您确定除了 Emacs 之外没有任何东西会更改远程文件。如果设置为 t，则从不使用缓存值。这是最安全的值，但可能会导致性能下降。
+</p>
+<p>折衷方案是将其设置为正数。这意味着自缓存值起，缓存值将用于该秒数。如果定期检查远程文件，最好将此变量绑定到小于连续检查之间的时间段的值。例如：
+</p><div class="lisp">
+<pre class="lisp">(defun display-time-file-nonempty-p (file)
+  (let ((remote-file-name-inhibit-cache
+         (- display-time-interval 5)))
+    (and (file-exists-p file)
+         (&lt; 0 (file-attribute-size
+               (file-attributes
+                (file-chase-links file)))))))
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="26.13_文件格式转换.html">文件格式转换</a>, Previous: <a href="26.11_创建、复制和删除目录.html">创建、复制和删除目录</a>, Up: <a href="26_文件.html">文件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

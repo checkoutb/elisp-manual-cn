@@ -1,0 +1,43 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>39.20.2 解包和打包字节的函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">39.20.2 解包和打包字节的函数</h3>
+<div class="nav-panel"><p>Next: <a href="39.20.3_高级数据布局规范.html">高级数据布局规范</a>, Previous: <a href="39.20.1_描述数据布局.html">描述数据布局</a>, Up: <a href="39.20_打包和解包字节数组.html">打包和解包字节数组.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在以下文档中，type 指的是从 bindat-type 返回的 Bindat 类型值，raw 指的是字节数组，struct 指的是表示解包字段数据的 alist。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: bindat-unpack type raw &amp;optional idx ¶
+</pre></div>
+<p>此函数根据类型从单字节字符串或字节数组 raw 中解包数据。通常，这会在字节数组的开头开始解包，但如果 idx 不为零，则它指定要使用的从零开始的起始位置。
+</p>
+<p>该值是一个 alist 或嵌套 alist，其中每个元素描述一个未打包的字段。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: bindat-get-field struct &amp;rest name ¶
+</pre></div>
+<p>此函数从嵌套的 alist 结构中选择字段的数据。通常 struct 由 bindat-unpack 返回。如果 name 只对应一个参数，这意味着提取顶级字段值。多个名称参数指定重复查找子结构。整数名称充当数组索引。
+</p>
+<p>例如，(bindat-get-field struct ab 2 c) 表示在字段a的子字段b的第三个元素中查找字段c。（这对应于 C 编程语言语法中的 struct.ab[2].c。）
+</p>
+<p>尽管打包和解包操作改变了数据的组织（在内存中），但它们保留了数据的总长度，即所有字段长度的总和，以字节为单位。该值通常不是规范或 alist 中固有的；  相反，这两条信息都有助于其计算。同样，被解包的字符串或数组的长度可能比规范中描述的数据的总长度长。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: bindat-length type struct ¶
+</pre></div>
+<p>此函数根据类型返回 struct 中数据的总长度。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: bindat-pack type struct &amp;optional raw idx ¶
+</pre></div>
+<p>此函数从 alist 结构中的数据返回一个根据类型打包的字节数组。它通常从头开始创建并填充一个新的字节数组。但是，如果 raw 不为 nil，则它指定要打包的预分配单字节字符串或向量。如果 idx 不是 nil，它指定打包成 raw 的起始偏移量。
+</p>
+<p>预分配时，应确保 (length raw) 满足或超过总长度以避免超出范围的错误。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: bindat-ip-to-string ip ¶
+</pre></div>
+<p>将 Internet 地址向量 ip 转换为通常点分表示法的字符串。
+</p>
+<div class="lisp">
+<pre class="lisp">(bindat-ip-to-string [127 0 0 1])
+     ⇒ "127.0.0.1"
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="39.20.3_高级数据布局规范.html">高级数据布局规范</a>, Previous: <a href="39.20.1_描述数据布局.html">描述数据布局</a>, Up: <a href="39.20_打包和解包字节数组.html">打包和解包字节数组.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

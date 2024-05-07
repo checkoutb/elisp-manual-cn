@@ -1,0 +1,205 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>5.4 构建 Cons 单元格和列表</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">5.4 构建 Cons 单元格和列表</h2>
+<div class="nav-panel"><p>Next: <a href="05.5_修改列表变量.html">修改列表变量</a>, Previous: <a href="05.3_访问列表元素.html">访问列表元素</a>, Up: <a href="05_列表.html">列表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>许多函数构建列表，因为列表位于 Lisp 的核心。cons 是基本的列表构建功能；  然而，有趣的是，list 在 Emacs 源代码中的使用次数比 cons 多。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: cons object1 object2
+</pre></div>
+<p>该函数是构建新列表结构的最基本函数。它创建了一个新的 cons 单元，使 object1 成为 CAR，object2 成为 CDR。然后它返回新的 cons 单元格。参数 object1 和 object2 可以是任何 Lisp 对象，但最常见的 object2 是一个列表。
+</p>
+<div class="lisp">
+<pre class="lisp">(cons 1 '(2))
+     ⇒ (1 2)
+
+(cons 1 '())
+     ⇒ (1)
+
+(cons 1 2)
+     ⇒ (1 . 2)
+</pre></div>
+<p>cons 通常用于将单个元素添加到列表的前面。这称为将元素添加到列表中。4 例如：
+</p>
+<div class="lisp">
+<pre class="lisp">(setq list (cons newelt list))
+</pre></div>
+<p>请注意，本例中使用的名为 list 的变量与下面描述的名为 list 的函数之间没有冲突；  任何符号都可以用于这两个目的。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: list &amp;rest objects
+</pre></div>
+<p>此函数创建一个以对象为元素的列表。结果列表总是以零结尾的。如果没有给出对象，则返回空列表。
+</p>
+<div class="lisp">
+<pre class="lisp">(list 1 2 3 4 5)
+     ⇒ (1 2 3 4 5)
+
+(list 1 2 '(3 4 5) 'foo)
+     ⇒ (1 2 (3 4 5) foo)
+
+(list)
+     ⇒ nil
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: make-list length object
+</pre></div>
+<p>此函数创建一个长度元素列表，其中每个元素都是对象。将 make-list 与 make-string 进行比较（请参阅创建字符串）。
+</p>
+<div class="lisp">
+<pre class="lisp">
+
+(make-list 3 'pigs)
+     ⇒ (pigs pigs pigs)
+
+(make-list 0 'pigs)
+     ⇒ nil
+
+(setq l (make-list 3 '(a b)))
+     ⇒ ((a b) (a b) (a b))
+(eq (car l) (cadr l))
+     ⇒ t
+
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: append &amp;rest sequences
+</pre></div>
+<p>这个函数返回一个包含所有序列元素的列表。序列可以是列表、向量、布尔向量或字符串，但最后一个通常应该是列表。除了最后一个参数之外的所有参数都被复制，因此没有任何参数被更改。（请参阅重新排列列表的函数中的 nconc，了解一种无需复制即可加入列表的方法。）
+</p>
+<p>更一般地， append 的最后一个参数可以是任何 Lisp 对象。最后一个参数不会被复制或转换；  它成为新列表中最后一个 cons 单元的 CDR。如果最后一个参数本身是一个列表，那么它的元素将成为结果列表的有效元素。如果最终元素不是列表，则结果是一个点列表，因为它的最终 CDR 不是正确列表中要求的 nil（请参阅列表和缺点单元格）。
+</p>
+<p>下面是一个使用 append 的例子：
+</p>
+<div class="lisp">
+<pre class="lisp">
+
+(setq trees '(pine oak))
+     ⇒ (pine oak)
+(setq more-trees (append '(maple birch) trees))
+     ⇒ (maple birch pine oak)
+
+
+trees
+     ⇒ (pine oak)
+more-trees
+     ⇒ (maple birch pine oak)
+
+(eq trees (cdr (cdr more-trees)))
+     ⇒ t
+</pre></div>
+<p>您可以通过查看箱形图了解 append 的工作原理。将变量 trees 设置为列表（松树橡木），然后将变量 more-trees 设置为列表（枫桦树松橡树）。但是，变量树继续引用原始列表：
+</p>
+<div class="lisp">
+<pre class="lisp">more-trees                trees
+|                           |
+|     --- ---      --- ---   -&gt; --- ---      --- ---
+ --&gt; |   |   |--&gt; |   |   |--&gt; |   |   |--&gt; |   |   |--&gt; nil
+      --- ---      --- ---      --- ---      --- ---
+       |            |            |            |
+       |            |            |            |
+        --&gt; maple    --&gt;birch     --&gt; pine     --&gt; oak
+</pre></div>
+<p>空序列对 append 返回的值没有任何贡献。因此，最终的 nil 参数强制复制前一个参数：
+</p>
+<div class="lisp">
+<pre class="lisp">
+
+trees
+     ⇒ (pine oak)
+
+(setq wood (append trees nil))
+     ⇒ (pine oak)
+
+wood
+     ⇒ (pine oak)
+
+(eq wood trees)
+     ⇒ nil
+</pre></div>
+<p>在发明函数复制序列之前，这曾经是复制列表的常用方法。请参阅序列、数组和向量。
+</p>
+<p>在这里，我们展示了使用向量和字符串作为附加参数：
+</p>
+<div class="lisp">
+<pre class="lisp">(append [a b] "cd" nil)
+     ⇒ (a b 99 100)
+</pre></div>
+<p>在 apply 的帮助下（请参阅调用函数），我们可以将所有列表附加到列表列表中：
+</p>
+<div class="lisp">
+<pre class="lisp">(apply 'append '((a b c) nil (x y z) nil))
+     ⇒ (a b c x y z)
+</pre></div>
+<p>如果没有给出序列，则返回 nil：
+</p>
+<div class="lisp">
+<pre class="lisp">(append)
+     ⇒ nil
+</pre></div>
+<p>以下是一些最终参数不是列表的示例：
+</p>
+<div class="lisp">
+<pre class="lisp">(append '(x y) 'z)
+     ⇒ (x y . z)
+(append '(x y) [z])
+     ⇒ (x y . [z])
+</pre></div>
+<p>第二个示例表明，当最后一个参数是序列而不是列表时，序列的元素不会成为结果列表的元素。相反，该序列成为最终的 CDR，就像任何其他非列表最终参数一样。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: copy-tree tree &amp;optional vecp
+</pre></div>
+<p>此函数返回树树的副本。如果树是一个 cons 单元，这将创建一个具有相同 CAR 和 CDR 的新 cons 单元，然后以相同的方式递归复制 CAR 和 CDR。
+</p>
+<p>通常，当 tree 不是 cons 单元格时，copy-tree 只返回 tree。但是，如果 vecp 不为零，它也会复制向量（并递归地对其元素进行操作）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: flatten-tree tree
+</pre></div>
+<p>此函数返回树的 <code>扁平化</code> 副本，即包含以 tree 为根的 cons 单元树的所有非 nil 终端节点或叶子的列表。返回列表中的叶子与树中的叶子顺序相同。
+</p>
+<div class="lisp">
+<pre class="lisp">(flatten-tree '(1 (2 . 3) nil (4 5 (6)) 7))
+    ⇒(1 2 3 4 5 6 7)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: ensure-list object
+</pre></div>
+<p>此函数将对象作为列表返回。如果 object 已经是一个列表，则函数返回它；  否则，该函数返回一个包含对象的单元素列表。
+</p>
+<p>如果您有一个可能是也可能不是列表的变量，这通常很有用，然后您可以说，例如：
+</p>
+<div class="lisp">
+<pre class="lisp">(dolist (elem (ensure-list foo))
+  (princ elem))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: number-sequence from &amp;optional to separation
+</pre></div>
+<p>此函数返回一个数字列表，该列表以 from 开头并按分隔递增，并在 to 或之前结束。分隔可以是正数或负数，默认为 1。如果 to 为 nil 或数值等于 from，则值为单元素列表 (from)。如果 to 小于 from 且为正分隔，或大于 from 且为负分隔，则值为 nil，因为这些参数指定了一个空序列。
+</p>
+<p>如果分隔为 0 并且 to 既不为零也不在数值上等于 from，则 number-sequence 表示错误，因为这些参数指定了无限序列。
+</p>
+<p>所有参数都是数字。浮点参数可能很棘手，因为浮点算术是不精确的。例如，根据机器的不同，很可能 (number-sequence 0.4 0.6 0.2) 返回一个元素列表 (0.4)，而 (number-sequence 0.4 0.8 0.2) 返回一个包含三个元素的列表。列表的第 n 个元素由精确公式（+ from (* n separator)）计算。因此，如果想要确保 to 包含在列表中，可以传递这种精确类型的表达式 for to。或者，可以将 to 替换为稍大的值（如果分离为负，则使用稍大的负值）。
+</p>
+<p>一些例子：
+</p><div class="lisp">
+<pre class="lisp">(number-sequence 4 9)
+     ⇒ (4 5 6 7 8 9)
+(number-sequence 9 4 -1)
+     ⇒ (9 8 7 6 5 4)
+(number-sequence 9 4 -2)
+     ⇒ (9 7 5)
+(number-sequence 8)
+     ⇒ (8)
+(number-sequence 8 5)
+     ⇒ nil
+(number-sequence 5 8 -1)
+     ⇒ nil
+(number-sequence 1.5 6 2)
+     ⇒ (1.5 3.5 5.5)
+</pre></div>
+<p>脚注 (4)
+</p>
+<p>没有严格等价的方法可以将元素添加到列表的末尾。您可以使用 (append listname (list newelt))，它通过复制 listname 并将 newelt 添加到其末尾来创建一个全新的列表。或者您可以使用 (nconc listname (list newelt))，它通过遵循所有 CDR 然后替换终止的 nil 来修改 listname。将此与使用 cons 将元素添加到列表的开头进行比较，既不复制也不修改列表。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="05.5_修改列表变量.html">修改列表变量</a>, Previous: <a href="05.3_访问列表元素.html">访问列表元素</a>, Up: <a href="05_列表.html">列表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

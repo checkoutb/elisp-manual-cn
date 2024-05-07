@@ -1,0 +1,21 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>3.10 随机数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">3.10 随机数</h2>
+<div class="nav-panel"><p>Next: <a href="04_字符串和字.html">字符串和字</a>, Previous: <a href="03.9_标准数学函数.html">标准数学函数</a>, Up: <a href="03_数字.html">数字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>确定性计算机程序无法生成真正的随机数。对于大多数目的，伪随机数就足够了。以确定的方式生成一系列伪随机数。这些数字并不是真正随机的，但它们具有模仿随机序列的某些特性。例如，所有可能的值在伪随机序列中同样频繁地出现。
+</p>
+<p>伪随机数是从种子值生成的。从任何给定的种子开始，随机函数总是生成相同的数字序列。默认情况下，Emacs 在启动时初始化随机种子，这样随机值的序列（具有压倒性的可能性）在每次 Emacs 运行中都不同。
+</p>
+<p>有时您希望随机数序列是可重复的。例如，在调试行为取决于随机数序列的程序时，在每个程序运行中获得相同的行为是有帮助的。要使序列重复，请执行（随机~ ~ ）。这会将种子设置为特定 Emacs 可执行文件的常量值（尽管对于其他 Emacs 构建可能会有所不同）。您可以使用其他字符串来选择各种种子值。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: random &amp;optional limit
+</pre></div>
+<p>此函数返回一个伪随机整数。重复调用返回一系列伪随机整数。
+</p>
+<p>如果 limit 是一个正整数，则该值被选择为非负且小于 limit。否则，该值可能是任何 fixnum，即从 most-negative-fixnum 到 most-positive-fixnum 的任何整数（参见整数基础）。
+</p>
+<p>如果 limit 是 t，这意味着选择一个新的种子，就像 Emacs 正在重新启动一样，通常来自系统熵。在缺乏熵池的系统上，从不太随机的易失性数据（例如当前时间）中选择种子。
+</p>
+<p>如果limit是一个字符串，则意味着根据字符串的内容选择一个新的种子。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="04_字符串和字.html">字符串和字</a>, Previous: <a href="03.9_标准数学函数.html">标准数学函数</a>, Up: <a href="03_数字.html">数字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

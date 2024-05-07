@@ -1,0 +1,83 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>12.6 稳健定义变量的技巧</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">12.6 稳健定义变量的技巧</h2>
+<div class="nav-panel"><p>Next: <a href="12.7_访问变量值.html">访问变量值</a>, Previous: <a href="12.5_定义全局变量.html">定义全局变量</a>, Up: <a href="12_变量.html">变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当您定义一个值为函数或函数列表的变量时，请分别使用以“-function”或“-functions”结尾的名称。
+</p>
+<p>还有其他几种变量名称约定；  这是一个完整的列表：
+</p>
+<div class="lisp">
+<pre class="lisp">‘…-hook’
+</pre></div>
+<p>该变量是一个普通的钩子（参见 Hooks）。
+</p><div class="lisp">
+<pre class="lisp">‘…-function’
+</pre></div>
+<p>值是一个函数。
+</p><div class="lisp">
+<pre class="lisp">‘…-functions’
+</pre></div>
+<p>该值是函数列表。
+</p><div class="lisp">
+<pre class="lisp">‘…-form’
+</pre></div>
+<p>该值是一种形式（一个表达式）。
+</p><div class="lisp">
+<pre class="lisp">‘…-forms’
+</pre></div>
+<p>该值是表单（表达式）的列表。
+</p><div class="lisp">
+<pre class="lisp">‘…-predicate’
+</pre></div>
+<p>该值是一个谓词——一个参数的函数，成功返回非零，失败返回零。
+</p><div class="lisp">
+<pre class="lisp">‘…-flag’
+</pre></div>
+<p>该值仅在它是否为零时才有意义。由于这些变量通常最终会随着时间的推移获得更多的值，因此强烈建议不要使用此约定。
+</p><div class="lisp">
+<pre class="lisp">‘…-program’
+</pre></div>
+<p>该值是程序名称。
+</p><div class="lisp">
+<pre class="lisp">‘…-command’
+</pre></div>
+<p>该值是一个完整的 shell 命令。
+</p><div class="lisp">
+<pre class="lisp">‘…-switches’
+</pre></div>
+<p>该值指定命令的选项。
+</p><div class="lisp">
+<pre class="lisp">‘prefix--…’
+</pre></div>
+<p>该变量供内部使用，并在文件 prefix.el 中定义。（2018 年之前贡献的 Emacs 代码可能遵循其他约定，这些约定正在逐步淘汰。）
+</p><div class="lisp">
+<pre class="lisp">‘…-internal’
+</pre></div>
+<p>该变量供内部使用，并在 C 代码中定义。（2018 年之前贡献的 Emacs 代码可能遵循其他约定，这些约定正在逐步淘汰。） 
+</p>
+<p>定义变量时，请始终考虑是否应将其标记为安全或有风险；  请参阅文件局部变量。
+</p>
+<p>在定义和初始化包含复杂值的变量时（例如其中包含绑定的键映射），最好将值的整个计算放入 defvar 中，如下所示：
+</p><div class="lisp">
+<pre class="lisp">(defvar my-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map "\C-c\C-a" 'my-command)
+    …
+    map)
+  docstring)
+</pre></div>
+<p>这种方法有几个好处。首先，如果用户在加载文件时退出，变量要么仍未初始化，要么已正确初始化，不会介于两者之间。如果它仍然未初始化，重新加载文件将正确初始化它。其次，变量初始化后重新加载文件不会改变它；  如果用户已经运行钩子来改变部分内容（例如，重新绑定键），这一点很重要。第三，使用 CMx 评估 defvar 形式将完全重新初始化地图。
+</p>
+<p>将这么多代码放在 defvar 形式中有一个缺点：它使文档字符串远离命名变量的行。这是避免这种情况的安全方法：
+</p>
+<div class="lisp">
+<pre class="lisp">(defvar my-mode-map nil
+  docstring)
+(unless my-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map "\C-c\C-a" 'my-command)
+    …
+    (setq my-mode-map map)))
+</pre></div>
+<p>这与将初始化放在 defvar 中具有所有相同的优点，除了您必须键入 CMx 两次，每个表单上一次，如果您确实要重新初始化变量。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="12.7_访问变量值.html">访问变量值</a>, Previous: <a href="12.5_定义全局变量.html">定义全局变量</a>, Up: <a href="12_变量.html">变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

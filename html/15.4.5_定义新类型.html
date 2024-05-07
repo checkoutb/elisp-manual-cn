@@ -1,0 +1,31 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>15.4.5 定义新类型</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">15.4.5 定义新类型</h3>
+<div class="nav-panel"><p>Next: <a href="15.5_应用自定义.html">应用自定义</a>, Previous: <a href="15.4.4_键入关键字.html">键入关键字</a>, Up: <a href="15.4_自定义类型.html">自定义类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在前面的部分中，我们已经描述了如何为 defcustom 构建详细的类型规范。在某些情况下，您可能希望为这样的类型规范命名。显而易见的情况是，当您对许多用户选项使用相同的类型时：您可以为类型规范指定一个名称，并在每个 defcustom 中使用该名称，而不是为每个选项重复规范。另一种情况是用户选项的值是递归数据结构。为了使数据类型能够引用自身，它需要有一个名称。
+</p>
+<p>由于自定义类型是作为小部件实现的，因此定义新的自定义类型的方法是定义一个新的小部件。我们不打算在这里详细描述小部件界面，请参阅 The Emacs 小部件库中的介绍。相反，我们将通过一个简单的示例来演示定义新的自定义类型所需的最小功能。
+</p>
+<div class="lisp">
+<pre class="lisp">(define-widget 'binary-tree-of-string 'lazy
+  "A binary tree made of cons-cells and strings."
+  :offset 4
+  :tag "Node"
+  :type '(choice (string :tag "Leaf" :value "")
+                 (cons :tag "Interior"
+                       :value ("" . "")
+                       binary-tree-of-string
+                       binary-tree-of-string)))
+
+(defcustom foo-bar ""
+  "Sample variable holding a binary tree of strings."
+  :type 'binary-tree-of-string)
+</pre></div>
+<p>定义新小部件的函数称为define-widget。第一个参数是我们想要创建一个新的小部件类型的符号。第二个参数是表示现有小部件的符号，新小部件将根据与现有小部件的差异来定义。为了定义新的自定义类型，惰性小部件是完美的，因为它接受 :type 关键字参数，其语法与 defcustom 的关键字参数相同的名称。第三个参数是新小部件的文档字符串。您将能够使用 Mx widget-browse RET binary-tree-of-string RET 命令查看该字符串。
+</p>
+<p>在这些强制参数之后是关键字参数。最重要的是:type，它描述了我们要与这个widget匹配的数据类型。在这里，字符串二叉树被描述为一个字符串，或者是一个 cons-cell，其 car 和 cdr 本身都是二叉树。请注意对我们当前正在定义的小部件类型的引用。:tag 属性是用于在用户界面中命名小部件的字符串，并且 :offset 参数用于确保子节点相对于父节点缩进四个空格，从而使树结构在自定义缓冲区中显而易见。
+</p>
+<p>defcustom 显示了如何将新的小部件用作普通的自定义类型。
+</p>
+<p>之所以命名为lazy，是因为当小部件在缓冲区中实例化时，其他复合小部件会将其劣质小部件转换为内部形式。这种转换是递归的，因此劣质小部件将转换它们的劣质小部件。如果数据结构本身是递归的，那么这种转换就是无限递归。惰性小部件防止递归：它仅在需要时转换其 :type 参数。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="15.5_应用自定义.html">应用自定义</a>, Previous: <a href="15.4.4_键入关键字.html">键入关键字</a>, Up: <a href="15.4_自定义类型.html">自定义类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

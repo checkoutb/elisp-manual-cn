@@ -1,0 +1,125 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>10.2.7 特殊表格</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">10.2.7 特殊表格</h3>
+<div class="nav-panel"><p>Next: <a href="10.2.8_自动加载.html">自动加载</a>, Previous: <a href="10.2.6_Lisp_宏评估.html">Lisp_宏评估</a>, Up: <a href="10.2_表格种类.html">表格种类.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>特殊形式是特别标记的原始函数，因此它的参数不会全部被评估。大多数特殊形式定义控制结构或执行变量绑定——函数不能做的事情。
+</p>
+<p>每种特殊形式都有自己的规则，对哪些参数进行评估，哪些在不评估的情况下使用。是否评估特定参数可能取决于评估其他参数的结果。
+</p>
+<p>如果表达式的第一个符号是特殊形式的符号，则表达式应遵循该特殊形式的规则；  否则，Emacs 的行为没有明确定义（尽管它不会崩溃）。例如， ((lambda (x) x . 3) 4) 包含一个以 lambda 开头但不是格式良好的 lambda 表达式的子表达式，因此 Emacs 可能会发出错误信号，或者可能返回 3 或 4 或 nil，或者可能以其他方式行事。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: special-form-p object ¶
+</pre></div>
+<p>此谓词测试其参数是否为特殊形式，如果是则返回 t，否则返回 nil。 
+</p>
+<p>这是 Emacs Lisp 中所有特殊形式的列表，按字母顺序排列，并参考了每种形式的描述位置。
+</p>
+<div class="lisp">
+<pre class="lisp">catch
+</pre></div>
+<p>请参阅组合条件的构造
+</p><div class="lisp">
+<pre class="lisp">cond
+</pre></div>
+<p>请参阅显式非本地退出：catch and throw
+</p><div class="lisp">
+<pre class="lisp">cond
+</pre></div>
+<p>见条件
+</p><div class="lisp">
+<pre class="lisp">condition-case
+</pre></div>
+<p>请参阅编写代码以处理错误
+</p><div class="lisp">
+<pre class="lisp">defconst
+</pre></div>
+<p>请参阅定义全局变量
+</p><div class="lisp">
+<pre class="lisp">defvar
+</pre></div>
+<p>请参阅定义全局变量
+</p><div class="lisp">
+<pre class="lisp">function
+</pre></div>
+<p>请参阅匿名函数
+</p><div class="lisp">
+<pre class="lisp">if
+</pre></div>
+<p>见条件
+</p>
+<div class="lisp">
+<pre class="lisp">interactive
+</pre></div>
+<p>请参阅交互式呼叫
+</p>
+<div class="lisp">
+<pre class="lisp">lambda
+</pre></div>
+<p>请参阅 Lambda 表达式
+</p>
+<div class="lisp">
+<pre class="lisp">let
+</pre></div>
+<div class="lisp">
+<pre class="lisp">let*
+</pre></div>
+<p>见局部变量
+</p>
+<div class="lisp">
+<pre class="lisp">or
+</pre></div>
+<p>请参阅组合条件的构造
+</p>
+<div class="lisp">
+<pre class="lisp">prog1
+</pre></div>
+<div class="lisp">
+<pre class="lisp">prog2
+</pre></div>
+<div class="lisp">
+<pre class="lisp">progn
+</pre></div>
+<p>见测序
+</p>
+<div class="lisp">
+<pre class="lisp">quote
+</pre></div>
+<p>见引用
+</p>
+<div class="lisp">
+<pre class="lisp">save-current-buffer
+</pre></div>
+<p>请参阅当前缓冲区
+</p>
+<div class="lisp">
+<pre class="lisp">save-excursion
+</pre></div>
+<p>见游览
+</p>
+<div class="lisp">
+<pre class="lisp">save-restriction
+</pre></div>
+<p>见收窄
+</p>
+<div class="lisp">
+<pre class="lisp">setq
+</pre></div>
+<p>请参阅设置变量值
+</p>
+<div class="lisp">
+<pre class="lisp">setq-default
+</pre></div>
+<p>请参阅创建和删除缓冲区本地绑定
+</p>
+<div class="lisp">
+<pre class="lisp">unwind-protect
+</pre></div>
+<p>参见非本地出口
+</p><div class="lisp">
+<pre class="lisp">while
+</pre></div>
+<p>见迭代 
+</p>
+<p>Common Lisp 注意：以下是 GNU Emacs Lisp 和 Common Lisp 中特殊形式的一些比较。setq、if 和 catch 在 Emacs Lisp 和 Common Lisp 中都是特殊形式。save-excursion 是 Emacs Lisp 中的一种特殊形式，但在 Common Lisp 中不存在。throw 是 Common Lisp 中的一种特殊形式（因为它必须能够抛出多个值），但它是 Emacs Lisp 中的一个函数（它没有多个值）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="10.2.8_自动加载.html">自动加载</a>, Previous: <a href="10.2.6_Lisp_宏评估.html">Lisp_宏评估</a>, Up: <a href="10.2_表格种类.html">表格种类.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

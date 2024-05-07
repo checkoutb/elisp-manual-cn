@@ -1,0 +1,39 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>39.17.3 测试网络功能的可用性</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">39.17.3 测试网络功能的可用性</h3>
+<div class="nav-panel"><p>Next: <a href="39.18_其他网络设施.html">其他网络设施</a>, Previous: <a href="39.17.2_网络选项.html">网络选项</a>, Up: <a href="39.17_低级网络访问.html">低级网络访问.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>要测试给定网络功能的可用性，请像这样使用 featurep：
+</p>
+<div class="lisp">
+<pre class="lisp">(featurep 'make-network-process '(keyword value))
+</pre></div>
+<p>如果在 make-network-process 中使用 value value 指定关键字，则此形式的结果为 t。以下是您可以通过这种方式测试的一些关键字值对。
+</p>
+<div class="lisp">
+<pre class="lisp">(:nowait t)
+</pre></div>
+<p>如果支持非阻塞连接，则为非零。
+</p><div class="lisp">
+<pre class="lisp">(:type datagram)
+</pre></div>
+<p>如果支持数据报，则为非零。
+</p><div class="lisp">
+<pre class="lisp">(:family local)
+</pre></div>
+<p>如果支持本地（又称 <code>UNIX 域</code> ）套接字，则为非零。
+</p><div class="lisp">
+<pre class="lisp">(:family ipv6)
+</pre></div>
+<p>如果支持 IPv6，则为非零。
+</p><div class="lisp">
+<pre class="lisp">(:service t)
+</pre></div>
+<p>如果系统可以为服务器选择端口，则非 nil。
+</p>
+<p>要测试给定网络选项的可用性，请像这样使用 featurep：
+</p>
+<div class="lisp">
+<pre class="lisp">(featurep 'make-network-process 'keyword)
+</pre></div>
+<p>接受的关键字值为 :bindtodevice 等。有关完整列表，请参阅网络选项。如果 make-network-process（或 set-network-process-option）支持该特定网络选项，则此表单返回非零。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="39.18_其他网络设施.html">其他网络设施</a>, Previous: <a href="39.17.2_网络选项.html">网络选项</a>, Up: <a href="39.17_低级网络访问.html">低级网络访问.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

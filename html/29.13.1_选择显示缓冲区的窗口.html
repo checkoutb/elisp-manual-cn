@@ -1,0 +1,57 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>29.13.1 选择显示缓冲区的窗口</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">29.13.1 选择显示缓冲区的窗口</h3>
+<div class="nav-panel"><p>Next: <a href="29.13.2_缓冲区显示的动作函数.html">缓冲区显示的动作函数</a>, Previous: <a href="29.13_在合适的窗口中显示缓冲区.html">在合适的窗口中显示缓冲区</a>, Up: <a href="29.13_在合适的窗口中显示缓冲区.html">在合适的窗口中显示缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>display-buffer 命令可以灵活选择一个窗口进行显示，并在该窗口中显示一个指定的缓冲区。它可以通过键绑定 Cx 4 Co 以交互方式调用。它还被许多函数和命令用作子例程，包括切换到缓冲区和弹出到缓冲区（请参阅在窗口中切换到缓冲区）。
+</p>
+<p>该命令执行几个复杂的步骤来查找要在其中显示的窗口。这些步骤通过显示操作进行描述，其形式为 (functions .alist)。在这里，functions 要么是单个函数，要么是一个函数列表，称为 <code>动作函数</code> （参见用于缓冲区显示的动作函数）；  而alist是一个关联列表，称为 <code>action alist</code> （见Action Alists for Buffer Display）。有关显示操作的示例，请参阅缓冲区显示之禅。
+</p>
+<p>动作函数接受两个参数：要显示的缓冲区和动作列表。它尝试在某个窗口中显示缓冲区，根据自己的标准选择或创建一个窗口。如果成功，则返回窗口；  否则，它返回 nil。
+</p>
+<p>display-buffer 通过组合来自多个来源的显示动作并依次调用动作函数来工作，直到其中一个设法显示缓冲区并返回非零值。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: display-buffer buffer-or-name &amp;optional action frame ¶
+</pre></div>
+<p>此命令使缓冲区或名称出现在某个窗口中，而不选择窗口或使缓冲区成为当前的。参数 buffer-or-name 必须是缓冲区或现有缓冲区的名称。返回值是选择显示缓冲区的窗口，如果没有找到合适的窗口，则返回 nil。
+</p>
+<p>可选参数动作，如果非零，通常应该是一个显示动作（如上所述）。display-buffer 通过合并来自以下来源的显示操作（按照它们的优先级，从高到低）来构建操作函数列表和操作列表：
+</p>
+<p>变量 display-buffer-overriding-action。
+用户选项 display-buffer-alist。
+行动论据。
+用户选项 display-buffer-base-action。
+恒定的显示缓冲区回退动作。
+</p>
+<p>在实践中，这意味着 display-buffer 构建了由这些显示操作指定的所有操作函数的列表。此列表的第一个元素是 display-buffer-overriding-action 指定的第一个操作函数（如果有）。它的最后一个元素是 display-buffer-pop-up-frame — display-buffer-fallback-action 指定的最后一个动作函数。重复项不会从此列表中删除——因此，在一次显示缓冲区调用期间，可能会多次调用同一个操作函数。
+</p>
+<p>display-buffer 依次调用此列表指定的操作函数，将缓冲区作为第一个参数传递，将组合的操作 alist 作为第二个参数传递，直到其中一个函数返回非零。请参阅动作函数的优先级，例如 display-buffer 如何处理不同来源指定的显示动作。
+</p>
+<p>请注意，第二个参数始终是上述来源指定的所有操作列表条目的列表。因此，该列表的第一个元素是 display-buffer-overriding-action 指定的第一个 action alist 条目，如果有的话。它的最后一个元素是 display-buffer-base-action 的最后一个 alist 条目，如果有的话（display-buffer-fallback-action 的 action alist 为空）。
+</p>
+<p>另请注意，组合操作列表可能包含重复条目和具有不同值的相同键的条目。通常，动作函数总是使用它们找到的键的第一个关联。因此，动作函数使用的关联不一定是指定该动作函数的显示动作提供的关联，
+</p>
+<p>参数动作也可以有一个非零、非列表值。这具有特殊含义，即缓冲区应显示在所选窗口之外的窗口中，即使所选窗口已经在显示它。如果使用前缀参数交互调用，则 action 为 t。Lisp 程序应该总是提供一个列表值。
+</p>
+<p>可选参数 frame，如果非 nil，则指定在确定缓冲区是否已显示时要检查哪些帧。相当于在动作的动作列表中添加一个元素（reusable-frames .frame）（请参阅用于缓冲区显示的动作列表）。提供 frame 参数是出于兼容性原因，Lisp 程序不应该使用它。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: display-buffer-overriding-action ¶
+</pre></div>
+<p>这个变量的值应该是一个显示动作，它被显示缓冲区以最高优先级处理。默认值为空显示动作，即 (nil . nil)。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: display-buffer-alist ¶
+</pre></div>
+<p>该选项的值是一个列表映射条件来显示动作。每个条件可以是匹配缓冲区名称的正则表达式，也可以是带有两个参数的函数：缓冲区名称和传递给显示缓冲区的操作参数。如果传递给 display-buffer 的缓冲区名称与此 alist 中的正则表达式匹配，或者条件指定的函数返回非 nil，则 display-buffer 使用相应的显示操作来显示缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: display-buffer-base-action ¶
+</pre></div>
+<p>这个选项的值应该是一个显示动作。此选项可用于定义调用显示缓冲区的标准显示操作。
+</p>
+<div class="lisp">
+<pre class="lisp">Constant: display-buffer-fallback-action ¶
+</pre></div>
+<p>如果没有给出其他显示操作，此显示操作指定显示缓冲区的后备行为。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="29.13.2_缓冲区显示的动作函数.html">缓冲区显示的动作函数</a>, Previous: <a href="29.13_在合适的窗口中显示缓冲区.html">在合适的窗口中显示缓冲区</a>, Up: <a href="29.13_在合适的窗口中显示缓冲区.html">在合适的窗口中显示缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

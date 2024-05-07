@@ -1,0 +1,37 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>35.6.3 访问整个比赛数据</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">35.6.3 访问整个比赛数据</h3>
+<div class="nav-panel"><p>Next: <a href="35.6.4_保存和恢复匹配数据.html">保存和恢复匹配数据</a>, Previous: <a href="35.6.2_简单匹配数据访问.html">简单匹配数据访问</a>, Up: <a href="35.6_匹配数据.html">匹配数据.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>函数 match-data 和 set-match-data 一次读取或写入整个匹配数据。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: match-data &amp;optional integers reuse reseat ¶
+</pre></div>
+<p>此函数返回一个位置列表（标记或整数），这些位置记录了上次搜索匹配的文本的所有信息。元素零是整个表达式匹配开始的位置；  元素一是表达式匹配结束的位置。接下来的两个元素是第一个子表达式匹配的开始和结束的位置，依此类推。一般情况下，元素编号 2n 对应（匹配开始 n）；  元素编号 2n + 1 对应于 (match-end n)。
+</p>
+<p>通常所有元素都是标记或零，但如果整数是非零，这意味着使用整数而不是标记。（在这种情况下，缓冲区本身作为附加元素附加到列表的末尾，以便于完全恢复匹配数据。）如果最后一次匹配是在使用 string-match 的字符串上完成的，则始终使用整数，因为标记不能指向字符串。
+</p>
+<p>如果重用不是零，它应该是一个列表。在这种情况下，match-data 存储匹配数据以供重复使用。也就是说，重用被破坏性地修改了。重用不需要有正确的长度。如果它不足以包含匹配数据，则将其扩展。如果太长，重用的长度保持不变，但未使用的元素设置为零。此功能的目的是减少垃圾收集的需要。
+</p>
+<p>如果 reseat 不为零，则重用列表上的所有标记都将重新定位以指向无处。
+</p>
+<p>与往常一样，在对搜索函数的调用和对旨在访问该搜索的匹配数据的匹配数据的调用之间不得有干预搜索的可能性。
+</p>
+<div class="lisp">
+<pre class="lisp">(match-data)
+     ⇒  (#&lt;marker at 9 in foo&gt;
+          #&lt;marker at 17 in foo&gt;
+          #&lt;marker at 13 in foo&gt;
+          #&lt;marker at 17 in foo&gt;)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: set-match-data match-list &amp;optional reseat ¶
+</pre></div>
+<p>此函数从 match-list 的元素中设置匹配数据，它应该是一个列表，它是之前调用 match-data 的值。（更准确地说，任何具有相同格式的东西都可以使用。）
+</p>
+<p>如果 match-list 引用了一个不存在的缓冲区，则不会出现错误；  以无意义但无害的方式设置匹配数据。
+</p>
+<p>如果 reseat 不为零，则匹配列表列表上的所有标记都将重新定位以指向无处。
+</p>
+<p>store-match-data 是 set-match-data 的半过时别名。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="35.6.4_保存和恢复匹配数据.html">保存和恢复匹配数据</a>, Previous: <a href="35.6.2_简单匹配数据访问.html">简单匹配数据访问</a>, Up: <a href="35.6_匹配数据.html">匹配数据.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

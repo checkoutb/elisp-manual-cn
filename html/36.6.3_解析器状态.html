@@ -1,0 +1,36 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>36.6.3 解析器状态</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">36.6.3 解析器状态</h3>
+<div class="nav-panel"><p>Next: <a href="36.6.4_低级解析.html">低级解析</a>, Previous: <a href="36.6.2_查找位置的解析状态.html">查找位置的解析状态</a>, Up: <a href="36.6_解析表达式.html">解析表达式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>解析器状态是（当前）描述句法解析器状态的 11 个元素的列表，在它使用 parse-partial-sexp 解析缓冲区中指定起点和指定终点之间的文本之后（请参阅低级解析）。诸如 syntax-ppss 之类的解析函数（请参阅查找位置的解析状态）也返回解析器状态作为值。parse-partial-sexp 可以接受解析器状态作为参数，用于恢复解析。
+</p>
+<p>以下是解析器状态元素的含义：
+</p>
+<p>括号中的深度，从 0 开始计数。警告：如果解析器的起点和终点之间的近括号比开放括号多，则此值可能为负数。
+包含停止点的最里面的括号分组的开始字符位置；  如果没有，则为零。
+最后一个完整子表达式开始的字符位置终止；  如果没有，则为零。
+如果在字符串中，则为非零。更准确地说，这是终止字符串的字符，或者如果通用字符串分隔符应该终止它，则为 t。
+t 如果在不可嵌套的注释中（任何注释样式；请参阅语法标志）；  或评论嵌套级别（如果在可以嵌套的评论中）。
+t 如果结束点就在引号字符之后。
+在此扫描期间遇到的最小括号深度。
+什么样的评论处于活动状态：如果不在评论中或在样式为 <code>a</code> 的评论中，则为零；  1 用于样式 <code>b</code> 的评论；  2 用于样式 <code>c</code> 的评论；  和语法表，用于应以通用注释分隔符结尾的注释。
+字符串或注释的开始位置。在评论中，这是评论开始的位置；  在字符串中，这是字符串开始的位置。在字符串和注释之外时，此元素为零。
+当前开括号的位置列表，从最外层开始。
+当扫描的最后一个缓冲区位置是两个字符构造（注释分隔符或转义/字符引用的字符对）的（潜在）第一个字符时，该位置的语法代码（参见语法表内部）。否则为零。
+</p>
+<p>在您作为参数传递给 parse-partial-sexp 以继续解析的状态下，元素 1、2 和 6 将被忽略。元素 9 和 10 主要由解析器代码在内部使用。
+</p>
+<p>使用这些函数可以从解析器状态获得一些额外的有用信息：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: syntax-ppss-toplevel-pos state ¶
+</pre></div>
+<p>该函数从解析器状态状态中提取在语法结构中处于顶层的解析中最后扫描的位置。 <code>在顶层</code> 是指在任何括号、注释或字符串之外。
+</p>
+<p>如果 state 表示已到达顶层位置的解析，则该值为 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: syntax-ppss-context state ¶
+</pre></div>
+<p>如果扫描返回状态的结束位置在字符串中，则返回字符串，如果在注释中，则为注释。否则返回零。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="36.6.4_低级解析.html">低级解析</a>, Previous: <a href="36.6.2_查找位置的解析状态.html">查找位置的解析状态</a>, Up: <a href="36.6_解析表达式.html">解析表达式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

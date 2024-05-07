@@ -1,0 +1,76 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>28.4 缓冲区文件名</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">28.4 缓冲区文件名</h2>
+<div class="nav-panel"><p>Next: <a href="28.5_缓冲区修改.html">缓冲区修改</a>, Previous: <a href="28.3_缓冲区名称.html">缓冲区名称</a>, Up: <a href="28_缓冲区.html">缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>缓冲区文件名是在该缓冲区中访问的文件的名称。当一个缓冲区没有访问一个文件时，它的缓冲区文件名是 nil。大多数时候，缓冲区名与缓冲区文件名的非目录部分相同，但缓冲区文件名和缓冲区名是不同的，可以独立设置。请参阅访问文件。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: buffer-file-name &amp;optional buffer ¶
+</pre></div>
+<p>此函数返回缓冲区正在访问的文件的绝对文件名。如果 buffer 没有访问任何文件，则 buffer-file-name 返回 nil。如果未提供缓冲区，则默认为当前缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">(buffer-file-name (other-buffer))
+     ⇒ "/usr/user/lewis/manual/files.texi"
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Variable: buffer-file-name ¶
+</pre></div>
+<p>此缓冲区局部变量包含当前缓冲区中正在访问的文件的名称，如果不访问文件，则为 nil。它是一个永久的局部变量，不受 kill-all-local-variables 的影响。
+</p>
+<div class="lisp">
+<pre class="lisp">buffer-file-name
+     ⇒ "/usr/user/lewis/manual/buffers.texi"
+</pre></div>
+<p>在不做各种其他事情的情况下更改此变量的值是有风险的。通常最好使用 set-visited-file-name （见下文）；  那里完成的一些事情，例如更改缓冲区名称，并不是绝对必要的，但其他一些事情对于避免混淆 Emacs 是必不可少的。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: buffer-file-truename ¶
+</pre></div>
+<p>这个缓冲区局部变量保存当前缓冲区中访问的文件的缩写真名，如果没有访问文件，则为 nil。它是一个永久的局部变量，不受 kill-all-local-variables 的影响。请参见 Truenames 和 abbreviate-file-name。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: buffer-file-number ¶
+</pre></div>
+<p>这个缓冲区局部变量保存当前缓冲区中访问的文件的文件号和目录设备号，如果没有文件或不存在的文件被访问，则为 nil。它是一个永久的局部变量，不受 kill-all-local-variables 的影响。
+</p>
+<p>该值通常是一个形式为 (filenum devnum) 的列表。这对数字在系统上可访问的所有文件中唯一标识该文件。有关它们的更多信息，请参阅文件属性中的函数文件属性。
+</p>
+<p>如果 buffer-file-name 是符号链接的名称，则两个数字都指递归目标。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: get-file-buffer filename ¶
+</pre></div>
+<p>该函数返回缓冲区访问文件filename。如果没有这样的缓冲区，则返回 nil。必须是字符串的参数文件名被扩展（请参阅扩展文件名的函数），然后与所有活动缓冲区的访问文件名进行比较。请注意，缓冲区的缓冲区文件名必须与文件名的扩展完全匹配。此函数不会识别同一文件的其他名称。
+</p>
+<div class="lisp">
+<pre class="lisp">(get-file-buffer "buffers.texi")
+    ⇒ #&lt;buffer buffers.texi&gt;
+</pre></div>
+<p>在不寻常的情况下，可能有多个缓冲区访问同一个文件名。在这种情况下，此函数返回缓冲区列表中的第一个此类缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: find-buffer-visiting filename &amp;optional predicate ¶
+</pre></div>
+<p>这类似于 get-file-buffer，只是它可以返回访问文件的任何缓冲区，可能以不同的名称访问文件。即缓冲区的缓冲区文件名不需要完全匹配文件名的扩展，它只需要引用同一个文件。如果谓词非零，它应该是一个参数的函数，一个缓冲区访问文件名。如果谓词返回非零，则缓冲区仅被视为合适的返回值。如果找不到合适的缓冲区返回，find-buffer-visiting 返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: set-visited-file-name filename &amp;optional no-query along-with-file ¶
+</pre></div>
+<p>如果 filename 是一个非空字符串，则该函数将当前缓冲区中访问的文件的名称更改为 filename。（如果缓冲区没有访问过的文件，这给它一个。）下次保存缓冲区时，它将进入新指定的文件。
+</p>
+<p>该命令将缓冲区标记为已修改，因为它不（据 Emacs 所知）匹配文件名的内容，即使它匹配之前访问过的文件。它还会重命名缓冲区以对应于新文件名，除非新名称已在使用中。
+</p>
+<p>如果 filename 为 nil 或空字符串，则表示 <code>没有访问过的文件</code> 。在这种情况下，set-visited-file-name 将缓冲区标记为没有访问过的文件，而不更改缓冲区的修改标志。
+</p>
+<p>通常，此函数要求用户确认是否已经存在缓冲区访问文件名。如果 no-query 不是 nil，则阻止提出这个问题。如果已经有一个缓冲区访问文件名，并且用户确认或 no-query 为非 nil，则此函数通过在文件名中附加一个 ’&lt;…&gt;’ 内的数字来使新的缓冲区名称唯一。
+</p>
+<p>如果连同文件是非零，这意味着假设以前访问的文件已被重命名为文件名。在这种情况下，该命令不会更改缓冲区的修改标志，也不会更改访问文件修改时间报告的缓冲区记录的最后文件修改时间（请参阅缓冲区修改时间）。如果连同文件是零，这个函数清除记录的最后文件修改时间，之后访问文件修改时间返回零。
+</p>
+<p>当交互式调用函数 set-visited-file-name 时，它​​会提示输入 minibuffer 中的文件名。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: list-buffers-directory ¶
+</pre></div>
+<p>对于没有访问文件名的缓冲区，此缓冲区局部变量指定一个字符串，以显示在访问文件名所在的缓冲区列表中。Dired 缓冲区使用此变量。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="28.5_缓冲区修改.html">缓冲区修改</a>, Previous: <a href="28.3_缓冲区名称.html">缓冲区名称</a>, Up: <a href="28_缓冲区.html">缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

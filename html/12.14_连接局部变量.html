@@ -1,0 +1,129 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>12.14 连接局部变量</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">12.14 连接局部变量</h2>
+<div class="nav-panel"><p>Next: <a href="12.15_变量别名.html">变量别名</a>, Previous: <a href="12.13_目录局部变量.html">目录局部变量</a>, Up: <a href="12_变量.html">变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>连接局部变量为具有远程连接的缓冲区中的不同变量设置提供了一种通用机制。它们根据缓冲区专用的远程连接进行绑定和设置。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: connection-local-set-profile-variables profile variables ¶
+</pre></div>
+<p>该函数为连接配置文件定义了一组变量设置，这是一个符号。您可以稍后将连接配置文件分配给一个或多个远程连接，Emacs 会将这些变量设置应用于这些连接的所有进程缓冲区。variables 中的列表是一个形式为 (name . value) 的列表。例子：
+</p>
+<div class="lisp">
+<pre class="lisp">
+
+(connection-local-set-profile-variables
+  'remote-bash
+  '((shell-file-name . "/bin/bash")
+    (shell-command-switch . "-c")
+    (shell-interactive-switch . "-i")
+    (shell-login-switch . "-l")))
+
+
+(connection-local-set-profile-variables
+  'remote-ksh
+  '((shell-file-name . "/bin/ksh")
+    (shell-command-switch . "-c")
+    (shell-interactive-switch . "-i")
+    (shell-login-switch . "-l")))
+
+
+(connection-local-set-profile-variables
+  'remote-null-device
+  '((null-device . "/dev/null")))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Variable: connection-local-profile-alist ¶
+</pre></div>
+<p>此列表包含连接配置文件符号和关联的变量设置。它由 connection-local-set-profile-variables 更新。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: connection-local-set-profiles criteria &amp;rest profiles ¶
+</pre></div>
+<p>此功能将作为符号的配置文件分配给由标准标识的所有远程连接。标准是一个 plist 标识一个连接和使用这个连接的应用程序。属性名称可能是 :application、:protocol、:user 和 :machine。:application 的属性值是一个符号，所有其他属性值都是字符串。所有属性都是可选的；  如果条件为 nil，则始终适用。例子：
+</p>
+<div class="lisp">
+<pre class="lisp">(connection-local-set-profiles
+  '(:application 'tramp :protocol "ssh" :machine "localhost")
+  'remote-bash 'remote-null-device)
+
+
+(connection-local-set-profiles
+  '(:application 'tramp :protocol "sudo"
+    :user "root" :machine "localhost")
+  'remote-ksh 'remote-null-device)
+</pre></div>
+<p>如果条件为 nil，则适用于所有远程连接。因此，上面的例子相当于
+</p><div class="lisp">
+<pre class="lisp">(connection-local-set-profiles
+  '(:application 'tramp :protocol "ssh" :machine "localhost")
+  'remote-bash)
+
+
+(connection-local-set-profiles
+  '(:application 'tramp :protocol "sudo"
+    :user "root" :machine "localhost")
+  'remote-ksh)
+
+
+(connection-local-set-profiles
+  nil 'remote-null-device)
+</pre></div>
+<p>配置文件的任何连接配置文件必须已由 connection-local-set-profile-variables 定义。 
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: connection-local-criteria-alist ¶
+</pre></div>
+<p>此列表包含连接标准及其分配的配置文件名称。函数 connection-local-set-profiles 更新此列表。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: hack-connection-local-variables criteria ¶
+</pre></div>
+<p>此函数收集与连接局部变量列表中的条件相关联的适用连接局部变量，而不应用它们。例子：
+</p><div class="lisp">
+<pre class="lisp">
+
+(hack-connection-local-variables
+  '(:application 'tramp :protocol "ssh" :machine "localhost"))
+
+
+connection-local-variables-alist
+     ⇒ ((null-device . "/dev/null")
+        (shell-login-switch . "-l")
+        (shell-interactive-switch . "-i")
+        (shell-command-switch . "-c")
+        (shell-file-name . "/bin/bash"))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: hack-connection-local-variables-apply criteria ¶
+</pre></div>
+<p>此函数根据标准查找连接局部变量，并立即将它们应用到当前缓冲区中。 
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: with-connection-local-variables &amp;rest body ¶
+</pre></div>
+<p>应用默认目录指定的所有连接局部变量。
+</p>
+<p>之后，body 被执行，连接局部变量被解开。例子：
+</p>
+<div class="lisp">
+<pre class="lisp">(connection-local-set-profile-variables
+  'remote-perl
+  '((perl-command-name . "/usr/local/bin/perl")
+    (perl-command-switch . "-e %s")))
+
+
+(connection-local-set-profiles
+  '(:application 'tramp :protocol "ssh" :machine "remotehost")
+  'remote-perl)
+
+
+(let ((default-directory "/ssh:remotehost:/working/dir/"))
+  (with-connection-local-variables
+    do something useful))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Variable: enable-connection-local-variables ¶
+</pre></div>
+<p>如果为零，则忽略连接局部变量。该变量只能在特殊模式下临时更改。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="12.15_变量别名.html">变量别名</a>, Previous: <a href="12.13_目录局部变量.html">目录局部变量</a>, Up: <a href="12_变量.html">变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

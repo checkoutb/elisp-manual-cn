@@ -1,0 +1,54 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>28.5 缓冲区修改</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">28.5 缓冲区修改</h2>
+<div class="nav-panel"><p>Next: <a href="28.6_缓冲区修改时间.html">缓冲区修改时间</a>, Previous: <a href="28.4_缓冲区文件名.html">缓冲区文件名</a>, Up: <a href="28_缓冲区.html">缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 为每个缓冲区保留一个称为修改标志的标志，以记录您是否更改了缓冲区的文本。每当您更改缓冲区的内容时，此标志设置为 t，并在保存时清除为 nil。因此，该标志显示是否有未保存的更改。标志值通常显示在模式行中（请参阅模式行中使用的变量），并控制保存（请参阅保存缓冲区）和自动保存（请参阅自动保存）。
+</p>
+<p>一些 Lisp 程序明确地设置了这个标志。例如，函数 set-visited-file-name 将标志设置为 t，因为文本与新访问的文件不匹配，即使它与以前访问的文件相比没有变化。
+</p>
+<p>修改缓冲区内容的函数在文本中描述。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: buffer-modified-p &amp;optional buffer ¶
+</pre></div>
+<p>如果缓冲区缓冲区自上次从文件读入或保存后已被修改，则此函数返回 t，否则返回 nil。如果未提供缓冲区，则测试当前缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-buffer-modified-p flag ¶
+</pre></div>
+<p>如果 flag 为非 nil，此函数将当前缓冲区标记为已修改，如果 flag 为 nil，则此函数将其标记为未修改。
+</p>
+<p>调用此函数的另一个效果是无条件地重新显示当前缓冲区的模式行。实际上，函数 force-mode-line-update 就是这样工作的：
+</p>
+<div class="lisp">
+<pre class="lisp">(set-buffer-modified-p (buffer-modified-p))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: restore-buffer-modified-p flag ¶
+</pre></div>
+<p>与 set-buffer-modified-p 类似，但不强制重新显示模式行。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: not-modified &amp;optional arg ¶
+</pre></div>
+<p>该命令将当前缓冲区标记为未修改，不需要保存。如果 arg 不为零，则将缓冲区标记为已修改，以便在下一个合适的场合保存。交互式地， arg 是前缀参数。
+</p>
+<p>不要在程序中使用此功能，因为它会在回显区域打印一条消息；  改用 set-buffer-modified-p（上图）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: buffer-modified-tick &amp;optional buffer ¶
+</pre></div>
+<p>此函数返回缓冲区的修改计数。这是一个每次修改缓冲区时递增的计数器。如果 buffer 为 nil（或省略），则使用当前缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: buffer-chars-modified-tick &amp;optional buffer ¶
+</pre></div>
+<p>此函数返回缓冲区的字符更改修改计数。对文本属性的更改使该计数器保持不变；  但是，每次在缓冲区中插入或删除文本时，计数器都会重置为 buffer-modified-tick 返回的值。通过比较两个 buffer-chars-modified-tick 调用返回的值，您可以判断在调用之间该缓冲区中是否发生了字符更改。如果 buffer 为 nil（或省略），则使用当前缓冲区。
+</p>
+<p>有时需要以一种不会真正更改其文本的方式修改缓冲区，例如仅更改其文本属性。如果您的程序需要修改缓冲区而不触发任何对缓冲区修改作出反应的钩子和功能，请使用 with-silent-modifications 宏。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: with-silent-modifications body… ¶
+</pre></div>
+<p>执行 body 假装它不修改缓冲区。这包括检查缓冲区的文件是否被锁定（参见 File Locks）、运行缓冲区修改挂钩（参见 Change Hooks）等。请注意，如果 body 实际修改了缓冲区文本（与其文本属性相反），它的撤消数据可能会变为损坏。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="28.6_缓冲区修改时间.html">缓冲区修改时间</a>, Previous: <a href="28.4_缓冲区文件名.html">缓冲区文件名</a>, Up: <a href="28_缓冲区.html">缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

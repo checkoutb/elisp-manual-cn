@@ -1,0 +1,44 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>19.2.5 其他 Edebug 命令</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">19.2.5 其他 Edebug 命令</h3>
+<div class="nav-panel"><p>Next: <a href="19.2.6_休息.html">休息</a>, Previous: <a href="19.2.4_跳跃.html">跳跃</a>, Up: <a href="19.2_调试.html">调试.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>此处描述了一些杂项 Edebug 命令。
+</p>
+<div class="lisp">
+<pre class="lisp">?
+</pre></div>
+<p>显示 Edebug 的帮助信息 (edebug-help)。
+</p><div class="lisp">
+<pre class="lisp">a
+</pre></div>
+<div class="lisp">
+<pre class="lisp">C-]
+</pre></div>
+<p>中止一个级别回到上一个命令级别（中止递归编辑）。
+</p><div class="lisp">
+<pre class="lisp">q
+</pre></div>
+<p>返回到顶级编辑器命令循环（顶级）。这将退出所有递归编辑级别，包括所有级别的 Edebug 活动。但是，使用 unwind-protect 或条件案例形式保护的检测代码可能会恢复调试。
+</p><div class="lisp">
+<pre class="lisp">Q
+</pre></div>
+<p>像 q，但即使是受保护的代码也不要停止（edebug-top-level-nonstop）。
+</p><div class="lisp">
+<pre class="lisp">r
+</pre></div>
+<p>在回显区域重新显示最近已知的表达式结果 (edebug-previous-result)。
+</p><div class="lisp">
+<pre class="lisp">d
+</pre></div>
+<p>显示回溯，为了清楚起见，不包括 Edebug 自己的函数（edebug-pop-to-backtrace）。
+</p>
+<p>请参阅 Backtraces，了解对回溯和对其起作用的命令的描述。
+</p>
+<p>如果您想在回溯中查看 Edebug 的功能，请使用 Mx edebug-backtrace-show-instrumentation。要再次隐藏它们，请使用 Mx edebug-backtrace-hide-instrumentation。
+</p>
+<p>如果回溯帧以 <code>&gt;</code> 开头，则意味着 Edebug 知道该帧的源代码所在的位置。使用 s 跳转到当前帧的源代码。
+</p>
+<p>当您继续执行时，回溯缓冲区会自动终止。
+</p>
+<p>您可以从 Edebug 调用以递归方式再次激活 Edebug 的命令。每当 Edebug 处于活动状态时，您可以使用 q 退出到顶层或使用 C-] 中止一个递归编辑级别。您可以使用 d 显示所有未决评估的回溯。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="19.2.6_休息.html">休息</a>, Previous: <a href="19.2.4_跳跃.html">跳跃</a>, Up: <a href="19.2_调试.html">调试.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

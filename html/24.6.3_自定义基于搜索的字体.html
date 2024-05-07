@@ -1,0 +1,43 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.6.3 自定义基于搜索的字体</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">24.6.3 自定义基于搜索的字体</h3>
+<div class="nav-panel"><p>Next: <a href="24.6.4_其他字体锁定变量.html">其他字体锁定变量</a>, Previous: <a href="24.6.2_基于搜索的字体.html">基于搜索的字体</a>, Up: <a href="24.6_字体锁定模式.html">字体锁定模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>您可以使用 font-lock-add-keywords 将其他基于搜索的字体化规则添加到主要模式，并使用 font-lock-remove-keywords 删除规则。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: font-lock-add-keywords mode keywords &amp;optional how ¶
+</pre></div>
+<p>此函数为当前缓冲区或主要模式模式添加突出显示关键字。参数关键字应该是一个与变量 font-lock-keywords 格式相同的列表。
+</p>
+<p>如果 mode 是一个主要模式命令名称的符号，例如 c-mode，则效果是在 mode 中启用 Font Lock 模式会将关键字添加到 font-lock-keywords。仅在 ~/.emacs 文件中使用非零值 mode 调用是正确的。
+</p>
+<p>如果 mode 为 nil，此函数将关键字添加到当前缓冲区中的 font-lock-keywords。这种调用 font-lock-add-keywords 的方式通常用于模式挂钩函数中。
+</p>
+<p>默认情况下，关键字添加在 font-lock-keywords 的开头。如果设置了可选参数 how ，它们用于替换 font-lock-keywords 的值。如果有任何其他非零值，则将它们添加到 font-lock-keywords 的末尾。
+</p>
+<p>某些模式提供专门的支持，您可以在其他突出显示模式中使用。例如，请参阅变量 c-font-lock-extra-types、c++-font-lock-extra-types 和 java-font-lock-extra-types。
+</p>
+<p>警告：主要模式命令在任何情况下都不得直接或间接调用 font-lock-add-keywords，除非通过它们的模式挂钩。（这样做会导致某些次要模式的错误行为。）他们应该通过设置 font-lock-keywords 来设置基于搜索的字体化规则。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: font-lock-remove-keywords mode keywords ¶
+</pre></div>
+<p>此函数从 font-lock-keywords 中删除当前缓冲区或主要模式模式的关键字。与 font-lock-add-keywords 一样，mode 应该是主要模式命令名称或 nil。font-lock-add-keywords 的所有注意事项和要求也适用于此处。参数关键字必须与相应的 font-lock-add-keywords 使用的关键字完全匹配。
+</p>
+<p>例如，以下代码为 C 模式添加了两种字体化模式：一种用于字体化单词 <code>FIXME</code> ，甚至在注释中，另一种将单词 <code>and</code> 、 <code>or</code> 和 <code>not</code> 字体化为关键字。
+</p>
+<div class="lisp">
+<pre class="lisp">(font-lock-add-keywords 'c-mode
+ '(("\\&lt;\\(FIXME\\):" 1 font-lock-warning-face prepend)
+   ("\\&lt;\\(and\\|or\\|not\\)\\&gt;" . font-lock-keyword-face)))
+</pre></div>
+<p>此示例仅影响正确的 C 模式。要将相同的模式添加到 C 模式和从它派生的所有模式，请改为执行以下操作：
+</p>
+<div class="lisp">
+<pre class="lisp">(add-hook 'c-mode-hook
+ (lambda ()
+  (font-lock-add-keywords nil
+   '(("\\&lt;\\(FIXME\\):" 1 font-lock-warning-face prepend)
+     ("\\&lt;\\(and\\|or\\|not\\)\\&gt;" .
+      font-lock-keyword-face)))))
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="24.6.4_其他字体锁定变量.html">其他字体锁定变量</a>, Previous: <a href="24.6.2_基于搜索的字体.html">基于搜索的字体</a>, Up: <a href="24.6_字体锁定模式.html">字体锁定模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

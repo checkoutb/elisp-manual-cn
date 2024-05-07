@@ -1,0 +1,88 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>29.10 Windows的循环排序</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">29.10 Windows的循环排序</h2>
+<div class="nav-panel"><p>Next: <a href="29.11_缓冲区和窗口.html">缓冲区和窗口</a>, Previous: <a href="29.9_重新组合窗口.html">重新组合窗口</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当您使用命令 Cx o (other-window) 选择某个其他窗口时，它会以特定顺序在活动窗口中移动。对于任何给定的窗口配置，此顺序永远不会改变。它被称为窗口的循环排序。
+</p>
+<p>排序由每个帧的窗口树的深度优先遍历确定，检索作为树的叶节点的活动窗口（请参阅窗口和帧）。如果 minibuffer 处于活动状态，则 minibuffer 窗口也包括在内。顺序是循环的，因此序列中的最后一个窗口后面是第一个窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: next-window &amp;optional window minibuf all-frames ¶
+</pre></div>
+<p>此函数返回一个实时窗口，即窗口循环排序中的下一个窗口。窗口应该是一个活动窗口；  如果省略或为零，则默认为选定的窗口。
+</p>
+<p>可选参数 minibuf 指定是否应将 minibuffer 窗口包含在循环排序中。通常，当 minibuf 为 nil 时，仅当 minibuffer 窗口当前处于活动状态时才包含它；  这与 Cx o 的行为相匹配。（请注意，只要 minibuffer 正在使用，minibuffer 窗口就处于活动状态；请参阅 Minibuffers）。
+</p>
+<p>如果 minibuf 为 t，则循环排序包括所有 minibuffer 窗口。如果 minibuf 既不是 t 也不是 nil，即使 minibuffer 窗口处于活动状态，也不包括在内。
+</p>
+<p>可选参数 all-frames 指定要考虑的帧：
+</p>
+<p>nil 表示考虑窗口 <code>帧</code> ( <code>frame</code> )上的窗口。如果考虑了 minibuffer 窗口（由 minibuf 参数指定），那么共享 minibuffer 窗口的帧也会被考虑。
+t 表示考虑所有现有 <code>帧</code> ( <code>frame</code> )上的窗口。
+可见意味着考虑所有可见 <code>帧</code> ( <code>frame</code> )上的窗口。
+0 表示考虑所有可见或图标化 <code>帧</code> ( <code>frame</code> )上的窗口。
+ <code>帧</code> ( <code>frame</code> )意味着考虑该特定 <code>帧</code> ( <code>frame</code> )上的窗口。
+其他任何事情都意味着考虑窗口 <code>帧</code> ( <code>frame</code> )上的窗口，而不是其他。
+</p>
+<p>如果考虑多于一帧，则通过附加这些帧的排序来获得循环排序，其顺序与所有活动帧列表的顺序相同（请参阅查找所有帧）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: previous-window &amp;optional window minibuf all-frames ¶
+</pre></div>
+<p>此函数返回一个实时窗口，即窗口循环排序中的前一个窗口。其他参数的处理方式与下一个窗口类似。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: other-window count &amp;optional all-frames ¶
+</pre></div>
+<p>此函数选择一个实时窗口，从选定的窗口开始按窗口的循环顺序计数。如果 count 为正数，则向前跳过 count 个窗口；  如果 count 是负数，它会向后跳过 -count 个窗口；  如果计数为零，则只是重新选择选定的窗口。当以交互方式调用时，count 是数字前缀参数。
+</p>
+<p>可选参数 all-frames 与 next-window 中的含义相同，就像 next-window 的 nil minibuf 参数。
+</p>
+<p>如果 ignore-window-parameters 为 nil，则此函数不会选择具有非 nil no-other-window 窗口参数的窗口（请参阅窗口参数）。
+</p>
+<p>如果所选窗口的 other-window 参数是一个函数，并且 ignore-window-parameters 为 nil，则将使用参数 count 和 all-frames 调用该函数，而不是该函数的正常操作。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: walk-windows fun &amp;optional minibuf all-frames ¶
+</pre></div>
+<p>此函数为每个活动窗口调用一次函数 fun，并以窗口作为参数。
+</p>
+<p>它遵循窗口的循环排序。可选参数 minibuf 和 all-frames 指定包含的窗口集；  这些参数与下一个窗口中的参数相同。如果 all-frames 指定一个 <code>帧</code> ( <code>frame</code> )，则第一个经过的窗口是该 <code>帧</code> ( <code>frame</code> )上的第一个窗口（由 frame-first-window 返回的窗口），不一定是选定的窗口。
+</p>
+<p>如果 fun 通过拆分或删除窗口来更改窗口配置，则不会改变已行走的窗口集，这是在第一次调用 fun 之前确定的。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: one-window-p &amp;optional no-mini all-frames ¶
+</pre></div>
+<p>如果所选窗口是唯一的活动窗口，则此函数返回 t，否则返回 nil。
+</p>
+<p>如果 minibuffer 窗口处于活动状态，则通常会考虑它（因此该函数返回 nil）。但是，如果可选参数 no-mini 不为零，则即使处于活动状态，也会忽略 minibuffer 窗口。可选参数 all-frames 与 next-window 具有相同的含义。
+</p>
+<p>以下函数返回一个满足某些标准的窗口，而不选择它：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: get-lru-window &amp;optional all-frames dedicated not-selected no-other ¶
+</pre></div>
+<p>此函数返回一个活动窗口，它是启发式的最近最少使用的窗口。最近最少使用的窗口是最近最少选择的窗口——其使用时间少于所有其他活动窗口的使用时间的窗口（请参阅选择窗口）。可选参数 all-frames 与 next-window 中的含义相同。
+</p>
+<p>如果存在任何全角窗口，则仅考虑这些窗口。minibuffer 窗口永远不是候选对象。除非可选参数 dedicated 不为零，否则专用窗口（请参阅专用窗口）永远不是候选窗口。选定的窗口永远不会返回，除非它是唯一的候选者。但是，如果可选参数 not-selected 为非 nil，则此函数在这种情况下返回 nil。可选参数 no-other，如果非 nil，则意味着永远不会返回 no-other-window 参数为非 nil 的窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: get-mru-window &amp;optional all-frames dedicated not-selected no-other ¶
+</pre></div>
+<p>此函数类似于 get-lru-window，但它返回最近使用的窗口。最近使用的窗口是最近选择的窗口——使用时间超过所有其他活动窗口的使用时间的窗口（请参阅选择窗口）。参数的含义与 get-lru-window 相同。
+</p>
+<p>由于在实践中最近使用的窗口总是被选中的窗口，所以通常只用一个非 nil 未选中的参数调用这个函数是有意义的。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: get-largest-window &amp;optional all-frames dedicated not-selected no-other ¶
+</pre></div>
+<p>此函数返回面积最大的窗口（高度乘以宽度）。如果有两个大小相同的候选窗口，它会优先选择在窗口循环排序中排在第一位的窗口，从所选窗口开始。参数的含义与 get-lru-window 相同。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: get-window-with-predicate predicate &amp;optional minibuf all-frames default ¶
+</pre></div>
+<p>该函数按窗口的循环顺序依次调用每个窗口的函数谓词，并将窗口作为参数传递给它。如果谓词为任何窗口返回非零，则此函数停止并返回该窗口。如果没有找到这样的窗口，则返回值为 default（默认为 nil）。
+</p>
+<p>可选参数 minibuf 和 all-frames 指定要搜索的窗口，并且与 next-window 中的含义相同。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="29.11_缓冲区和窗口.html">缓冲区和窗口</a>, Previous: <a href="29.9_重新组合窗口.html">重新组合窗口</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

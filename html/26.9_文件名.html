@@ -1,0 +1,10 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>26.9 文件名</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">26.9 文件名</h2>
+<div class="nav-panel"><p>Next: <a href="26.9.1_文件名组件.html">文件名组件</a>, Previous: <a href="26.8_文件和二级存储.html">文件和二级存储</a>, Up: <a href="26_文件.html">文件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在 Emacs 中和其他地方一样，文件通常以它们的名称来引用。Emacs 中的文件名表示为字符串。对文件进行操作的函数都需要一个文件名参数。
+</p>
+<p>除了对文件本身进行操作外，Emacs Lisp 程序还经常需要对文件名进行操作；  即，将它们分开并使用名称的一部分来构造相关的文件名。本节介绍如何操作文件名。
+</p>
+<p>本节中的函数实际上并不访问文件，因此它们可以对不引用现有文件或目录的文件名进行操作。
+</p>
+<p>在 MS-DOS 和 MS-Windows 上，这些函数（如实际操作文件的函数）接受 MS-DOS 或 MS-Windows 文件名语法，其中反斜杠分隔组件，以及 POSIX 语法；  但它们总是返回 POSIX 语法。这使 Lisp 程序能够以 POSIX 语法指定文件名，并且无需更改即可在所有系统上正常工作。 17
+</p>
+<div class="nav-panel"><p>Next: <a href="26.9.1_文件名组件.html">文件名组件</a>, Previous: <a href="26.8_文件和二级存储.html">文件和二级存储</a>, Up: <a href="26_文件.html">文件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>28.8 缓冲区列表</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">28.8 缓冲区列表</h2>
+<div class="nav-panel"><p>Next: <a href="28.9_创建缓冲区.html">创建缓冲区</a>, Previous: <a href="28.7_只读缓冲区.html">只读缓冲区</a>, Up: <a href="28_缓冲区.html">缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>缓冲区列表是所有活动缓冲区的列表。此列表中缓冲区的顺序主要基于每个缓冲区在窗口中显示的最近时间。几个函数，尤其是 other-buffer，使用这种排序。为用户显示的缓冲区列表也遵循此顺序。
+</p>
+<p>创建缓冲区会将其添加到缓冲区列表的末尾，而终止缓冲区会将其从该列表中删除。A buffer moves to the front of this list whenever it is chosen for display in a window (see Switching to a Buffer in a Window) or a window displaying it is selected (see Selecting Windows).  当一个缓冲区被掩埋时，它会移动到列表的末尾（参见下面的 bury-buffer）。Lisp 程序员没有可用的函数直接操作缓冲区列表。
+</p>
+<p>除了刚刚描述的基本缓冲区列表之外，Emacs 还为每一帧维护了一个本地缓冲区列表，其中首先显示了在该帧中显示（或选择了它们的窗口）的缓冲区。（此顺序记录在帧的缓冲区列表帧参数中；请参阅缓冲区参数。）该帧中从未显示的缓冲区随后出现，根据基本缓冲区列表排序。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: buffer-list &amp;optional frame ¶
+</pre></div>
+<p>此函数返回缓冲区列表，包括所有缓冲区，甚至包括名称以空格开头的缓冲区。这些元素是实际的缓冲区，而不是它们的名称。
+</p>
+<p>如果 frame 是一个帧，则返回帧的本地缓冲区列表。如果 frame 为 nil 或省略，则使用基本缓冲区列表：缓冲区按最近显示或选择的顺序出现，无论它们显示在哪些帧上。
+</p><div class="lisp">
+<pre class="lisp">
+
+(buffer-list)
+     ⇒ (#&lt;buffer buffers.texi&gt;
+         #&lt;buffer  *Minibuf-1*&gt; #&lt;buffer buffer.c&gt;
+         #&lt;buffer *Help*&gt; #&lt;buffer TAGS&gt;)
+
+
+;; Note that the name of the minibuffer
+;;   begins with a space!
+(mapcar #'buffer-name (buffer-list))
+    ⇒ ("buffers.texi" " *Minibuf-1*"
+        "buffer.c" "*Help*" "TAGS")
+</pre></div>
+<p>buffer-list返回的列表是专门构造的；  它不是 Emacs 内部的数据结构，修改它对缓冲区的顺序没有影响。如果要更改基本缓冲区列表中缓冲区的顺序，这里有一个简单的方法：
+</p>
+<div class="lisp">
+<pre class="lisp">(defun reorder-buffer-list (new-list)
+  (while new-list
+    (bury-buffer (car new-list))
+    (setq new-list (cdr new-list))))
+</pre></div>
+<p>使用此方法，您可以为列表指定任何顺序，但不会有丢失缓冲区或添加不是有效活动缓冲区的内容的危险。
+</p>
+<p>要更改特定帧的缓冲区列表的顺序或值，请使用 modify-frame-parameters 设置该帧的缓冲区列表参数（请参阅访问帧参数）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: other-buffer &amp;optional buffer visible-ok frame ¶
+</pre></div>
+<p>此函数返回缓冲区列表中除缓冲区之外的第一个缓冲区。通常，这是出现在最近选择的窗口中的缓冲区（在帧帧或所选帧中，请参阅输入焦点），除了缓冲区。根本不考虑名称以空格开头的缓冲区。
+</p>
+<p>如果未提供缓冲区（或者如果它不是实时缓冲区），则 other-buffer 返回所选帧的本地缓冲区列表中的第一个缓冲区。（如果 frame 不是 nil，则返回 frame 的本地缓冲区列表中的第一个缓冲区。）
+</p>
+<p>如果 frame 有一个非 nil 缓冲区谓词参数，则 other-buffer 使用该谓词来决定要考虑哪些缓冲区。它为每个缓冲区调用一次谓词，如果值为 nil，则忽略该缓冲区。请参阅缓冲区参数。
+</p>
+<p>如果 visible-ok 为 nil，则 other-buffer 避免返回在任何可见帧上的任何窗口中可见的缓冲区，除非作为最后的手段。如果 visible-ok 不为零，那么缓冲区是否显示在某处并不重要。
+</p>
+<p>如果不存在合适的缓冲区，则返回缓冲区 *scratch*（并在必要时创建）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: last-buffer &amp;optional buffer visible-ok frame ¶
+</pre></div>
+<p>此函数返回帧缓冲区列表中除缓冲区之外的最后一个缓冲区。如果 frame 被省略或为零，它使用选定帧的缓冲区列表。
+</p>
+<p>参数 visible-ok 与 other-buffer 一样处理，见上文。如果找不到合适的缓冲区，则返回缓冲区 *scratch*。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: bury-buffer &amp;optional buffer-or-name ¶
+</pre></div>
+<p>此命令将 buffer-or-name 放在缓冲区列表的末尾，而不更改列表中任何其他缓冲区的顺序。因此，此缓冲区成为其他缓冲区返回的最不理想的候选者。参数可以是缓冲区本身，也可以是缓冲区的名称。
+</p>
+<p>该函数对每个帧的缓冲区列表参数以及基本缓冲区列表进行操作；  因此，您埋入的缓冲区将在 (buffer-list frame) 的值和 (buffer-list) 的值中排在最后。此外，它还将缓冲区放在所选窗口的缓冲区列表的末尾（请参阅窗口历史记录），前提是它显示在该窗口中。
+</p>
+<p>如果 buffer-or-name 为 nil 或省略，这意味着要掩埋当前缓冲区。此外，如果当前缓冲区显示在所选窗口中（请参阅选择窗口），这将确保窗口被删除或显示另一个缓冲区。更准确地说，如果选定的窗口是专用的（请参阅专用窗口）并且其框架上有其他窗口，则该窗口将被删除。如果它是其框架上的唯一窗口，并且该框架不是其终端上的唯一框架，则通过调用 frame-auto-hide-function 指定的函数来解除该框架（请参阅退出窗口）。否则，它会调用 switch-to-prev-buffer（参见 Window History）以在该窗口中显示另一个缓冲区。如果 buffer-or-name 显示在其他窗口中，它仍然显示在那里。
+</p>
+<p>要在显示它的所有窗口中替换缓冲区，请使用 replace-buffer-in-windows，请参阅缓冲区和窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: unbury-buffer ¶
+</pre></div>
+<p>此命令切换到所选帧的本地缓冲区列表中的最后一个缓冲区。更准确地说，它调用函数 switch-to-buffer（参见 Switching to a Buffer in a Window），以在所选窗口中显示 last-buffer 返回的缓冲区（参见上文）。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: buffer-list-update-hook ¶
+</pre></div>
+<p>每当缓冲区列表更改时，这是一个正常的钩子运行。运行此钩子的函数（隐式）是 get-buffer-create（参见创建缓冲区）、rename-buffer（参见缓冲区名称）、kill-buffer（参见终止缓冲区）、bury-buffer（参见上文）和 select-window (请参阅选择窗口）。对于由 get-buffer-create 或 generate-new-buffer 使用非 nil 参数禁止缓冲区钩子创建的内部或临时缓冲区，不会运行此挂钩。
+</p>
+<p>由该钩子运行的函数应避免使用 nil norecord 参数调用 select-window，因为这可能导致无限递归。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="28.9_创建缓冲区.html">创建缓冲区</a>, Previous: <a href="28.7_只读缓冲区.html">只读缓冲区</a>, Up: <a href="28_缓冲区.html">缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

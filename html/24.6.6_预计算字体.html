@@ -1,0 +1,10 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.6.6 预计算字体</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">24.6.6 预计算字体</h3>
+<div class="nav-panel"><p>Next: <a href="24.6.7_字体锁定面.html">字体锁定面</a>, Previous: <a href="24.6.5_字体锁定级别.html">字体锁定级别</a>, Up: <a href="24.6_字体锁定模式.html">字体锁定模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>一些主要的模式，如列表缓冲区和发生以编程方式构造缓冲区文本。他们支持字体锁定模式的最简单方法是在他们将文本插入缓冲区时指定文本的面。
+</p>
+<p>这样做的方法是使用特殊的文本属性 font-lock-face 指定文本中的面（请参阅具有特殊含义的属性）。启用字体锁定模式时，此属性控制显示，就像 face 属性一样。禁用字体锁定模式时，font-lock-face 对显示没有影响。
+</p>
+<p>一种模式可以对某些文本使用 font-lock-face 并使用普通的 Font Lock 机制。但如果该模式不使用正常的字体锁定机制，则不应设置变量 font-lock-defaults。在这种情况下，face 属性不会被覆盖，因此使用 face 属性也可以。但是，通常最好使用 font-lock-face，因为它允许用户通过切换 font-lock-mode 来控制字体化，并且无论该模式是否使用 Font Lock 机制，都可以让代码工作。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="24.6.7_字体锁定面.html">字体锁定面</a>, Previous: <a href="24.6.5_字体锁定级别.html">字体锁定级别</a>, Up: <a href="24.6_字体锁定模式.html">字体锁定模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,17 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.2.5 在命令选项中进行选择</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">22.2.5 在命令选项中进行选择</h3>
+<div class="nav-panel"><p>Next: <a href="22.3_交互调用.html">交互调用</a>, Previous: <a href="22.2.4_指定命令模式.html">指定命令模式</a>, Up: <a href="22.2_定义命令.html">定义命令.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>宏define-alternatives 可用于定义通用命令。这些是交互式功能，可以根据用户偏好从几个备选方案中选择其实现。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: define-alternatives command &amp;rest customizations ¶
+</pre></div>
+<p>定义新的命令命令，一个符号。
+</p>
+<p>当用户第一次运行 Mx 命令 RET 时，Emacs 会提示使用该命令的真实形式，并通过自定义变量的方式记录选择。使用前缀参数重复这个选择替代的过程。
+</p>
+<p>变量 command-alternatives 应该包含一个带有替代命令实现的列表。在设置此变量之前，define-alternatives 无效。
+</p>
+<p>如果定制不是零，它应该由交替的 defcustom 关键字（通常是 :group 和 :version）和添加到命令替代声明的值组成。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.3_交互调用.html">交互调用</a>, Previous: <a href="22.2.4_指定命令模式.html">指定命令模式</a>, Up: <a href="22.2_定义命令.html">定义命令.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

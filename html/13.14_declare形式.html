@@ -1,0 +1,58 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>13.14 declare形式</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">13.14 declare形式</h2>
+<div class="nav-panel"><p>Next: <a href="13.15_告诉编译器定义了一个函数.html">告诉编译器定义了一个函数</a>, Previous: <a href="13.13_内联函数.html">内联函数</a>, Up: <a href="13_函数.html">函数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>declare 是一个特殊的宏，可用于向函数或宏添加元属性：例如，将其标记为过时，或在 Emacs Lisp 模式下为其形式提供特殊的 TAB 缩进约定。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: declare specs… ¶
+</pre></div>
+<p>这个宏忽略它的参数并计算为 nil；  它没有运行时影响。但是，当 defun 或 defsubst 函数定义（请参阅定义函数）或 defmacro 宏定义（请参阅定义宏）的 declare 参数中出现声明形式时，它会将 specs 指定的属性附加到函数或宏。这项工作由 defun、defsubst 和 defmacro 专门执行。
+</p>
+<p>specs 中的每个元素都应具有 (property args…) 形式，不应被引用。它们具有以下效果：
+</p>
+<div class="lisp">
+<pre class="lisp">(advertised-calling-convention signature when)
+</pre></div>
+<p>这就像对 set-advertised-calling-convention 的调用（请参阅声明过时的函数）；  签名指定调用函数或宏的正确参数列表，以及何时应该是一个字符串，指示旧参数列表何时首次过时。
+</p><div class="lisp">
+<pre class="lisp">(debug edebug-form-spec)
+</pre></div>
+<p>这仅对宏有效。使用 Edebug 单步执行宏时，请使用 edebug-form-spec。请参阅检测宏调用。
+</p><div class="lisp">
+<pre class="lisp">(doc-string n)
+</pre></div>
+<p>这在定义一个函数或宏时使用，该函数或宏本身将用于定义函数、宏或变量等实体。它表示第 n 个参数（如果有）应被视为文档字符串。
+</p><div class="lisp">
+<pre class="lisp">(indent indent-spec)
+</pre></div>
+<p>根据 indent-spec 缩进对此函数或宏的调用。这通常用于宏，尽管它也适用于函数。请参阅缩进宏。
+</p><div class="lisp">
+<pre class="lisp">(interactive-only value)
+</pre></div>
+<p>将函数的仅交互属性设置为 value。请参阅仅交互属性。
+</p><div class="lisp">
+<pre class="lisp">(obsolete current-name when)
+</pre></div>
+<p>将函数或宏标记为过时，类似于调用 make-obsolete（请参阅声明函数过时）。current-name 应该是一个符号（在这种情况下，警告消息说要使用它）、一个字符串（指定警告消息）或 nil（在这种情况下，警告消息没有提供额外的细节）。when 应该是一个字符串，指示函数或宏何时首次过时。
+</p><div class="lisp">
+<pre class="lisp">(compiler-macro expander)
+</pre></div>
+<p>这只能用于函数，并告诉编译器使用扩展器作为优化函数。当遇到对函数的调用时，形式为 (function args…)，宏扩展器将使用该形式以及 args… 调用扩展器，并且扩展器可以返回一个新表达式以代替函数调用，或者它可以只返回未更改的形式，以指示函数调用应该不理会。扩展器可以是一个符号，也可以是一个形式（lambda (arg) body），在这种情况下，arg 将保存原始函数调用表达式，并且可以使用函数的形式参数访问函数的（未计算的）参数。
+</p><div class="lisp">
+<pre class="lisp">(gv-expander expander)
+</pre></div>
+<p>将扩展器声明为将宏（或函数）调用处理为广义变量的函数，类似于 gv-define-expander。扩展器可以是一个符号，也可以是 (lambda (arg) body) 形式，在这种情况下，该函数还可以访问宏（或函数）的参数。
+</p><div class="lisp">
+<pre class="lisp">(gv-setter setter)
+</pre></div>
+<p>将 setter 声明为将宏（或函数）调用处理为广义变量的函数。setter 可以是一个符号，在这种情况下它将被传递给 gv-define-simple-setter，或者它可以是 (lambda (arg) body) 的形式，在这种情况下，该函数将另外可以访问宏（或函数) 的参数，它将被传递给 gv-define-setter。
+</p><div class="lisp">
+<pre class="lisp">(completion completion-predicate)
+</pre></div>
+<p>将完成谓词声明为函数，以确定在 Mx 中请求完成时是否将符号包含在函数列表中。使用两个参数调用完成谓词：第一个参数是符号，第二个参数是当前缓冲区。
+</p><div class="lisp">
+<pre class="lisp">(modes modes)
+</pre></div>
+<p>指定此命令仅适用于模式。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="13.15_告诉编译器定义了一个函数.html">告诉编译器定义了一个函数</a>, Previous: <a href="13.13_内联函数.html">内联函数</a>, Up: <a href="13_函数.html">函数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

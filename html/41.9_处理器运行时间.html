@@ -1,0 +1,27 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>41.9 处理器运行时间</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">41.9 处理器运行时间</h2>
+<div class="nav-panel"><p>Next: <a href="41.10_时间计算.html">时间计算</a>, Previous: <a href="41.8_解析和格式化时间.html">解析和格式化时间</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 提供了几个函数和原语，它们返回 Emacs 进程使用的时间，包括已用时间和处理器时间。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: emacs-uptime &amp;optional format ¶
+</pre></div>
+<p>这个函数返回一个代表 Emacs 正常运行时间的字符串——这个 Emacs 实例正在运行的挂钟时间。字符串根据可选参数格式由 format-seconds 格式化。有关可用的格式描述符，请参阅格式秒。如果 format 为 nil 或省略，则默认为 "%Y, %D, %H, %M, %z%S"。
+</p>
+<p>当以交互方式调用时，它会在回声区域打印正常运行时间。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: get-internal-run-time ¶
+</pre></div>
+<p>此函数返回 Emacs 使用的处理器运行时间，作为 Lisp 时间戳（请参阅时间）。
+</p>
+<p>注意这个函数返回的时间不包括 Emacs 没有使用处理器的时间，如果 Emacs 进程有多个线程，则返回值是所有 Emacs 线程使用的处理器时间的总和。
+</p>
+<p>如果系统没有提供确定处理器运行时间的方法，get-internal-run-time 将返回与当前时间相同的时间。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: emacs-init-time ¶
+</pre></div>
+<p>此函数以字符串形式返回 Emacs 初始化的持续时间（请参阅摘要：启动时的操作序列），以秒为单位。当以交互方式调用时，它会在回声区域打印持续时间。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="41.10_时间计算.html">时间计算</a>, Previous: <a href="41.8_解析和格式化时间.html">解析和格式化时间</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

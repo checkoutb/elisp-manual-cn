@@ -1,0 +1,24 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>39.5 删除进程</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">39.5 删除进程</h2>
+<div class="nav-panel"><p>Next: <a href="39.6_过程信息.html">过程信息</a>, Previous: <a href="39.4_创建一个异步进程.html">创建一个异步进程</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>删除一个进程会立即断开 Emacs 与子进程的连接。进程在终止后会自动删除，但不一定立即删除。您可以随时明确删除进程。如果您在自动删除之前明确删除已终止的进程，则不会造成任何损害。删除一个正在运行的进程会发送一个信号来终止它（及其子进程，如果有的话），并调用进程哨兵。请参阅 Sentinels：检测进程状态更改。
+</p>
+<p>当一个进程被删除时，只要其他 Lisp 对象指向它，该进程对象本身就会继续存在。所有在进程对象上工作的 Lisp 原语都接受已删除的进程，但那些执行 I/O 或发送信号的进程将报告错误。进程标记继续指向与以前相同的位置，通常指向插入进程输出的缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: delete-exited-processes ¶
+</pre></div>
+<p>此变量控制自动删除已终止的进程（由于调用 exit 或信号）。如果它是 nil，那么它们将继续存在，直到用户运行列表进程。否则，它们会在退出后立即被删除。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: delete-process process ¶
+</pre></div>
+<p>此函数删除一个进程，如果该进程正在运行程序，则使用 SIGKILL 信号终止它。参数可以是进程、进程名称、缓冲区或缓冲区名称。（缓冲区或缓冲区名称代表 get-buffer-process 返回的进程。）对正在运行的进程调用 delete-process 会终止它，更新进程状态，并立即运行哨兵。如果进程已经终止，调用 delete-process 对其状态或哨兵的运行没有影响（迟早会发生）。
+</p>
+<p>如果进程对象代表网络、串行或管道连接，则其状态更改为关闭；  否则，它变为信号，除非进程已经退出。请参阅进程状态。
+</p>
+<div class="lisp">
+<pre class="lisp">(delete-process "*shell*")
+     ⇒ nil
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="39.6_过程信息.html">过程信息</a>, Previous: <a href="39.4_创建一个异步进程.html">创建一个异步进程</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

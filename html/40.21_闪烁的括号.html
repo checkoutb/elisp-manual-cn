@@ -1,0 +1,45 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.21 闪烁的括号</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">40.21 闪烁的括号</h2>
+<div class="nav-panel"><p>Next: <a href="40.22_字符显示.html">字符显示</a>, Previous: <a href="40.20.2_抽象显示示例.html">抽象显示示例</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节描述当用户插入右括号时 Emacs 显示匹配的左括号的机制。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: blink-paren-function ¶
+</pre></div>
+<p>这个变量的值应该是一个函数（没有参数），每当插入带有右括号语法的字符时就会被调用。blink-paren-function 的值可能为 nil，在这种情况下什么都不做。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: blink-matching-paren ¶
+</pre></div>
+<p>如果此变量为 nil，则 blink-matching-open 什么也不做。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: blink-matching-paren-distance ¶
+</pre></div>
+<p>此变量指定在放弃之前扫描匹配括号的最大距离。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: blink-matching-delay ¶
+</pre></div>
+<p>此变量指定保持指示匹配括号的秒数。几分之一秒通常会产生良好的结果，但默认值为 1，适用于所有系统。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: blink-matching-open ¶
+</pre></div>
+<p>该函数是 blink-paren-function 的默认值。它假定 point 跟随一个带有右括号语法的字符，并立即将适当的效果应用于匹配的开始字符。如果该字符尚未出现在屏幕上，则会在回显区域中显示该字符的上下文。为避免长时间延迟，此函数不会搜索比眨眼匹配父距离字符更远的距离。
+</p>
+<p>这是显式调用此函数的示例。
+</p>
+<div class="lisp">
+<pre class="lisp">
+
+(defun interactive-blink-matching-open ()
+  "Indicate momentarily the start of parenthesized sexp before point."
+  (interactive)
+
+  (let ((blink-matching-paren-distance
+         (buffer-size))
+        (blink-matching-paren t))
+    (blink-matching-open)))
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.22_字符显示.html">字符显示</a>, Previous: <a href="40.20.2_抽象显示示例.html">抽象显示示例</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

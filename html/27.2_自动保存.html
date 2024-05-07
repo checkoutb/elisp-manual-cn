@@ -1,0 +1,152 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>27.2 自动保存</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">27.2 自动保存</h2>
+<div class="nav-panel"><p>Next: <a href="27.3_还原.html">还原</a>, Previous: <a href="27.1.4_命名备份文件.html">命名备份文件</a>, Up: <a href="27_备份和自动保存.html">备份和自动保存.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 会定期保存您正在访问的所有文件；  这称为自动保存。如果系统崩溃，自动保存可防止您丢失超过有限数量的工作。默认情况下，每 300 次击键或大约 30 秒的空闲时间后会自动保存一次。有关用户自动保存的信息，请参阅 GNU Emacs 手册中的自动保存：防止灾难。这里我们描述用于实现自动保存的函数和控制它们的变量。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: buffer-auto-save-file-name ¶
+</pre></div>
+<p>此缓冲区局部变量是用于自动保存当前缓冲区的文件的名称。如果缓冲区不应自动保存，则为 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">buffer-auto-save-file-name
+     ⇒ "/xcssun/users/rms/lewis/#backups.texi#"
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Command: auto-save-mode arg ¶
+</pre></div>
+<p>这是自动保存模式的模式命令，一种缓冲区本地次要模式。启用自动保存模式时，会在缓冲区中启用自动保存。调用约定与其他次要模式命令相同（请参阅编写次要模式的约定）。
+</p>
+<p>与大多数次要模式不同，没有自动保存模式变量。如果 buffer-auto-save-file-name 为非 nil 且 buffer-saved-size（见下文）非零，则启用自动保存模式。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: auto-save-file-name-transforms ¶
+</pre></div>
+<p>此变量列出在生成自动保存文件名之前要应用于缓冲区文件名的转换。
+</p>
+<p>每个转换都是一个表单列表（正则表达式替换 [uniquify]）。regexp 是匹配文件名的正则表达式；  如果匹配，则使用replace-match 将匹配的部分替换为replacement。如果可选元素 uniquify 不为 nil，则自动保存文件名是通过将转换后的文件名的目录部分与缓冲区的文件名连接起来构建的，其中所有目录分隔符都更改为 <code>！</code>   以防止冲突。（如果您的文件系统截断生成的名称，这将无法正常工作。）
+</p>
+<p>如果 uniquify 是 secure-hash-algorithms 的成员之一，Emacs 会通过将该安全哈希应用于缓冲区文件名来构造自动保存文件名的非目录部分。这避免了文件名过长的任何风险。
+</p>
+<p>列表中的所有转换都按照列出的顺序进行尝试。当一个变换应用时，它的结果是最终的；  没有尝试进一步的转换。
+</p>
+<p>默认值设置为将远程文件的自动保存文件放入临时目录（请参阅生成唯一文件名）。
+</p>
+<p>在没有长名称的 MS-DOS 文件系统上，这个变量总是被忽略。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: auto-save-file-name-p filename ¶
+</pre></div>
+<p>如果 filename 是一个可能是自动保存文件名称的字符串，则此函数返回一个非 nil 值。它假定自动保存文件的通常命名约定：以井号 (’#’) 开头和结尾的名称是可能的自动保存文件名。参数文件名不应包含目录部分。
+</p><div class="lisp">
+<pre class="lisp">
+
+(make-auto-save-file-name)
+     ⇒ "/xcssun/users/rms/lewis/#backups.texi#"
+
+(auto-save-file-name-p "#backups.texi#")
+     ⇒ 0
+
+(auto-save-file-name-p "backups.texi")
+     ⇒ nil
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: make-auto-save-file-name ¶
+</pre></div>
+<p>此函数返回用于自动保存当前缓冲区的文件名。这只是带有哈希标记 (’#’) 的文件名。此函数不查看变量 auto-save-visited-file-name（如下所述）；  此函数的调用者应首先检查该变量。
+</p>
+<div class="lisp">
+<pre class="lisp">(make-auto-save-file-name)
+     ⇒ "/xcssun/users/rms/lewis/#backups.texi#"
+</pre></div>
+<div class="lisp">
+<pre class="lisp">User Option: auto-save-visited-file-name ¶
+</pre></div>
+<p>如果这个变量不为 nil，Emacs 会在他们正在访问的文件中自动保存缓冲区。也就是说，自动保存在您正在编辑的同一文件中完成。通常，此变量为零，因此自动保存文件具有由 make-auto-save-file-name 创建的不同名称。
+</p>
+<p>当您更改此变量的值时，新值不会在现有缓冲区中生效，直到下次在其中重新启用自动保存模式。如果已启用自动保存模式，则自动保存将继续以相同的文件名进行，直到再次调用自动保存模式。
+</p>
+<p>请注意，将此变量设置为非零值不会改变自动保存与保存缓冲区不同的事实；  例如，当缓冲区被自动保存时，保存缓冲区中描述的钩子不会运行。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: recent-auto-save-p ¶
+</pre></div>
+<p>如果当前缓冲区自上次读入或保存后已自动保存，则此函数返回 t。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-buffer-auto-saved ¶
+</pre></div>
+<p>此函数将当前缓冲区标记为自动保存。在缓冲区文本再次更改之前，缓冲区不会再次自动保存。该函数返回零。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: auto-save-interval ¶
+</pre></div>
+<p>此变量的值根据输入事件的数量指定自动保存的频率。每次读取这么多额外的输入事件时，Emacs 都会自动保存所有启用的缓冲区。将此设置为零会根据键入的字符数禁用自动保存。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: auto-save-timeout ¶
+</pre></div>
+<p>此变量的值是应该导致自动保存的空闲时间秒数。每次用户暂停这么长时间，Emacs 都会自动保存所有启用该功能的缓冲区。（如果当前缓冲区很大，则指定的超时乘以一个随着大小增加而增加的因子；对于百万字节的缓冲区，该因子几乎是 4。）
+</p>
+<p>如果该值为 0 或 nil，则仅在 auto-save-interval 指定的一定数量的输入事件之后，才会由于空闲而不会执行自动保存。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: auto-save-hook ¶
+</pre></div>
+<p>每当自动保存即将发生时，都会运行此正常挂钩。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: auto-save-default ¶
+</pre></div>
+<p>如果此变量非零，则访问文件的缓冲区默认启用自动保存。否则，他们不会。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: do-auto-save &amp;optional no-message current-only ¶
+</pre></div>
+<p>此功能自动保存所有需要自动保存的缓冲区。它保存启用了自动保存并且自上次自动保存以来已更改的所有缓冲区。
+</p>
+<p>如果任何缓冲区被自动保存，do-auto-save 通常会在自动保存进行时在回显区域显示一条消息 <code>自动保存...</code> 。但是，如果 no-message 不为零，则消息被禁止。
+</p>
+<p>如果 current-only 不为零，则仅自动保存当前缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: delete-auto-save-file-if-necessary &amp;optional force ¶
+</pre></div>
+<p>如果 delete-auto-save-files 不为零，则此函数删除当前缓冲区的自动保存文件。每次保存缓冲区时都会调用它。
+</p>
+<p>除非 force 为非 nil，否则此函数仅删除自上次真正保存以来由当前 Emacs 会话写入的文件。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: delete-auto-save-files ¶
+</pre></div>
+<p>此变量由函数 delete-auto-save-file-if-necessary 使用。如果它不是 nil，Emacs 会在真正的保存完成时删除自动保存文件（在访问的文件中）。这可以节省磁盘空间并整理您的目录。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: rename-auto-save-file ¶
+</pre></div>
+<p>如果访问的文件名已更改，此函数会调整当前缓冲区的自动保存文件名。如果它是在当前 Emacs 会话中创建的，它还会重命名现有的自动保存文件。如果访问的文件名没有改变，这个函数什么也不做。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: buffer-saved-size ¶
+</pre></div>
+<p>这个缓冲区局部变量的值是当前缓冲区的长度，当它最后一次读入、保存或自动保存时。这用于检测大小的显着减小，并作为响应关闭自动保存。
+</p>
+<p>如果为 -1，则表示由于大小大幅减少，此缓冲区中的自动保存暂时关闭。显式保存缓冲区会在此变量中存储一个正值，从而重新启用自动保存。关闭或打开自动保存模式也会更新此变量，因此会忘记大小的大幅减少。
+</p>
+<p>如果是 -2，这意味着这个缓冲区应该忽略缓冲区大小的变化；  特别是，它不应该因为缓冲区大小的变化而暂时关闭自动保存。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: auto-save-list-file-name ¶
+</pre></div>
+<p>此变量（如果非零）指定一个文件，用于记录所有自动保存文件的名称。每次 Emacs 执行自动保存时，它都会为每个启用了自动保存的缓冲区将两行写入此文件。第一行给出访问文件的名称（如果缓冲区没有，则为空），第二行给出自动保存文件的名称。
+</p>
+<p>当 Emacs 正常退出时，它会删除这个文件；  如果 Emacs 崩溃，您可以在文件中查找所有可能包含丢失工作的自动保存文件。恢复会话命令使用此文件来查找它们。
+</p>
+<p>此文件的默认名称指定您的主目录并以 <code>.saves-</code> 开头。它还包含 Emacs 进程 ID 和主机名。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: auto-save-list-file-prefix ¶
+</pre></div>
+<p>在 Emacs 读取您的 init 文件后，它会根据此前缀初始化 auto-save-list-file-name（如果您尚未将其设置为非 nil），并添加主机名和进程 ID。如果你在你的 init 文件中将它设置为 nil，那么 Emacs 不会初始化 auto-save-list-file-name。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="27.3_还原.html">还原</a>, Previous: <a href="27.1.4_命名备份文件.html">命名备份文件</a>, Up: <a href="27_备份和自动保存.html">备份和自动保存.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

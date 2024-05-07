@@ -1,0 +1,90 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>29.3 选择窗口</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">29.3 选择窗口</h2>
+<div class="nav-panel"><p>Next: <a href="29.4_窗口大小.html">窗口大小</a>, Previous: <a href="29.2_窗口和帧.html">窗口和帧</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在每一帧中，在任何时候，都恰好有一个 Emacs 窗口被指定为在该帧中被选中。对于选定的帧，该窗口称为选定窗口 — 进行大部分编辑的窗口，其中显示选定窗口的光标（请参阅光标参数）。插入或删除文本的键盘输入通常也指向此窗口。所选窗口的缓冲区通常也是当前缓冲区，除非使用了 set-buffer（请参阅当前缓冲区）。对于未选择的 <code>帧</code> ( <code>frame</code> )，如果曾经选择过该 <code>帧</code> ( <code>frame</code> )，则在该 <code>帧</code> ( <code>frame</code> )内选择的窗口将成为选定的窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: selected-window ¶
+</pre></div>
+<p>此函数返回选定的窗口（始终是活动窗口）。
+</p>
+<p>以下函数显式选择一个窗口及其 <code>帧</code> ( <code>frame</code> )。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: select-window window &amp;optional norecord ¶
+</pre></div>
+<p>此函数使 window 成为选定窗口和在其 <code>帧</code> ( <code>frame</code> )内选定的窗口，并选择该 <code>帧</code> ( <code>frame</code> )。它还使窗口的缓冲区（参见缓冲区和窗口）成为当前缓冲区，并将该缓冲区的点值设置为窗口中窗口点的值（参见窗口和点）。窗口必须是活动窗口。返回值为窗口。
+</p>
+<p>默认情况下，此函数还将窗口的缓冲区移动到缓冲区列表的前面（请参阅缓冲区列表）并使窗口成为最近选择的窗口。如果可选参数 norecord 不为零，则省略这些附加操作。
+</p>
+<p>此外，该函数默认情况下还告诉显示引擎在下次重新显示窗口的 <code>帧</code> ( <code>frame</code> )时更新窗口的显示。如果 norecord 不为零，则通常不执行此类更新。但是，如果 norecord 等于特殊符号 mark-for-redisplay，则省略上述附加操作，但仍会更新窗口的显示。
+</p>
+<p>请注意，有时选择一个窗口不足以显示它，或者使其 <code>帧</code> ( <code>frame</code> )成为显示的最顶层 <code>帧</code> ( <code>frame</code> )：您可能还需要提升 <code>帧</code> ( <code>frame</code> )或确保输入焦点指向该 <code>帧</code> ( <code>frame</code> )。请参阅输入焦点。
+</p>
+<p>由于历史原因，Emacs 不会在选择窗口时运行单独的钩子。应用程序和内部例程通常会临时选择一个窗口来对其执行一些操作。他们这样做是为了简化编码——因为许多函数在没有指定窗口参数时默认在选定的窗口上运行——或者因为某些函数没有（并且仍然没有）将窗口作为参数并且总是在选择的窗口。每次短时间选择一个窗口时运行一个钩子，当恢复先前选择的窗口时再次运行一个钩子是没有用的。
+</p>
+<p>然而，当它的 norecord 参数为 nil 时，select-window 会更新缓冲区列表，从而间接运行正常的钩子 buffer-list-update-hook（请参阅缓冲区列表）。因此，该挂钩提供了一种在窗口被更 <code>永久</code> 选择时运行函数的方法。
+</p>
+<p>由于 buffer-list-update-hook 也由与窗口管理无关的函数运行，因此将所选窗口的值保存在某处并在运行该钩子时将其与 selected-window 的值进行比较通常是有意义的。此外，为避免在使用 buffer-list-update-hook 时出现误报，最好的做法是每个应该选择窗口的 select-window 调用仅临时传递一个非 nil norecord 参数。如果可能，在这种情况下应使用带有选定窗口的宏（见下文）。
+</p>
+<p>每当重新显示例程检测到自上次重新显示以来已选择另一个窗口时，Emacs 也会运行挂钩窗口选择更改函数。有关详细说明，请参阅 Hooks for Window Scrolling and Changes。window-state-change-functions （在同一部分中描述）是另一个在选择了不同的窗口后运行的异常钩子，但也被其他窗口更改触发。
+</p>
+<p>使用非 nil norecord 参数调用 select-window 的顺序根据它们的选择或使用时间确定窗口的顺序，见下文。例如，函数 get-lru-window 可用于检索最近最少选择的窗口（请参阅 Windows 的循环排序）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: frame-selected-window &amp;optional frame ¶
+</pre></div>
+<p>此函数返回在该 <code>帧</code> ( <code>frame</code> )内选择的 <code>帧</code> ( <code>frame</code> )上的窗口。帧应该是实时帧；  如果省略或为零，则默认为选定的帧。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-frame-selected-window frame window &amp;optional norecord ¶
+</pre></div>
+<p>该函数使窗口成为在 <code>帧</code> ( <code>frame</code> ) <code>帧</code> ( <code>frame</code> )内选择的窗口。帧应该是实时帧；  如果为零，则默认为选定的帧。窗口应该是一个活动窗口；  如果为零，则默认为选定的窗口。
+</p>
+<p>如果 frame 是选定的 <code>帧</code> ( <code>frame</code> )，这会使 window 成为选定的窗口。
+</p>
+<p>如果可选参数 norecord 不为 nil，则此函数不会更改最近选择的窗口的顺序，也不会更改缓冲区列表。
+</p>
+<p>以下宏可用于临时选择一个窗口，而不影响最近选择的窗口或缓冲区列表的顺序。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: save-selected-window forms… ¶
+</pre></div>
+<p>该宏记录选中的帧，以及每一帧的选中窗口，依次执行窗体，然后恢复之前选中的帧和窗口。它还保存和恢复当前缓冲区。它返回表单中最后一个表单的值。
+</p>
+<p>该宏不保存或恢复任何有关窗口大小、排列或内容的信息；  因此，如果表格改变了它们，那么改变仍然存在。如果某个 <code>帧</code> ( <code>frame</code> )的先前选择的窗口在退出表单时不再存在，则该 <code>帧</code> ( <code>frame</code> )的选定窗口将保持不变。如果先前选择的窗口不再有效，则在表单末尾选择的任何窗口都将保持选中状态。当且仅当退出表单时当前缓冲区仍然存在时，才会恢复当前缓冲区。
+</p>
+<p>这个宏既不会改变最近选择的窗口的顺序，也不会改变缓冲区列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: with-selected-window window forms… ¶
+</pre></div>
+<p>该宏选择窗口，依次执行表单，然后恢复先前选择的窗口和当前缓冲区。最近选择的窗口和缓冲区列表的顺序保持不变，除非您在表单中故意更改它们；  例如，通过使用参数 norecord nil 调用 select-window。因此，此宏是临时使用窗口作为选定窗口而不不必要地运行缓冲区列表更新挂钩的首选方法。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: with-selected-frame frame forms… ¶
+</pre></div>
+<p>此宏执行以 <code>帧</code> ( <code>frame</code> )为选定 <code>帧</code> ( <code>frame</code> )的表单。返回的值是表单中最后一个表单的值。此宏保存和恢复选定的帧，并且既不改变最近选择的窗口也不改变缓冲区列表中的缓冲区的顺序。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-use-time &amp;optional window ¶
+</pre></div>
+<p>该函数返回窗口窗口的使用时间。window 必须是活动窗口，并且默认为选定的窗口。
+</p>
+<p>窗口的使用时间并不是真正的时间值，而是一个整数，它会随着每次调用带有 nil norecord 参数的 select-window 单调增加。使用时间最短的窗口通常称为最近最少使用的窗口，而使用时间最长的窗口称为最近使用的窗口（参见窗口的循环排序）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-bump-use-time &amp;optional window ¶
+</pre></div>
+<p>此功能将窗口标记为最近使用的窗口。这在编写某些弹出到缓冲区场景时很有用（请参阅在窗口中切换到缓冲区）。window 必须是活动窗口，并且默认为选定的窗口。
+</p>
+<p>有时，几个窗口共同协作显示缓冲区，例如，在跟随模式的管理下（参见 (emacs)跟随模式），其中窗口一起显示的缓冲区比一个窗口单独显示的缓冲区更大。将这样的窗口组视为单个实体通常很有用。诸如 window-group-start 之类的几个函数（请参阅窗口开始和结束位置）允许您通过提供一个作为参数的窗口作为整个组的替身来做到这一点。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: selected-window-group ¶
+</pre></div>
+<p>当所选窗口是一组窗口的成员时，此功能将返回该组中的窗口列表，以使列表中的第一个窗口显示了缓冲区的最早部分，依此类推。否则，该函数将返回一个仅包含所选窗口的列表。
+</p>
+<p>当缓冲区局部变量 selected-window-group-function 设置为函数时，所选窗口被视为组的一部分。在这种情况下， selected-window-group 不带参数调用它并返回其结果（应该是组中的窗口列表）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="29.4_窗口大小.html">窗口大小</a>, Previous: <a href="29.2_窗口和帧.html">窗口和帧</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>15.2 定义自定义组</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">15.2 定义自定义组</h2>
+<div class="nav-panel"><p>Next: <a href="15.3_定义自定义变量.html">定义自定义变量</a>, Previous: <a href="15.1_常用项关键字.html">常用项关键字</a>, Up: <a href="15_自定义设置.html">自定义设置.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>每个 Emacs Lisp 包都应该有一个主要的自定义组，其中包含包中的所有选项、面孔和其他组。如果包装中的选项和面孔数量较少，请仅使用一组并将所有内容都放入其中。当有二十多个左右的选项和面孔时，您应该将它们构造成子组，并将子组放在软件包的主要自定义组下。可以将一些选项和面孔放在包的主要组中与子组一起。
+</p>
+<p>包的主要或唯一组应该是一个或多个标准定制组的成员。（要显示它们的完整列表，请使用 Mx customize。）选择其中一个或多个（但不要太多），然后使用 :group 关键字将您的组添加到每个组中。
+</p>
+<p>声明新自定义组的方法是使用 defgroup。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: defgroup group members doc [keyword value]… ¶
+</pre></div>
+<p>将组声明为包含成员的自定义组。不要引用符号组。参数 doc 指定组的文档字符串。
+</p>
+<p>参数 members 是一个列表，指定一组初始定制项作为组的成员。但是，大多数情况下 members 是 nil，并且您在定义这些成员时使用 :group 关键字指定组的成员。
+</p>
+<p>如果要通过成员指定组成员，则每个元素都应具有表单（名称小部件）。这里 name 是一个符号，widget 是用于编辑该符号的小部件类型。有用的小部件是用于变量的自定义变量、用于面部的自定义面部和用于组的自定义组。
+</p>
+<p>当你在 Emacs 中引入一个新组时，在 defgroup 中使用 :version 关键字；  那么您不需要将它用于组的各个成员。
+</p>
+<p>除了常见的关键字（见 Common Item Keywords），你还可以在 defgroup 中使用这个关键字：
+</p>
+<div class="lisp">
+<pre class="lisp">:prefix prefix ¶
+</pre></div>
+<p>如果组中的项目名称以前缀开头，并且可自定义变量 custom-unlispify-remove-prefixes 不为零，则项目的标签将省略前缀。一个组可以有任意数量的前缀。
+</p>
+<p>组的变量和子组存储在组符号的自定义组属性中。请参阅访问符号属性。该属性的值是一个对的列表，其中 car 是变量或子组符号，而 cdr 是自定义变量或自定义组。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: custom-unlispify-remove-prefixes ¶
+</pre></div>
+<p>如果此变量不为 nil，则无论何时用户自定义组，组的 :prefix 关键字指定的前缀都会从标记名称中省略。
+</p>
+<p>默认值为 nil，即禁用前缀丢弃功能。这是因为丢弃前缀通常会导致选项和面孔的名称混淆。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="15.3_定义自定义变量.html">定义自定义变量</a>, Previous: <a href="15.1_常用项关键字.html">常用项关键字</a>, Up: <a href="15_自定义设置.html">自定义设置.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

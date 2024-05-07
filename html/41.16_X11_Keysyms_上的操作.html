@@ -1,0 +1,40 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>41.16 X11 Keysyms 上的操作</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">41.16 X11 Keysyms 上的操作</h2>
+<div class="nav-panel"><p>Next: <a href="41.17_批处理模式.html">批处理模式</a>, Previous: <a href="41.15_声音输出.html">声音输出</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>要定义系统特定的 X11 键符，请设置变量 system-key-alist。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: system-key-alist ¶
+</pre></div>
+<p>这个变量的值应该是一个列表，每个系统特定的键符都有一个元素。每个元素都有格式 (code.symbol)，其中 code 是数字键符代码（不包括特定于供应商的位，-2**28），symbol 是功能键的名称。
+</p>
+<p>例如 (168 . mute-acute) 定义一个系统特定的键（由 HP X 服务器使用），其数字代码为 -2**28 + 168。
+</p>
+<p>从 alist 中排除其他 X 服务器的键符并不重要；  只要它们不与实际使用的 X 服务器所使用的相冲突，它们就没有害处。
+</p>
+<p>该变量始终是当前终端的本地变量，并且不能是缓冲区本地的。请参阅多个终端。
+</p>
+<p>您可以通过设置这些变量来指定 Emacs 应该为 Control、Meta、Alt、Hyper 和 Super 修饰符使用哪些键符：
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: x-ctrl-keysym ¶
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Variable: x-alt-keysym ¶
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Variable: x-meta-keysym ¶
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Variable: x-hyper-keysym ¶
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Variable: x-super-keysym ¶
+</pre></div>
+<p>应代表 Control 修饰符的键符名称（分别代表 Alt、Meta、Hyper 和 Super）。例如，这里是如何在 Emacs 中交换 Meta 和 Alt 修饰符：
+</p>
+<div class="lisp">
+<pre class="lisp">(setq x-alt-keysym 'meta)
+(setq x-meta-keysym 'alt)
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="41.17_批处理模式.html">批处理模式</a>, Previous: <a href="41.15_声音输出.html">声音输出</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

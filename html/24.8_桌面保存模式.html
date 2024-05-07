@@ -1,0 +1,32 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.8 桌面保存模式</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">24.8 桌面保存模式</h2>
+<div class="nav-panel"><p>Next: <a href="25_文档.html">文档</a>, Previous: <a href="24.7.1_简单的缩进引擎.html">简单的缩进引擎</a>, Up: <a href="24_主要和次要模式.html">主要和次要模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>桌面保存模式是一种将 Emacs 的状态从一个会话保存到另一个会话的功能。GNU Emacs 手册中描述了使用桌面保存模式的用户级命令（请参阅 GNU Emacs 手册中的保存 Emacs 会话）。缓冲区访问文件的模式无需执行任何操作即可使用此功能。
+</p>
+<p>对于不访问文件以保存其状态的缓冲区，主要模式必须将缓冲区局部变量 desktop-save-buffer 绑定到非零值。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: desktop-save-buffer ¶
+</pre></div>
+<p>如果此缓冲区局部变量不为零，则缓冲区将在桌面保存时将其状态保存在桌面文件中。如果该值是一个函数，则在桌面保存时使用参数 desktop-dirname 调用它，并且它的值与调用它的缓冲区的状态一起保存在桌面文件中。当文件名作为辅助信息的一部分返回时，它们应该使用调用格式化
+</p>
+<div class="lisp">
+<pre class="lisp">(desktop-file-name file-name desktop-dirname)
+</pre></div>
+<p>对于不访问要恢复的文件的缓冲区，主要模式必须定义一个函数来完成这项工作，并且该函数必须列在 alist desktop-buffer-mode-handlers 中。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: desktop-buffer-mode-handlers ¶
+</pre></div>
+<p>Alist 与元素
+</p><div class="lisp">
+<pre class="lisp">(major-mode . restore-buffer-function)
+</pre></div>
+<p>将使用参数列表调用函数 restore-buffer-function
+</p>
+<div class="lisp">
+<pre class="lisp">(buffer-file-name buffer-name desktop-buffer-misc)
+</pre></div>
+<p>它应该返回恢复的缓冲区。此处 desktop-buffer-misc 是可选绑定到 desktop-save-buffer 的函数返回的值。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="25_文档.html">文档</a>, Previous: <a href="24.7.1_简单的缩进引擎.html">简单的缩进引擎</a>, Up: <a href="24_主要和次要模式.html">主要和次要模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

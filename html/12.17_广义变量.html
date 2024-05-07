@@ -1,0 +1,6 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>12.17 广义变量</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">12.17 广义变量</h2>
+<div class="nav-panel"><p>Next: <a href="12.17.1_setf_宏.html">setf_宏</a>, Previous: <a href="12.16_有限制值的变量.html">有限制值的变量</a>, Up: <a href="12_变量.html">变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>广义变量或位置形式是 Lisp 内存中可以使用 setf 宏存储值的众多位置之一（请参阅 setf 宏）。最简单的位置形式是一个常规的 Lisp 变量。但是列表的 CAR 和 CDR、数组的元素、符号的属性以及许多其他位置也是存储 Lisp 值的地方。
+</p>
+<p>广义变量类似于 C 语言中的左值，其中 ’x = a[i]’ 从数组中获取一个元素，而 ’a[i] = x’ 使用相同的符号存储一个元素。正如像 a[i] 这样的某些形式在 C 中可以是左值，在 Lisp 中也有一组形式可以是泛化变量。
+</p>
+<div class="nav-panel"><p>Next: <a href="12.17.1_setf_宏.html">setf_宏</a>, Previous: <a href="12.16_有限制值的变量.html">有限制值的变量</a>, Up: <a href="12_变量.html">变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

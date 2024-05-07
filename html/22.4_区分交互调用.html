@@ -1,0 +1,54 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.4 区分交互调用</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">22.4 区分交互调用</h2>
+<div class="nav-panel"><p>Next: <a href="22.5_来自命令循环的信息.html">来自命令循环的信息</a>, Previous: <a href="22.3_交互调用.html">交互调用</a>, Up: <a href="22_命令循环.html">命令循环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>有时，命令应仅针对交互式呼叫显示额外的视觉反馈（例如回显区域中的信息性消息）。有三种方法可以做到这一点。测试是否使用 call-interactively 调用函数的推荐方法是给它一个可选参数 print-message 并使用交互式规范使其在交互式调用中非 nil。这是一个例子：
+</p><div class="lisp">
+<pre class="lisp">(defun foo (&amp;optional print-message)
+  (interactive "p")
+  (when print-message
+    (message "foo")))
+</pre></div>
+<p>我们使用 <code>p</code> 是因为数字前缀参数从不为零。以这种方式定义的函数在从键盘宏调用时会显示消息。
+</p>
+<p>带有附加参数的上述方法通常是最好的，因为它允许调用者说 <code>将此调用视为交互式</code> 。但是您也可以通过测试称为交互式-p 来完成这项工作。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: called-interactively-p kind ¶
+</pre></div>
+<p>当使用 call-interactively 调用调用函数时，此函数返回 t。
+</p>
+<p>参数种类应该是符号 interactive 或符号 any。如果它是交互式的，那么只有当调用是由用户直接进行时，called-interactively-p 才返回 t——例如，如果用户键入了绑定到调用函数的键序列，但如果用户运行了调用的键盘宏则不会返回函数（请参阅键盘宏）。如果 kind 是 any，called-interactively-p 为任何类型的交互式调用返回 t，包括键盘宏。
+</p>
+<p>如有疑问，请使用任何；  唯一已知的正确使用交互是如果您需要决定是否在函数运行时显示有用的消息。
+</p>
+<p>如果函数是通过 Lisp 求值（或使用 apply 或 funcall）调用的，则永远不会认为它是交互式调用的。
+</p>
+<p>下面是一个使用 called-interactively-p 的例子：
+</p><div class="lisp">
+<pre class="lisp">
+
+(defun foo ()
+  (interactive)
+  (when (called-interactively-p 'any)
+    (message "Interactive!")
+    'foo-called-interactively))
+
+
+;; Type M-x foo.
+     -| Interactive!
+
+
+(foo)
+     ⇒ nil
+</pre></div>
+<p>这是另一个对比被调用交互 p 的直接和间接调用的示例。
+</p><div class="lisp">
+<pre class="lisp">(defun bar ()
+  (interactive)
+  (message "%s" (list (foo) (called-interactively-p 'any))))
+
+
+;; Type M-x bar.
+     -| (nil t)
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.5_来自命令循环的信息.html">来自命令循环的信息</a>, Previous: <a href="22.3_交互调用.html">交互调用</a>, Up: <a href="22_命令循环.html">命令循环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

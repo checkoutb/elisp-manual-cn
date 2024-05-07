@@ -1,0 +1,130 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.3.3 定义次要模式</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">24.3.3 定义次要模式</h3>
+<div class="nav-panel"><p>Next: <a href="24.4_模式线格式.html">模式线格式</a>, Previous: <a href="24.3.2_键盘映射和次要模式.html">键盘映射和次要模式</a>, Up: <a href="24.3_次要模式.html">次要模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>宏 define-minor-mode 提供了一种在一个自包含定义中实现模式的便捷方式。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: define-minor-mode mode doc keyword-args… body… ¶
+</pre></div>
+<p>这个宏定义了一个新的次要模式，它的名字是模式（一个符号）。它定义了一个名为 mode 的命令来切换次要模式，其中 doc 作为其文档字符串。
+</p>
+<p>toggle 命令采用一个可选（前缀）参数。如果在没有参数的情况下以交互方式调用，它会打开或关闭模式。正前缀参数启用该模式，任何其他前缀参数禁用它。在 Lisp 中，toggle 的参数切换模式，而省略或 nil 参数启用模式。例如，这使得在主要模式挂钩中启用次要模式变得容易。如果 doc 为 nil，则宏提供解释上述内容的默认文档字符串。
+</p>
+<p>默认情况下，它还定义了一个名为 mode 的变量，通过启用或禁用该模式将其设置为 t 或 nil。
+</p>
+<p>关键字参数由关键字和相应的值组成。一些关键字具有特殊含义：
+</p>
+<div class="lisp">
+<pre class="lisp">:global global
+</pre></div>
+<p>如果非零，这指定次要模式应该是全局的而不是缓冲区本地的。它默认为零。
+</p>
+<p>使次要模式全局化的效果之一是模式变量成为自定义变量。通过自定义界面切换它可以打开和关闭模式，并且可以保存它的值以供将来的 Emacs 会话使用（请参阅 GNU Emacs 手册中的保存自定义。要使保存的变量起作用，您应该确保次要模式功能可用每次 Emacs 启动时；通常这是通过将 define-minor-mode 表单标记为自动加载来完成的。
+</p><div class="lisp">
+<pre class="lisp">:init-value init-value
+</pre></div>
+<p>这是模式变量初始化的值。除非在不寻常的情况下（见下文），此值必须为零。
+</p><div class="lisp">
+<pre class="lisp">:lighter lighter
+</pre></div>
+<p>字符串打火机表示启用模式时在模式行中显示的内容；  如果为 nil，则模式不显示在模式行中。
+</p><div class="lisp">
+<pre class="lisp">:keymap keymap
+</pre></div>
+<p>可选参数 keymap 指定次要模式的键盘映射。如果非零，它应该是一个变量名（它的值是一个keymap），一个keymap，或者一个形式的alist
+</p>
+<div class="lisp">
+<pre class="lisp">(key-sequence . definition)
+</pre></div>
+<p>其中每个键序列和定义都是适合传递给定义键的参数（请参阅更改键绑定）。如果 keymap 是 keymap 或 alist，这也定义了变量 mode-map。
+</p><div class="lisp">
+<pre class="lisp">:variable place
+</pre></div>
+<p>这替换了默认变量模式，用于存储模式的状态。如果您指定它，则未定义模式变量，并且未使用任何初始值参数。place 可以是不同的命名变量（您必须自己定义），也可以是任何可以与 setf 函数一起使用的变量（请参阅通用变量）。place 也可以是一个 cons (get . set)，其中 get 是一个返回当前状态的表达式，set 是一个应分配给 place 的参数（一个状态）的函数。
+</p><div class="lisp">
+<pre class="lisp">:after-hook after-hook
+</pre></div>
+<p>这定义了一个单一的 Lisp 表单，它在模式挂钩运行后进行评估。它不应该被引用。
+</p><div class="lisp">
+<pre class="lisp">:interactive value
+</pre></div>
+<p>默认情况下，次要模式是交互式命令。如果值为 nil，则禁止此操作。如果 value 是符号列表，则用于说明该次要模式在哪些主要模式中有用。
+</p>
+<p>任何其他关键字参数都直接传递给为变量模式生成的 defcustom。
+</p>
+<p>名为 mode 的命令首先执行标准操作，例如设置名为 mode 的变量，然后执行主体表单（如果有）。然后它运行模式挂钩变量 mode-hook 并通过评估 :after-hook 中的任何形式来完成。（请注意，所有这些，包括运行钩子，都是在启用和禁用模式时完成的。）
+</p>
+<p>初始值必须为 nil，除非 (1) 模式在 Emacs 中预加载，或者 (2) 即使用户没有请求，加载也能轻松启用模式。例如，如果除非启用其他功能，否则该模式无效，并且将始终在那时加载，则默认启用它是无害的。但这些都是不寻常的情况。通常，初始值必须为零。
+</p>
+<p>名称 easy-mmode-define-minor-mode 是此宏的别名。
+</p>
+<p>以下是使用 define-minor-mode 的示例：
+</p>
+<div class="lisp">
+<pre class="lisp">(define-minor-mode hungry-mode
+  "Toggle Hungry mode.
+Interactively with no argument, this command toggles the mode.
+A positive prefix argument enables the mode, any other prefix
+argument disables it.  From Lisp, argument omitted or nil enables
+the mode, `toggle' toggles the state.
+
+When Hungry mode is enabled, the control delete key
+gobbles all preceding whitespace except the last.
+See the command \\[hungry-electric-delete]."
+ ;; The initial value.
+ nil
+ ;; The indicator for the mode line.
+ " Hungry"
+ ;; The minor mode bindings.
+ '(([C-backspace] . hungry-electric-delete)))
+</pre></div>
+<p>这定义了一个名为 <code>饥饿模式</code> 的次要模式，一个名为饥饿模式的命令来切换它，一个名为饥饿模式的变量指示该模式是否启用，以及一个名为饥饿模式地图的变量，它保存的是键盘映射启用该模式时激活。它使用 C-DEL 的键绑定初始化键映射。没有身体形式——许多次要模式不需要任何形式。
+</p>
+<p>这是一种等效的编写方式：
+</p><div class="lisp">
+<pre class="lisp">(define-minor-mode hungry-mode
+  "Toggle Hungry mode.
+...rest of documentation as before..."
+ ;; The initial value.
+ :init-value nil
+ ;; The indicator for the mode line.
+ :lighter " Hungry"
+ ;; The minor mode bindings.
+ :keymap
+ '(([C-backspace] . hungry-electric-delete)
+   ([C-M-backspace]
+    . (lambda ()
+        (interactive)
+        (hungry-electric-delete t)))))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Macro: define-globalized-minor-mode global-mode mode turn-on keyword-args… body… ¶
+</pre></div>
+<p>这定义了一个名为 global-mode 的全局切换，其含义是在所有（或一些；见下文）缓冲区中启用或禁用缓冲区本地次要模式模式。它还执行身体形式。要打开缓冲区中的次要模式，它使用函数打开；  要关闭次要模式，它会以 -1 作为参数调用模式。
+</p>
+<p>全局启用该模式还会影响随后通过访问文件创建的缓冲区，以及使用除基本模式以外的主要模式的缓冲区；  但在基本模式下它不会检测到新缓冲区的创建。
+</p>
+<p>这定义了自定义选项 global-mode（请参阅自定义设置），可以在自定义界面中切换以打开和关闭次要模式。与 define-minor-mode 一样，您应该确保每次 Emacs 启动时都会评估 define-globalized-minor-mode 表单，例如通过提供 :require 关键字。
+</p>
+<p>在关键字参数中使用 :group group 为全局次要模式的模式变量指定自定义组。
+</p>
+<p>默认情况下，表示模式是打开还是关闭的缓冲区局部次要模式变量与模式本身的名称相同。如果不是这种情况，请使用 :variable 变量——一些次要模式使用不同的变量来存储此状态信息。
+</p>
+<p>一般来说，当你定义一个全球化的次要模式时，你还应该定义一个非全球化的版本，以便人们可以在单独的缓冲区中使用（或禁用）它。这也允许他们通过使用该模式的钩子在特定的主要模式中禁用全局启用的次要模式。
+</p>
+<p>如果给定一个 :predicate 关键字，将创建一个与全局模式变量调用相同的用户选项，但最后会创建 -modes 而不是 -mode。该变量用作谓词，指定应在哪些主要模式中激活次要模式。有效值包括 t（在所有主要模式中使用，nil（在非主要模式中使用）或模式名称列表（或（不mode-name …)) 元素（以及 t 和 nil）。
+</p><div class="lisp">
+<pre class="lisp">(c-mode (not mail-mode message-mode) text-mode)
+</pre></div>
+<p>这意味着 <code>在从 c-mode 派生的模式中使用，而不是在从 message-mode 或 mail-mode 派生的模式中使用，但在从 text-mode 派生的模式中使用，否则没有其他模式</code> 。
+</p><div class="lisp">
+<pre class="lisp">((not c-mode) t)
+</pre></div>
+<p>这意味着 <code>不要使用从 c-mode 派生的模式，而是在其他任何地方使用</code> 。
+</p>
+<div class="lisp">
+<pre class="lisp">(text-mode)
+</pre></div>
+<p>这意味着 <code>在从文本模式派生的模式中使用，但在其他地方没有</code> 。（最后有一个隐含的 nil 元素。）
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="24.4_模式线格式.html">模式线格式</a>, Previous: <a href="24.3.2_键盘映射和次要模式.html">键盘映射和次要模式</a>, Up: <a href="24.3_次要模式.html">次要模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

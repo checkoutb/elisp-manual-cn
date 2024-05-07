@@ -1,0 +1,68 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>12.5 定义全局变量</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">12.5 定义全局变量</h2>
+<div class="nav-panel"><p>Next: <a href="12.6_稳健定义变量的技巧.html">稳健定义变量的技巧</a>, Previous: <a href="12.4_当变量为空时.html">当变量为空时</a>, Up: <a href="12_变量.html">变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>变量定义是一种结构，它表明您打算将符号用作全局变量。它使用下面记录的特殊形式 defvar 或 defconst。
+</p>
+<p>变量定义有三个目的。首先，它通知阅读代码的人该符号旨在以某种方式（作为变量）使用。其次，它通知 Lisp 系统这一点，可选地提供一个初始值和一个文档字符串。第三，它为 etags 等编程工具提供信息，使它们能够找到变量的定义位置。
+</p>
+<p>defconst 和 defvar 之间的区别主要是意图问题，用于告知人类读者该值是否应该改变。Emacs Lisp 实际上并不会阻止您更改使用 defconst 定义的变量的值。这两种形式之间的一个显着区别是 defconst 无条件地初始化变量，而 defvar 仅在它最初为 void 时才对其进行初始化。
+</p>
+<p>要定义可自定义的变量，您应该使用 defcustom（将 defvar 作为子例程调用）。请参阅定义自定义变量。
+</p>
+<div class="lisp">
+<pre class="lisp">Special Form: defvar symbol [value [doc-string]] ¶
+</pre></div>
+<p>这种特殊形式将符号定义为变量。请注意，不评估符号；  要定义的符号应该以 defvar 形式显式出现。该变量被标记为特殊，这意味着它应该始终是动态绑定的（请参阅变量绑定的范围规则）。
+</p>
+<p>如果指定了 value，并且 symbol 为 void（即，它没有动态绑定的值；请参阅当变量为 Void 时），则计算 value 并将 symbol 设置为结果。但如果 symbol 不是 void，则不会评估 value，并且 symbol 的值保持不变。如果省略 value，则符号的值在任何情况下都不会改变。
+</p>
+<p>请注意，指定一个值，即使是 nil，也会将变量永久标记为特殊。而如果 value 被省略，则该变量仅在本地标记为特殊（即在当前词法范围内，或者如果在顶层，则为文件）。这对于抑制字节编译警告很有用，请参阅编译器错误。
+</p>
+<p>如果 symbol 在当前缓冲区中具有缓冲区本地绑定，则 defvar 作用于与缓冲区无关的默认值，而不是缓冲区本地绑定。如果默认值为 void，它会设置默认值。请参阅缓冲区局部变量。
+</p>
+<p>如果 symbol 已经被词法绑定（例如，如果 defvar 形式出现在启用词法绑定的 let 形式中），则 defvar 设置动态值。词法绑定在其绑定构造退出之前一直有效。请参阅变量绑定的范围规则。
+</p>
+<p>当您在 Emacs Lisp 模式下使用 CMx (eval-defun) 或 Cx Ce (eval-last-sexp) 评估顶级 defvar 表单时，这两个命令的一个特殊功能安排无条件设置变量，而不测试其是否价值是无效的。
+</p>
+<p>如果提供了 doc-string 参数，它指定变量的文档字符串（存储在符号的 variable-documentation 属性中）。请参阅文档。
+</p>
+<p>这里有些例子。这种形式定义了 foo 但没有初始化它：
+</p>
+<div class="lisp">
+<pre class="lisp">(defvar foo)
+     ⇒ foo
+</pre></div>
+<p>这个例子将 bar 的值初始化为 23，并给它一个文档字符串：
+</p>
+<div class="lisp">
+<pre class="lisp">(defvar bar 23
+  "The normal weight of a bar.")
+     ⇒ bar
+</pre></div>
+<p>defvar 形式返回符号，但通常在文件的顶层使用它的值无关紧要。
+</p>
+<p>有关在没有值的情况下使用 defvar 的更详细示例，请参阅本地 defvar 示例。 
+</p>
+<div class="lisp">
+<pre class="lisp">Special Form: defconst symbol value [doc-string]
+</pre></div>
+<p>这种特殊形式将符号定义为一个值并对其进行初始化。它通知阅读您的代码的人符号具有标准全局值，在此处建立，用户或其他程序不应更改该值。请注意，不评估符号；  要定义的符号必须显式出现在 defconst 中。
+</p>
+<p>defconst 形式与 defvar 一样，将变量标记为特殊，这意味着它应该始终是动态绑定的（请参阅变量绑定的范围规则）。此外，它会将变量标记为有风险的（请参阅文件局部变量）。
+</p>
+<p>defconst 总是计算 value，并将 symbol 的值设置为结果。如果 symbol 在当前缓冲区中确实具有缓冲区本地绑定，则 defconst 设置默认值，而不是缓冲区本地值。（但您不应该为使用 defconst 定义的符号进行缓冲区本地绑定。）
+</p>
+<p>使用 defconst 的一个例子是 Emacs 对 float-pi 的定义——数学常数 pi，任何人都不应该改变它（尽管印第安纳州立法机构有尝试）。然而，正如第二种形式所示，defconst 只是建议性的。
+</p><div class="lisp">
+<pre class="lisp">(defconst float-pi 3.141592653589793 "The value of Pi.")
+     ⇒ float-pi
+
+(setq float-pi 3)
+     ⇒ float-pi
+
+float-pi
+     ⇒ 3
+</pre></div>
+<p>警告：如果您使用 defconst 或 defvar 特殊形式，而变量具有局部绑定（使用 let 或函数参数），它将设置局部绑定而不是全局绑定。这不是您通常想要的。为了防止这种情况，在文件的顶层使用这些特殊形式，通常没有本地绑定生效，并确保在为变量进行本地绑定之前加载文件。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="12.6_稳健定义变量的技巧.html">稳健定义变量的技巧</a>, Previous: <a href="12.4_当变量为空时.html">当变量为空时</a>, Up: <a href="12_变量.html">变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

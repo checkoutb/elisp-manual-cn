@@ -1,0 +1,22 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>E.8 编写动态加载的模块</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">E.8 编写动态加载的模块</h2>
+<div class="nav-panel"><p>Next: <a href="0E.8.1_模块初始化代码.html">模块初始化代码</a>, Previous: <a href="0E.7_编写Emacs原语.html">编写Emacs原语</a>, Up: <a href="附录_E_GNU_Emacs内部结构.html">E_GNU_Emacs内部结构.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍 Emacs 模块 API 以及如何将其用作为 Emacs 编写扩展模块的一部分。模块 API 是用 C 编程语言定义的，因此本节中的描述和示例假定模块是用 C 编写的。对于其他编程语言，您将需要使用适当的绑定、接口和工具来调用 C 代码。Emacs C 代码需要 C99 或更高版本的编译器（请参阅 C 方言），因此本节中的代码示例也遵循该标准。
+</p>
+<p>编写一个模块并将其集成到 Emacs 中包括以下任务：
+</p>
+<ul>
+<li>
+为模块编写初始化代码。
+</li><li>
+编写一个或多个模块函数。
+</li><li>
+在 Emacs 和您的模块函数之间传递值和对象。
+</li><li>
+处理错误条件和非本地退出。
+</li></ul>
+<p>以下小节更详细地描述了这些任务和 API 本身。
+</p>
+<p>编写模块后，根据底层平台的约定对其进行编译以生成共享库。然后将共享库放在 load-path 中提到的目录中（请参阅库搜索），Emacs 会在其中找到它。
+</p>
+<p>如果您希望验证模块与 Emacs 动态模块 API 的一致性，请使用 –module-assertions 选项调用 Emacs。请参阅 GNU Emacs 手册中的初始选项。
+</p>
+<div class="nav-panel"><p>Next: <a href="0E.8.1_模块初始化代码.html">模块初始化代码</a>, Previous: <a href="0E.7_编写Emacs原语.html">编写Emacs原语</a>, Up: <a href="附录_E_GNU_Emacs内部结构.html">E_GNU_Emacs内部结构.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

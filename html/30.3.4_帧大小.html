@@ -1,0 +1,103 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>30.3.4 帧大小</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">30.3.4 帧大小</h3>
+<div class="nav-panel"><p>Next: <a href="30.3.5_隐含的帧大小调整.html">隐含的帧大小调整</a>, Previous: <a href="30.3.3_帧位置.html">帧位置</a>, Up: <a href="30.3_帧几何.html">帧几何.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在 Emacs 中指定帧大小的规范方法是指定其文本大小——帧文本区域的宽度和高度的元组（请参阅帧布局）。它可以以像素为单位或根据帧的规范字符大小来衡量（请参阅帧字体）。
+</p>
+<p>对于带有内部菜单或工具栏的帧，在实际绘制帧之前，无法准确地知道帧的原始高度。这意味着通常您不能使用本机大小来指定帧的初始大小。一旦您知道可见帧的原始大小，您就可以通过从 frame-geometry 的返回值中添加剩余的组件来计算其外部大小（请参阅帧布局）。但是，对于不可见的帧或尚未创建的帧，只能估计外部尺寸。这也意味着不可能计算通过屏幕右边缘或下边缘的偏移量指定的帧的精确初始位置（请参阅帧位置）。
+</p>
+<p>任何帧的文本大小都可以在帧高度和宽度参数的帮助下设置和检索（请参阅大小参数）。初始帧的文本大小也可以在 X 样式几何规范的帮助下设置。请参阅 GNU Emacs 手册中的 Emacs 调用的命令行参数。下面我们列出了一些函数来访问和设置现有可见帧的大小，默认情况下是选定的。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: frame-height &amp;optional frame ¶
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: frame-width &amp;optional frame ¶
+</pre></div>
+<p>这些函数返回帧文本区域的高度和宽度，以帧的默认字体高度和宽度为单位（请参阅帧字体）。这些函数是编写 (frame-parameter frame ’height) 和 (frame-parameter frame ’width) 的简写。
+</p>
+<p>如果以像素为单位测量的帧文本区域不是其默认字体大小的倍数，则这些函数返回的值将向下舍入为完全适合文本区域的默认字体的字符数。
+</p>
+<p>接下来的函数返回给定帧的本机、外部和内部帧以及文本区域（请参阅帧布局）的像素宽度和高度。对于文本终端，结果是字符而不是像素。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: frame-outer-width &amp;optional frame ¶
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: frame-outer-height &amp;optional frame ¶
+</pre></div>
+<p>这些函数以像素为单位返回帧的外部宽度和高度。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: frame-native-height &amp;optional frame ¶
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: frame-native-width &amp;optional frame ¶
+</pre></div>
+<p>这些函数返回帧的原始宽度和高度（以像素为单位）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: frame-inner-width &amp;optional frame ¶
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: frame-inner-height &amp;optional frame ¶
+</pre></div>
+<p>这些函数以像素为单位返回帧的内部宽度和高度。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: frame-text-width &amp;optional frame ¶
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: frame-text-height &amp;optional frame ¶
+</pre></div>
+<p>这些函数以像素为单位返回帧文本区域的宽度和高度。
+</p>
+<p>在支持它的窗口系统上，Emacs 默认尝试使以像素为单位测量的帧的文本大小为帧字符大小的倍数。然而，这通常意味着当拖动其外部边框时，只能以字符大小增量来调整帧的大小。它还可能会破坏真正最大化帧或使其 <code>全高</code> 或 <code>全宽</code> （请参阅​​尺寸参数）的尝试，从而在帧下方和/或右侧留下一些空白空间。在这种情况下，以下选项可能会有所帮助。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: frame-resize-pixelwise ¶
+</pre></div>
+<p>如果此选项为 nil（默认值），则每当调整帧大小时，通常会将帧的文本像素大小四舍五入为该帧的 frame-char-height 和 frame-char-width 的当前值的倍数。如果这是非零，则不会发生舍入，因此帧大小可以增加/减少一个像素。
+</p>
+<p>设置此变量通常会导致下一次调整大小操作将相应的大小提示传递给窗口管理器。这意味着该变量只能在用户的初始文件中设置；  应用程序永远不应该临时绑定它。
+</p>
+<p>此选项的 nil 值的确切含义取决于使用的工具包。如果窗口管理器愿意处理相应的大小提示，则用鼠标拖动外部边框是按字符完成的。但是，使用未将帧大小指定为其字符大小的整数倍的参数调用 set-frame-size（见下文）可能会：被忽略，导致舍入 (GTK+)，或被接受（Lucid、Motif、微软视窗）。
+</p>
+<p>对于某些窗口管理器，您可能必须将其设置为非零，以使帧真正最大化或全屏显示。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-frame-size frame width height &amp;optional pixelwise ¶
+</pre></div>
+<p>此函数设置帧文本区域的大小，以帧上字符的规范高度和宽度来衡量（请参阅帧字体）。
+</p>
+<p>可选参数 pixelwise non-nil 表示以像素为单位测量新的宽度和高度。请注意，如果 frame-resize-pixelwise 为 nil，如果它不将帧大小增加/减小到其字符大小的倍数，某些工具包可能会拒绝真正履行请求。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-frame-height frame height &amp;optional pretend pixelwise ¶
+</pre></div>
+<p>此函数将帧的文本区域调整为高度线的高度。帧中现有窗口的大小会按比例更改以适合。
+</p>
+<p>如果假装是非零，那么 Emacs 会在帧中显示输出的高度线，但不会改变它的值以适应帧的实际高度。这仅在文本终端上有用。使用比终端实际实现的高度更小的高度可能有助于重现在较小屏幕上观察到的行为，或者如果终端在使用整个屏幕时出现故障。直接设置帧高度并不总是有效，因为可能需要知道正确的实际大小才能在文本终端上正确定位光标。
+</p>
+<p>可选的第四个参数 pixelwise non-nil 表示帧的高度应该是像素高。请注意，如果 frame-resize-pixelwise 为 nil，如果它不将帧高度增加/减少到其字符高度的倍数，某些窗口管理器可能会拒绝真正履行请求。
+</p>
+<p>当交互使用时，此命令将询问用户设置当前所选帧高度的行数。您还可以为该值提供数字前缀。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-frame-width frame width &amp;optional pretend pixelwise ¶
+</pre></div>
+<p>此函数设置帧文本区域的宽度，以字符为单位。参数假装与 set-frame-height 中的含义相同。
+</p>
+<p>可选的第四个参数 pixelwise non-nil 意味着 frame 的宽度应该是像素宽。请注意，如果 frame-resize-pixelwise 为 nil，如果某些窗口管理器没有将帧宽度增加/减少到其字符宽度的倍数，它可能会拒绝完全接受请求。
+</p>
+<p>当交互使用时，此命令将询问用户列数以设置当前选定帧的宽度。您还可以为该值提供数字前缀。
+</p>
+<p>这三个函数都不会使帧小于显示所有窗口及其滚动条、边缘、边距、分隔线、模式和标题行所需的大小。这与由窗口管理器触发的请求形成对比，例如，通过用鼠标拖动帧的外部边框。如有必要，此类请求始终会通过裁剪无法显示在帧右下角的部分来实现。参数 min-width 和 min-height（请参阅尺寸参数）可用于在 Emacs 中更改帧大小时获得类似的行为。
+</p>
+<p>异常钩子窗口大小更改函数（请参阅窗口滚动和更改钩子）跟踪帧内部大小的所有更改，包括由窗口系统或窗口管理器的请求引起的更改。要排除在仅更改帧窗口的大小而不实际更改内部帧的大小时可能发生的误报，请使用以下函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: frame-size-changed-p &amp;optional frame ¶
+</pre></div>
+<p>自上次为 frame 运行 window-size-change-functions 以来，当 frame 的内部宽度或高度发生变化时，此函数返回非 nil。它总是在为 frame 运行 window-size-change-functions 后立即返回 nil。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="30.3.5_隐含的帧大小调整.html">隐含的帧大小调整</a>, Previous: <a href="30.3.3_帧位置.html">帧位置</a>, Up: <a href="30.3_帧几何.html">帧几何.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

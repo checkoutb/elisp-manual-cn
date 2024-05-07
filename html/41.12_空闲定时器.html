@@ -1,0 +1,57 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>41.12 空闲定时器</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">41.12 空闲定时器</h2>
+<div class="nav-panel"><p>Next: <a href="41.13_终端输入.html">终端输入</a>, Previous: <a href="41.11_延迟执行的定时器.html">延迟执行的定时器</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>以下是如何设置在 Emacs 空闲一定时间长度时运行的计时器。除了如何设置它们之外，空闲计时器的工作方式与普通计时器一样。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: run-with-idle-timer secs repeat function &amp;rest args ¶
+</pre></div>
+<p>设置一个计时器，该计时器在 Emacs 下一次空闲 secs 秒时运行。secs 的值可以是数字，也可以是 current-idle-time 返回的类型的值。
+</p>
+<p>如果repeat 为nil，定时器只运行一次，第一次Emacs 保持空闲足够长的时间。更常见的重复是非零，这意味着每次 Emacs 保持空闲 secs 秒时运行计时器。
+</p>
+<p>run-with-idle-timer 函数返回一个计时器值，您可以在调用取消计时器时使用它（请参阅延迟执行的计时器）。
+</p>
+<p>Emacs 在开始等待用户输入时变为空闲状态，并且在用户提供一些输入之前它保持空闲状态。如果一个定时器设置为 5 秒空闲，它会在 Emacs 第一次空闲后运行大约 5 秒。即使repeat 不是nil，只要Emacs 保持空闲，这个定时器就不会再次运行，因为空闲的持续时间会继续增加，不会再次下降到5 秒。
+</p>
+<p>Emacs 可以在空闲时做各种事情：垃圾收集、自动保存或处理来自子进程的数据。但是空闲期间的这些插曲不会干扰空闲计时器，因为它们不会将空闲时钟重置为零。设置为 600 秒的空闲计时器将在自最后一个用户命令完成十分钟后运行，即使在这十分钟内子进程输出已被接受数千次，即使已经进行了垃圾收集和自动保存。
+</p>
+<p>当用户提供输入时，Emacs 在执行输入时变为非空闲状态。然后它再次变得空闲，所有设置为重复的空闲计时器随后将一个接一个地运行另一个时间。
+</p>
+<p>不要编写包含循环的空闲计时器函数，该循环每次都会执行一定数量的处理，并在 (input-pending-p) 为非零时退出。这种方法看起来很自然，但有两个问题：
+</p>
+<p>它阻止所有进程输出（因为 Emacs 仅在等待时接受进程输出）。
+它会阻止任何应该在此期间运行的空闲计时器。
+</p>
+<p>同样，不要编写一个空闲定时器函数来设置另一个空闲定时器（包括相同的空闲定时器），其 secs 参数小于或等于当前空闲时间。这样的计时器将几乎立即运行，并一次又一次地继续运行，而不是等待 Emacs 下一次空闲。正确的做法是使用空闲时间的当前值的适当增量重新调度，如下所述。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: current-idle-time ¶
+</pre></div>
+<p>如果 Emacs 空闲，此函数返回 Emacs 空闲的时间长度，使用与当前时间相同的格式（请参阅时间）。
+</p>
+<p>当 Emacs 不空闲时，current-idle-time 返回 nil。这是测试 Emacs 是否空闲的一种便捷方法。
+</p>
+<p>current-idle-time 的主要用途是当一个空闲计时器函数想要 <code>休息</code> 一段时间。它可以设置另一个空闲计时器来再次调用相同的函数，在几秒钟之后再空闲。这是一个例子：
+</p>
+<div class="lisp">
+<pre class="lisp">(defvar my-resume-timer nil
+  "Timer for `my-timer-function' to reschedule itself, or nil.")
+
+(defun my-timer-function ()
+  ;; If the user types a command while my-resume-timer
+  ;; is active, the next time this function is called from
+  ;; its main idle timer, deactivate my-resume-timer.
+  (when my-resume-timer
+    (cancel-timer my-resume-timer))
+  ...do the work for a while...
+  (when taking-a-break
+    (setq my-resume-timer
+          (run-with-idle-timer
+            ;; Compute an idle time break-length
+            ;; more than the current value.
+            (time-add (current-idle-time) break-length)
+            nil
+            'my-timer-function))))
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="41.13_终端输入.html">终端输入</a>, Previous: <a href="41.11_延迟执行的定时器.html">延迟执行的定时器</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,16 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>25.1 文档基础</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">25.1 文档基础</h2>
+<div class="nav-panel"><p>Next: <a href="25.2_访问文档字符串.html">访问文档字符串</a>, Previous: <a href="25_文档.html">文档</a>, Up: <a href="25_文档.html">文档.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>文档字符串是使用 Lisp 字符串语法编写的，文本周围有双引号字符。事实上，它是一个真正的 Lisp 字符串。当字符串出现在函数或变量定义中的适当位置时，它充当函数或变量的文档。
+</p>
+<p>在函数定义（lambda 或 defun 形式）中，文档字符串在参数列表之后指定，并且通常直接存储在函数对象中。请参阅函数的文档字符串。您还可以将函数文档放在函数名称的函数文档属性中（请参阅访问文档字符串）。
+</p>
+<p>在变量定义（defvar 形式）中，文档字符串在初始值之后指定。请参阅定义全局变量。该字符串存储在变量的变量文档属性中。
+</p>
+<p>有时，Emacs 不会将文档字符串保存在内存中。这样的情况有两种。首先，为了节省内存，预加载函数和变量（包括原语）的文档保存在一个名为 DOC 的文件中，该文件位于 doc-directory 指定的目录中（请参阅对文档字符串的访问）。其次，当从字节编译文件加载函数或变量时，Emacs 会避免加载其文档字符串（请参阅文档字符串和编译）。在这两种情况下，Emacs 仅在需要时才从文件中查找文档字符串，例如当用户为函数调用 Ch f (describe-function) 时。
+</p>
+<p>文档字符串可以包含特殊的键替换序列，指的是仅在用户查看文档时才查找的键绑定。即使用户重新排列默认键绑定，这也允许帮助命令显示正确的键。请参阅替换文档中的键绑定。
+</p>
+<p>在自动加载命令的文档字符串中（请参阅 Autoload），这些键替换序列具有额外的特殊效果：它们会导致命令上的 Ch f 触发自动加载。（这是正确设置 <strong>Help</strong> 缓冲区中的超链接所必需的。）
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="25.2_访问文档字符串.html">访问文档字符串</a>, Previous: <a href="25_文档.html">文档</a>, Up: <a href="25_文档.html">文档.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

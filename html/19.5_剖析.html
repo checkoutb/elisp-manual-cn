@@ -1,0 +1,18 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>19.5 剖析</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">19.5 剖析</h2>
+<div class="nav-panel"><p>Next: <a href="20_阅读和打印_Lisp_对象.html">阅读和打印_Lisp_对象</a>, Previous: <a href="19.4_测试覆盖率.html">测试覆盖率</a>, Up: <a href="19_调试_Lisp_程序.html">调试_Lisp_程序.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>如果您的程序运行正常，但速度不够快，并且您想让它运行得更快或更有效，那么首先要做的是分析您的代码，以便您知道它在哪里花费了大部分执行时间。如果您发现某个特定功能占了执行时间的很大一部分，您可以开始寻找优化该部分的方法。
+</p>
+<p>Emacs 对此有内置支持。要开始分析，请键入 Mx profiler-start。您可以选择定期采样 CPU 使用率 (cpu)、分配内存时 (memory)，或两者兼而有之。然后运行您想要加速的代码。之后，键入 Mx profiler-report 以显示您选择分析的每种类型（cpu 和内存）采样的 CPU 使用情况摘要缓冲区。报告缓冲区的名称包括生成报告的时间，因此您可以稍后生成另一个报告，而不会删除以前的结果。完成分析后，键入 Mx profiler-stop（与分析相关的开销很小，因此我们不建议将其保持活动状态，除非您实际运行要检查的代码）。
+</p>
+<p>分析器报告缓冲区在每一行显示一个被调用的函数，前面是它使用了多少 CPU 资源，以绝对和百分比表示，自分析开始。如果给定行的函数名称左侧有一个 <code>+</code> 符号，您可以通过键入 RET 扩展该行，以便查看更高级别函数调用的函数。使用前缀参数 (Cu RET) 查看函数下方的整个调用树。再次按 RET 将折叠回原始状态。
+</p>
+<p>按 j 或 mouse-2 跳转到该点的函数定义。按 d 查看函数的文档。您可以使用 Cx Cw 将配置文件保存到文件中。您可以使用 = 比较两个配置文件。
+</p>
+<p>elp 库提供了一种替代方法，当您提前知道要分析哪些 Lisp 函数时，该方法很有用。使用该库，您首先将 elp-function-list 设置为函数符号列表——这些是您要分析的函数。然后键入 Mx elp-instrument-list RET nil RET 以安排分析这些功能。运行要分析的代码后，调用 Mx elp-results 以显示当前结果。有关更详细的说明，请参阅文件 elp.el。这种方法仅限于分析用 Lisp 编写的函数，它不能分析 Emacs 原语。
+</p>
+<p>您可以使用基准库来衡量评估单个 Emacs Lisp 表单所花费的时间。在 benchmark.el 中查看函数 benchmark-call 以及 benchmark-run、benchmark-run-compiled、benchmark-progn 和 benchmark-call 宏。您还可以交互地使用基准命令来计时表格。
+</p>
+<p>要在其 C 代码级别分析 Emacs，您可以使用 configure 的 –enable-profiling 选项构建它。当 Emacs 退出时，它会生成一个文件 gmon.out，您可以使用 gprof 实用程序检查该文件。此功能主要用于调试 Emacs。它实际上停止了上述 Lisp 级别的 Mx profiler-… 命令的工作。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="20_阅读和打印_Lisp_对象.html">阅读和打印_Lisp_对象</a>, Previous: <a href="19.4_测试覆盖率.html">测试覆盖率</a>, Up: <a href="19_调试_Lisp_程序.html">调试_Lisp_程序.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>12.11.3 缓冲区局部变量的默认值</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">12.11.3 缓冲区局部变量的默认值</h3>
+<div class="nav-panel"><p>Next: <a href="12.12_文件局部变量.html">文件局部变量</a>, Previous: <a href="12.11.2_创建和删除缓冲区本地绑定.html">创建和删除缓冲区本地绑定</a>, Up: <a href="12.11_缓冲区局部变量.html">缓冲区局部变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>具有缓冲区局部绑定的变量的全局值也称为默认值，因为它是在当前缓冲区和选定帧都没有自己的变量绑定时生效的值。
+</p>
+<p>无论当前缓冲区是否具有缓冲区本地绑定，函数 default-value 和 setq-default 都可以访问和更改变量的默认值。例如，您可以使用 setq-default 更改大多数缓冲区的默认段落开始设置；  即使您在 C 或 Lisp 模式的缓冲区中，这也可以工作，该缓冲区具有该变量的缓冲区本地值。
+</p>
+<p>特殊形式的 defvar 和 defconst 也设置默认值（如果它们设置了变量），而不是任何缓冲区本地值。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: default-value symbol ¶
+</pre></div>
+<p>此函数返回符号的默认值。这是在没有此变量自己的值的缓冲区和帧中看到的值。如果 symbol 不是缓冲区本地的，则这等效于 symbol-value（请参阅访问变量值）。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: default-boundp symbol ¶
+</pre></div>
+<p>函数 default-boundp 告诉您符号的默认值是否为非空值。如果 (default-boundp ’foo) 返回 nil，则 (default-value ’foo) 会出错。
+</p>
+<p>default-boundp 对应于默认值，就像 boundp 对应于符号值一样。 
+</p>
+<div class="lisp">
+<pre class="lisp">Special Form: setq-default [symbol form]… ¶
+</pre></div>
+<p>这种特殊形式为每个符号赋予了一个新的默认值，这是对相应形式求值的结果。它不评估符号，但评估形式。setq-default 形式的值是最后一个形式的值。
+</p>
+<p>如果符号不是当前缓冲区的缓冲区本地，并且没有自动标记为缓冲区本地，则 setq-default 与 setq 具有相同的效果。如果符号对于当前缓冲区是缓冲区本地的，那么这会更改其他缓冲区将看到的值（只要它们没有缓冲区本地值），但不会更改当前缓冲区看到的值。
+</p><div class="lisp">
+<pre class="lisp">;; In buffer ‘foo’:
+(make-local-variable 'buffer-local)
+     ⇒ buffer-local
+
+(setq buffer-local 'value-in-foo)
+     ⇒ value-in-foo
+
+(setq-default buffer-local 'new-default)
+     ⇒ new-default
+
+buffer-local
+     ⇒ value-in-foo
+
+(default-value 'buffer-local)
+     ⇒ new-default
+
+
+;; In (the new) buffer ‘bar’:
+buffer-local
+     ⇒ new-default
+
+(default-value 'buffer-local)
+     ⇒ new-default
+
+(setq buffer-local 'another-default)
+     ⇒ another-default
+
+(default-value 'buffer-local)
+     ⇒ another-default
+
+
+;; Back in buffer ‘foo’:
+buffer-local
+     ⇒ value-in-foo
+(default-value 'buffer-local)
+     ⇒ another-default
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: set-default symbol value ¶
+</pre></div>
+<p>这个函数类似于 setq-default，除了 symbol 是一个普通的评估参数。
+</p>
+<div class="lisp">
+<pre class="lisp">(set-default (car '(a b c)) 23)
+     ⇒ 23
+
+(default-value 'a)
+     ⇒ 23
+</pre></div>
+<p>变量可以绑定（参见局部变量）到一个值。这使得它的全局值被绑定所遮蔽；  然后 default-value 将返回该绑定的值，而不是全局值，并且 set-default 将被阻止设置全局值（它将更改 let-bound 值）。以下两个函数允许引用全局值，即使它被 let-binding 遮蔽。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: default-toplevel-value symbol ¶
+</pre></div>
+<p>此函数返回符号的顶级默认值，这是它在任何 let 绑定之外的值。 
+</p>
+<div class="lisp">
+<pre class="lisp">(defvar variable 'global-value)
+    ⇒ variable
+
+(let ((variable 'let-binding))
+  (default-value 'variable))
+    ⇒ let-binding
+
+(let ((variable 'let-binding))
+  (default-toplevel-value 'variable))
+    ⇒ global-value
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: set-default-toplevel-value symbol value ¶
+</pre></div>
+<p>此函数将符号的顶级默认值设置为指定值。当您想要设置 symbol 的全局值时，无论您的代码是否在 symbol 的 let-binding 上下文中运行，这都会派上用场。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="12.12_文件局部变量.html">文件局部变量</a>, Previous: <a href="12.11.2_创建和删除缓冲区本地绑定.html">创建和删除缓冲区本地绑定</a>, Up: <a href="12.11_缓冲区局部变量.html">缓冲区局部变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

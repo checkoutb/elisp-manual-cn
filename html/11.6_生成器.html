@@ -1,0 +1,78 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>11.6 生成器</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">11.6 生成器</h2>
+<div class="nav-panel"><p>Next: <a href="11.7_非本地出口.html">非本地出口</a>, Previous: <a href="11.5_迭代.html">迭代</a>, Up: <a href="11_控制结构.html">控制结构.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>生成器是一个产生潜在无限值流的函数。每次函数产生一个值时，它都会挂起自己并等待调用者请求下一个值。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: iter-defun name args [doc] [declare] [interactive] body… ¶
+</pre></div>
+<p>iter-defun 定义了一个生成器函数。生成器函数与普通函数具有相同的签名，但工作方式不同。生成器函数在调用时不会执行主体，而是返回一个迭代器对象。该迭代器运行 body 以生成值，发出一个值并在出现 iter-yield 或 iter-yield-from 的地方暂停。当 body 正常返回时，iter-next 以 body 的结果作为其条件数据发出 iter-end-of-sequence 信号。
+</p>
+<p>任何类型的 Lisp 代码在正文中都是有效的，但 iter-yield 和 iter-yield-from 不能出现在 unwind-protect 表单中。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: iter-lambda args [doc] [interactive] body… ¶
+</pre></div>
+<p>iter-lambda 生成一个未命名的生成器函数，其工作方式与使用 iter-defun 生成的生成器函数一样。 
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: iter-yield value ¶
+</pre></div>
+<p>当它出现在生成器函数中时，iter-yield 表示当前迭代器应该暂停并从 iter-next 返回值。iter-yield 计算为下一次调用 iter-next 的 value 参数。 
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: iter-yield-from iterator ¶
+</pre></div>
+<p>iter-yield-from 产生迭代器生成的所有值，并计算为迭代器的生成器函数正常返回的值。虽然它有控制权，但迭代器使用 iter-next 接收发送给迭代器的值。 
+</p>
+<p>要使用生成器函数，首先正常调用它，生成一个迭代器对象。迭代器是生成器的特定实例。然后使用 iter-next 从这个迭代器中检索值。当没有更多值可以从迭代器中提取时，iter-next 会使用迭代器的最终值引发 iter-end-of-sequence 条件。
+</p>
+<p>重要的是要注意生成器函数体仅在对 iter-next 的调用内部执行。对使用 iter-defun 定义的函数的调用会产生一个迭代器；  您必须使用 iter-next 驱动此迭代器，以使任何有趣的事情发生。对生成器函数的每次调用都会产生一个不同的迭代器，每个迭代器都有自己的状态。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: iter-next iterator value ¶
+</pre></div>
+<p>从迭代器中检索下一个值。如果没有更多值要生成（因为返回了迭代器的生成器函数），iter-next 会发出 iter-end-of-sequence 条件的信号；  与此条件关联的数据值是迭代器的生成器函数返回的值。
+</p>
+<p>value 被发送到迭代器并成为 iter-yield 评估的值。对于给定迭代器的第一次 iter-next 调用， value 将被忽略，因为在迭代器的生成器函数开始时，生成器函数不会评估任何 iter-yield 形式。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: iter-close iterator ¶
+</pre></div>
+<p>如果迭代器在 unwind-protect 的 bodyform 中暂停并且变得无法访问，Emacs 最终将在垃圾收集通过后运行 unwind 处理程序。（请注意，在 unwind-protect 的 unwindforms 中，iter-yield 是非法的。）要确保这些处理程序在此之前运行，请使用 iter-close。 
+</p>
+<p>提供了一些便利功能以使使用迭代器更容易：
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: iter-do (var iterator) body … ¶
+</pre></div>
+<p>运行 body 并将 var 绑定到迭代器生成的每个值。
+</p>
+<p>Common Lisp 循环工具还包含使用迭代器的功能。请参阅 Common Lisp 扩展中的循环工具。
+</p>
+<p>以下代码展示了使用迭代器的一些重要原则。
+</p>
+<div class="lisp">
+<pre class="lisp">(require 'generator)
+(iter-defun my-iter (x)
+  (iter-yield (1+ (iter-yield (1+ x))))
+   ;; Return normally
+  -1)
+
+(let* ((iter (my-iter 5))
+       (iter2 (my-iter 0)))
+  ;; Prints 6
+  (print (iter-next iter))
+  ;; Prints 9
+  (print (iter-next iter 8))
+  ;; Prints 1; iter and iter2 have distinct states
+  (print (iter-next iter2 nil))
+
+  ;; We expect the iter sequence to end now
+  (condition-case x
+      (iter-next iter)
+    (iter-end-of-sequence
+      ;; Prints -1, which my-iter returned normally
+      (print (cdr x)))))
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="11.7_非本地出口.html">非本地出口</a>, Previous: <a href="11.5_迭代.html">迭代</a>, Up: <a href="11_控制结构.html">控制结构.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

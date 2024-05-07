@@ -1,0 +1,95 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.13 递归编辑</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">22.13 递归编辑</h2>
+<div class="nav-panel"><p>Next: <a href="22.15_命令历史.html">命令历史</a>, Previous: <a href="22.12_前缀命令参数.html">前缀命令参数</a>, Up: <a href="22_命令循环.html">命令循环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 启动时会自动进入 Emacs 命令循环。命令循环的这种顶级调用永远不会退出；  只要 Emacs 运行，它就会一直运行。Lisp 程序也可以调用命令循环。由于这会激活不止一次的命令循环，我们称之为递归编辑。递归编辑级别具有暂停调用它的任何命令并允许用户在恢复该命令之前进行任意编辑的效果。
+</p>
+<p>递归编辑期间可用的命令与顶级编辑循环中可用的命令相同，并在键盘映射中定义。只有少数特殊命令退出递归编辑级别；  其他人完成后返回递归编辑级别。（退出的特殊命令总是可用的，但是当递归编辑没有进行时它们什么都不做。）
+</p>
+<p>所有命令循环，包括递归循环，都设置了通用错误处理程序，以便从命令循环运行的命令中的错误不会退出循环。
+</p>
+<p>Minibuffer 输入是一种特殊的递归编辑。它有一些特殊的皱纹，例如启用 minibuffer 和 minibuffer 窗口的显示，但比您想象的要少。某些键在 minibuffer 中的行为不同，但这只是因为 minibuffer 的本地映射；  如果你切换窗口，你会得到通常的 Emacs 命令。
+</p>
+<p>要调用递归编辑级别，请调用函数 recursive-edit。该函数包含命令循环；  它还包含对带有标签 exit 的 catch 的调用，这使得可以通过 throw 退出递归编辑级别（请参阅显式非本地退出：catch 和 throw）。抛出 value 会导致 recursive-edit 退出，以便控制返回到上一级的命令循环。这称为中止，由 C-] (abort-recursive-edit) 完成。同样，您可以抛出一个字符串值以使递归编辑信号出错，并将此字符串打印为消息。如果你抛出一个函数，recursive-edit 将在返回之前不带参数地调用它。抛出任何其他值，将使递归编辑正常返回到调用它的函数。命令 CMc (exit-recursive-edit) 执行此操作。
+</p>
+<p>大多数应用程序不应该使用递归编辑，除非作为使用 minibuffer 的一部分。通常将当前缓冲区的主模式临时更改为特殊的主模式对用户来说更方便，它应该有一个命令返回到以前的模式。（Rmail 中的 e 命令使用这种技术。）或者，如果您希望为用户提供不同的文本以递归地编辑，请在特殊模式下创建并选择一个新缓冲区。在这种模式下，定义一个命令来完成处理并返回到上一个缓冲区。（Rmail 中的 m 命令执行此操作。）
+</p>
+<p>递归编辑在调试中很有用。您可以将调试调用作为一种断点插入到函数定义中，以便在函数到达那里时可以环顾四周。debug 调用递归编辑，但也提供调试器的其他功能。
+</p>
+<p>当您在 query-replace 中键入 Cr 或使用 Cx q (kbd-macro-query) 时，也会使用递归编辑级别。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: recursive-edit ¶
+</pre></div>
+<p>此函数调用编辑器命令循环。它由 Emacs 的初始化自动调用，让用户开始编辑。当从 Lisp 程序调用时，它进入递归编辑级别。
+</p>
+<p>如果当前缓冲区与所选窗口的缓冲区不同，递归编辑将保存并恢复当前缓冲区。否则，如果您切换缓冲区，则您切换到的缓冲区在递归编辑返回后是当前的。
+</p>
+<p>在下面的示例中，函数 simple-rec 首先前进一个单词，然后进入递归编辑，在回显区域打印出一条消息。然后用户可以进行任何所需的编辑，然后键入 CMc 退出并继续执行 simple-rec。
+</p>
+<div class="lisp">
+<pre class="lisp">(defun simple-rec ()
+  (forward-word 1)
+  (message "Recursive edit in progress")
+  (recursive-edit)
+  (forward-word 1))
+     ⇒ simple-rec
+(simple-rec)
+     ⇒ nil
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Command: exit-recursive-edit ¶
+</pre></div>
+<p>该函数从最里面的递归编辑（包括 minibuffer 输入）中退出。它的定义是有效的（抛出’exit nil）。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: abort-recursive-edit ¶
+</pre></div>
+<p>此函数通过在退出递归编辑后发出 quit 信号来中止请求最内层递归编辑（包括 minibuffer 输入）的命令。它的定义是有效的（throw ’exit t）。请参阅退出。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: top-level ¶
+</pre></div>
+<p>该函数退出所有递归编辑级别；  它不返回值，因为它完全跳出任何计算直接回到主命令循环。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: recursion-depth ¶
+</pre></div>
+<p>此函数返回递归编辑的当前深度。当没有递归编辑处于活动状态时，它返回 0。
+</p>
+<p>禁用命令会将命令标记为需要用户确认才能执行。禁用用于可能使初学者感到困惑的命令，以防止他们意外使用命令。
+</p>
+<p>禁用命令的低级机制是在命令的 Lisp 符号上放置一个非 nil 禁用属性。这些属性通常由用户的初始化文件（参见初始化文件）使用 Lisp 表达式设置，如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(put 'upcase-region 'disabled t)
+</pre></div>
+<p>对于一些命令，这些属性默认存在（如果您愿意，可以在初始化文件中删除它们）。
+</p>
+<p>如果 disabled 属性的值是字符串，则说明命令已禁用的消息包括该字符串。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">(put 'delete-region 'disabled
+     "Text deleted this way cannot be yanked back!\n")
+</pre></div>
+<p>有关交互式调用禁用命令时发生的情况的详细信息，请参见 GNU Emacs 手册中的禁用。禁用命令对从 Lisp 程序中将其作为函数调用没有影响。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: enable-command command ¶
+</pre></div>
+<p>从现在开始允许在没有特别确认的情况下执行命令（一个符号），并更改用户的 init 文件（请参阅 The Init File），以便将其应用于未来的会话。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: disable-command command ¶
+</pre></div>
+<p>从现在开始需要特别确认才能执行命令，并更改用户的 init 文件，以便将其应用于未来的会话。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: disabled-command-function ¶
+</pre></div>
+<p>这个变量的值应该是一个函数。当用户以交互方式调用禁用命令时，将调用此函数而不是禁用命令。它可以使用 this-command-keys 来确定用户键入什么来运行命令，从而找到命令本身。
+</p>
+<p>该值也可能为零。然后所有命令都可以正常工作，甚至是禁用的命令。
+</p>
+<p>默认情况下，该值是一个询问用户是否继续的函数。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.15_命令历史.html">命令历史</a>, Previous: <a href="22.12_前缀命令参数.html">前缀命令参数</a>, Up: <a href="22_命令循环.html">命令循环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

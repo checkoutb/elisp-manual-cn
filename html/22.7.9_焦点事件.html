@@ -1,0 +1,17 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.7.9 焦点事件</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">22.7.9 焦点事件</h3>
+<div class="nav-panel"><p>Next: <a href="22.7.10_其他系统事件.html">其他系统事件</a>, Previous: <a href="22.7.8_运动事件.html">运动事件</a>, Up: <a href="22.7_输入事件.html">输入事件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>窗口系统为用户提供了控制哪个窗口获得键盘输入的通用方法。这种窗口的选择称为焦点。当用户在 Emacs 帧之间切换时，会产生一个焦点事件。在全局键映射中，焦点事件的正常定义是在 Emacs 中选择一个新帧，正如用户所期望的那样。请参阅输入焦点，其中还描述了与焦点事件相关的钩子。
+</p>
+<p>焦点事件在 Lisp 中表示为如下所示的列表：
+</p>
+<div class="lisp">
+<pre class="lisp">(switch-frame new-frame)
+</pre></div>
+<p>其中 new-frame 是切换到的帧。
+</p>
+<p>一些 X 窗口管理器的设置使得只需将鼠标移入窗口就足以将焦点设置在那里。通常，在某种其他类型的输入到达之前，Lisp 程序不需要知道焦点的变化。Emacs 仅当用户在新帧中实际键入键盘键或按下鼠标按钮时才会生成焦点事件；  只是在帧之间移动鼠标不会产生焦点事件。
+</p>
+<p>键序列中间的焦点事件会使序列乱码。所以 Emacs 永远不会在键序列的中间生成焦点事件。如果用户在键序列的中间（即在前缀键之后）更改焦点，那么 Emacs 会重新排序事件，以便焦点事件出现在多事件键序列之前或之后，而不是在其中。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.7.10_其他系统事件.html">其他系统事件</a>, Previous: <a href="22.7.8_运动事件.html">运动事件</a>, Up: <a href="22.7_输入事件.html">输入事件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

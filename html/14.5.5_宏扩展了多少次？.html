@@ -1,0 +1,28 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>14.5.5 宏扩展了多少次？</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">14.5.5 宏扩展了多少次？</h3>
+<div class="nav-panel"><p>Next: <a href="14.6_缩进宏.html">缩进宏</a>, Previous: <a href="14.5.4_评估扩展中的宏观参数.html">评估扩展中的宏观参数</a>, Up: <a href="14.5_使用宏的常见问题.html">使用宏的常见问题.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>有时会出现问题，因为宏调用每次在解释函数中求值时都会扩展，但对于编译函数仅扩展一次（在编译期间）。如果宏定义有副作用，它们的工作方式会有所不同，具体取决于宏扩展的次数。
+</p>
+<p>因此，除非您真的知道自己在做什么，否则您应该避免计算宏展开时的副作用。
+</p>
+<p>无法避免一种特殊的副作用：构造 Lisp 对象。几乎所有的宏扩展都包含构造列表；  这是大多数宏的重点。这通常是安全的；  只有一种情况你必须小心：当你构造的对象是宏扩展中带引号的常量的一部分时。
+</p>
+<p>如果宏在编译过程中只展开一次，那么对象在编译过程中只被构造一次。但是在解释执行中，每次宏调用运行时都会扩展宏，这意味着每次都会构造一个新对象。
+</p>
+<p>在大多数干净的 Lisp 代码中，这种差异并不重要。仅当您对宏定义构造的对象执行副作用时才有意义。因此，为避免麻烦，请避免对由宏定义构造的对象产生副作用。以下是此类副作用如何让您陷入困境的示例：
+</p><div class="lisp">
+<pre class="lisp">(defmacro empty-object ()
+  (list 'quote (cons nil nil)))
+
+
+(defun initialize (condition)
+  (let ((object (empty-object)))
+    (if condition
+        (setcar object condition))
+    object))
+</pre></div>
+<p>如果 initialize 被解释，则每次调用 initialize 时都会构造一个新列表 (nil)。因此，调用之间没有副作用。如果 initialize 被编译，那么宏空对象在编译期间被扩展，产生一个常量（nil），每次调用 initialize 时都会重用和更改。
+</p>
+<p>避免这种病态情况的一种方法是将空对象视为一种有趣的常量，而不是内存分配结构。您不会在诸如 ’(nil) 之类的常量上使用 setcar，因此自然也不会在 (empty-object) 上使用它。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="14.6_缩进宏.html">缩进宏</a>, Previous: <a href="14.5.4_评估扩展中的宏观参数.html">评估扩展中的宏观参数</a>, Up: <a href="14.5_使用宏的常见问题.html">使用宏的常见问题.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

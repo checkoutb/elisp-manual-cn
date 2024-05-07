@@ -1,0 +1,160 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>39.12 访问其他进程</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">39.12 访问其他进程</h2>
+<div class="nav-panel"><p>Next: <a href="39.13_事务队列.html">事务队列</a>, Previous: <a href="39.11_退出前查询.html">退出前查询</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>除了访问和操作作为当前 Emacs 会话的子进程的进程之外，Emacs Lisp 程序还可以访问在同一台机器上运行的其他进程。我们将这些系统进程称为系统进程，以将它们与 Emacs 子进程区分开来。
+</p>
+<p>Emacs 提供了几个用于访问系统进程的原语。并非所有平台都支持这些原语；  在那些没有的情况下，这些原语返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: list-system-processes ¶
+</pre></div>
+<p>此函数返回系统上运行的所有进程的列表。每个进程都由其 PID 标识，PID 是一个由操作系统分配的数字进程 ID，用于将该进程与同时在同一台机器上运行的所有其他进程区分开来。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: process-attributes pid ¶
+</pre></div>
+<p>此函数返回由进程 ID pid 指定的进程的属性列表。alist 中的每个关联都采用 (key . value) 形式，其中 key 指定属性，value 是该属性的值。下面列出了该函数可以返回的各种属性键。并非所有平台都支持所有这些属性；  如果某个属性不受支持，则其关联不会出现在返回的列表中。
+</p>
+<div class="lisp">
+<pre class="lisp">euid
+</pre></div>
+<p>调用流程的用户的有效用户 ID。对应的值是一个数字。如果进程由运行当前 Emacs 会话的同一用户调用，则该值与 user-uid 返回的值相同（请参阅用户标识）。
+</p><div class="lisp">
+<pre class="lisp">user
+</pre></div>
+<p>进程有效用户ID对应的用户名，字符串。
+</p><div class="lisp">
+<pre class="lisp">egid
+</pre></div>
+<p>有效用户ID的组ID，一个数字。
+</p><div class="lisp">
+<pre class="lisp">group
+</pre></div>
+<p>有效用户组ID对应的组名，字符串。
+</p><div class="lisp">
+<pre class="lisp">comm
+</pre></div>
+<p>在进程中运行的命令的名称。这是一个字符串，通常指定进程的可执行文件的名称，没有前导目录。但是，一些特殊的系统进程可能会报告与程序的可执行文件不对应的字符串。
+</p><div class="lisp">
+<pre class="lisp">state
+</pre></div>
+<p>进程的状态码。这是一个对进程的调度状态进行编码的短字符串。以下是最常见的代码列表：
+</p>
+<div class="lisp">
+<pre class="lisp">"D"
+</pre></div>
+<p>不间断睡眠（通常是 I/O）
+</p><div class="lisp">
+<pre class="lisp">"R"
+</pre></div>
+<p>跑步
+</p><div class="lisp">
+<pre class="lisp">"S"
+</pre></div>
+<p>可中断睡眠（等待某个事件）
+</p><div class="lisp">
+<pre class="lisp">"T"
+</pre></div>
+<p>停止，例如，通过作业控制信号
+</p><div class="lisp">
+<pre class="lisp">"Z"
+</pre></div>
+<p>僵尸：一个已终止但未被其父进程收割的进程
+</p>
+<p>有关可能状态的完整列表，请参阅 ps 命令的手册页。
+</p><div class="lisp">
+<pre class="lisp">ppid
+</pre></div>
+<p>父进程的进程ID，一个数字。
+</p><div class="lisp">
+<pre class="lisp">pgrp
+</pre></div>
+<p>进程的进程组ID，一个数字。
+</p><div class="lisp">
+<pre class="lisp">sess
+</pre></div>
+<p>进程的会话 ID。这是一个数字，它是进程会话负责人的进程 ID。
+</p><div class="lisp">
+<pre class="lisp">ttname
+</pre></div>
+<p>一个字符串，它是进程的控制终端的名称。在 Unix 和 GNU 系统上，这通常是相应终端设备的文件名，例如 /dev/pts65。
+</p><div class="lisp">
+<pre class="lisp">tpgid
+</pre></div>
+<p>使用进程终端的前台进程组的数字进程组 ID。
+</p><div class="lisp">
+<pre class="lisp">minflt
+</pre></div>
+<p>进程自开始以来导致的次要页面错误数。（次要页面错误是那些不涉及从磁盘读取的错误。）
+</p><div class="lisp">
+<pre class="lisp">majflt
+</pre></div>
+<p>进程自开始以来导致的主要页面错误数。（主要页面错误需要读取磁盘，因此比次要页面错误更昂贵。）
+</p><div class="lisp">
+<pre class="lisp">cminflt
+</pre></div>
+<div class="lisp">
+<pre class="lisp">cmajflt
+</pre></div>
+<p>与 minflt 和 majflt 类似，但包括给定进程的所有子进程的页面错误数。
+</p><div class="lisp">
+<pre class="lisp">utime
+</pre></div>
+<p>进程在用户上下文中花费的时间，用于运行应用程序的代码。相应的值是 Lisp 时间戳（请参阅时间）。
+</p><div class="lisp">
+<pre class="lisp">cutime
+</pre></div>
+<p>进程在系统（内核）上下文中用于处理系统调用的时间。对应的值是 Lisp 时间戳。
+</p><div class="lisp">
+<pre class="lisp">cstime
+</pre></div>
+<p>utime 和 stime 的总和。对应的值是 Lisp 时间戳。
+</p><div class="lisp">
+<pre class="lisp">cstime
+</pre></div>
+<div class="lisp">
+<pre class="lisp">ctime
+</pre></div>
+<p>与 utime、stime 和 time 类似，但包括给定进程的所有子进程的时间。
+</p><div class="lisp">
+<pre class="lisp">pri
+</pre></div>
+<p>进程的数字优先级。
+</p><div class="lisp">
+<pre class="lisp">nice
+</pre></div>
+<p>进程的nice值，一个数字。（nice 值较小的进程会得到更有利的调度。）
+</p><div class="lisp">
+<pre class="lisp">thcount
+</pre></div>
+<p>进程中的线程数。
+</p><div class="lisp">
+<pre class="lisp">start
+</pre></div>
+<p>进程启动的时间，作为 Lisp 时间戳。
+</p><div class="lisp">
+<pre class="lisp">etime
+</pre></div>
+<p>自进程启动以来经过的时间，作为 Lisp 时间戳。
+</p><div class="lisp">
+<pre class="lisp">vsize
+</pre></div>
+<p>进程的虚拟内存大小，以千字节为单位。
+</p><div class="lisp">
+<pre class="lisp">rss
+</pre></div>
+<p>进程驻留集的大小，进程在机器物理内存中占用的千字节数。
+</p><div class="lisp">
+<pre class="lisp">pcpu
+</pre></div>
+<p>进程自启动以来使用的 CPU 时间百分比。对应的值是 0 到 100 之间的浮点数。
+</p><div class="lisp">
+<pre class="lisp">pmem
+</pre></div>
+<p>进程驻留集使用的机器上安装的总物理内存的百分比。该值是 0 到 100 之间的浮点数。
+</p><div class="lisp">
+<pre class="lisp">args
+</pre></div>
+<p>调用进程的命令行。这是一个字符串，其中各个命令行参数由空格分隔；  嵌入参数中的空白字符被引用为适合系统的 shell：在 GNU 和 Unix 上用反斜杠字符转义，在 Windows 上用双引号字符括起来。因此，这个命令行字符串可以直接用在原语中，比如 shell-command。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="39.13_事务队列.html">事务队列</a>, Previous: <a href="39.11_退出前查询.html">退出前查询</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

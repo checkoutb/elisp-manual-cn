@@ -1,0 +1,62 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>34.10.7 显式编码和解码</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">34.10.7 显式编码和解码</h3>
+<div class="nav-panel"><p>Next: <a href="34.10.8_终端_IO_编码.html">终端_IO_编码</a>, Previous: <a href="34.10.6_为一个操作指定编码系统.html">为一个操作指定编码系统</a>, Up: <a href="34.10_编码系统.html">编码系统.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>所有将文本传入和传出 Emacs 的操作都能够使用编码系统对文本进行编码或解码。您还可以使用本节中的函数显式编码和解码文本。
+</p>
+<p>编码的结果和解码的输入，不是普通的文本。它们在逻辑上由一系列字节值组成；  即一系列 ASCII 和八位字符。在单字节缓冲区和字符串中，这些字符的代码范围为 0 到 #xFF (255)。在多字节缓冲区或字符串中，八位字符的字符代码高于 #xFF（请参阅文本表示），但是当您对此类文本进行编码或解码时，Emacs 会透明地将它们转换为单字节值。
+</p>
+<p>将文件作为字节序列读入缓冲区的常用方法是使用 insert-file-contents-literally （请参阅从文件中读取）；  或者，在使用 find-file-noselect 访问文件时指定非 nil 原始文件参数。这些方法产生一个单字节缓冲区。
+</p>
+<p>使用显式编码文本产生的字节序列的常用方法是将其复制到文件或进程中——例如，使用 write-region 写入它（请参阅写入文件），并通过绑定 coding-system- 来抑制编码for-write 到 no-conversion。
+</p>
+<p>以下是执行显式编码或解码的函数。编码函数产生字节序列；  解码功能旨在对字节序列进行操作。所有这些函数都会丢弃文本属性。他们还将 last-coding-system-used 设置为他们使用的精确编码系统。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: encode-coding-region start end coding-system &amp;optional destination ¶
+</pre></div>
+<p>该命令根据编码系统编码系统从头到尾对文本进行编码。通常，编码文本会替换缓冲区中的原始文本，但可选参数目标可以改变它。如果destination 是一个缓冲区，则将编码文本插入到该缓冲区中的点之后（点不移动）；  如果是 t，则该命令将编码文本作为单字节字符串返回，而不插入它。
+</p>
+<p>如果将编码文本插入某个缓冲区，则此命令返回编码文本的长度。
+</p>
+<p>编码的结果在逻辑上是一个字节序列，但如果缓冲区之前是多字节，则缓冲区仍然是多字节的，并且任何 8 位字节都将转换为它们的多字节表示（参见文本表示）。
+</p>
+<p>编码文本时不要使用 undecided 作为编码系统，因为这可能会导致意想不到的结果。相反，如果编码系统没有明显的相关价值，请使用 select-safe-coding-system（请参阅 select-safe-coding-system）建议合适的编码。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: encode-coding-string string coding-system &amp;optional nocopy buffer ¶
+</pre></div>
+<p>该函数根据编码系统编码系统对字符串中的文本进行编码。它返回一个包含编码文本的新字符串，除非 nocopy 为非零，在这种情况下，如果编码操作很简单，函数可能会返回字符串本身。编码的结果是一个单字节字符串。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: decode-coding-region start end coding-system &amp;optional destination ¶
+</pre></div>
+<p>该命令根据编码系统编码系统从头到尾对文本进行解码。为了使显式解码有用，解码前的文本应该是字节值序列，但多字节和单字节缓冲区都是可接受的（在多字节情况下，原始字节值应表示为八位字符）。通常，解码后的文本会替换缓冲区中的原始文本，但可选参数目标可以改变这一点。如果destination是一个缓冲区，则解码后的文本将插入到该缓冲区中的点之后（点不移动）；  如果是 t，则命令将解码后的文本作为多字节字符串返回，而不插入它。
+</p>
+<p>如果解码文本插入某个缓冲区，则此命令返回解码文本的长度。如果该缓冲区是单字节缓冲区（请参阅选择表示），则解码文本的内部表示（请参阅文本表示）作为单个字节插入缓冲区。
+</p>
+<p>此命令将字符集文本属性放在解码的文本上。该属性的值表示用于解码原始文本的字符集。
+</p>
+<p>如有必要，此命令会检测文本的编码。如果 encoding-system 未确定，该命令会根据它在文本中找到的字节序列检测文本的编码，并且还会检测文本使用的行尾约定的类型（参见 eol 类型）。如果 coding-system 是 undecided-eol-type，其中 eol-type 是 unix、dos 或 mac，则该命令仅检测文本的编码。任何未指定 eol-type 的编码系统，如 utf-8，都会导致命令检测行尾约定；  完全指定编码，如在 utf-8-unix 中，如果预先知道文本使用的 EOL 约定，以防止任何自动检测。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: decode-coding-string string coding-system &amp;optional nocopy buffer ¶
+</pre></div>
+<p>该函数根据编码系统对字符串中的文本进行解码。它返回一个包含解码文本的新字符串，除非 nocopy 为非零，在这种情况下，如果解码操作很简单，函数可能会返回字符串本身。为了使显式解码有用，字符串的内容应该是具有一系列字节值的单字节字符串，但多字节字符串也是可以接受的（假设它包含多字节形式的 8 位字节）。
+</p>
+<p>如果需要，此函数会检测字符串的编码，就像 decode-coding-region 一样。
+</p>
+<p>如果可选参数 buffer 指定一个缓冲区，则解码后的文本将插入到该缓冲区中的点之后（点不移动）。在这种情况下，返回值是解码文本的长度。如果该缓冲区是单字节缓冲区，则解码文本的内部表示将作为单个字节插入其中。
+</p>
+<p>此函数在解码后的文本上放置一个字符集文本属性。该属性的值表示用于解码原始文本的字符集：
+</p><div class="lisp">
+<pre class="lisp">(decode-coding-string "Gr\374ss Gott" 'latin-1)
+     ⇒ #("Grüss Gott" 0 9 (charset iso-8859-1))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: decode-coding-inserted-region from to filename &amp;optional visit beg end replace ¶
+</pre></div>
+<p>此函数将文本从 from 解码到 to ，就好像它是使用 insert-file-contents 使用提供的其余参数从文件文件名中读取的一样。
+</p>
+<p>使用此功能的正常方法是从文件中读取文本而不进行解码，如果您决定更愿意对其进行解码。而不是删除文本并再次阅读它，这次解码，您可以调用此函数。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="34.10.8_终端_IO_编码.html">终端_IO_编码</a>, Previous: <a href="34.10.6_为一个操作指定编码系统.html">为一个操作指定编码系统</a>, Up: <a href="34.10_编码系统.html">编码系统.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

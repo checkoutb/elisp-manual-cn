@@ -1,0 +1,152 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.15 文本排序</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">33.15 文本排序</h2>
+<div class="nav-panel"><p>Next: <a href="33.16_计数列.html">计数列</a>, Previous: <a href="33.14_自动填充.html">自动填充</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节中描述的排序函数都在缓冲区中重新排列文本。这与重新排列列表元素顺序的函数排序相反（请参阅重新排列列表的函数）。这些函数返回的值没有意义。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: sort-subr reverse nextrecfun endrecfun &amp;optional startkeyfun endkeyfun predicate ¶
+</pre></div>
+<p>此函数是通用的文本排序例程，它将缓冲区细分为记录，然后对它们进行排序。本节中的大多数命令都使用此功能。
+</p>
+<p>要了解 sort-subr 的工作原理，请将缓冲区的整个可访问部分划分为称为排序记录的不相交部分。这些记录可能是连续的，也可能不是连续的，但它们不能重叠。每个排序记录的一部分（可能是全部）被指定为排序键。排序通过它们的排序键重新排列记录。
+</p>
+<p>通常，记录按升序排序键的顺序重新排列。如果 sort-subr 函数的第一个参数 reverse 不为 nil，则排序记录按照排序键的降序重新排列。
+</p>
+<p>sort-subr 的接下来的四个参数是被调用以在排序记录中移动点的函数。它们在 sort-subr 中被多次调用。
+</p>
+<p>nextrecfun 在记录末尾用点调用。此函数将点移动到下一条记录的开头。当调用 sort-subr 时，假设第一条记录从 point 的位置开始。因此，您通常应该在调用 sort-subr 之前将指针移动到缓冲区的开头。
+</p>
+<p>该函数可以通过将点留在缓冲区末尾来指示没有更多的排序记录。
+endrecfun 使用记录中的点调用。它将点移动到记录的末尾。
+调用 startkeyfun 将点从记录的开头移动到排序键的开头。该参数是可选的；  如果省略，则整条记录为排序键。如果提供，该函数应该返回一个非 nil 值用作排序键，或者返回 nil 以指示排序键在从点开始的缓冲区中。在后一种情况下，调用 endkeyfun 来查找排序键的结尾。
+调用 endkeyfun 将点从排序键的开头移动到排序键的结尾。此参数是可选的。如果 startkeyfun 返回 nil 并且此参数被省略（或 ​​nil），则排序键将扩展到记录的末尾。如果 startkeyfun 返回非零值，则不需要 endkeyfun。
+</p>
+<p>参数谓词是用于比较键的函数。它使用两个参数调用，即要比较的键，如果第一个键在排序顺序中应该在第二个之前，则应该返回非零。关键参数究竟是什么取决于 startkeyfun 和 endkeyfun 返回的内容。如果谓词被省略或为零，则默认为 &lt; 如果键是数字，如果键是 cons 单元格（其 car 和 cdr 是键的开始和结束缓冲区位置），则默认为比较缓冲区子字符串，否则为 string&lt; （假设键是字符串）。
+</p>
+<p>作为 sort-subr 的示例，下面是 sort-lines 的完整函数定义：
+</p><div class="lisp">
+<pre class="lisp">
+
+;; Note that the first two lines of doc string
+;; are effectively one line when viewed by a user.
+(defun sort-lines (reverse beg end)
+  "Sort lines in region alphabetically;\
+ argument means descending order.
+Called from a program, there are three arguments:
+
+REVERSE (non-nil means reverse order),\
+ BEG and END (region to sort).
+The variable `sort-fold-case' determines\
+ whether alphabetic case affects
+the sort order."
+
+  (interactive "P\nr")
+  (save-excursion
+    (save-restriction
+      (narrow-to-region beg end)
+      (goto-char (point-min))
+      (let ((inhibit-field-text-motion t))
+        (sort-subr reverse 'forward-line 'end-of-line)))))
+</pre></div>
+<p>在这里，前行移动指向下一条记录的开头，行尾移动指向记录的结尾。我们不传递参数 startkeyfun 和 endkeyfun，因为整个记录被用作排序键。
+</p>
+<p>sort-paragraphs 函数非常相似，只是它的 sort-subr 调用如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(sort-subr reverse
+           (lambda ()
+             (while (and (not (eobp))
+                         (looking-at paragraph-separate))
+               (forward-line 1)))
+           'forward-paragraph)
+</pre></div>
+<p>在 sort-subr 返回后，指向任何排序记录的标记都没有有用的位置。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: sort-fold-case ¶
+</pre></div>
+<p>如果此变量不为 nil，则 sort-subr 和其他缓冲区排序函数在比较字符串时会忽略大小写。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: sort-regexp-fields reverse record-regexp key-regexp start end ¶
+</pre></div>
+<p>此命令按照 record-regexp 和 key-regexp 指定的字母顺序对 start 和 end 之间的区域进行排序。如果 reverse 是负整数，则排序是相反的。
+</p>
+<p>字母排序是指通过比较每个排序键的第一个字符、每个的第二个字符等等来比较两个排序键。如果发现不匹配，则表示排序键不相等；  在第一次不匹配时其字符较少的排序键是较小的排序键。各个字符根据它们在 Emacs 字符集中的数字字符代码进行比较。
+</p>
+<p>record-regexp 参数的值指定如何将缓冲区划分为排序记录。在每条记录的末尾，对该正则表达式进行搜索，并将匹配它的文本作为下一条记录。例如，正则表达式 ’^.+$’ 匹配除换行符之外至少包含一个字符的行，它将使每一行成为一个排序记录。有关正则表达式的语法和含义的描述，请参见正则表达式。
+</p>
+<p>key-regexp 参数的值指定每条记录的哪一部分是排序键。key-regexp 可以匹配整个记录，也可以只匹配一部分。在后一种情况下，记录的其余部分对记录的排序顺序没有影响，但是当记录移动到其新位置时，它会被携带。
+</p>
+<p>key-regexp 参数可以引用由 record-regexp 的子表达式匹配的文本，也可以是它自己的正则表达式。
+</p>
+<p>如果键正则表达式是：
+</p>
+<div class="lisp">
+<pre class="lisp">‘\digit’
+</pre></div>
+<p>那么记录正则表达式中由数字’\（…\）’括号分组匹配的文本是排序键。
+</p><div class="lisp">
+<pre class="lisp">‘\&amp;’
+</pre></div>
+<p>那么整个记录就是排序键。
+</p><div class="lisp">
+<pre class="lisp">a regular expression
+</pre></div>
+<p>然后 sort-regexp-fields 在记录中搜索正则表达式的匹配项。如果找到这样的匹配，它就是排序键。如果记录中的 key-regexp 不匹配，则忽略该记录，这意味着它在缓冲区中的位置不会改变。（其他记录可能会在它周围移动。）
+</p>
+<p>例如，如果您计划按每行以字母 <code>f</code> 开头的第一个单词对区域中的所有行进行排序，则应将 record-regexp 设置为 ’^.*$’ 并将 key-regexp 设置为 ’\ &lt;f\&gt;’。结果表达式如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(sort-regexp-fields nil "^.*$" "\\&lt;f\\w*\\&gt;"
+                    (region-beginning)
+                    (region-end))
+</pre></div>
+<p>如果您以交互方式调用 sort-regexp-fields，它会在 minibuffer 中提示输入记录正则表达式和键正则表达式。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: sort-lines reverse start end ¶
+</pre></div>
+<p>此命令按字母顺序对开始和结束之间的区域中的行进行排序。如果 reverse 不为零，则排序是相反的。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: sort-paragraphs reverse start end ¶
+</pre></div>
+<p>此命令按字母顺序对开始和结束之间区域中的段落进行排序。如果 reverse 不为零，则排序是相反的。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: sort-pages reverse start end ¶
+</pre></div>
+<p>此命令按字母顺序对开始和结束之间区域中的页面进行排序。如果 reverse 不为零，则排序是相反的。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: sort-fields field start end ¶
+</pre></div>
+<p>此命令对 start 和 end 之间的区域中的行进行排序，并按每行的字段字段按字母顺序进行比较。字段由空格分隔并从 1 开始编号。如果字段为负数，则从行尾的第 -fieldth 字段排序。此命令对排序表很有用。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: sort-numeric-fields field start end ¶
+</pre></div>
+<p>此命令对开始和结束之间的区域中的行进行排序，并通过每行的字段字段对它们进行数字比较。字段由空格分隔并从 1 开始编号。指定的字段必须在区域的每一行中包含一个数字。以 0 开头的数字被视为八进制，以 <code>0x</code> 开头的数字被视为十六进制。
+</p>
+<p>如果 field 为负数，则从行尾的第 -fieldth 字段排序。此命令对排序表很有用。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: sort-numeric-base ¶
+</pre></div>
+<p>此变量指定 sort-numeric-fields 解析数字的默认基数。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: sort-columns reverse &amp;optional beg end ¶
+</pre></div>
+<p>此命令对 beg 和 end 之间的区域中的行进行排序，并按一定范围的列按字母顺序比较它们。beg 和 end 的列位置限制了要排序的列范围。
+</p>
+<p>如果 reverse 不为零，则排序是相反的。
+</p>
+<p>这个命令的一个不寻常之处是包含位置 beg 的整行和包含位置 end 的整行都包含在排序的区域中。
+</p>
+<p>请注意，sort-columns 拒绝包含选项卡的文本，因为选项卡可以跨指定列拆分。排序前使用 Mx untabify 将制表符转换为空格。
+</p>
+<p>如果可能，此命令实际上是通过调用 sort 实用程序来工作的。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.16_计数列.html">计数列</a>, Previous: <a href="33.14_自动填充.html">自动填充</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

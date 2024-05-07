@@ -1,0 +1,14 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.1 钩子</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">24.1 钩子</h2>
+<div class="nav-panel"><p>Next: <a href="24.1.1_运行钩子.html">运行钩子</a>, Previous: <a href="24_主要和次要模式.html">主要和次要模式</a>, Up: <a href="24_主要和次要模式.html">主要和次要模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>钩子是一个变量，您可以在其中存储一个或多个函数（请参阅什么是函数？），以便在特定场合由现有程序调用。Emacs 提供了钩子来进行定制。大多数情况下，挂钩是在 init 文件中设置的（参见 The Init File），但 Lisp 程序也可以设置它们。有关一些标准钩子变量的列表，请参阅标准钩子。
+</p>
+<p>Emacs 中的大部分钩子都是普通的钩子。这些变量包含要调用的不带参数的函数列表。按照惯例，只要钩子名称以 <code>-hook</code> 结尾，就说明这是正常的。我们尽量使所有的钩子正常，以便您可以统一使用它们。
+</p>
+<p>每个主要模式命令都应该运行一个称为模式挂钩的普通挂钩，作为初始化的最后步骤之一。这使得用户可以很容易地自定义模式的行为，方法是覆盖模式已经进行的缓冲区局部变量分配。大多数次要模式函数最后也会运行一个模式挂钩。但是钩子也用于其他情况。例如，挂起钩子钩子在 Emacs 挂起之前运行（请参阅挂起 Emacs）。
+</p>
+<p>如果钩子变量的名称不以 <code>-hook</code> 结尾，则表明它可能是一个异常钩子。它们在两个方面不同于普通的钩子：它们可以用一个或多个参数调用，它们的返回值可以以某种方式使用。钩子的文档说明了如何调用函数以及如何使用它们的返回值。添加到异常钩子的任何函数都必须遵循钩子的调用约定。按照惯例，异常的钩子名称以 <code>-functions</code> 结尾。
+</p>
+<p>如果变量的名称以 <code>-predicate</code> 或 <code>-function</code> （单数）结尾，那么它的值必须是一个函数，而不是函数列表。与异常钩子一样，预期的参数和返回值的含义因此类单个函数钩子而异。详细信息在每个变量的文档字符串中进行了说明。
+</p>
+<p>由于钩子（多函数和单函数）是变量，它们的值可以用 setq 或临时用 let 修改。但是，从钩子中添加或删除特定函数同时保留它可能具有的任何其他函数通常很有用。对于多功能挂钩，推荐的方法是使用 add-hook 和 remove-hook（请参阅设置挂钩）。大多数正常的钩子变量最初都是无效的；  add-hook 知道如何处理这个问题。您可以使用 add-hook 全局或本地缓冲区添加挂钩。对于只包含一个函数的钩子，add-hook 是不合适的，但您可以使用 add-function（请参阅 Advising Emacs Lisp Functions）将新函数与钩子结合起来。请注意，某些单个函数挂钩可能为 nil，而 add-function 无法处理，因此您必须在调用 add-function 之前检查这一点。
+</p>
+<div class="nav-panel"><p>Next: <a href="24.1.1_运行钩子.html">运行钩子</a>, Previous: <a href="24_主要和次要模式.html">主要和次要模式</a>, Up: <a href="24_主要和次要模式.html">主要和次要模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

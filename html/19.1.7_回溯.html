@@ -1,0 +1,49 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>19.1.7 回溯</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">19.1.7 回溯</h3>
+<div class="nav-panel"><p>Next: <a href="19.1.8_调试器命令.html">调试器命令</a>, Previous: <a href="19.1.6_使用调试器.html">使用调试器</a>, Up: <a href="19.1_Lisp_调试器.html">Lisp_调试器.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Debugger 模式源自 Backtrace 模式，Edebug 和 ERT 也用于显示回溯。（请参阅 Edebug 和 ERT 中的 ERT 手册：Emacs Lisp 回归测试。）
+</p>
+<p>回溯缓冲区显示正在执行的函数及其参数值。创建回溯缓冲区时，它会将每个堆栈帧显示在一个可能很长的行上。（堆栈帧是 Lisp 解释器记录有关函数的特定调用的信息的地方。）最近调用的函数将位于顶部。
+</p>
+<p>在回溯中，您可以通过将点移动到描述该帧的行来指定堆栈帧。线点打开的帧被认为是当前帧。
+</p>
+<p>如果函数名带有下划线，则表示 Emacs 知道其源代码的位置。您可以用鼠标单击该名称，或移至该名称并键入 RET，以访问源代码。您还可以在 point 位于没有下划线的函数或变量的任何名称上时键入 RET，以查看帮助缓冲区中该符号的帮助信息（如果存在）。绑定到 M-. 的 xref-find-definitions 命令也可用于回溯中的任何标识符（请参阅 GNU Emacs 手册中的查找标识符）。
+</p>
+<p>在回溯中，长列表的尾部和长字符串、向量或结构的末尾，以及深度嵌套的对象，将打印为带下划线的 <code>...</code> 。您可以用鼠标单击 <code>...</code> ，或在点位于其上时键入 RET，以显示隐藏的对象部分。要控制完成多少缩写，请自定义 backtrace-line-length。
+</p>
+<p>以下是用于导航和查看回溯的命令列表：
+</p>
+<div class="lisp">
+<pre class="lisp">v
+</pre></div>
+<p>切换当前堆栈帧的局部变量的显示。
+</p><div class="lisp">
+<pre class="lisp">p
+</pre></div>
+<p>移动到帧的开头，或上一帧的开头。
+</p><div class="lisp">
+<pre class="lisp">n
+</pre></div>
+<p>移动到下一帧的开头。
+</p><div class="lisp">
+<pre class="lisp">+
+</pre></div>
+<p>在顶层 Lisp 表单中添加换行符和缩进，使其更具可读性。
+</p><div class="lisp">
+<pre class="lisp">-
+</pre></div>
+<p>将点处的顶级 Lisp 表单折叠回单行。
+</p><div class="lisp">
+<pre class="lisp">#
+</pre></div>
+<p>在点处切换框架的打印圆圈。
+</p><div class="lisp">
+<pre class="lisp">:
+</pre></div>
+<p>在该点切换帧的 print-gensym。
+</p><div class="lisp">
+<pre class="lisp">.
+</pre></div>
+<p>展开框架中所有缩写为 <code>...</code> 的表格。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="19.1.8_调试器命令.html">调试器命令</a>, Previous: <a href="19.1.6_使用调试器.html">使用调试器</a>, Up: <a href="19.1_Lisp_调试器.html">Lisp_调试器.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

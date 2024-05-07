@@ -1,0 +1,48 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.7.1 键盘事件</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">22.7.1 键盘事件</h3>
+<div class="nav-panel"><p>Next: <a href="22.7.2_功能键.html">功能键</a>, Previous: <a href="22.7_输入事件.html">输入事件</a>, Up: <a href="22.7_输入事件.html">输入事件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>您可以从键盘获得两种输入：普通键和功能键。普通键对应（可能修改过的）字符；  它们生成的事件在 Lisp 中表示为字符。字符事件的事件类型是字符本身（一个整数），它可能设置了一些修饰符位；  见分类事件。
+</p>
+<p>输入字符事件由 0 到 524287 之间的基本代码以及任何或所有这些修饰符位组成：
+</p>
+<div class="lisp">
+<pre class="lisp">meta
+</pre></div>
+<p>字符代码中的 2**27 位表示按住元键键入的字符。
+</p>
+<div class="lisp">
+<pre class="lisp">control
+</pre></div>
+<p>字符代码中的 2**26 位表示非 ASCII 控制字符。
+</p>
+<p>ASCII 控制字符（例如 Ca）具有自己的特殊基本代码，因此 Emacs 不需要特殊位来指示它们。因此，Ca 的代码仅为 1。
+</p>
+<p>但是如果你键入一个不是ASCII的控制组合，比如用控制键的%，你得到的数值就是%加2**26的代码（假设终端支持非ASCII控制字符），即用第27个位设置。
+</p>
+<div class="lisp">
+<pre class="lisp">shift
+</pre></div>
+<p>字符事件代码中的 2**25 位（第 26 位）表示按住 shift 键键入的 ASCII 控制字符。
+</p>
+<p>对于字母，基本代码本身表示大写与小写；  对于数字和标点符号，shift 键选择具有不同基本代码的完全不同的字符。为了尽可能保持在 ASCII 字符集中，Emacs 避免对这些字符事件使用 2**25 位。
+</p>
+<p>但是，ASCII 没有提供区分 CA 和 Ca 的方法，因此 Emacs 在 CA 中使用 2**25 位而不在 Ca 中。
+</p>
+<div class="lisp">
+<pre class="lisp">hyper
+</pre></div>
+<p>字符事件代码中的 2**24 位表示按住超级键键入的字符。
+</p>
+<div class="lisp">
+<pre class="lisp">super
+</pre></div>
+<p>字符事件代码中的 2**23 位表示按住超级键键入的字符。
+</p>
+<div class="lisp">
+<pre class="lisp">alt
+</pre></div>
+<p>字符事件代码中的 2**22 位表示按住 alt 键键入的字符。（大多数键盘上标记为 Alt 的键实际上被视为元键，而不是这个。）
+</p>
+<p>最好避免在程序中提及特定的位数。要测试字符的修饰符位，请使用函数 event-modifiers（请参阅分类事件）。在进行键绑定时，您可以对带有修饰符位的字符（’-’、’-’ 等）使用读取语法。要使用 define-key 进行键绑定，您可以使用 (control hyper ?x) 之类的列表来指定字符（请参阅更改键绑定）。函数 event-convert-list 将此类列表转换为事件类型（请参阅分类事件）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.7.2_功能键.html">功能键</a>, Previous: <a href="22.7_输入事件.html">输入事件</a>, Up: <a href="22.7_输入事件.html">输入事件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

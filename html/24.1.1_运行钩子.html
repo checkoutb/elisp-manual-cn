@@ -1,0 +1,32 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.1.1 运行钩子</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">24.1.1 运行钩子</h3>
+<div class="nav-panel"><p>Next: <a href="24.1.2_设置挂钩.html">设置挂钩</a>, Previous: <a href="24.1_钩子.html">钩子</a>, Up: <a href="24.1_钩子.html">钩子.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在本节中，我们记录了 run-hooks 函数，它用于运行普通的钩子。我们还记录了运行各种异常钩子的函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: run-hooks &amp;rest hookvars ¶
+</pre></div>
+<p>该函数将一个或多个普通钩子变量名作为参数，并依次运行每个钩子。每个参数都应该是一个符号，它是一个普通的钩子变量。这些参数按指定的顺序处理。
+</p>
+<p>如果挂钩变量具有非零值，则该值应该是函数列表。run-hooks 一个一个地调用所有函数，没有参数。
+</p>
+<p>钩子变量的值也可以是一个单独的函数——一个 lambda 表达式或一个带有函数定义的符号——它会被 run-hooks 调用。但是这种用法已经过时了。
+</p>
+<p>如果挂钩变量是缓冲区局部变量，则将使用缓冲区局部变量而不是全局变量。但是，如果缓冲区局部变量包含元素 t，则全局挂钩变量也将运行。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: run-hook-with-args hook &amp;rest args ¶
+</pre></div>
+<p>该函数通过调用钩子中的所有钩子函数来运行异常钩子，并为每个函数传递参数 args。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: run-hook-with-args-until-failure hook &amp;rest args ¶
+</pre></div>
+<p>该函数通过依次调用每个钩子函数来运行异常钩子，如果其中一个函数失败并返回 nil 则停止。每个钩子函数都传递参数 args。如果此函数由于其中一个钩子函数失败而停止，则返回 nil；  否则它返回一个非零值。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: run-hook-with-args-until-success hook &amp;rest args ¶
+</pre></div>
+<p>这个函数通过调用每个钩子函数来运行一个异常钩子，如果其中一个函数成功返回一个非零值，则停止。每个钩子函数都传递参数 args。如果这个函数因为一个钩子函数返回一个非零值而停止，它返回那个值；  否则返回零。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="24.1.2_设置挂钩.html">设置挂钩</a>, Previous: <a href="24.1_钩子.html">钩子</a>, Up: <a href="24.1_钩子.html">钩子.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

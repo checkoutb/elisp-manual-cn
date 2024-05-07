@@ -1,0 +1,34 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.17.7 其他图像类型</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.17.7 其他图像类型</h3>
+<div class="nav-panel"><p>Next: <a href="40.17.8_定义图像.html">定义图像</a>, Previous: <a href="40.17.6_SVG_图像.html">SVG_图像</a>, Up: <a href="40.17_图像.html">图像.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>对于 PBM 图像，请指定图像类型 pbm。支持彩色、灰度和单色图像。对于单声道 PBM 图像，支持两个额外的图像属性。
+</p>
+<div class="lisp">
+<pre class="lisp">:foreground foreground
+</pre></div>
+<p>值 foreground 应该是指定图像前景色的字符串，或者默认颜色为 nil。此颜色用于 PBM 中为 1 的每个像素。默认为帧的前景色。
+</p><div class="lisp">
+<pre class="lisp">:background background
+</pre></div>
+<p>值 background 应该是指定图像背景颜色的字符串，或者默认颜色为 nil。此颜色用于 PBM 中为 0 的每个像素。默认为框架的背景颜色。
+</p>
+<p>Emacs 可以支持的其余图像类型有：
+</p>
+<div class="lisp">
+<pre class="lisp">GIF
+</pre></div>
+<p>图像类型 gif。支持 :index 属性。请参阅多帧图像。
+</p><div class="lisp">
+<pre class="lisp">JPEG
+</pre></div>
+<p>图像类型 jpeg。
+</p><div class="lisp">
+<pre class="lisp">PNG
+</pre></div>
+<p>图片类型.png
+</p><div class="lisp">
+<pre class="lisp">TIFF
+</pre></div>
+<p>图像类型 tiff。支持 :index 属性。请参阅多帧图像。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.17.8_定义图像.html">定义图像</a>, Previous: <a href="40.17.6_SVG_图像.html">SVG_图像</a>, Up: <a href="40.17_图像.html">图像.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

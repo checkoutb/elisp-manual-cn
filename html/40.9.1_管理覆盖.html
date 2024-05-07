@@ -1,0 +1,126 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.9.1 管理覆盖</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.9.1 管理覆盖</h3>
+<div class="nav-panel"><p>Next: <a href="40.9.2_覆盖属性.html">覆盖属性</a>, Previous: <a href="40.9_叠加.html">叠加</a>, Up: <a href="40.9_叠加.html">叠加.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍创建、删除和移动覆盖以及检查其内容的功能。覆盖更改不会记录在缓冲区的撤消列表中，因为覆盖不是缓冲区内容的一部分。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: overlayp object ¶
+</pre></div>
+<p>如果对象是叠加层，则此函数返回 t。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-overlay start end &amp;optional buffer front-advance rear-advance ¶
+</pre></div>
+<p>此函数创建并返回属于缓冲区且范围从开始到结束的覆盖。start 和 end 都必须指定缓冲区位置；  它们可能是整数或标记。如果省略缓冲区，则在当前缓冲区中创建覆盖。
+</p>
+<p>开始和结束指定相同缓冲区位置的覆盖称为空。如果删除了开头和结尾之间的文本，则非空叠加层可能会变为空。发生这种情况时，默认情况下不会删除覆盖，但您可以通过赋予其 <code>蒸发</code> 属性（请参阅蒸发属性）将其删除。
+</p>
+<p>参数front-advance 和rear-advance 分别指定覆盖开始和覆盖结束的标记插入类型。请参阅标记插入类型。如果它们都是 nil（默认值），则覆盖将扩展到包括在开头插入的任何文本，但不包括在末尾插入的文本。如果 front-advance 不为零，则插入在覆盖开头的文本将从覆盖中排除。如果 back-advance 不为零，则插入到覆盖层末尾的文本将包含在覆盖层中。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: overlay-start overlay ¶
+</pre></div>
+<p>此函数以整数形式返回覆盖开始的位置。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: overlay-end overlay ¶
+</pre></div>
+<p>此函数以整数形式返回覆盖结束的位置。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: overlay-buffer overlay ¶
+</pre></div>
+<p>该函数返回叠加层所属的缓冲区。如果覆盖已被删除，则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: delete-overlay overlay ¶
+</pre></div>
+<p>此功能删除覆盖。叠加层继续作为 Lisp 对象存在，它的属性列表没有改变，但它不再附加到它所属的缓冲区，并且不再对显示产生任何影响。
+</p>
+<p>已删除的叠加层不会永久断开连接。您可以通过调用 move-overlay 再次给它在缓冲区中的位置。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: move-overlay overlay start end &amp;optional buffer ¶
+</pre></div>
+<p>此函数将覆盖移动到缓冲区，并将其边界放置在开始和结束处。参数 start 和 end 都必须指定缓冲区位置；  它们可能是整数或标记。
+</p>
+<p>如果 buffer 被省略，overlay 将停留在它已经关联的同一个缓冲区中；  如果覆盖被删除，它会进入当前缓冲区。
+</p>
+<p>返回值是覆盖。
+</p>
+<p>这是更改覆盖的端点的唯一有效方法。不要尝试手动修改叠加层中的标记，因为这无法更新其他重要数据结构并可能导致一些叠加层丢失。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: remove-overlays &amp;optional start end name value ¶
+</pre></div>
+<p>此函数删除属性名称具有值 value 的 start 和 end 之间的所有覆盖。它可以移动区域中叠加层的端点，或拆分它们。
+</p>
+<p>如果 name 省略或为 nil，则表示删除指定区域内的所有叠加层。如果 start 和/或 end 被省略或为零，则分别表示缓冲区的开始和结束。因此， (remove-overlays) 删除当前缓冲区中的所有覆盖。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: copy-overlay overlay ¶
+</pre></div>
+<p>此函数返回覆盖的副本。副本具有与覆盖相同的端点和属性。但是，覆盖开始和覆盖结束的标记插入类型设置为其默认值（请参阅标记插入类型）。
+</p>
+<p>这里有些例子：
+</p>
+<div class="lisp">
+<pre class="lisp">;; Create an overlay.
+(setq foo (make-overlay 1 10))
+     ⇒ #&lt;overlay from 1 to 10 in display.texi&gt;
+(overlay-start foo)
+     ⇒ 1
+(overlay-end foo)
+     ⇒ 10
+(overlay-buffer foo)
+     ⇒ #&lt;buffer display.texi&gt;
+;; Give it a property we can check later.
+(overlay-put foo 'happy t)
+     ⇒ t
+;; Verify the property is present.
+(overlay-get foo 'happy)
+     ⇒ t
+;; Move the overlay.
+(move-overlay foo 5 20)
+     ⇒ #&lt;overlay from 5 to 20 in display.texi&gt;
+(overlay-start foo)
+     ⇒ 5
+(overlay-end foo)
+     ⇒ 20
+;; Delete the overlay.
+(delete-overlay foo)
+     ⇒ nil
+;; Verify it is deleted.
+foo
+     ⇒ #&lt;overlay in no buffer&gt;
+;; A deleted overlay has no position.
+(overlay-start foo)
+     ⇒ nil
+(overlay-end foo)
+     ⇒ nil
+(overlay-buffer foo)
+     ⇒ nil
+;; Undelete the overlay.
+(move-overlay foo 1 20)
+     ⇒ #&lt;overlay from 1 to 20 in display.texi&gt;
+;; Verify the results.
+(overlay-start foo)
+     ⇒ 1
+(overlay-end foo)
+     ⇒ 20
+(overlay-buffer foo)
+     ⇒ #&lt;buffer display.texi&gt;
+;; Moving and deleting the overlay does not change its properties.
+(overlay-get foo 'happy)
+     ⇒ t
+</pre></div>
+<p>Emacs 将每个缓冲区的覆盖存储在两个列表中，围绕任意中心位置划分。一个列表从该中心位置向后延伸穿过缓冲区，另一个从该中心位置向前延伸。中心位置可以在缓冲区中的任何位置。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: overlay-recenter pos ¶
+</pre></div>
+<p>此函数将当前缓冲区的覆盖集中在位置 pos 周围。这使得 pos 附近的位置的覆盖查找更快，但远离 pos 的位置更慢。
+</p>
+<p>如果您先执行 (overlay-recenter (point-max))，则向前扫描缓冲区并创建覆盖的循环可以运行得更快。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.9.2_覆盖属性.html">覆盖属性</a>, Previous: <a href="40.9_叠加.html">叠加</a>, Up: <a href="40.9_叠加.html">叠加.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

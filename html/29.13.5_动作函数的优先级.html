@@ -1,0 +1,142 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>29.13.5 动作函数的优先级</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">29.13.5 动作函数的优先级</h3>
+<div class="nav-panel"><p>Next: <a href="29.13.6_缓冲区显示之禅.html">缓冲区显示之禅</a>, Previous: <a href="29.13.4_显示缓冲区的附加选项.html">显示缓冲区的附加选项</a>, Up: <a href="29.13_在合适的窗口中显示缓冲区.html">在合适的窗口中显示缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>从前面的小节中我们已经知道 display-buffer 必须提供许多显示操作（请参阅选择用于显示缓冲区的窗口）才能显示缓冲区。在完全非自定义的 Emacs 中，这些动作由 display-buffer-fallback-action 指定，按以下优先顺序：重用一个窗口，在同一帧上弹出一个新窗口，使用以前显示缓冲区的窗口，使用某个窗口并弹出一个新 <code>帧</code> ( <code>frame</code> )。（请注意，由 display-buffer-fallback-action 命名的其余操作在未自定义的 Emacs 中是无效的）。
+</p>
+<p>考虑以下形式：
+</p>
+<div class="lisp">
+<pre class="lisp">(display-buffer (get-buffer-create "*foo*"))
+</pre></div>
+<p>在未自定义的 Emacs 会话的缓冲区 <strong>scratch</strong> 中评估此表单通常无法重用已显示 <strong>foo</strong> 的窗口，但会成功弹出一个新窗口。再次评估相同的表单现在不会导致任何可见的变化——display-buffer 重用了已经显示 <strong>foo</strong> 的窗口，因为该操作是适用的并且在所有适用的操作中具有最高优先级。
+</p>
+<p>如果所选 <code>帧</code> ( <code>frame</code> )上没有足够的空间，则弹出新窗口将失败。在未定制的 Emacs 中，当一个 <code>帧</code> ( <code>frame</code> )上已经有两个窗口时，它通常会失败。例如，如果您现在键入 Cx 1，然后键入 Cx 2 并再次计算表单，*foo* 应该显示在下部窗口中 - display-buffer 刚刚使用了 <code>some</code> 窗口。如果在键入 Cx 2 之前您已键入 Cx o，*foo* 将显示在上部窗口中，因为 <code>some</code> 窗口代表 <code>最近最少使用</code> 窗口，并且选定的窗口最近最少使用当且仅当它独自一人在它的 <code>帧</code> ( <code>frame</code> )上。
+</p>
+<p>假设您没有键入 Cx o 并且 <strong>foo</strong> 显示在下部窗口中。输入 Cx o 到达那里，然后输入 Cx left 并再次评估表单。这应该在同一个较低的窗口中显示 *foo*，因为该窗口之前已经显示了 *foo*，因此被选择而不是其他一些窗口。
+</p>
+<p>到目前为止，我们只观察了未自定义的 Emacs 会话中的默认行为。要了解如何自定义此行为，让我们考虑选项 display-buffer-base-action。它提供了一个非常粗略的自定义，在概念上会影响任何缓冲区的显示。它可用于补充 display-buffer-fallback-action 提供的操作，方法是重新排序或添加不存在但更适合用户编辑实践的操作。但是，它也可以用于以更深刻的方式更改默认行为。
+</p>
+<p>让我们考虑一个用户，他通常喜欢在另一帧上显示缓冲区。这样的用户可能会提供以下定制：
+</p>
+<div class="lisp">
+<pre class="lisp">(customize-set-variable
+ 'display-buffer-base-action
+ '((display-buffer-reuse-window display-buffer-pop-up-frame)
+   (reusable-frames . 0)))
+</pre></div>
+<p>此设置将导致 display-buffer 首先尝试在可见或图标化 <code>帧</code> ( <code>frame</code> )上找到显示缓冲区的窗口，如果不存在此类 <code>帧</code> ( <code>frame</code> )，则弹出一个新 <code>帧</code> ( <code>frame</code> )。您可以通过在显示 <strong>scratch</strong> 的窗口中键入 Cx 1 并评估我们的规范显示缓冲区形式来观察图形系统上的这种行为。这通常会创建（并关注）其根窗口显示 <strong>foo</strong> 的新 <code>帧</code> ( <code>frame</code> )。图标化该 <code>帧</code> ( <code>frame</code> )并再次评估规范形式：显示缓冲区将重用新 <code>帧</code> ( <code>frame</code> )上的窗口（通常提升 <code>帧</code> ( <code>frame</code> )并为其提供焦点）。
+</p>
+<p>只有在创建新 <code>帧</code> ( <code>frame</code> )失败时，display-buffer 才会应用 display-buffer-fallback-action 提供的操作，这意味着再次尝试重用窗口、弹出新窗口等。以下形式提供了一种使 <code>帧</code> ( <code>frame</code> )创建失败的简单方法：
+</p><div class="lisp">
+<pre class="lisp">(let ((pop-up-frame-function 'ignore))
+  (display-buffer (get-buffer-create "*foo*")))
+</pre></div>
+<p>在观察到它无法创建新 <code>帧</code> ( <code>frame</code> )并使用回退操作后，我们将立即忘记该表单。
+</p>
+<p>请注意，display-buffer-reuse-window 在 display-buffer-base-action 的自定义中显得多余，因为它已经是 display-buffer-fallback-action 的一部分，无论如何都应该在那里尝试。但是，这会失败，因为由于 display-buffer-base-action 优先于 display-buffer-fallback-action，那时 display-buffer-pop-up-frame 已经赢得了比赛。事实上，这个：
+</p><div class="lisp">
+<pre class="lisp">(customize-set-variable
+ 'display-buffer-base-action
+ '(display-buffer-pop-up-frame (reusable-frames . 0)))
+</pre></div>
+<p>会导致显示缓冲区总是弹出一个新的帧，这可能不是我们用户想要的。
+</p>
+<p>到目前为止，我们只展示了用户如何自定义显示缓冲区的默认行为。现在让我们看看应用程序如何改变显示缓冲区的过程。执行此操作的规范方法是使用 display-buffer 的 action 参数或调用它的函数，例如 pop-to-buffer（请参阅在窗口中切换到缓冲区）。
+</p>
+<p>假设应用程序希望在所选窗口下方显示 *foo*（以立即将用户的注意力吸引到新窗口），或者如果失败，则在 <code>帧</code> ( <code>frame</code> )底部的窗口中显示。它可以通过这样的调用来做到这一点：
+</p>
+<div class="lisp">
+<pre class="lisp">(customize-set-variable
+ 'display-buffer-base-action
+ '(display-buffer-pop-up-frame (reusable-frames . 0)))
+</pre></div>
+<p>为了查看这个新的、修改后的表单是如何工作的，删除任何显示 <strong>foo</strong> 的 <code>帧</code> ( <code>frame</code> )，在显示 <strong>scratch</strong> 的窗口中键入 Cx 1 后跟 Cx 2，然后评估该表单。display-buffer 应该分割上面的窗口，并在新窗口中显示 *foo*。或者，如果在 Cx 2 之后您输入了 Cx o，则显示缓冲区将在底部拆分窗口。
+</p>
+<p>现在假设，在评估新表单之前，您已经使所选窗口尽可能小，例如，通过评估该窗口中的表单 (fit-window-to-buffer)。在这种情况下，显示缓冲区将无法拆分所选窗口，而是拆分 <code>帧</code> ( <code>frame</code> )的根窗口，从而在 <code>帧</code> ( <code>frame</code> )底部有效地显示 *foo*。
+</p>
+<p>在任何一种情况下，第二次评估新表单都应该重用已经显示 <strong>foo</strong> 的窗口，因为 action 参数提供的两个函数都尝试首先重用这样的窗口。
+</p>
+<p>通过设置 action 参数，应用程序有效地否决了 display-buffer-base-action 的任何自定义。我们的用户现在可以接受应用程序的选择，或者通过自定义选项 display-buffer-alist 来加倍，如下所示：
+</p><div class="lisp">
+<pre class="lisp">(customize-set-variable
+ 'display-buffer-alist
+ '(("\\*foo\\*"
+    (display-buffer-reuse-window display-buffer-pop-up-frame))))
+</pre></div>
+<p>在不显示 <strong>foo</strong> 的配置中尝试使用上面的新修改形式，将在单独的帧上显示 *foo*，完全忽略显示缓冲区的操作参数。
+</p>
+<p>请注意，我们并不关心在我们的 display-buffer-alist 规范中指定可重用帧操作 alist 条目。display-buffer 总是取它找到的第一个——在我们的例子中是 display-buffer-base-action 指定的那个。如果我们想使用不同的规范，例如，从可重复使用的列表中排除显示 <strong>foo</strong> 的图标化 <code>帧</code> ( <code>frame</code> )，我们必须单独指定，但是：
+</p>
+<div class="lisp">
+<pre class="lisp">(customize-set-variable
+ 'display-buffer-alist
+ '(("\\*foo\\*"
+    (display-buffer-reuse-window display-buffer-pop-up-frame)
+    (reusable-frames . visible))))
+</pre></div>
+<p>如果你尝试这个，你会注意到重复尝试显示 <strong>foo</strong> 将成功地重用一个 <code>帧</code> ( <code>frame</code> )，只有当该 <code>帧</code> ( <code>frame</code> )可见时。
+</p>
+<p>上面的示例可以得出这样的结论：用户自定义 display-buffer-alist 的唯一目的是推翻应用程序选择的操作参数。这样的结论是不正确的。display-buffer-alist 是用户以首选方式指导特定缓冲区显示过程的标准选项，无论显示是否也由操作参数引导。
+</p>
+<p>然而，我们可以合理地得出结论，自定义 display-buffer-alist 与自定义 display-buffer-base-action 在两个主要方面不同：它更强大，因为它覆盖了 display-buffer 的 action 参数，并且它允许显式指定受影响的缓冲区。事实上，显示其他缓冲区不受 <strong>foo</strong> 自定义的任何影响。例如，
+</p>
+<div class="lisp">
+<pre class="lisp">(display-buffer (get-buffer-create "*bar*"))
+</pre></div>
+<p>继续受 display-buffer-base-action 和 display-buffer-fallback-action 的设置控制。
+</p>
+<p>我们可以在这里停止我们的示例，但 Lisp 程序仍然有一个王牌，他们可以使用它来推翻对 display-buffer-alist 的任何自定义。这是变量 display-buffer-overriding-action ，它们可以围绕 display-buffer 调用绑定，如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(let ((display-buffer-overriding-action
+       '((display-buffer-same-window))))
+  (display-buffer
+   (get-buffer-create "*foo*")
+   '((display-buffer-below-selected display-buffer-at-bottom))))
+</pre></div>
+<p>无论操作参数和任何用户自定义如何，评估此表单通常会在所选窗口中显示 *foo*。（通常，应用程序不会费心也提供一个动作参数。这里它只是用来说明它被覆盖的事实。）
+</p>
+<p>查看显示缓冲区将尝试使用我们在此处提供的自定义项显示 <strong>foo</strong> 的操作函数列表可能是说明性的。列表（包括解释谁添加了这个和后续元素的评论）是：
+</p>
+<div class="lisp">
+<pre class="lisp">(display-buffer-same-window  ;; `display-buffer-overriding-action'
+ display-buffer-reuse-window ;; `display-buffer-alist'
+ display-buffer-pop-up-frame
+ display-buffer-below-selected ;; ACTION argument
+ display-buffer-at-bottom
+ display-buffer-reuse-window ;; `display-buffer-base-action'
+ display-buffer-pop-up-frame
+ display-buffer--maybe-same-window ;; `display-buffer-fallback-action'
+ display-buffer-reuse-window
+ display-buffer--maybe-pop-up-frame-or-window
+ display-buffer-in-previous-window
+ display-buffer-use-some-window
+ display-buffer-pop-up-frame)
+</pre></div>
+<p>请注意，在此处列出的内部函数中，display-buffer–maybe-same-window 被有效地忽略，而 display-buffer–maybe-pop-up-frame-or-window 实际上运行 display-buffer-pop-up-window .
+</p>
+<p>每个函数调用中传递的动作列表是：
+</p><div class="lisp">
+<pre class="lisp">((reusable-frames . visible)
+ (reusable-frames . 0))
+</pre></div>
+<p>这表明我们使用了上面 display-buffer-alist 的第二个规范，覆盖了 display-buffer-base-action 提供的规范。假设我们的用户将其写为
+</p>
+<div class="lisp">
+<pre class="lisp">(customize-set-variable
+ 'display-buffer-alist
+ '(("\\*foo\\*"
+    (display-buffer-reuse-window display-buffer-pop-up-frame)
+    (inhibit-same-window . t)
+    (reusable-frames . visible))))
+</pre></div>
+<p>在这种情况下，inhibit-same-window alist 条目将成功地使 display-buffer-overriding-action 中的 display-buffer-same-window 规范无效，并且 display-buffer 将在另一个帧上显示 *foo*。为了使 display-buffer-overriding-action 在这方面更加健壮，应用程序还必须指定适当的禁止相同窗口条目，例如，如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(let ((display-buffer-overriding-action
+       '(display-buffer-same-window (inhibit-same-window . nil))))
+  (display-buffer (get-buffer-create "*foo*")))
+</pre></div>
+<p>最后一个示例表明，虽然操作函数的优先顺序是固定的，如选择用于显示缓冲区的窗口中所述，但由按该顺序排列较低的显示操作指定的操作列表条目可能会影响排名较高的显示操作的执行.
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="29.13.6_缓冲区显示之禅.html">缓冲区显示之禅</a>, Previous: <a href="29.13.4_显示缓冲区的附加选项.html">显示缓冲区的附加选项</a>, Up: <a href="29.13_在合适的窗口中显示缓冲区.html">在合适的窗口中显示缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

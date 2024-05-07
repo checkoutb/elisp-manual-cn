@@ -1,0 +1,23 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.17.1 缩进原语</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">33.17.1 缩进原语</h3>
+<div class="nav-panel"><p>Next: <a href="33.17.2_主模式控制的缩进.html">主模式控制的缩进</a>, Previous: <a href="33.17_缩进.html">缩进</a>, Up: <a href="33.17_缩进.html">缩进.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍用于计算和插入缩进的基本函数。以下部分中的函数使用这些原语。有关相关功能，请参见显示文本的大小。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: current-indentation ¶
+</pre></div>
+<p>该函数返回当前行的缩进，即第一个非空白字符的水平位置。如果内容完全空白，则这是行尾的水平位置。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: indent-to column &amp;optional minimum ¶
+</pre></div>
+<p>此函数使用制表符和空格从点缩进，直到到达列。如果指定了 minimum 且非 nil，则至少插入那么多空格，即使这需要超出列。否则，如果点已经超出列，则该函数不执行任何操作。该值是插入缩进结束的列。
+</p>
+<p>插入的空白字符从周围的文本（通常仅从前面的文本）继承文本属性。请参阅文本属性的粘性。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: indent-tabs-mode ¶
+</pre></div>
+<p>如果此变量不为零，则缩进函数可以插入制表符和空格。否则，它们只插入空格。自动设置此变量使其在当前缓冲区中成为局部缓冲区。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.17.2_主模式控制的缩进.html">主模式控制的缩进</a>, Previous: <a href="33.17_缩进.html">缩进</a>, Up: <a href="33.17_缩进.html">缩进.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

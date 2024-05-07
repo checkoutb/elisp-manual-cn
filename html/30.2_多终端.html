@@ -1,0 +1,148 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>30.2 多终端</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">30.2 多终端</h2>
+<div class="nav-panel"><p>Next: <a href="30.3_帧几何.html">帧几何</a>, Previous: <a href="30.1_创建帧.html">创建帧</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 将每个终端表示为终端对象数据类型（请参阅终端类型）。在 GNU 和 Unix 系统上，Emacs 可以在每个会话中同时使用多个终端。在其他系统上，它只能使用一个终端。每个终端对象具有以下属性：
+</p>
+<ul>
+<li>
+终端使用的设备名称（例如，’:0.0’ 或 /dev/tty）。
+</li><li>
+终端上使用的终端和键盘编码系统。请参阅终端 I/O 编码。
+</li><li>
+与终端关联的显示类型。这是函数 terminal-live-p（即 x、t、w32、ns 或 pc）返回的符号。请参阅帧。
+</li><li>
+终端参数列表。请参阅终端参数。
+</li></ul>
+<p>没有用于创建终端对象的原语。Emacs 根据需要创建它们，例如当您调用 make-frame-on-display 时（如下所述）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: terminal-name &amp;optional terminal ¶
+</pre></div>
+<p>该函数返回终端使用的设备的文件名。如果终端被省略或为零，则默认为所选帧的终端。终端也可以是一个帧，表示该帧的终端。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: terminal-list ¶
+</pre></div>
+<p>此函数返回所有活动终端对象的列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: get-device-terminal device ¶
+</pre></div>
+<p>此函数返回一个终端，其设备名称由 device 给出。如果 device 是字符串，它可以是终端设备的文件名，也可以是 <code>host:server.screen</code> 形式的 X 显示器的名称。如果设备是一个帧，这个函数返回那个帧的终端；  nil 表示选中的帧。最后，如果 device 是一个表示活动终端的终端对象，则返回该终端。如果函数的参数不是上述任何一个，则该函数会发出错误信号。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: delete-terminal &amp;optional terminal force ¶
+</pre></div>
+<p>此函数删除终端上的所有帧并释放它使用的资源。它运行异常钩子 delete-terminal-functions，将终端作为参数传递给每个函数。
+</p>
+<p>如果终端被省略或为零，则默认为所选帧的终端。终端也可以是一个帧，表示该帧的终端。
+</p>
+<p>通常，如果您尝试删除唯一的活动终端，此函数会发出错误信号，但如果 force 不为零，则允许您这样做。当终端上的最后一帧被删除时，Emacs 会自动调用这个函数（参见删除帧）。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: delete-terminal-functions ¶
+</pre></div>
+<p>删除终端运行的异常钩子。每个函数接收一个参数，即传递给 delete-terminal 的终端参数。由于技术细节，这些函数可以在终端被删除之前或之后被调用。
+</p>
+<p>一些 Lisp 变量是终端本地的；  也就是说，它们对每个终端都有单独的绑定。任何时候生效的绑定都是针对当前选择的帧所属的终端的绑定。这些变量包括 default-minibuffer-frame、defining-kbd-macro、last-kbd-macro 和 system-key-alist。它们始终是终端本地的，并且永远不能是缓冲区本地的（请参阅缓冲区本地变量）。
+</p>
+<p>在 GNU 和 Unix 系统上，每个 X 显示器都是一个单独的图形终端。当 Emacs 从 X 窗口系统中启动时，它使用由 DISPLAY 环境变量或 <code>--display</code> 选项指定的 X 显示（参见 GNU Emacs 手册中的初始选项）。Emacs 可以通过命令 make-frame-on-display 连接到其他 X 显示器。每个 X 显示器都有自己的选定帧和自己的 minibuffer 窗口；  但是，在任何给定时刻，只有这些帧中的一个是选定的帧（请参阅输入焦点）。通过与 emacsclient 程序交互，Emacs 甚至可以连接到其他文本终端。请参阅 GNU Emacs 手册中的 Emacs 服务器。
+</p>
+<p>单个 X 服务器可以处理多个显示。每个 X 显示器都有一个由三部分组成的名称，’hostname:displaynumber.screennumber’。第一部分，主机名，指定显示器物理连接的机器的名称。第二部分 displaynumber 是一个从零开始的数字，用于标识连接到该机器的一个或多个监视器，这些监视器共享一个公共键盘和指点设备（鼠标、平板电脑等）。第三部分 screennumber 标识从零开始的屏幕编号（一个单独的监视器），它是该 X 服务器上单个监视器集合的一部分。当您使用属于一个服务器的两个或多个屏幕时，Emacs 通过名称的相似性知道它们共享一个键盘。
+</p>
+<p>不使用 X 窗口系统的系统，例如 MS-Windows，不支持 X 显示器的概念，并且每台主机上只有一个显示器。这些系统上的显示名称不遵循上述 3 部分格式；  例如，MS-Windows 系统上的显示名称是一个常量字符串 ’w32’，并且为了兼容性而存在，因此您可以将它传递给需要显示名称的函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: make-frame-on-display display &amp;optional parameters ¶
+</pre></div>
+<p>此函数在显示时创建并返回一个新帧，并从 alist 参数中获取其他帧参数。display 应该是 X 显示的名称（字符串）。
+</p>
+<p>在创建帧之前，该函数确保 Emacs 设置为显示图形。例如，如果 Emacs 没有处理 X 资源（例如，如果它是在文本终端上启动的），那么此时它会处理。在所有其他方面，此函数的行为类似于 make-frame（请参阅创建帧）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: x-display-list ¶
+</pre></div>
+<p>此函数返回一个列表，指示 Emacs 连接到的 X 显示器。列表的元素是字符串，每一个都是一个显示名称。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: x-open-connection display &amp;optional xrm-string must-succeed ¶
+</pre></div>
+<p>此函数打开到 X 显示显示的连接，而不在该显示上创建帧。通常，Emacs Lisp 程序不需要调用这个函数，因为 make-frame-on-display 会自动调用它。调用它的唯一原因是检查是否可以与给定的 X 显示器建立通信。
+</p>
+<p>可选参数 xrm-string（如果不是 nil）是资源名称和值的字符串，其格式与 .Xresources 文件中使用的格式相同。请参阅 GNU Emacs 手册中的 X 资源。这些值适用于在此显示上创建的所有 Emacs 帧，覆盖 X 服务器中记录的资源值。以下是此字符串的示例：
+</p>
+<div class="lisp">
+<pre class="lisp">"*BorderWidth: 3\n*InternalBorder: 2\n"
+</pre></div>
+<p>如果 must-succeed 不为零，则无法打开连接会终止 Emacs。否则，这是一个普通的 Lisp 错误。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: x-close-connection display ¶
+</pre></div>
+<p>此函数关闭连接以显示显示。在执行此操作之前，您必须先删除在该显示器上打开的所有帧（请参阅删除帧）。
+</p>
+<p>在某些多显示器设置中，单个 X 显示器输出到多个物理显示器。您可以使用函数 display-monitor-attributes-list 和 frame-monitor-attributes 来获取有关此类设置的信息。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-monitor-attributes-list &amp;optional display ¶
+</pre></div>
+<p>该函数返回显示的物理监视器属性列表，可以是显示名称（字符串）、终端或帧；  如果省略或为零，则默认为所选帧的显示。列表的每个元素都是一个关联列表，表示物理监视器的属性。第一个元素对应于主监视器。属性键和值是：
+</p>
+<div class="lisp">
+<pre class="lisp">‘geometry’
+</pre></div>
+<p>显示器屏幕左上角的位置及其大小（以像素为单位），如 <code>（xy 宽度高度）</code> 。请注意，如果监视器不是主监视器，则某些坐标可能为负数。
+</p><div class="lisp">
+<pre class="lisp">‘workarea’
+</pre></div>
+<p>左上角的位置和工作区域（可用空间）的大小（以像素为单位）为 <code>（xy 宽度高度）</code> 。这可能与 <code>几何</code> 不同，因为各种窗口管理器功能（停靠栏、任务栏等）占用的空间可能会被排除在工作区之外。这些功能是否实际上从工作区域中减去取决于平台和环境。同样，如果监视器不是主监视器，则某些坐标可能是负数。
+</p><div class="lisp">
+<pre class="lisp">‘mm-size’
+</pre></div>
+<p>以毫米为单位的宽度和高度为 <code>（宽度高度</code> ）
+</p><div class="lisp">
+<pre class="lisp">‘frames’
+</pre></div>
+<p>此物理监视器控制的帧列表（见下文）。
+</p><div class="lisp">
+<pre class="lisp">‘name’
+</pre></div>
+<p>物理监视器的名称为字符串。
+</p><div class="lisp">
+<pre class="lisp">‘source’
+</pre></div>
+<p>多显示器信息的来源为字符串；  例如， <code>XRandr</code> 或 <code>Xinerama</code> 。
+</p>
+<p>x、y、宽度和高度是整数。 <code>名称</code> 和 <code>来源</code> 可能不存在。
+</p>
+<p>当帧的最大区域位于该监视器中时，或者（如果该帧不与任何物理监视器相交）该监视器最接近该帧，则该帧由该物理监视器支配。图形显示中的每个（非工具提示）帧（无论是否可见）一次仅由一个物理监视器控制，尽管该帧可以跨越多个（或没有）物理监视器。
+</p>
+<p>以下是此函数在 2 监视器显示屏上生成的数据示例：
+</p><div class="lisp">
+<pre class="lisp">(display-monitor-attributes-list)
+⇒
+(((geometry 0 0 1920 1080) ;; Left-hand, primary monitor
+  (workarea 0 0 1920 1050) ;; A taskbar occupies some of the height
+  (mm-size 677 381)
+  (name . "DISPLAY1")
+  (frames #&lt;frame emacs@host *Messages* 0x11578c0&gt;
+          #&lt;frame emacs@host *scratch* 0x114b838&gt;))
+ ((geometry 1920 0 1680 1050) ;; Right-hand monitor
+  (workarea 1920 0 1680 1050) ;; Whole screen can be used
+  (mm-size 593 370)
+  (name . "DISPLAY2")
+  (frames)))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: frame-monitor-attributes &amp;optional frame ¶
+</pre></div>
+<p>此函数返回物理监视器支配（见上文）帧的属性，默认为选定的帧。
+</p>
+<p>在多显示器显示器上，可以使用命令 make-frame-on-monitor 在指定的显示器上制作帧。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: make-frame-on-monitor monitor &amp;optional display parameters ¶
+</pre></div>
+<p>此函数在显示器上的监视器上创建并返回一个新帧，并从 alist 参数中获取其他帧参数。monitor 应该是物理监视器的名称，与属性名称中函数 display-monitor-attributes-list 返回的字符串相同。display 应该是 X 显示的名称（字符串）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="30.3_帧几何.html">帧几何</a>, Previous: <a href="30.1_创建帧.html">创建帧</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

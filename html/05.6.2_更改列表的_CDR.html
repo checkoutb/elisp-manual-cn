@@ -1,0 +1,74 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>5.6.2 更改列表的 CDR</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">5.6.2 更改列表的 CDR</h3>
+<div class="nav-panel"><p>Next: <a href="05.6.3_重新排列列表的函数.html">重新排列列表的函数</a>, Previous: <a href="05.6.1_改变列表元素_setcar.html">改变列表元素_setcar</a>, Up: <a href="05.6_修改现有列表结构.html">修改现有列表结构.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>用于修改 CDR 的最低级原语是 setcdr：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: setcdr cons object
+</pre></div>
+<p>此函数将对象存储为 cons 的新 CDR，替换其先前的 CDR。换句话说，它将 cons 的 CDR slot 更改为引用 object。它返回值对象。
+</p>
+<p>这是一个用不同列表替换列表的 CDR 的示例。除了第一个元素之外的所有元素都被删除，以支持不同的元素序列。第一个元素没有改变，因为它位于列表的 CAR 中，并且无法通过 CDR 到达。
+</p>
+<div class="lisp">
+<pre class="lisp">(setq x (list 1 2 3))
+     ⇒ (1 2 3)
+
+(setcdr x '(4))
+     ⇒ (4)
+
+x
+     ⇒ (1 4)
+
+</pre></div>
+<p>您可以通过更改列表中 cons 单元格的 CDR 从列表中间删除元素。例如，这里我们通过更改第一个 cons 单元的 CDR 从列表 (abc) 中删除第二个元素 b：
+</p>
+<div class="lisp">
+<pre class="lisp">(setq x1 (list 'a 'b 'c))
+     ⇒ (a b c)
+(setcdr x1 (cdr (cdr x1)))
+     ⇒ (c)
+x1
+     ⇒ (a c)
+</pre></div>
+<p>这是框符号的结果：
+</p>
+<div class="lisp">
+<pre class="lisp">                   --------------------
+                  |                    |
+ --------------   |   --------------   |    --------------
+| car   | cdr  |  |  | car   | cdr  |   --&gt;| car   | cdr  |
+|   a   |   o-----   |   b   |   o--------&gt;|   c   |  nil |
+|       |      |     |       |      |      |       |      |
+ --------------       --------------        --------------
+</pre></div>
+<p>之前保存元素 b 的第二个 cons 单元仍然存在，并且它的 CAR 仍然是 b，但它不再构成此列表的一部分。
+</p>
+<p>通过更改 CDR 插入新元素同样容易：
+</p>
+<div class="lisp">
+<pre class="lisp">(setq x1 (list 'a 'b 'c))
+     ⇒ (a b c)
+(setcdr x1 (cons 'd (cdr x1)))
+     ⇒ (d b c)
+x1
+     ⇒ (a d b c)
+</pre></div>
+<p>这是框符号的结果：
+</p>
+<div class="lisp">
+<pre class="lisp"> --------------        -------------       -------------
+| car  | cdr   |      | car  | cdr  |     | car  | cdr  |
+|   a  |   o   |   --&gt;|   b  |   o-------&gt;|   c  |  nil |
+|      |   |   |  |   |      |      |     |      |      |
+ --------- | --   |    -------------       -------------
+           |      |
+     -----         --------
+    |                      |
+    |    ---------------   |
+    |   | car   | cdr   |  |
+     --&gt;|   d   |   o------
+        |       |       |
+         ---------------
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="05.6.3_重新排列列表的函数.html">重新排列列表的函数</a>, Previous: <a href="05.6.1_改变列表元素_setcar.html">改变列表元素_setcar</a>, Up: <a href="05.6_修改现有列表结构.html">修改现有列表结构.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

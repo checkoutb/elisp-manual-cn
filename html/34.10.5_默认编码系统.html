@@ -1,0 +1,91 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>34.10.5 默认编码系统</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">34.10.5 默认编码系统</h3>
+<div class="nav-panel"><p>Next: <a href="34.10.6_为一个操作指定编码系统.html">为一个操作指定编码系统</a>, Previous: <a href="34.10.4_用户选择的编码系统.html">用户选择的编码系统</a>, Up: <a href="34.10_编码系统.html">编码系统.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节描述了为某些文件或运行某些子程序时指定默认编码系统的变量，以及 I/O 操作用来访问它们的函数。
+</p>
+<p>这些变量的想法是您将它们一劳永逸地设置为您想要的默认值，然后不再更改它们。要为 Lisp 程序中的特定操作指定特定的编码系统，请不要更改这些变量；  相反，使用 coding-system-for-read 和 coding-system-for-write 覆盖它们（请参阅为一个操作指定编码系统）。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: auto-coding-regexp-alist ¶
+</pre></div>
+<p>该变量是文本模式和相应编码系统的列表。每个元素都有形式 (regexp . coding-system);  前几千字节与正则表达式匹配的文件在其内容被读入缓冲区时使用编码系统进行解码。此 alist 中的设置优先于编码：文件中的标签和 file-coding-system-alist 的内容（见下文）。设置默认值是为了让 Emacs 自动识别 Babyl 格式的邮件文件并在不进行代码转换的情况下读取它们。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: file-coding-system-alist ¶
+</pre></div>
+<p>此变量是一个列表，它指定用于读取和写入特定文件的编码系统。每个元素都有格式（pattern .coding），其中pattern 是匹配特定文件名的正则表达式。该元素适用于匹配模式的文件名。
+</p>
+<p>元素的 CDR，coding，应该是一个编码系统，一个包含两个编码系统的 cons 单元，或者一个函数名（一个带有函数定义的符号）。如果编码是一个编码系统，则该编码系统用于读取文件和写入文件。如果coding是一个包含两个编码系统的cons cell，它的CAR指定解码的编码系统，它的CDR指定编码的编码系统。
+</p>
+<p>如果 coding 是一个函数名，该函数应该有一个参数，即传递给 find-operation-coding-system 的所有参数的列表。它必须返回一个编码系统或一个包含两个编码系统的 cons 单元。该值与上述含义相同。
+</p>
+<p>如果编码（或上述函数返回的内容）未确定，则执行正常的代码检测。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: auto-coding-alist ¶
+</pre></div>
+<p>此变量是一个列表，它指定用于读取和写入特定文件的编码系统。它的形式类似于 file-coding-system-alist，但与后者不同的是，此变量优先于文件中的任何编码：标签。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: process-coding-system-alist ¶
+</pre></div>
+<p>此变量是一个列表，指定子进程使用哪些编码系统，具体取决于子进程中运行的程序。它的工作方式类似于 file-coding-system-alist，除了该模式与用于启动子进程的程序名称相匹配。此列表中指定的编码系统用于初始化用于子进程 I/O 的编码系统，但您可以稍后使用 set-process-coding-system 指定其他编码系统。
+</p>
+<p>警告：编码系统，如 undecided，根据数据确定编码系统，不能完全可靠地处理异步子进程输出。这是因为 Emacs 在异步子进程输出到达时分批处理它。如果编码系统未指定字符代码转换，或未指定行尾转换，Emacs 必须尝试一次从一批中检测正确的转换，但这并不总是有效。
+</p>
+<p>因此，对于异步子进程，如果可能的话，请使用既确定字符代码转换又确定行尾转换的编码系统——即类似于 latin-1-unix 的编码系统，而不是未定或 latin-1。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: network-coding-system-alist ¶
+</pre></div>
+<p>此变量是一个列表，指定用于网络流的编码系统。它的工作原理很像 file-coding-system-alist，不同之处在于元素中的模式可以是端口号或正则表达式。如果是正则表达式，则匹配用于打开网络流的网络服务名称。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: default-process-coding-system ¶
+</pre></div>
+<p>此变量指定用于子进程（和网络流）输入和输出的编码系统，而没有其他指定要做什么。
+</p>
+<p>该值应该是形式的 cons 单元格（输入编码。输出编码）。这里输入编码适用于子流程的输入，输出编码适用于它的输出。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: auto-coding-functions ¶
+</pre></div>
+<p>该变量包含一个函数列表，这些函数试图根据文件的未解码内容确定文件的编码系统。
+</p>
+<p>此列表中的每个函数都应编写为查看当前缓冲区中的文本，但不应以任何方式修改它。缓冲区将包含文件部分的文本。每个函数都应该有一个参数 size，它告诉它从 point 开始要查看多少个字符。如果函数成功确定文件的编码系统，它应该返回该编码系统。否则，它应该返回 nil。
+</p>
+<p>当文件被访问并且 Emacs 想要解码其内容时，和/或当文件的缓冲区即将被保存并且 Emacs 想要确定如何对其内容进行编码时，可以调用此列表中的函数。
+</p>
+<p>如果一个文件有一个 ’coding:’ 标记，它优先，所以这些函数不会被调用。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: find-auto-coding filename size ¶
+</pre></div>
+<p>此函数尝试为文件名确定合适的编码系统。它检查访问指定文件的缓冲区，按顺序使用上面记录的变量，直到找到这些变量指定的规则之一的匹配项。然后它返回一个形式为 (coding.source) 的 cons 单元格，其中 coding 是要使用的编码系统， source 是一个符号，是 auto-coding-alist、auto-coding-regexp-alist、:coding 或 auto 之一-coding-functions，指明是哪一个提供了匹配规则。值 :coding 表示编码系统由文件中的 coding: 标记指定（参见 GNU Emacs 手册中的编码标记）。查找匹配规则的顺序是先auto-coding-alist，然后是auto-coding-regexp-alist，然后是coding: tag，最后是auto-coding-functions。如果没有找到匹配的规则，该函数返回 nil。
+</p>
+<p>第二个参数 size 是文本的大小，以字符为单位，如下点。该函数仅检查点后大小字符内的文本。正常情况下，调用这个函数时缓冲区应该定位在开头，因为编码的地方之一： tag 是文件的前一两行；  在这种情况下， size 应该是缓冲区的大小。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-auto-coding filename size ¶
+</pre></div>
+<p>此函数为文件文件名返回一个合适的编码系统。它使用 find-auto-coding 来查找编码系统。如果无法确定编码系统，则函数返回 nil。参数大小的含义类似于 find-auto-coding。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: find-operation-coding-system operation &amp;rest arguments ¶
+</pre></div>
+<p>此函数返回编码系统以使用（默认情况下）执行带参数的操作。该值具有以下形式：
+</p>
+<div class="lisp">
+<pre class="lisp">(decoding-system . encoding-system)
+</pre></div>
+<p>第一个元素，解码系统，是用于解码的编码系统（如果操作进行解码），编码系统是用于编码的编码系统（如果操作进行编码）。
+</p>
+<p>参数操作是一个符号；  它应该是 write-region、start-process、call-process、call-process-region、insert-file-contents 或 open-network-stream 之一。这些是可以进行字符代码和 eol 转换的 Emacs I/O 原语的名称。
+</p>
+<p>剩余的参数应该与可能提供给相应 I/O 原语的参数相同。根据原语，选择这些参数之一作为目标。例如，如果操作执行文件 I/O，则指定文件名的任何一个参数都是目标。对于子流程原语，流程名称是目标。对于 open-network-stream，目标是服务名称或端口号。
+</p>
+<p>根据操作，此函数在 file-coding-system-alist、process-coding-system-alist 或 network-coding-system-alist 中查找目标。如果在 alist 中找到目标，则 find-operation-coding-system 返回其在 alist 中的关联；  否则返回零。
+</p>
+<p>如果 operation 是 insert-file-contents，则对应于目标的参数可能是形式的 cons 单元格 (filename.buffer)。在这种情况下，filename 是要在 file-coding-system-alist 中查找的文件名，而 buffer 是包含文件内容（尚未解码）的缓冲区。如果 file-coding-system-alist 指定了一个函数来调用这个文件，并且该函数需要检查文件的内容（就像它通常那样），它应该检查缓冲区的内容而不是读取文件。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="34.10.6_为一个操作指定编码系统.html">为一个操作指定编码系统</a>, Previous: <a href="34.10.4_用户选择的编码系统.html">用户选择的编码系统</a>, Up: <a href="34.10_编码系统.html">编码系统.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.15 命令历史</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">22.15 命令历史</h2>
+<div class="nav-panel"><p>Next: <a href="22.16_键盘宏.html">键盘宏</a>, Previous: <a href="22.13_递归编辑.html">递归编辑</a>, Up: <a href="22_命令循环.html">命令循环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>命令循环保留已执行的复杂命令的历史记录，以便于重复这些命令。复杂命令是交互式参数读取使用迷你缓冲区的命令。这包括任何 Mx 命令、任何 M-: 命令以及任何其交互规范从 minibuffer 中读取参数的命令。在命令本身执行期间显式使用迷你缓冲区不会导致命令被认为是复杂的。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: command-history ¶
+</pre></div>
+<p>该变量的值是最近的复杂命令的列表，每个都表示为要评估的形式。它在编辑会话期间继续累积所有复杂命令，但是当它达到最大大小时（请参阅 Minibuffer History），随着新元素的添加，最旧的元素将被删除。
+</p>
+<div class="lisp">
+<pre class="lisp">command-history
+⇒ ((switch-to-buffer "chistory.texi")
+    (describe-key "^X^[")
+    (visit-tags-table "~/emacs/src/")
+    (find-tag "repeat-complex-command"))
+</pre></div>
+<p>这个历史列表实际上是 minibuffer 历史的一个特例（参见 Minibuffer History），有一个特殊的转折：元素是表达式而不是字符串。
+</p>
+<p>有许多命令专门用于编辑和调用以前的命令。命令 repeat-complex-command 和 list-command-history 在用户手册中有描述（参见 GNU Emacs 手册中的重复）。在 minibuffer 中，可以使用常用的 minibuffer 历史命令。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.16_键盘宏.html">键盘宏</a>, Previous: <a href="22.13_递归编辑.html">递归编辑</a>, Up: <a href="22_命令循环.html">命令循环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

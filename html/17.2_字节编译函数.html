@@ -1,0 +1,90 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>17.2 字节编译函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">17.2 字节编译函数</h2>
+<div class="nav-panel"><p>Next: <a href="17.3_文档字符串和编译.html">文档字符串和编译</a>, Previous: <a href="17.1_字节编译代码的性能.html">字节编译代码的性能</a>, Up: <a href="17_字节编译.html">字节编译.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>您可以使用字节编译函数对单个函数或宏定义进行字节编译。您可以使用 byte-compile-file 编译整个文件，也可以使用 byte-recompile-directory 或 batch-byte-compile 编译多个文件。
+</p>
+<p>有时，字节编译器会产生警告和/或错误消息（有关详细信息，请参阅编译器错误）。这些消息通常记录在一个名为 <strong>Compile-Log</strong> 的缓冲区中，该缓冲区使用编译模式。请参阅 GNU Emacs 手册中的编译模式。但是，如果变量 byte-compile-debug 不为零，则错误消息将作为 Lisp 错误发出信号（请参阅错误）。
+</p>
+<p>在您打算进行字节编译的文件中编写宏调用时要小心。由于宏调用在编译时会扩展，因此需要将宏加载到 Emacs 中，否则字节编译器将无法执行正确的操作。处理此问题的常用方法是使用指定包含所需宏定义的文件的要求表单（请参阅功能）。通常，字节编译器不会评估它正在编译的代码，但它会通过加载指定的库来专门处理需求表单。为了避免在有人运行已编译的程序时加载宏定义文件，请在 require 调用周围编写 eval-when-compile（请参阅编译期间的评估）。有关更多详细信息，请参阅宏和字节编译。
+</p>
+<p>内联（defsubst）函数不那么麻烦；  如果您在知道其定义之前编译对此类函数的调用，则该调用仍然可以正常工作，只是运行速度较慢。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: byte-compile symbol ¶
+</pre></div>
+<p>该函数对符号的函数定义进行字节编译，将之前的定义替换为编译后的定义。symbol的函数定义必须是函数的实际代码；  字节编译不处理函数间接。返回值是字节码函数对象，它是符号的编译定义（参见字节码函数对象）。
+</p>
+<div class="lisp">
+<pre class="lisp">
+
+(defun factorial (integer)
+  "Compute factorial of INTEGER."
+  (if (= 1 integer) 1
+    (* integer (factorial (1- integer)))))
+⇒ factorial
+
+
+(byte-compile 'factorial)
+⇒
+#[(integer)
+  "^H\301U\203^H^@\301\207\302^H\303^HS!\"\207"
+  [integer 1 * factorial]
+  4 "Compute factorial of INTEGER."]
+</pre></div>
+<p>如果 symbol 的定义是一个字节码函数对象，byte-compile 什么都不做并且返回 nil。它不会再次编译符号的定义，因为原始（未编译的）代码已经在符号的函数单元中被字节编译代码替换。
+</p>
+<p>byte-compile 的参数也可以是 lambda 表达式。在这种情况下，该函数会返回相应的编译代码，但不会将其存储在任何地方。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: compile-defun &amp;optional arg ¶
+</pre></div>
+<p>此命令读取包含点的 defun，对其进行编译并评估结果。如果在实际上是函数定义的 defun 上使用它，效果是安装该函数的编译版本。
+</p>
+<p>compile-defun 通常在 echo 区域显示计算结果，但如果 arg 不为零，它会将结果插入到它编译的表单之后的当前缓冲区中。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: byte-compile-file filename ¶
+</pre></div>
+<p>该函数将名为 filename 的 Lisp 代码文件编译成字节码文件。输出文件的名称是通过将 <code>.el</code> 后缀更改为 <code>.elc</code> 来获得的；  如果文件名不以 <code>.el</code> 结尾，则将 <code>.elc</code> 添加到文件名的末尾。
+</p>
+<p>编译通过一次读取一种形式的输入文件来工作。如果是函数或宏的定义，则写出编译后的函数或宏定义。其他形式一起批处理，然后每个批处理都被编译和编写，以便在读取文件时执行其编译的代码。读取输入文件时，所有注释都将被丢弃。
+</p>
+<p>如果没有错误，此命令返回 t，否则返回 nil。当以交互方式调用时，它会提示输入文件名。
+</p><div class="example">
+<pre class="example">$ ls -l push*
+-rw-r--r-- 1 lewis lewis 791 Oct  5 20:31 push.el
+
+
+(byte-compile-file "~/emacs/push.el")
+     ⇒ t
+
+
+$ ls -l push*
+-rw-r--r-- 1 lewis lewis 791 Oct  5 20:31 push.el
+-rw-rw-rw- 1 lewis lewis 638 Oct  8 20:25 push.elc
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Command: byte-recompile-directory directory &amp;optional flag force follow-symlinks ¶
+</pre></div>
+<p>此命令重新编译目录（或其子目录）中需要重新编译的每个 <code>.el</code> 文件。如果 <code>.elc</code> 文件存在但比 <code>.el</code> 文件旧，则需要重新编译文件。
+</p>
+<p>当一个 ’.el’ 文件没有对应的 ’.elc’ 文件时，flag 说明要做什么。如果为 nil，此命令将忽略这些文件。如果 flag 为 0，则编译它们。如果它既不是 nil 也不是 0，它询问用户是否编译每个这样的文件，并询问每个子目录。
+</p>
+<p>交互地，字节重新编译目录提示目录，标志是前缀参数。
+</p>
+<p>如果 force 不为零，则此命令重新编译每个具有 ’.elc’ 文件的 ’.el’ 文件。
+</p>
+<p>此命令通常不会编译符号链接的 <code>.el</code> 文件。如果可选的 follow-symlink 参数不为 nil，则符号链接的 ’.el’ 也将被编译。
+</p>
+<p>返回的值是不可预测的。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: batch-byte-compile &amp;optional noforce ¶
+</pre></div>
+<p>此函数在命令行上指定的文件上运行 byte-compile-file。该函数只能在 Emacs 的批处理执行中使用，因为它会在完成时杀死 Emacs。一个文件中的错误不会阻止后续文件的处理，但不会为其生成输出文件，并且 Emacs 进程将以非零状态码终止。
+</p>
+<p>如果 noforce 不为零，则此函数不会重新编译具有最新 ’.elc’ 文件的文件。
+</p><div class="example">
+<pre class="example">$ emacs -batch -f batch-byte-compile *.el
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="17.3_文档字符串和编译.html">文档字符串和编译</a>, Previous: <a href="17.1_字节编译代码的性能.html">字节编译代码的性能</a>, Up: <a href="17_字节编译.html">字节编译.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

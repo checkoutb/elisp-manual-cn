@@ -1,0 +1,71 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.1 检查文本近点</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">33.1 检查文本近点</h2>
+<div class="nav-panel"><p>Next: <a href="33.2_检查缓冲区内容.html">检查缓冲区内容</a>, Previous: <a href="33_文本.html">文本</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>提供了许多功能来查看点周围的字符。这里描述了几个简单的功能。另请参阅正则表达式搜索中的查看。
+</p>
+<p>在以下四个函数中，缓冲区的 <code>开始</code> 或 <code>结束</code> 指的是可访问部分的开始或结束。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: char-after &amp;optional position ¶
+</pre></div>
+<p>此函数返回当前缓冲区中位于（即紧随其后）位置的字符。如果 position 超出范围，无论是在缓冲区的开头之前，还是在缓冲区的末尾或之后，则该值为 nil。位置的默认值是点。
+</p>
+<p>在以下示例中，假设缓冲区中的第一个字符是 <code>@</code> ：
+</p>
+<div class="lisp">
+<pre class="lisp">(string (char-after 1))
+     ⇒ "@"
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: char-before &amp;optional position ¶
+</pre></div>
+<p>此函数返回当前缓冲区中紧挨位置位置之前的字符。如果 position 超出范围，无论是在缓冲区的开头或之前，还是在缓冲区的末尾，则该值为 nil。位置的默认值是点。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: following-char ¶
+</pre></div>
+<p>此函数返回当前缓冲区中跟随点的字符。这类似于 (char-after (point))。但是，如果 point 位于缓冲区的末尾，则 following-char 返回 0。
+</p>
+<p>请记住，该点始终位于字符之间，并且光标通常出现在字符后面的点上。因此，following-char 返回的字符就是光标所在的字符。
+</p>
+<p>在此示例中，点位于 <code>a</code> 和 <code>c</code> 之间。
+</p><div class="lisp">
+<pre class="lisp">
+
+---------- Buffer: foo ----------
+Gentlemen may cry ``Pea∗ce! Peace!,''
+but there is no peace.
+---------- Buffer: foo ----------
+
+
+(string (preceding-char))
+     ⇒ "a"
+(string (following-char))
+     ⇒ "c"
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: preceding-char ¶
+</pre></div>
+<p>此函数返回当前缓冲区中的前一个字符。例如，请参见上面的 following-char 下的示例。如果 point 位于缓冲区的开头，则preceding-char 返回 0。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: bobp ¶
+</pre></div>
+<p>如果 point 位于缓冲区的开头，则此函数返回 t。如果缩小生效，这意味着文本的可访问部分的开头。另请参见 Point 中的 point-min。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: eobp ¶
+</pre></div>
+<p>如果 point 位于缓冲区的末尾，则此函数返回 t。如果缩小生效，这意味着文本可访问部分的结尾。另请参阅 See Point 中的 point-max。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: bolp ¶
+</pre></div>
+<p>如果 point 位于行首，则此函数返回 t。请参阅按文本行移动。缓冲区的开头（或其可访问部分）始终算作一行的开头。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: eolp ¶
+</pre></div>
+<p>如果点位于行尾，则此函数返回 t。缓冲区的结尾（或其可访问部分）始终被视为行的结尾。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.2_检查缓冲区内容.html">检查缓冲区内容</a>, Previous: <a href="33_文本.html">文本</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

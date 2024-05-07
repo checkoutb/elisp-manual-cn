@@ -1,0 +1,121 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.19.8 定义可点击文本</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">33.19.8 定义可点击文本</h3>
+<div class="nav-panel"><p>Next: <a href="33.19.9_定义和使用字段.html">定义和使用字段</a>, Previous: <a href="33.19.7_文本属性的惰性计算.html">文本属性的惰性计算</a>, Up: <a href="33.19_文本属性.html">文本属性.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>可点击文本是可以通过鼠标或键盘命令单击以产生某些结果的文本。许多主要模式使用可点击文本来实现文本超链接，或简称链接。
+</p>
+<p>插入和操作链接的最简单方法是使用按钮包。请参阅按钮。在本节中，我们将解释如何使用文本属性在缓冲区中手动设置可点击文本。为简单起见，我们将可点击的文本称为链接。
+</p>
+<p>实现链接涉及三个独立的步骤： (1) 当鼠标移到链接上时指示可点击性；  (2) 使该链接上的 RET 或 mouse-2 执行某些操作；  (3) 设置跟随链接条件，使链接服从mouse-1-click-follows-link。
+</p>
+<p>要指示可点击性，请将 mouse-face 文本属性添加到链接的文本中；  然后 Emacs 将在鼠标移到链接上时突出显示链接。此外，您应该使用 help-echo 文本属性定义工具提示或回显区域消息。请参阅具有特殊含义的属性。例如，以下是 Dired 指示文件名可点击的方式：
+</p>
+<div class="lisp">
+<pre class="lisp">(if (dired-move-to-filename)
+    (add-text-properties
+      (point)
+      (save-excursion
+        (dired-move-to-end-of-filename)
+        (point))
+      '(mouse-face highlight
+        help-echo "mouse-2: visit this file in other window")))
+</pre></div>
+<p>要使链接可点击，请将 RET 和 mouse-2 绑定到执行所需操作的命令。每个命令都应该检查它是否在链接上被调用，并采取相应的行动。例如，Dired 的主要模式键盘映射将 mouse-2 绑定到以下命令：
+</p>
+<div class="lisp">
+<pre class="lisp">(defun dired-mouse-find-file-other-window (event)
+  "In Dired, visit the file or directory name you click on."
+  (interactive "e")
+  (let ((window (posn-window (event-end event)))
+        (pos (posn-point (event-end event)))
+        file)
+    (if (not (windowp window))
+        (error "No file chosen"))
+    (with-current-buffer (window-buffer window)
+      (goto-char pos)
+      (setq file (dired-get-file-for-visit)))
+    (if (file-directory-p file)
+        (or (and (cdr dired-subdir-alist)
+                 (dired-goto-subdir file))
+            (progn
+              (select-window window)
+              (dired-other-window file)))
+      (select-window window)
+      (find-file-other-window (file-name-sans-versions file t)))))
+</pre></div>
+<p>该命令使用函数 posn-window 和 posn-point 来确定点击发生的位置，并使用 dired-get-file-for-visit 来确定要访问的文件。
+</p>
+<p>您可以使用 keymap 文本属性将其绑定到链接文本中，而不是将鼠标命令绑定到主模式键映射中（请参阅具有特殊含义的属性）。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">(let ((map (make-sparse-keymap)))
+  (define-key map [mouse-2] 'operate-this-button)
+  (put-text-property link-start link-end 'keymap map))
+
+</pre></div>
+<p>使用这种方法，您可以轻松地为不同的链接定义不同的命令。此外， RET 和 mouse-2 的全局定义对于缓冲区中的其余文本仍然可用。
+</p>
+<p>单击链接的基本 Emacs 命令是 mouse-2。但是，为了与其他图形应用程序兼容，Emacs 还可以识别鼠标 1 对链接的点击，前提是用户在不移动鼠标的情况下快速点击链接。此行为由用户选项 mouse-1-click-follows-link 控制。请参阅 GNU Emacs 手册中的鼠标参考。
+</p>
+<p>要设置链接使其服从 mouse-1-click-follows-link，您必须 (1) 将后续链接文本或覆盖属性应用于链接文本，或 (2) 将后续链接事件绑定到一个键映射（可以是主模式键映射或通过键映射文本属性指定的本地键映射）。follow-link 属性的值或follow-link 事件的绑定充当链接操作的条件。这个条件告诉 Emacs 两件事：在什么情况下鼠标 1 单击应该被视为发生在链接内部，以及如何计算一个动作代码，该代码说明将鼠标 1 单击翻译成什么。链接操作条件可以是以下之一：
+</p>
+<div class="lisp">
+<pre class="lisp">mouse-face
+</pre></div>
+<p>如果条件是符号 mouse-face，则如果该位置存在非零鼠标面属性，则该位置位于链接内。动作代码总是 t。
+</p>
+<p>例如，以下是 Info 模式处理 mouse-1 的方式：
+</p>
+<div class="lisp">
+<pre class="lisp">(define-key Info-mode-map [follow-link] 'mouse-face)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">a function
+</pre></div>
+<p>如果条件是函数 func，则如果 (func pos) 计算结果为非零，则位置 pos 位于链接内。func 返回的值用作操作代码。
+</p>
+<p>例如，以下是 pcvs 如何使 mouse-1 仅跟随文件名上的链接：
+</p><div class="lisp">
+<pre class="lisp">(define-key map [follow-link]
+  (lambda (pos)
+    (eq (get-char-property pos 'face) 'cvs-filename-face)))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">anything else
+</pre></div>
+<p>如果条件值是其他值，则位置在链接内，条件本身就是操作代码。显然，您应该仅在通过链接文本上的文本或覆盖属性应用条件时指定这种条件（以便它不适用于整个缓冲区）。
+</p>
+<p>操作代码告诉 mouse-1 如何跟随链接：
+</p>
+<div class="lisp">
+<pre class="lisp">a string or vector
+</pre></div>
+<p>如果动作代码是字符串或向量，则将 mouse-1 事件转换为字符串或向量的第一个元素；  即，鼠标 1 单击的动作是该字符或符号的本地或全局绑定。因此，如果操作代码是 <code>foo</code> ，则 mouse-1 会转换为 f。如果是 [foo]，则 mouse-1 会转换为 foo。
+</p><div class="lisp">
+<pre class="lisp">anything else
+</pre></div>
+<p>对于任何其他非零操作代码，mouse-1 事件在相同位置被转换为 mouse-2 事件。
+</p>
+<p>要定义 mouse-1 以激活使用 define-button-type 定义的按钮，请为该按钮提供跟随链接属性。属性值应该是链接操作条件，如上所述。请参阅按钮。例如，这里是帮助模式如何处理 mouse-1：
+</p>
+<div class="lisp">
+<pre class="lisp">(define-button-type 'help-xref
+  'follow-link t
+  'action #'help-button-action)
+</pre></div>
+<p>要在使用 define-widget 定义的小部件上定义 mouse-1，请给小部件一个 :follow-link 属性。属性值应该是链接操作条件，如上所述。例如，这里是链接小部件如何指定鼠标 1 单击应转换为 RET：
+</p>
+<div class="lisp">
+<pre class="lisp">(define-widget 'link 'item
+  "An embedded link."
+  :button-prefix 'widget-link-prefix
+  :button-suffix 'widget-link-suffix
+  :follow-link "\C-m"
+  :help-echo "Follow the link."
+  :format "%[%t%]")
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: mouse-on-link-p pos ¶
+</pre></div>
+<p>如果当前缓冲区中的位置 pos 在链接上，则此函数返回非 nil。pos 也可以是鼠标事件位置，由 event-start 返回（请参阅访问鼠标事件）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.19.9_定义和使用字段.html">定义和使用字段</a>, Previous: <a href="33.19.7_文本属性的惰性计算.html">文本属性的惰性计算</a>, Up: <a href="33.19_文本属性.html">文本属性.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

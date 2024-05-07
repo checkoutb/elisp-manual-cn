@@ -1,0 +1,41 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.19.6 文本属性的粘性</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">33.19.6 文本属性的粘性</h3>
+<div class="nav-panel"><p>Next: <a href="33.19.7_文本属性的惰性计算.html">文本属性的惰性计算</a>, Previous: <a href="33.19.5_格式化文本属性.html">格式化文本属性</a>, Up: <a href="33.19_文本属性.html">文本属性.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>自插入字符，即在用户键入它们时插入缓冲区的字符（参见用户级插入命令），通常具有与前一个字符相同的属性。这称为属性的继承。
+</p>
+<p>相比之下，Lisp 程序可以根据插入原语的选择，在继承或不继承的情况下进行插入。普通的文本插入函数，例如 insert，不继承任何属性。它们插入的文本恰好具有所插入字符串的属性，而不是其他文本。这对于将文本从一个上下文复制到另一个上下文的程序是正确的——例如，进入或退出杀戮环。要使用继承插入，请使用本节中描述的特殊原语。自插入字符继承属性，因为它们使用这些原语工作。
+</p>
+<p>当您使用继承进行插入时，继承哪些属性以及从何处继承取决于哪些属性是粘性的。在字符之后插入会继承其后粘属性的那些。在字符之前插入会继承其前粘特性的那些。当双方为同一属性提供不同的粘性值时，前一个字符的值优先。
+</p>
+<p>默认情况下，文本属性是后粘的，但不是前粘的；  因此，默认是继承前一个字符的所有属性，而不是继承后一个字符的所有属性。
+</p>
+<p>您可以使用两个特定的文本属性（front-sticky 和 ​​back-nonsticky）以及变量 text-property-default-nonsticky 来控制各种文本属性的粘性。您可以使用该变量为给定属性指定不同的默认值。您可以使用这两个文本属性使任何特定属性在文本的任何特定部分具有粘性或非粘性。
+</p>
+<p>如果一个角色的前粘性属性是 t，那么它的所有属性都是前粘性的。如果front-sticky 属性是一个列表，那么角色的sticky 属性就是名字在列表中的那些。例如，如果一个角色有一个值为（face read-only）的front-sticky属性，那么在角色之前插入可以继承它的face属性和它的只读属性，但不能继承其他属性。
+</p>
+<p>后非粘性属性的工作方式相反。大多数属性默认是后置粘性的，因此后非粘性属性说明哪些属性不是后置粘性的。如果一个角色的后方非粘性属性是 t，那么它的所有属性都不是后方粘性的。如果后非粘性属性是一个列表，则属性是后粘性的，除非它们的名称在列表中。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: text-property-default-nonsticky ¶
+</pre></div>
+<p>此变量包含一个 alist，它定义了各种文本属性的默认后置粘性。每个元素都有形式 (property . nonstickiness)，它定义了特定文本属性 property 的粘性。
+</p>
+<p>如果 nonstickiness 是 non-nil，这意味着默认情况下 property 属性是 back-nonsticky。由于默认情况下所有属性都是前非粘性的，因此默认情况下这会使属性在两个方向上都非粘性。
+</p>
+<p>文本属性 front-sticky 和 ​​back-nonsticky 使用时，优先于 text-property-default-nonsticky 中指定的默认非粘性。
+</p>
+<p>以下是插入具有属性继承的文本的函数：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: insert-and-inherit &amp;rest strings ¶
+</pre></div>
+<p>插入字符串字符串，就像函数插入一样，但从相邻文本继承任何粘性属性。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: insert-before-markers-and-inherit &amp;rest strings ¶
+</pre></div>
+<p>插入字符串字符串，就像函数 insert-before-markers 一样，但从相邻文本继承任何粘性属性。
+</p>
+<p>有关不继承的普通插入功能，请参见插入文本。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.19.7_文本属性的惰性计算.html">文本属性的惰性计算</a>, Previous: <a href="33.19.5_格式化文本属性.html">格式化文本属性</a>, Up: <a href="33.19_文本属性.html">文本属性.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

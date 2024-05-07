@@ -1,0 +1,26 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>13.2.2 一个简单的 Lambda 表达式示例</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">13.2.2 一个简单的 Lambda 表达式示例</h3>
+<div class="nav-panel"><p>Next: <a href="13.2.3_参数列表的特点.html">参数列表的特点</a>, Previous: <a href="13.2.1_Lambda_表达式的组成部分.html">Lambda_表达式的组成部分</a>, Up: <a href="13.2_Lambda_表达式.html">Lambda_表达式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>考虑以下示例：
+</p>
+<div class="lisp">
+<pre class="lisp">(lambda (a b c) (+ a b c))
+</pre></div>
+<p>我们可以通过将其传递给 funcall 来调用此函数，如下所示：
+</p><div class="lisp">
+<pre class="lisp">(funcall (lambda (a b c) (+ a b c))
+         1 2 3)
+</pre></div>
+<p>此调用计算 lambda 表达式的主体，其中变量 a 绑定到 1，b 绑定到 2，c 绑定到 3。对主体的求值将这三个数字相加，产生结果 6；  因此，此函数调用返回值 6。
+</p>
+<p>请注意，参数可以是其他函数调用的结果，如下例所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(funcall (lambda (a b c) (+ a b c))
+         1 (* 2 3) (- 5 4))
+</pre></div>
+<p>这将从左到右评估参数 1、(* 2 3) 和 (- 5 4)。然后它将 lambda 表达式应用于参数值 1、6 和 1 以产生值 8。
+</p>
+<p>正如这些示例所示，您可以使用带有 lambda 表达式作为其 CAR 的表单来创建局部变量并为其赋值。在过去的 Lisp 时代，这种技术是绑定和初始化局部变量的唯一方法。但如今，为此目的使用特殊形式 let 更加清晰（参见局部变量）。Lambda 表达式主要用作匿名函数以作为参数传递给其他函数（请参阅匿名函数），或存储为符号函数定义以生成命名函数（请参阅命名函数）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="13.2.3_参数列表的特点.html">参数列表的特点</a>, Previous: <a href="13.2.1_Lambda_表达式的组成部分.html">Lambda_表达式的组成部分</a>, Up: <a href="13.2_Lambda_表达式.html">Lambda_表达式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

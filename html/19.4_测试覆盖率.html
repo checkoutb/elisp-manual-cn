@@ -1,0 +1,22 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>19.4 测试覆盖率</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">19.4 测试覆盖率</h2>
+<div class="nav-panel"><p>Next: <a href="19.5_剖析.html">剖析</a>, Previous: <a href="19.3.2_多余的右括号.html">多余的右括号</a>, Up: <a href="19_调试_Lisp_程序.html">调试_Lisp_程序.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>您可以通过加载 testcover 库并使用命令 Mx testcover-start RET file RET 来检测代码，对 Lisp 代码文件进行覆盖测试。然后通过调用一次或多次来测试您的代码。然后使用命令 Mx testcover-mark-all 在代码上显示彩色高亮显示覆盖不足的地方。命令 Mx testcover-next-mark 将向前移动指向下一个突出显示的点。
+</p>
+<p>通常，红色高亮表示表单从未被完全评估过；  棕色突出显示意味着它总是评估为相同的值（意味着几乎没有测试对结果所做的事情）。但是，对于无法完成评估的表单（例如错误），将跳过红色突出显示。对于预期总是评估为相同值的表单（例如 (setq x 14)），将跳过棕色突出显示。
+</p>
+<p>对于困难的情况，您可以在代码中添加无操作宏来为测试覆盖率工具提供建议。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: 1value form ¶
+</pre></div>
+<p>评估表单并返回其值，但通知覆盖测试表单的值应始终相同。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: noreturn form ¶
+</pre></div>
+<p>评估表单，通知覆盖测试该表单永远不会返回。如果它确实返回，你会得到一个运行时错误。
+</p>
+<p>Edebug 还具有覆盖测试功能（请参阅覆盖测试）。这些功能部分相互重复，将它们组合起来会更干净。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="19.5_剖析.html">剖析</a>, Previous: <a href="19.3.2_多余的右括号.html">多余的右括号</a>, Up: <a href="19_调试_Lisp_程序.html">调试_Lisp_程序.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

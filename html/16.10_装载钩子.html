@@ -1,0 +1,32 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>16.10 装载钩子</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">16.10 装载钩子</h2>
+<div class="nav-panel"><p>Next: <a href="16.11_Emacs_动态模块.html">Emacs_动态模块</a>, Previous: <a href="16.9_卸载.html">卸载</a>, Up: <a href="16_加载.html">加载.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>您可以通过使用变量 after-load-functions 来请求每次 Emacs 加载库时执行代码：
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: after-load-functions ¶
+</pre></div>
+<p>加载文件后运行此异常挂钩。挂钩中的每个函数都使用一个参数调用，即刚刚加载的文件的绝对文件名。
+</p>
+<p>如果您希望在加载特定库时执行代码，请使用 with-eval-after-load 宏：
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: with-eval-after-load library body… ¶
+</pre></div>
+<p>该宏安排在加载文件库结束时评估正文，每次加载库时。如果库已经加载，它会立即评估 body。
+</p>
+<p>您不需要在文件名库中提供目录或扩展名。通常，您只需提供一个裸文件名，如下所示：
+</p><div class="lisp">
+<pre class="lisp">(with-eval-after-load "js" (define-key js-mode-map "\C-c\C-c" 'js-eval))
+</pre></div>
+<p>要限制哪些文件可以触发评估，请在库中包含目录或扩展名或两者。只有绝对真实名称（即，所有符号链接被排除的名称）与所有给定名称组件匹配的文件才会匹配。在以下示例中，某个目录 …./foo/bar 中的 my<em>_inst.elc</em> 或 my<em>_inst.elc.gz</em> 将触发评估，但不会触发 my<em>_inst.el</em>：
+</p><div class="lisp">
+<pre class="lisp">(with-eval-after-load "foo/bar/my_inst.elc" …)
+</pre></div>
+<p>library 也可以是一个特征（即，一个符号），在这种情况下，body 会在调用（provide library）的任何文件的末尾进行评估。
+</p>
+<p>正文中的错误不会撤消加载，但会阻止正文其余部分的执行。
+</p>
+<p>通常，精心设计的 Lisp 程序不应该使用 with-eval-after-load。如果您需要检查和设置另一个库中定义的变量（那些供外部使用的变量），您可以立即进行，无需等到库加载完毕。如果您需要调用该库定义的函数，则应加载该库，最好使用 require（请参阅功能）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="16.11_Emacs_动态模块.html">Emacs_动态模块</a>, Previous: <a href="16.9_卸载.html">卸载</a>, Up: <a href="16_加载.html">加载.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>13.13 内联函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">13.13 内联函数</h2>
+<div class="nav-panel"><p>Next: <a href="13.14_declare形式.html">declare形式</a>, Previous: <a href="13.12_声明过时的函数.html">声明过时的函数</a>, Up: <a href="13_函数.html">函数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>内联函数是一个像普通函数一样工作的函数，除了一件事：当您对函数的调用进行字节编译时（请参阅字节编译），函数的定义会扩展到调用者。
+</p>
+<p>定义内联函数的简单方法是编写 defsubst 而不是 defun。定义的其余部分看起来一样，但使用 defsubst 表示使其内联以进行字节编译。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: defsubst name args [doc] [declare] [interactive] body… ¶
+</pre></div>
+<p>这个宏定义了一个内联函数。它的语法与 defun 完全相同（参见定义函数）。
+</p>
+<p>使函数内联通常会使其函数调用运行得更快。但它也有缺点。一方面，它降低了灵活性；  如果您更改函数的定义，则已内联的调用仍会使用旧定义，直到您重新编译它们。
+</p>
+<p>另一个缺点是内联大函数会增加文件和内存中编译代码的大小。由于内联函数的速度优势对于小函数来说是最大的，所以您通常不应该将大函数内联。
+</p>
+<p>此外，内联函数在调试、跟踪和建议方面表现不佳（请参阅建议 Emacs Lisp 函数）。由于易于调试和重新定义函数的灵活性是 Emacs 的重要特性，因此即使函数很小，也不应该将函数内联，除非它的速度非常关键，并且您已经对代码进行了计时以验证使用 defun 确实具有性能问题。
+</p>
+<p>定义内联函数后，可以稍后在同一个文件中执行其内联扩展，就像宏一样。
+</p>
+<p>可以使用 defmacro 定义一个宏，以扩展为内联函数将执行的相同代码（请参阅宏）。但是宏将仅限于直接在表达式中使用——宏不能用 apply、mapcar 等调用。此外，将普通函数转换为宏需要一些工作。将其转换为内联函数很容易；  只需将 defun 替换为 defsubst 即可。由于内联函数的每个参数只计算一次，因此您不必担心函数体使用参数的次数，就像对宏所做的那样。
+</p>
+<p>或者，您可以通过提供将其内联为编译器宏的代码来定义函数。以下宏使这成为可能。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: define-inline name args [doc] [declare] body… ¶
+</pre></div>
+<p>通过提供执行其内联的代码（作为编译器宏）来定义函数名称。该函数将接受参数列表 args 并具有指定的主体。
+</p>
+<p>如果存在，doc 应该是函数的文档字符串（请参阅函数文档字符串）；  如果存在，则声明应该是一个声明表单（请参阅声明表单），指定函数的元数据。
+</p>
+<p>通过 define-inline 定义的函数相对于 defsubst 或 defmacro 定义的宏有几个优点：
+</p>
+<ul>
+<li>
+它们可以传递给 mapcar（参见映射函数）。
+</li><li>
+他们更有效率。
+</li><li>
+它们可以用作存储值的地方表格（请参阅广义变量）。
+</li><li>
+它们的行为方式比 cl-defsubst 更可预测（请参阅 Common Lisp Extensions for GNU Emacs Lisp 中的参数列表）。
+</li></ul>
+<p>与 defmacro 一样，使用 define-inline 内联的函数从调用站点继承范围规则，无论是动态的还是词法的。请参阅变量绑定的范围规则。
+</p>
+<p>以下宏应该用在由define-inline 定义的函数体中。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: inline-quote expression ¶
+</pre></div>
+<p>内联定义的引用表达式。这类似于反引号（参见反引号），但引用代码并且只接受 , 不接受 ,@。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: inline-letevals (bindings…) body… ¶
+</pre></div>
+<p>这提供了一种方便的方法来确保内联函数的参数只被评估一次，以及创建局部变量。
+</p>
+<p>它类似于 let（请参阅局部变量）：它设置绑定指定的局部变量，然后使用有效的绑定评估 body。
+</p>
+<p>绑定的每个元素都应该是一个符号或形式的列表（var expr）；  结果是评估 expr 并将 var 绑定到结果。但是，当绑定的元素只是一个符号 var 时，评估 var 的结果会重新绑定到 var（这与 let 的工作方式完全不同）。
+</p>
+<p>绑定的尾部可以是 nil 或应该包含参数列表的符号，在这种情况下，每个参数都被评估，并且符号被绑定到结果列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: inline-const-p expression ¶
+</pre></div>
+<p>如果表达式的值已知，则返回非零。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: inline-const-val expression ¶
+</pre></div>
+<p>返回表达式的值。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: inline-error format &amp;rest args ¶
+</pre></div>
+<p>发出错误信号，根据格式格式化参数。
+</p>
+<p>下面是一个使用define-inline的例子：
+</p>
+<div class="lisp">
+<pre class="lisp">(define-inline myaccessor (obj)
+  (inline-letevals (obj)
+    (inline-quote (if (foo-p ,obj) (aref (cdr ,obj) 3) (aref ,obj 2)))))
+</pre></div>
+<p>这相当于
+</p>
+<div class="lisp">
+<pre class="lisp">(defsubst myaccessor (obj)
+  (if (foo-p obj) (aref (cdr obj) 3) (aref obj 2)))
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="13.14_declare形式.html">declare形式</a>, Previous: <a href="13.12_声明过时的函数.html">声明过时的函数</a>, Up: <a href="13_函数.html">函数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,10 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.3.2 键盘映射和次要模式</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">24.3.2 键盘映射和次要模式</h3>
+<div class="nav-panel"><p>Next: <a href="24.3.3_定义次要模式.html">定义次要模式</a>, Previous: <a href="24.3.1_编写次要模式的约定.html">编写次要模式的约定</a>, Up: <a href="24.3_次要模式.html">次要模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>每个次要模式都可以有自己的键盘映射，该映射在启用该模式时处于活动状态。要为次要模式设置键映射，请将元素添加到 alist minor-mode-map-alist。请参阅次要模式映射列表的定义。
+</p>
+<p>次要模式键映射的一种用途是修改某些自插入字符的行为，以便它们执行其他操作以及自插入。（自定义 self-insert-command 的另一种方法是通过 post-self-insert-hook，请参阅用户级插入命令。除此之外，自定义 self-insert-command 的工具仅限于特殊情况，专为缩写和自动填充模式。不要尝试用你自己定义的 self-insert-command 代替标准的。编辑器命令循环专门处理这个功能。）
+</p>
+<p>次要模式可以将命令绑定到由 Cc 后跟标点字符组成的键序列。但是，由 Cc 后跟 {}&lt;&gt;:; 之一或控制字符或数字组成的序列保留用于主要模式。此外，抄送字母是为用户保留的。请参阅键绑定约定。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="24.3.3_定义次要模式.html">定义次要模式</a>, Previous: <a href="24.3.1_编写次要模式的约定.html">编写次要模式的约定</a>, Up: <a href="24.3_次要模式.html">次要模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

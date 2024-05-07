@@ -1,0 +1,61 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.6 删除文本</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">33.6 删除文本</h2>
+<div class="nav-panel"><p>Next: <a href="33.7_用户级删除命令.html">用户级删除命令</a>, Previous: <a href="33.5_用户级插入命令.html">用户级插入命令</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>删除意味着删除缓冲区中的部分文本，而不将其保存在 kill ring 中（请参阅 The Kill Ring）。已删除的文本不能被拉出，但可以使用撤消机制重新插入（请参阅撤消）。在某些特殊情况下，某些删除功能确实会在 kill ring 中保存文本。
+</p>
+<p>所有删除函数都对当前缓冲区进行操作。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: erase-buffer ¶
+</pre></div>
+<p>此函数删除当前缓冲区的整个文本（不仅仅是可访问部分），使其为空。如果缓冲区是只读的，则表示缓冲区只读错误；  如果其中的某些文本是只读的，则表示文本只读错误。否则，它会删除文本而不要求任何确认。它返回零。
+</p>
+<p>通常，从缓冲区中删除大量文本会阻止该缓冲区的进一步自动保存，因为它已经缩小了。然而，erase-buffer 并没有这样做，其想法是未来的文本与之前的文本并没有真正的关系，它的大小不应该与之前的文本进行比较。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: delete-region start end ¶
+</pre></div>
+<p>此命令删除当前缓冲区中 start 和 end 之间的文本，并返回 nil。如果点在被删除的区域内，则其后的值为 start。否则，点与周围的文本一起重新定位，就像标记一样。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: delete-and-extract-region start end ¶
+</pre></div>
+<p>此函数删除当前缓冲区中 start 和 end 之间的文本，并返回一个包含刚刚删除的文本的字符串。
+</p>
+<p>如果点在被删除的区域内，则其后的值为 start。否则，点与周围的文本一起重新定位，就像标记一样。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: delete-char count &amp;optional killp ¶
+</pre></div>
+<p>此命令直接删除点之后的计数字符，如果计数为负数，则删除点之前的字符。如果 killp 不为零，则它将删除的字符保存在 kill ring 中。
+</p>
+<p>在交互式调用中，count 是数字前缀参数，而 killp 是未处理的前缀参数。因此，如果提供了前缀参数，则文本将保存在 kill ring 中。如果没有提供前缀参数，则删除一个字符，但不会保存在 kill ring 中。
+</p>
+<p>返回的值始终为零。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: delete-backward-char count &amp;optional killp ¶
+</pre></div>
+<p>此命令直接删除点之前的 count 个字符，如果 count 为负数，则删除点之后的字符。如果 killp 不为零，则它将删除的字符保存在 kill ring 中。
+</p>
+<p>在交互式调用中，count 是数字前缀参数，而 killp 是未处理的前缀参数。因此，如果提供了前缀参数，则文本将保存在 kill ring 中。如果没有提供前缀参数，则删除一个字符，但不会保存在 kill ring 中。
+</p>
+<p>返回的值始终为零。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: backward-delete-char-untabify count &amp;optional killp ¶
+</pre></div>
+<p>此命令向后删除 count 个字符，将制表符更改为空格。当下一个要删除的字符是制表符时，首先将其替换为适当数量的空格以保持对齐，然后删除其中一个空格而不是制表符。如果 killp 不为零，则该命令将删除的字符保存在 kill ring 中。
+</p>
+<p>仅当计数为正时才会将制表符转换为空格。如果为负数，则删除 point 之后的正好 -count 个字符。
+</p>
+<p>在交互式调用中，count 是数字前缀参数，而 killp 是未处理的前缀参数。因此，如果提供了前缀参数，则文本将保存在 kill ring 中。如果没有提供前缀参数，则删除一个字符，但不会保存在 kill ring 中。
+</p>
+<p>返回的值始终为零。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: backward-delete-char-untabify-method ¶
+</pre></div>
+<p>此选项指定后向删除字符 untabify 应如何处理空格。可能的值包括 untabify，默认值，意味着将一个制表符转换为多个空格并删除一个；  饿了，意思是用一个命令删除点之前的所有制表符和空格；  all 表示删除 point 之前的所有制表符、空格和换行符，nil 表示对空白字符不做任何特殊处理。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.7_用户级删除命令.html">用户级删除命令</a>, Previous: <a href="33.5_用户级插入命令.html">用户级插入命令</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

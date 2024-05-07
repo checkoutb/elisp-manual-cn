@@ -1,0 +1,63 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>30.19 指针形状</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">30.19 指针形状</h2>
+<div class="nav-panel"><p>Next: <a href="30.20_窗口系统选择.html">窗口系统选择</a>, Previous: <a href="30.18_对话框.html">对话框</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>您可以使用指针文本属性为特定文本或图像指定鼠标指针样式，并为具有 :pointer 和 :map 图像属性的图像指定鼠标指针样式。您可以在这些属性中使用的值如下表所示。实际形状可能因系统而异；  描述是示例。
+</p>
+<div class="lisp">
+<pre class="lisp">text
+</pre></div>
+<div class="lisp">
+<pre class="lisp">nil
+</pre></div>
+<p>在文本上使用的常用鼠标指针样式（类似 <code>I</code> 的形状）。
+</p><div class="lisp">
+<pre class="lisp">arrow
+</pre></div>
+<div class="lisp">
+<pre class="lisp">vdrag
+</pre></div>
+<div class="lisp">
+<pre class="lisp">modeline
+</pre></div>
+<p>指向西北的箭头。
+</p><div class="lisp">
+<pre class="lisp">hand
+</pre></div>
+<p>一只指向上方的手。
+</p><div class="lisp">
+<pre class="lisp">hdrag
+</pre></div>
+<p>一个左右箭头。
+</p><div class="lisp">
+<pre class="lisp">nhdrag
+</pre></div>
+<p>一个上下箭头。
+</p><div class="lisp">
+<pre class="lisp">hourglass
+</pre></div>
+<p>一个旋转的环。
+</p>
+<p>在窗口的空白部分（与任何缓冲区内容不对应的部分）上，鼠标指针通常使用箭头样式，但您可以通过设置 void-text-area- 来指定不同的样式（上述样式之一）指针。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: void-text-area-pointer ¶
+</pre></div>
+<p>此变量指定空白文本区域的鼠标指针样式。这些包括缓冲区中一行结束之后或最后一行之下的区域。默认是使用箭头（非文本）指针样式。
+</p>
+<p>使用 X 时，您可以通过设置变量 x-pointer-shape 来指定文本指针样式的真实外观。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: x-pointer-shape ¶
+</pre></div>
+<p>此变量指定通常在 Emacs 帧中使用的指针形状，用于文本指针样式。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: x-sensitive-text-pointer-shape ¶
+</pre></div>
+<p>此变量指定当鼠标悬停在鼠标敏感文本上时要使用的指针形状。
+</p>
+<p>这些变量会影响新创建的帧。它们通常不会影响现有帧；  但是，如果您设置帧的鼠标颜色，也会安装这两个变量的当前值。请参阅字体和颜色参数。
+</p>
+<p>用于指定这些指针形状中的任何一个的值在文件 lisp/term/x-win.el 中定义。使用 Mx apropos RET x-pointer RET 查看它们的列表。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="30.20_窗口系统选择.html">窗口系统选择</a>, Previous: <a href="30.18_对话框.html">对话框</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

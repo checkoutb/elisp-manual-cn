@@ -1,0 +1,49 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.4.3 顶层模式线控制</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">24.4.3 顶层模式线控制</h3>
+<div class="nav-panel"><p>Next: <a href="24.4.4_模式行中使用的变量.html">模式行中使用的变量</a>, Previous: <a href="24.4.2_模式行的数据结构.html">模式行的数据结构</a>, Up: <a href="24.4_模式线格式.html">模式线格式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>模式线整体控制的变量是模式线格式。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: mode-line-format ¶
+</pre></div>
+<p>此变量的值是控制模式行内容的模式行结构。它在所有缓冲区中始终是缓冲区本地的。
+</p>
+<p>如果在缓冲区中将此变量设置为 nil，则该缓冲区没有模式行。（只有一行高的窗口也不会显示模式行。）
+</p>
+<p>mode-line-format 的默认值旨在使用其他变量的值，例如 mode-line-position 和 mode-line-modes（它又包含变量 mode-name 和 minor-mode-alist 的值）。很少有模式需要改变模式行格式本身。对于大多数目的，更改 mode-line-format 直接或间接引用的一些变量就足够了。
+</p>
+<p>如果您更改 mode-line-format 本身，则新值应使用出现在默认值中的相同变量（请参阅模式行中使用的变量），而不是复制它们的内容或以另一种方式显示信息。这样，用户或 Lisp 程序（例如显示时间和主要模式）通过更改这些变量进行的自定义仍然有效。
+</p>
+<p>下面是一个可能对 Shell 模式有用的 mode-line-format 的假设示例（实际上，Shell 模式不设置 mode-line-format）：
+</p>
+<div class="lisp">
+<pre class="lisp">(setq mode-line-format
+  (list "-"
+   'mode-line-mule-info
+   'mode-line-modified
+   'mode-line-frame-identification
+   "%b--"
+
+   ;; Note that this is evaluated while making the list.
+   ;; It makes a mode line construct which is just a string.
+   (getenv "HOST")
+
+   ":"
+   'default-directory
+   "   "
+   'global-mode-string
+   "   %[("
+   '(:eval (format-time-string "%F"))
+   'mode-line-process
+   'minor-mode-alist
+   "%n"
+   ")%]--"
+
+   '(which-function-mode ("" which-func-format "--"))
+   '(line-number-mode "L%l--")
+   '(column-number-mode "C%c--")
+   '(-3 "%p")))
+</pre></div>
+<p>（变量 line-number-mode、column-number-mode 和 which-function-mode 启用特定的次要模式；像往常一样，这些变量名称也是次要模式命令名称。）
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="24.4.4_模式行中使用的变量.html">模式行中使用的变量</a>, Previous: <a href="24.4.2_模式行的数据结构.html">模式行的数据结构</a>, Up: <a href="24.4_模式线格式.html">模式线格式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

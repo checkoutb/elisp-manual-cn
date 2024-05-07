@@ -1,0 +1,39 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.8.4 Yanking 函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">33.8.4 Yanking 函数</h3>
+<div class="nav-panel"><p>Next: <a href="33.8.5_低级环.html">低级环</a>, Previous: <a href="33.8.3_扬克.html">扬克</a>, Up: <a href="33.8_环.html">环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍用于 yanking 的高级命令，这些命令主要针对用户，但在 Lisp 程序中也很有用。yank 和 yank-pop 都支持 yank-excluded-properties 变量和 yank-handler 文本属性（请参阅 Yanking）。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: yank &amp;optional arg ¶
+</pre></div>
+<p>此命令在终止环前面的点之前插入文本。它使用 push-mark（参见 The Mark）在文本的开头设置标记，并将 point 放在末尾。
+</p>
+<p>如果 arg 是一个非 nil 列表（当用户键入不带数字的 Cu 时以交互方式发生），则 yank 如上所述插入文本，但将 point 放在被 yanked 文本之前并在其后设置标记。
+</p>
+<p>如果 arg 是一个数字，则 yank 插入 argth 最近终止的文本——终止环列表的 argth 元素，从前面循环计数，为此目的，它被认为是第一个元素。
+</p>
+<p>yank 不会改变 kill ring 的内容，除非它使用了另一个程序提供的文本，在这种情况下，它会将该文本推送到 kill ring 上。但是，如果 arg 是一个不同于 1 的整数，它会旋转 kill ring 以将被拉出的字符串放在前面。
+</p>
+<p>yank 返回零。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: yank-pop &amp;optional arg ¶
+</pre></div>
+<p>当在 yank 或另一个 yank-pop 之后立即调用时，此命令会将刚刚从 kill ring 中提取的条目替换为来自 kill ring 的不同条目。当像这样调用此命令时，该区域包含刚刚由另一个 yank 命令插入的文本。yank-pop 删除该文本并在其位置插入另一段已删除的文本。它不会将删除的文本添加到杀伤环，因为它已经在某个杀伤环中。但是，它确实会旋转杀伤环以将新拉出的绳子放在前面。
+</p>
+<p>如果 arg 为 nil，则替换文本是 kill ring 的前一个元素。如果 arg 是数字，则替换为 argth 前一个 kill。如果 arg 为负数，则替换为最近的杀戮。
+</p>
+<p>杀戮环中的杀戮序列环绕，所以如果重复调用 yank-pop 并达到最旧的杀戮，则后面的那个是最新的，最新的之前的那个是最旧的。
+</p>
+<p>该命令也可以在不是 yank 命令的命令之后调用。在这种情况下，它会在 minibuffer 中提示输入 kill-ring 条目并完成，并将 kill ring 元素用作 minibuffer 历史记录（请参阅 Minibuffer History）。这允许用户以交互方式选择记录在杀戮环中的先前杀戮之一。
+</p>
+<p>返回值始终为零。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: yank-undo-function ¶
+</pre></div>
+<p>如果此变量不为 nil，则函数 yank-pop 使用其值而不是 delete-region 来删除由前一个 yank 或 yank-pop 命令插入的文本。该值必须是两个参数的函数，即当前区域的开始和结束。
+</p>
+<p>函数 insert-for-yank 根据 yank-handler 文本属性的 undo 元素自动设置此变量（如果有）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.8.5_低级环.html">低级环</a>, Previous: <a href="33.8.3_扬克.html">扬克</a>, Up: <a href="33.8_环.html">环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

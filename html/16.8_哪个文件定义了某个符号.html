@@ -1,0 +1,61 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>16.8 哪个文件定义了某个符号</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">16.8 哪个文件定义了某个符号</h2>
+<div class="nav-panel"><p>Next: <a href="16.9_卸载.html">卸载</a>, Previous: <a href="16.7_特征.html">特征</a>, Up: <a href="16_加载.html">加载.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><div class="lisp">
+<pre class="lisp">Function: symbol-file symbol &amp;optional type ¶
+</pre></div>
+<p>此函数返回定义符号的文件的名称。如果 type 为 nil，那么任何类型的定义都是可以接受的。如果 type 是 defun、defvar 或 defface，则仅指定函数定义、变量定义或面定义。
+</p>
+<p>该值通常是绝对文件名。如果定义不与任何文件关联，它也可以为 nil。如果 symbol 指定了一个自动加载的函数，该值可以是一个相对文件名，不带扩展名。
+</p>
+<p>符号文件的基础是变量加载历史中的数据。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: load-history ¶
+</pre></div>
+<p>这个变量的值是一个列表，它将加载的库文件的名称与它们定义的函数和变量的名称以及它们提供或需要的特性相关联。
+</p>
+<p>此列表中的每个元素都描述了一个已加载的库（包括在启动时预加载的库）。它是一个列表，其 CAR 是库的绝对文件名（字符串）。其余列表元素具有以下形式：
+</p>
+<div class="lisp">
+<pre class="lisp">var
+</pre></div>
+<p>符号 var 被定义为一个变量。
+</p><div class="lisp">
+<pre class="lisp">(defun . fun)
+</pre></div>
+<p>定义了函数 fun。
+</p><div class="lisp">
+<pre class="lisp">(t . fun)
+</pre></div>
+<p>在此库将其重新定义为函数之前，函数 fun 以前是自动加载的。以下元素总是 (defun . fun)，表示将 fun 定义为函数。
+</p><div class="lisp">
+<pre class="lisp">(autoload . fun)
+</pre></div>
+<p>函数 fun 被定义为自动加载。
+</p><div class="lisp">
+<pre class="lisp">(defface . face)
+</pre></div>
+<p>面面被定义。
+</p><div class="lisp">
+<pre class="lisp">(require . feature)
+</pre></div>
+<p>该功能特性是必需的。
+</p><div class="lisp">
+<pre class="lisp">(provide . feature)
+</pre></div>
+<p>提供了功能特性。
+</p><div class="lisp">
+<pre class="lisp">(cl-defmethod method specializers)
+</pre></div>
+<p>命名方法是通过使用 cl-defmethod 定义的，并以 specialters 作为它的specialters。
+</p><div class="lisp">
+<pre class="lisp">(define-type . type)
+</pre></div>
+<p>类型类型已定义。
+</p>
+<p>load-history 的值可能有一个 CAR 为 nil 的元素。此元素描述了使用 eval-buffer 在不访问文件的缓冲区上所做的定义。
+</p>
+<p>命令 eval-region 更新 load-history，但这样做是通过将定义的符号添加到正在访问的文件的元素中，而不是替换该元素。见评估。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="16.9_卸载.html">卸载</a>, Previous: <a href="16.7_特征.html">特征</a>, Up: <a href="16_加载.html">加载.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>41.14 终端输出</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">41.14 终端输出</h2>
+<div class="nav-panel"><p>Next: <a href="41.15_声音输出.html">声音输出</a>, Previous: <a href="41.13.2_录音输入.html">录音输入</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>终端输出功能将输出发送到文本终端，或跟踪发送到终端的输出。变量波特率告诉你 Emacs 认为终端的输出速度是多少。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: baud-rate ¶
+</pre></div>
+<p>这个变量的值是终端的输出速度，据 Emacs 所知。设置此变量不会改变实际数据传输的速度，但该值用于填充等计算。
+</p>
+<p>它还影响有关是否滚动部分屏幕或在文本终端上重新绘制的决定。有关图形终端上的相应功能，请参阅强制重新显示。
+</p>
+<p>该值以波特为单位。
+</p>
+<p>如果您在网络上运行，并且网络的不同部分以不同的波特率工作，则 Emacs 返回的值可能与您本地终端使用的值不同。一些网络协议将本地终端速度传达给远程机器，以便 Emacs 和其他程序可以获得正确的值，但其他程序则不能。如果 Emacs 有错误的值，它会做出不是最优的决策。要解决此问题，请设置波特率。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: send-string-to-terminal string &amp;optional terminal ¶
+</pre></div>
+<p>此函数将字符串发送到终端而不进行更改。字符串中的控制字符具有与终端相关的效果。（如果您需要在终端上显示非 ASCII 文本，请使用显式编码和解码中描述的函数之一对其进行编码。）此函数仅在文本终端上运行。终端可以是终端对象、框架或选定框架终端的 nil。在批处理模式下，当终端为 nil 时，字符串被发送到标准输出。
+</p>
+<p>该功能的一种用途是在具有可下载功能键定义的终端上定义功能键。例如，这是如何（在某些终端上）定义功能键 4 以向前移动四个字符（通过将字符 Cu Cf 传输到计算机）：
+</p>
+<div class="lisp">
+<pre class="lisp">(send-string-to-terminal "\eF4\^U\^F")
+     ⇒ nil
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Command: open-termscript filename ¶
+</pre></div>
+<p>此函数用于打开一个 termscript 文件，该文件将记录 Emacs 发送到终端的所有字符。它返回零。Termscript 文件对于调查 Emacs 屏幕乱码的问题非常有用，这些问题是由于 Termcap 条目不正确或终端选项的不良设置导致的问题，而不是实际的 Emacs 错误。一旦确定实际输出了哪些字符，就可以可靠地确定它们是否符合使用的 Termcap 规范。
+</p>
+<div class="lisp">
+<pre class="lisp">(open-termscript "../junk/termscript")
+     ⇒ nil
+</pre></div>
+<p>通过使用 nil 参数调用此函数来关闭 termscript 文件。
+</p>
+<p>另请参阅录制输入中的 open-dribble-file。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="41.15_声音输出.html">声音输出</a>, Previous: <a href="41.13.2_录音输入.html">录音输入</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

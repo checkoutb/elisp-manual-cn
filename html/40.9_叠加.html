@@ -1,0 +1,8 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.9 叠加</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">40.9 叠加</h2>
+<div class="nav-panel"><p>Next: <a href="40.9.1_管理覆盖.html">管理覆盖</a>, Previous: <a href="40.8_临时展示.html">临时展示</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>为了演示功能，您可以使用覆盖来改变屏幕上缓冲区文本的外观。覆盖是属于特定缓冲区的对象，具有指定的开始和结束。它还具有您可以检查和设置的属性；  这些会影响叠加层中文本的显示。
+</p>
+<p>叠加层的视觉效果与相应的文本属性相同（请参阅文本属性）。然而，由于不同的实现，覆盖通常不能很好地扩展（许多操作所花费的时间与缓冲区中的覆盖数量成正比）。如果您需要影响缓冲区中许多部分的视觉外观，我们建议使用文本属性。
+</p>
+<p>覆盖使用标记来记录它的开始和结束；  因此，编辑缓冲区的文本会调整每个叠加层的开头和结尾，使其与文本保持一致。创建叠加层时，您可以指定在开头插入的文本应该在叠加层内部还是外部，同样用于叠加层的末尾。
+</p>
+<div class="nav-panel"><p>Next: <a href="40.9.1_管理覆盖.html">管理覆盖</a>, Previous: <a href="40.8_临时展示.html">临时展示</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>38.3 条件变量</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">38.3 条件变量</h2>
+<div class="nav-panel"><p>Next: <a href="38.4_线程列表.html">线程列表</a>, Previous: <a href="38.2_互斥体.html">互斥体</a>, Up: <a href="38_线程.html">线程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>条件变量是线程阻塞直到某个事件发生的一种方式。一个线程可以等待一个条件变量，当其他线程通知该条件时被唤醒。
+</p>
+<p>条件变量与互斥体相关联，并且在概念上与某些条件相关联。为了正确操作，必须获取互斥体，然后必须循环等待线程，测试条件并等待条件变量。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">(with-mutex mutex
+  (while (not global-variable)
+    (condition-wait cond-var)))
+</pre></div>
+<p>互斥体确保原子性，循环是为了健壮性——可能存在虚假通知。
+</p>
+<p>同样，在通知条件之前必须持有互斥锁。典型且最佳的方法是获取互斥锁，进行与此条件相关的更改，然后通知它：
+</p>
+<div class="lisp">
+<pre class="lisp">(with-mutex mutex
+  (setq global-variable (some-computation))
+  (condition-notify cond-var))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: make-condition-variable mutex &amp;optional name ¶
+</pre></div>
+<p>创建一个与互斥锁关联的新条件变量。如果指定了名称，则它是赋予条件变量的名称。它必须是一个字符串。该名称仅用于调试目的；  它对 Emacs 没有任何意义。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: condition-variable-p object ¶
+</pre></div>
+<p>如果 object 表示条件变量，此函数返回 t，否则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: condition-wait cond ¶
+</pre></div>
+<p>等待另一个线程通知条件变量 cond。此函数将阻塞，直到通知条件，或者直到使用线程信号将信号传递给该线程。
+</p>
+<p>调用条件等待而不持有条件的关联互斥体是错误的。
+</p>
+<p>条件等待在等待时释放关联的互斥锁。这允许其他线程获取互斥锁以通知条件。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: condition-notify cond &amp;optional all ¶
+</pre></div>
+<p>通知条件。在调用它之前，必须持有带有 cond 的互斥锁。通常条件通知会唤醒单个等待线程；  但如果 all 不为零，则通知所有等待 cond 的线程。
+</p>
+<p>条件通知在等待时释放关联的互斥锁。这允许其他线程获取互斥锁以等待条件。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: condition-name cond ¶
+</pre></div>
+<p>返回传递给 make-condition-variable 的 cond 的名称。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: condition-mutex cond ¶
+</pre></div>
+<p>返回与 cond 关联的互斥锁。请注意，无法更改关联的互斥锁。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="38.4_线程列表.html">线程列表</a>, Previous: <a href="38.2_互斥体.html">互斥体</a>, Up: <a href="38_线程.html">线程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

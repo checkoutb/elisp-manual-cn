@@ -1,0 +1,87 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.4.1 在回显区显示消息</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.4.1 在回显区显示消息</h3>
+<div class="nav-panel"><p>Next: <a href="40.4.2_上报操作进度.html">上报操作进度</a>, Previous: <a href="40.4_回显区.html">回显区</a>, Up: <a href="40.4_回显区.html">回显区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍在回显区域中显示消息的标准功能。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: message format-string &amp;rest arguments ¶
+</pre></div>
+<p>此功能在回显区域显示一条消息。format-string 是一个格式字符串，参数是其格式规范的对象，就像在 format-message 函数中一样（请参阅格式化字符串）。生成的格式化字符串显示在回显区域；  如果它包含面文本属性，它会与指定的面一起显示（请参阅面）。该字符串也被添加到 <strong>Messages</strong> 缓冲区，但没有文本属性（请参阅在 <strong>Messages</strong> 中记录消息）。
+</p>
+<p>通常，格式中的重音和撇号会转换为匹配的弯引号，例如， <code>Missing `%s'</code> 可能会导致 <code>Missing 'foo'</code> 。有关如何影响或禁止此翻译的信息，请参阅文本引用样式。
+</p>
+<p>在批处理模式下，消息被打印到标准错误流，后跟换行符。
+</p>
+<p>当 inhibitor-message 为非 nil 时，回显区域不会显示任何消息，只会记录到 ’<strong>Messages</strong>’。
+</p>
+<p>如果 format-string 为 nil 或空字符串，则 message 清除回显区域；  如果回显区域已自动扩展，则会将其恢复到正常大小。如果 minibuffer 处于活动状态，这会将 minibuffer 内容立即带回屏幕。
+</p>
+<div class="lisp">
+<pre class="lisp">(message "Reverting `%s'..." (buffer-name))
+ -| Reverting ‘subr.el’...
+⇒ "Reverting ‘subr.el’..."
+
+
+---------- Echo Area ----------
+Reverting ‘subr.el’...
+---------- Echo Area ----------
+</pre></div>
+<p>要根据消息的大小在回显区域或弹出缓冲区中自动显示消息，请使用 display-message-or-buffer（见下文）。
+</p>
+<p>警告：如果您想将自己的字符串逐字用作消息，请不要只写（消息字符串）。如果字符串包含 ’%’、’‘’ 或 ”’ 它可能会被重新格式化，从而产生不希望的结果。而是使用 (message "%s" 字符串)。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: set-message-function ¶
+</pre></div>
+<p>如果此变量非零，它应该是一个参数的函数，即在回显区域中显示的消息文本。该函数将被消息和相关函数调用。如果函数返回 nil，则消息将照常显示在回显区域中。如果此函数返回一个字符串，则该字符串将显示在回显区域而不是原始字符串。如果此函数返回其他非零值，则表示该消息已被处理，因此消息不会在回显区域显示任何内容。另见 clear-message-function 可用于清除此函数显示的消息。
+</p>
+<p>默认值是当 minibuffer 处于活动状态时在 minibuffer 末尾显示消息的函数。但是，如果活动小缓冲区中显示的文本在某些字符上具有 minibuffer-message 文本属性（请参阅具有特殊含义的属性），则消息将在具有该属性的第一个字符之前显示。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: clear-message-function ¶
+</pre></div>
+<p>如果此变量为非 nil，则 message 和相关函数在其参数 message 为 nil 或空字符串时不带参数调用它。
+</p>
+<p>通常在显示回显区域消息后下一个输入事件到达时调用此函数。该函数应清除由 set-message-function 指定的对应函数显示的消息。
+</p>
+<p>默认值是清除活动小缓冲区中显示的消息的函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: inhibit-message ¶
+</pre></div>
+<p>当此变量为非零时，消息和相关函数将不会使用回显区域来显示消息。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: with-temp-message message &amp;rest body ¶
+</pre></div>
+<p>此构造在执行主体期间临时在回显区域中显示一条消息。它显示消息，执行正文，然后返回最后一个正文形式的值，同时恢复先前的回显区域内容。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: message-or-box format-string &amp;rest arguments ¶
+</pre></div>
+<p>此功能显示类似消息的消息，但可能会在对话框而不是回显区域中显示它。如果在使用鼠标调用的命令中调用此函数（更准确地说，如果 last-nonmenu-event（请参阅命令循环中的信息）为 nil 或列表），则它使用对话框或弹出菜单显示消息。否则，它使用回显区域。（这与 y-or-np 用于做出类似决定的标准相同；请参阅是或否查询。）
+</p>
+<p>您可以通过将 last-nonmenu-event 绑定到调用周围的合适值来强制使用鼠标或回显区域。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: message-box format-string &amp;rest arguments ¶
+</pre></div>
+<p>此函数显示类似消息的消息，但尽可能使用对话框（或弹出菜单）。如果由于终端不支持而无法使用对话框或弹出菜单，则 message-box 使用回显区域，如 message。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-message-or-buffer message &amp;optional buffer-name action frame ¶
+</pre></div>
+<p>此函数显示消息消息，它可以是字符串或缓冲区。如果它小于由 max-mini-window-height 定义的回波区域的最大高度，则使用消息将其显示在回波区域中。否则，显示缓冲区用于在弹出缓冲区中显示它。
+</p>
+<p>返回显示在回显区域中的字符串，或者在使用弹出缓冲区时返回用于显示它的窗口。
+</p>
+<p>如果 message 是字符串，则可选参数 buffer-name 是使用弹出缓冲区时用于显示它的缓冲区的名称，默认为 *Message*。在message是字符串并显示在回显区的情况下，不指定是否将内容插入缓冲区。
+</p>
+<p>可选参数 action 和 frame 与 display-buffer 相同，仅在显示缓冲区时使用。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: current-message ¶
+</pre></div>
+<p>此函数返回当前显示在回显区域中的消息，如果没有则返回 nil。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.4.2_上报操作进度.html">上报操作进度</a>, Previous: <a href="40.4_回显区.html">回显区</a>, Up: <a href="40.4_回显区.html">回显区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

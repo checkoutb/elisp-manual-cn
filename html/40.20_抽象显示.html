@@ -1,0 +1,28 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.20 抽象显示</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">40.20 抽象显示</h2>
+<div class="nav-panel"><p>Next: <a href="40.20.1_抽象显示函数.html">抽象显示函数</a>, Previous: <a href="40.19.5_按钮缓冲区命令.html">按钮缓冲区命令</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Ewoc 包构造表示 Lisp 对象结构的缓冲区文本，并更新文本以跟随该结构的变化。这就像 <code>模型-视图-控制器</code> 设计范式中的 <code>视图</code> 组件。Ewoc 的意思是 <code>Emacs 的对象集合小部件</code> 。
+</p>
+<p>ewoc 是一种结构，用于组织构建表示某些 Lisp 数据的缓冲区文本所需的信息。ewoc的缓冲文本分为三部分，依次为：一是固定的头部文本；  接下来，一系列数据元素的文本描述（您指定的 Lisp 对象）；  最后，固定页脚文本。具体来说，一个 ewoc 包含以下信息：
+</p>
+<p>生成其文本的缓冲区。
+文本在缓冲区中的起始位置。
+页眉和页脚字符串。
+一个双向链接的节点链，每个节点包含：
+     一个数据元素，一个单一的 Lisp 对象。
+     链接到链中的前后节点。
+一个漂亮的打印机函数，负责将数据元素值的文本表示插入当前缓冲区。
+</p>
+<p>通常，您使用 ewoc-create 定义一个 ewoc，然后将生成的 ewoc 结构传递给 Ewoc 包中的其他函数以在其中构建节点，并将其显示在缓冲区中。一旦它显示在缓冲区中，其他函数确定缓冲区位置和节点之间的对应关系，将点从一个节点的文本表示移动到另一个节点，等等。请参阅抽象显示函数。
+</p>
+<p>节点封装数据元素的方式与变量保存值的方式非常相似。通常，封装作为向 ewoc 添加节点的一部分发生。您可以检索数据元素值并在其位置放置一个新值，如下所示：
+</p><div class="lisp">
+<pre class="lisp">(ewoc-data node)
+⇒ value
+
+(ewoc-set-data node new-value)
+⇒ new-value
+</pre></div>
+<p>作为数据元素值，您还可以使用 Lisp 对象（列表或向量），它是实际值的容器，或者是其他结构的索引。该示例（请参阅抽象显示示例）使用后一种方法。
+</p>
+<p>当数据发生变化时，您将需要更新缓冲区中的文本。您可以通过调用 ewoc-refresh 更新所有节点，或者使用 ewoc-invalidate 仅更新特定节点，或者使用 ewoc-map 更新所有满足谓词的节点。或者，您可以使用 ewoc-delete 或 ewoc-filter 删除无效节点，并在其位置添加新节点。从 ewoc 中删除节点也会从缓冲区中删除其关联的文本描述。
+</p>
+<div class="nav-panel"><p>Next: <a href="40.20.1_抽象显示函数.html">抽象显示函数</a>, Previous: <a href="40.19.5_按钮缓冲区命令.html">按钮缓冲区命令</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

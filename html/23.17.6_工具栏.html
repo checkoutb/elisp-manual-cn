@@ -1,0 +1,139 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>23.17.6 工具栏</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">23.17.6 工具栏</h3>
+<div class="nav-panel"><p>Next: <a href="23.17.7_修改菜单.html">修改菜单</a>, Previous: <a href="23.17.5_菜单栏.html">菜单栏</a>, Up: <a href="23.17_菜单键映射.html">菜单键映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>工具栏是框架顶部的一排可点击图标，就在菜单栏的下方。请参阅 GNU Emacs 手册中的工具栏。Emacs 通常在图形显示器上显示一个工具栏。
+</p>
+<p>在每一帧上，框架参数 tool-bar-lines 控制为工具栏保留多少行的高度。零值会抑制工具栏。如果该值不为零，并且 auto-resize-tool-bars 不为零，则工具栏会根据需要自动扩展和收缩以保存指定的内容。如果值为 grow-only，则工具栏会自动扩展，但不会自动收缩。
+</p>
+<p>工具栏内容由附加到名为 TOOL-BAR 的假功能键的菜单键映射控制（很像控制菜单栏的方式）。所以你使用define-key定义一个工具栏项，像这样：
+</p>
+<div class="lisp">
+<pre class="lisp">(define-key global-map [tool-bar key] item)
+</pre></div>
+<p>其中 key 是一个伪造的功能键，用于将该项目与其他项目区分开来，而 item 是一个菜单项键绑定（请参阅扩展菜单项），它说明如何显示该项目及其行为方式。
+</p>
+<p>常用的菜单键映射项属性 :visible、:enable、:button 和 :filter 在工具栏绑定中很有用并且具有它们的正常含义。item中的real-binding必须是一个命令，而不是一个keymap；  换句话说，将工具栏图标定义为前缀键不起作用。
+</p>
+<p>:help 属性指定当鼠标在该项目上时要显示的帮助回显字符串。这与 help-echo 文本属性的显示方式相同（请参阅帮助显示）。
+</p>
+<p>此外，您应该使用 :image 属性；  这是您指定要在工具栏中显示的图像的方式：
+</p>
+<div class="lisp">
+<pre class="lisp">:image image
+</pre></div>
+<p>image 可以是单个图像规范（请参阅图像）或四个图像规范的向量。如果您使用四个向量，则根据情况使用其中一个：
+</p>
+<div class="lisp">
+<pre class="lisp">item 0
+</pre></div>
+<p>在启用和选择项目时使用。
+</p><div class="lisp">
+<pre class="lisp">item 1
+</pre></div>
+<p>在启用和取消选择项目时使用。
+</p><div class="lisp">
+<pre class="lisp">item 2
+</pre></div>
+<p>当项目被禁用和选择时使用。
+</p><div class="lisp">
+<pre class="lisp">item 3
+</pre></div>
+<p>当项目被禁用和取消选择时使用。
+</p>
+<p>Emacs 的 GTK+ 和 NS 版本忽略了项目 1 到 3，因为禁用和/或取消选择的图像是从项目 0 自动计算的。
+</p>
+<p>如果图像是单个图像规范，Emacs 通过对图像应用边缘检测算法将工具栏按钮绘制为禁用状态。
+</p>
+<p>:rtl 属性指定用于从右到左语言的替代图像。目前只有 GTK+ 版本的 Emacs 支持这个。
+</p>
+<p>与菜单栏一样，工具栏也可以显示分隔符（请参阅菜单分隔符）。但是，工具栏分隔符是垂直的而不是水平的，并且只支持一种样式。它们在工具栏键盘映射中由 (menu-item "–") 条目表示；  工具栏分隔符不支持 :visible 等属性。分隔符在 GTK+ 和 Nextstep 工具栏中原生呈现；  在其他情况下，它们使用垂直线的图像进行渲染。
+</p>
+<p>定义了默认工具栏，这样特定于编辑的项目不会出现在其命令符号具有特殊模式类属性的主要模式中（请参阅主要模式约定）。主要模式可以通过在其本地地图中绑定 [tool-bar foo] 来将项目添加到全局栏。一些主要模式完全替换默认工具栏项目是有意义的，因为不能方便地容纳很多，并且默认绑定通过使用通过工具栏映射的间接来使这很容易。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: tool-bar-map ¶
+</pre></div>
+<p>默认情况下，全局地图绑定[tool-bar]如下：
+</p>
+<div class="lisp">
+<pre class="lisp">(global-set-key [tool-bar]
+                `(menu-item ,(purecopy "tool bar") ignore
+                            :filter tool-bar-make-keymap))
+</pre></div>
+<p>反过来，函数 tool-bar-make-keymap 从变量 tool-bar-map 的值动态地导出实际的工具栏映射。因此，您通常应该通过更改该地图来调整默认（全局）工具栏。一些主要模式，例如 Info 模式，通过将 tool-bar-map buffer-local 并将其设置为不同的 keymap 来完全替换全局工具栏。
+</p>
+<p>定义工具栏项有两个便捷功能，如下所示。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: tool-bar-add-item icon def key &amp;rest props ¶
+</pre></div>
+<p>该函数通过修改 tool-bar-map 向工具栏添加一个项目。要使用的图像由 icon 定义，它是 find-image 要定位的 XPM、XBM 或 PBM 图像文件的基本名称。例如，给定一个值 <code>exit</code> ，exit.xpm、exit.pbm 和 exit.xbm 将在彩色显示器上按该顺序搜索。在单色显示器上，搜索顺序是 <code>.pbm</code> 、 <code>.xbm</code> 和 <code>.xpm</code> 。要使用的绑定是命令 def，key 是前缀键盘映射中的假功能键符号。其余的参数 props 是要添加到菜单项规范的附加属性列表元素。
+</p>
+<p>要在某些本地地图中定义项目，请将 tool-bar-map 与 let around 调用此函数绑定：
+</p>
+<div class="lisp">
+<pre class="lisp">(defvar foo-tool-bar-map
+  (let ((tool-bar-map (make-sparse-keymap)))
+    (tool-bar-add-item …)
+    …
+    tool-bar-map))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: tool-bar-add-item-from-menu command icon &amp;optional map &amp;rest props ¶
+</pre></div>
+<p>此功能便于定义与现有菜单栏绑定一致的工具栏项。command的绑定在map（默认global-map）的菜单栏中查找，修改为icon添加图片规范，查找方式与tool-bar-add-item相同。然后将生成的绑定放置在工具栏地图中，因此仅将此功能用于全局工具栏项目。
+</p>
+<p>map 必须包含绑定到 [menu-bar] 的适当键映射。其余的参数 props 是要添加到菜单项规范的附加属性列表元素。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: tool-bar-local-item-from-menu command icon in-map &amp;optional from-map &amp;rest props ¶
+</pre></div>
+<p>此函数用于制作非全局工具栏项。像 tool-bar-add-item-from-menu 一样使用它，除了 in-map 指定要在其中进行定义的本地地图。参数 from-map 类似于 tool-bar-add-item-from- 的 map 参数菜单。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: auto-resize-tool-bars ¶
+</pre></div>
+<p>如果此变量不为零，则工具栏会自动调整大小以显示所有已定义的工具栏项目——但不大于框架高度的四分之一。
+</p>
+<p>如果值为 grow-only，则工具栏会自动扩展，但不会自动收缩。要收缩工具栏，用户必须通过输入 Cl 重新绘制框架。
+</p>
+<p>如果 Emacs 是用 GTK+ 或 Nextstep 构建的，工具栏只能显示一行，所以这个变量没有作用。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: auto-raise-tool-bar-buttons ¶
+</pre></div>
+<p>如果此变量不为零，则当鼠标移到工具栏项目上时，工具栏项目会以凸起的形式显示。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: tool-bar-button-margin ¶
+</pre></div>
+<p>此变量指定要在工具栏项目周围添加的额外边距。该值是一个整数，像素数。默认值为 4。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: tool-bar-button-relief ¶
+</pre></div>
+<p>此变量指定工具栏项的阴影宽度。该值是一个整数，像素数。默认值为 1。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: tool-bar-border ¶
+</pre></div>
+<p>此变量指定在工具栏区域下方绘制的边框的高度。整数将高度指定为像素数。如果该值为 internal-border-width（默认）或border-width 之一，则工具栏边框高度对应相应的frame 参数。
+</p>
+<p>您可以使用 shift、control、meta 等修饰符定义单击工具栏项的特殊含义。为此，您可以通过假功能键设置与原始项目相关的附加项目。具体来说，附加项目应使用用于命名原始项目的相同假功能键的修改版本。
+</p>
+<p>因此，如果原始项目是这样定义的，
+</p><div class="lisp">
+<pre class="lisp">(define-key global-map [tool-bar shell]
+  '(menu-item "Shell" shell
+              :image (image :type xpm :file "shell.xpm")))
+</pre></div>
+<p>那么这里是您如何定义使用 shift 修饰符单击同一工具栏图像的方法：
+</p>
+<div class="lisp">
+<pre class="lisp">(define-key global-map [tool-bar S-shell] 'some-command)
+</pre></div>
+<p>有关如何将修饰符添加到功能键的更多信息，请参阅功能键。
+</p>
+<p>如果您具有更改工具栏项是否启用的功能，则此状态不一定会立即以视觉方式更新。要强制重新计算工具栏，请调用 force-mode-line-update（请参阅模式行格式）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="23.17.7_修改菜单.html">修改菜单</a>, Previous: <a href="23.17.5_菜单栏.html">菜单栏</a>, Up: <a href="23.17_菜单键映射.html">菜单键映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

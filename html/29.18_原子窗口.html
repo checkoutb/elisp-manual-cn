@@ -1,0 +1,65 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>29.18 原子窗口</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">29.18 原子窗口</h2>
+<div class="nav-panel"><p>Next: <a href="29.19_窗口和点.html">窗口和点</a>, Previous: <a href="29.17.3_带有侧窗的帧布局.html">带有侧窗的帧布局</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>原子窗口是至少两个活动窗口的矩形组合。它们具有以下显着特征：
+</p>
+<p>函数 split-window（请参阅拆分窗口）在应用于原子窗口的组成部分时，将尝试在原子窗口之外创建新窗口。
+函数 delete-window（请参阅删除窗口）在应用于原子窗口的组成部分时，将尝试删除整个原子窗口。
+函数 delete-other-windows（请参阅删除窗口）在应用于原子窗口的组成部分时，将尝试使原子窗口填充其 <code>帧</code> ( <code>frame</code> )或主窗口（请参阅侧窗口）。
+</p>
+<p>这意味着改变窗口结构的基本函数组将原子窗口视为活窗口，从而保留原子窗口的内部结构。
+</p>
+<p>原子窗口有助于构建和保留仅当所有涉及的缓冲区以特定方式同时显示时才有意义的窗口布局，例如显示文件修订之间的差异，或不同语言或标记的相同文本时。它们还可用于永久显示与特定窗口相关的信息，并在该窗口两侧的条形图中显示。
+</p>
+<p>原子窗口是在保留的窗口原子窗口参数（参见窗口参数）和一个称为原子窗口根窗口的内部窗口（参见 Emacs Windows 的基本概念）的帮助下实现的。属于同一原子窗口的所有窗口都将此根窗口作为它们的共同祖先，并分配有一个非零窗口原子参数。
+</p>
+<p>以下函数返回指定窗口所属的原子窗口的根：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-atom-root &amp;optional window ¶
+</pre></div>
+<p>这个函数返回原子窗口的根窗口是窗口的一部分。指定的窗口必须是有效的窗口，并且默认为选定的窗口。如果窗口不是原子窗口的一部分，则返回 nil。
+</p>
+<p>制作新原子窗口的最简单方法是采用现有的内部窗口并应用以下函数：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-make-atom window ¶
+</pre></div>
+<p>此函数将窗口转换为原子窗口。指定的窗口必须是内部窗口。这个函数所做的只是将window的每个后代的window-atom参数设置为t。
+</p>
+<p>要从现有的实时窗口创建新的原子窗口或将新窗口添加到现有的原子窗口，可以使用以下缓冲区显示操作函数（请参阅缓冲区显示的操作函数）：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-buffer-in-atom-window buffer alist ¶
+</pre></div>
+<p>此函数尝试在新窗口中显示缓冲区，该新窗口将与现有窗口组合形成一个原子窗口。如果现有窗口已经是原子窗口的一部分，它会将新窗口添加到该原子窗口。
+</p>
+<p>指定的 alist 是符号和值的关联列表。以下符号具有特殊含义：
+</p>
+<div class="lisp">
+<pre class="lisp">window
+</pre></div>
+<p>这样一个元素的值指定了新窗口应与之组合的现有窗口。如果它指定了一个内部窗口，那么该窗口的所有子窗口也将成为原子窗口的一部分。如果未指定窗口，则新窗口将成为选定窗口的同级窗口。如果窗口是活动的并且它的窗口原子参数尚未设置，则现有窗口的窗口原子参数设置为 main。
+</p><div class="lisp">
+<pre class="lisp">side
+</pre></div>
+<p>这种元素的值表示新窗口应位于的现有窗口的一侧。有效值是下、右、上和左。默认值如下。新窗口的 window-atom 参数设置为此值。
+</p>
+<p>返回值为新窗口，创建该窗口失败时返回 nil。
+</p>
+<p>请注意，window-atom 参数的值并不重要，只要它不是 nil 即可。display-buffer-in-atom-window 分配的值只允许在应用该函数后轻松检索原始窗口和新窗口。另请注意，window-atom 参数是 display-buffer-in-atom-window 分配的唯一窗口参数。应用程序必须通过 alist 中的窗口参数条目显式设置更多参数。
+</p>
+<p>当其组成部分之一被删除时，原子窗口将自动不存在。要手动分解原子窗口，请重置其组成部分的 window-atom 参数 - 原子窗口的根及其所有后代。
+</p>
+<p>以下代码片段在应用于单窗口 <code>帧</code> ( <code>frame</code> )时，首先拆分选定的窗口，并使选定的窗口和新窗口组成原子窗口，其父窗口为根。然后它将缓冲区 <strong>Messages</strong> 显示在 <code>帧</code> ( <code>frame</code> )底部的新窗口中，并使该新窗口成为刚刚创建的原子窗口的一部分。
+</p>
+<div class="lisp">
+<pre class="lisp">(let ((window (split-window-right)))
+  (window-make-atom (window-parent window))
+  (display-buffer-in-atom-window
+   (get-buffer-create "*Messages*")
+   `((window . ,(window-parent window)) (window-height . 5))))
+</pre></div>
+<p>此时在该 <code>帧</code> ( <code>frame</code> )的任何窗口中键入 Cx 2 都会在 <code>帧</code> ( <code>frame</code> )底部生成一个新窗口。相反，键入 Cx 3 会将新窗口放在 <code>帧</code> ( <code>frame</code> )的右侧。在任何一种情况下，现在在原子窗口的任何窗口中键入 Cx 1 都只会删除新窗口。在原子窗口的任何窗口中键入 Cx 0 将使新窗口填满 <code>帧</code> ( <code>frame</code> )。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="29.19_窗口和点.html">窗口和点</a>, Previous: <a href="29.17.3_带有侧窗的帧布局.html">带有侧窗的帧布局</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

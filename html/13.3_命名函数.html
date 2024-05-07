@@ -1,0 +1,18 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>13.3 命名函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">13.3 命名函数</h2>
+<div class="nav-panel"><p>Next: <a href="13.4_定义函数.html">定义函数</a>, Previous: <a href="13.2.4_函数的文档字符串.html">函数的文档字符串</a>, Up: <a href="13_函数.html">函数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>符号可以作为函数的名称。当符号的函数单元（参见符号组件）包含函数对象（例如，lambda 表达式）时，就会发生这种情况。然后符号本身成为一个有效的、可调用的函数，相当于其函数单元格中的函数对象。
+</p>
+<p>函数单元格的内容也称为符号的函数定义。使用符号的函数定义代替符号的过程称为符号函数间接；  请参阅符号函数间接。如果你没有给符号一个函数定义，那么它的函数单元就被称为是无效的，并且它不能被用作一个函数。
+</p>
+<p>在实践中，几乎所有函数都有名称，并通过它们的名称来引用。您可以通过定义 lambda 表达式并将其放入函数单元格来创建命名 Lisp 函数（请参阅访问函数单元格内容）。但是，更常见的是使用 defun 特殊形式，将在下一节中介绍。请参阅定义函数。
+</p>
+<p>我们给函数命名是因为在 Lisp 表达式中通过它们的名称来引用它们很方便。此外，一个命名的 Lisp 函数可以很容易地引用它自己——它可以是递归的。此外，原语只能通过它们的名称在文本中引用，因为原语函数对象（请参阅原语函数类型）没有读取语法。
+</p>
+<p>函数不需要有唯一的名称。一个给定的函数对象通常只出现在一个符号的函数单元格中，但这只是一种约定。使用 fset 很容易将其存储在多个符号中；  那么每个符号都是同一函数的有效名称。
+</p>
+<p>请注意，用作函数名的符号也可以用作变量；  符号的这两种用法是独立的，并不冲突。（在某些 Lisp 方言中，情况并非如此，例如 Scheme。）
+</p>
+<p>按照惯例，如果一个函数的符号由两个用 <code>--</code> 分隔的名称组成，则该函数是供内部使用的，第一部分命名定义该函数的文件。例如，名为 vc-git–rev-parse 的函数是 vc-git.el 中定义的内部函数。用 C 编写的内部使用函数的名称以 <code>-internal</code> 结尾，例如 bury-buffer-internal。2018 年之前贡献的 Emacs 代码可能遵循其他内部使用的命名约定，这些约定正在逐步淘汰。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="13.4_定义函数.html">定义函数</a>, Previous: <a href="13.2.4_函数的文档字符串.html">函数的文档字符串</a>, Up: <a href="13_函数.html">函数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

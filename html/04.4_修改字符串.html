@@ -1,0 +1,24 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>4.4 修改字符串</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">4.4 修改字符串</h2>
+<div class="nav-panel"><p>Next: <a href="04.5_字符与字符串的比较.html">字符与字符串的比较</a>, Previous: <a href="04.3_创建字符串.html">创建字符串</a>, Up: <a href="04_字符串和字.html">字符串和字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>您可以通过本节中描述的操作更改可变字符串的内容。请参阅可变性。
+</p>
+<p>更改现有字符串内容的最基本方法是使用 aset（请参阅操作数组的函数）。(aset string idx char) 将 char 存储到索引 idx 处的字符串中。每个字符占用一个或多个字节，如果 char 需要与该索引处已经存在的字符不同的字节数，则 aset 会发出错误信号。
+</p>
+<p>一个更强大的功能是 store-substring：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: store-substring string idx obj
+</pre></div>
+<p>此函数通过存储从索引 idx 开始的 obj 来更改字符串 string 的部分内容。参数 obj 可以是一个字符或一个（较小的）字符串。
+</p>
+<p>由于不可能更改现有字符串的长度，因此如果 obj 不适合字符串的实际长度，或者任何新字符需要与字符串中该点当前存在的字符不同的字节数，则会出现错误。 
+</p>
+<p>要清除包含密码的字符串，请使用 clear-string：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: clear-string string
+</pre></div>
+<p>这使 string 成为单字节字符串并将其内容清除为零。它也可能改变字符串的长度。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="04.5_字符与字符串的比较.html">字符与字符串的比较</a>, Previous: <a href="04.3_创建字符串.html">创建字符串</a>, Up: <a href="04_字符串和字.html">字符串和字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

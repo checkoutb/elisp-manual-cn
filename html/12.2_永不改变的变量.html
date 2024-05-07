@@ -1,0 +1,22 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>12.2 永不改变的变量</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">12.2 永不改变的变量</h2>
+<div class="nav-panel"><p>Next: <a href="12.3_局部变量.html">局部变量</a>, Previous: <a href="12.1_全局变量.html">全局变量</a>, Up: <a href="12_变量.html">变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在 Emacs Lisp 中，某些符号通常会对自己求值。这些包括 nil 和 t，以及名称以“:”开头的任何符号（这些称为关键字）。这些符号不能被反弹，也不能改变它们的值。任何设置或绑定 nil 或 t 的尝试都表示设置常量错误。对于关键字（名称以’:’开头的符号）也是如此，如果它被实习在标准 obarray 中，除了将这样的符号设置为自身不是错误。
+</p>
+<div class="lisp">
+<pre class="lisp">nil ≡ 'nil
+     ⇒ nil
+
+(setq nil 500)
+error→ Attempt to set constant symbol: nil
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: keywordp object ¶
+</pre></div>
+<p>如果 object 是一个名称以 ’:’ 开头的符号，则函数返回 t，并在标准 obarray 中实习，否则返回 nil。 
+</p>
+<p>这些常量与使用 defconst 特殊形式定义的常量根本不同（请参阅定义全局变量）。defconst 形式用于通知人类读者您不打算更改变量的值，但如果您实际更改它，Emacs 不会引发错误。
+</p>
+<p>由于各种实际原因，少量附加符号被设为只读。其中包括 enable-multibyte-characters、most-positive-fixnum、most-negative-fixnum 和其他一些。任何设置或绑定这些的尝试也表示设置常量错误。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="12.3_局部变量.html">局部变量</a>, Previous: <a href="12.1_全局变量.html">全局变量</a>, Up: <a href="12_变量.html">变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.14 滚动条</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">40.14 滚动条</h2>
+<div class="nav-panel"><p>Next: <a href="40.15_窗口分隔线.html">窗口分隔线</a>, Previous: <a href="40.13.6_叠加箭头.html">叠加箭头</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>通常框架参数vertical-scroll-bars控制框架中的窗口是否有垂直滚动条，以及它们是在左边还是右边。frame 参数 scroll-bar-width 指定它们的宽度（nil 表示默认值）。
+</p>
+<p>框架参数 Horizo​​ntal-scroll-bars 控制框架中的窗口是否有水平滚动条。框架参数 scroll-bar-height 指定它们的高度（nil 表示默认值）。请参阅布局参数。
+</p>
+<p>水平滚动条并非在所有平台上都可用。如果它们在您的系统上可用，则不带参数的函数 Horizo​​ntal-scroll-bars-available-p 返回非零。
+</p>
+<p>以下三个函数将默认为所选帧的实时帧作为参数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: frame-current-scroll-bars &amp;optional frame ¶
+</pre></div>
+<p>此函数报告框架框架的滚动条类型。该值是一个 cons 单元格（vertical-type . Horizo​​ntal-type），其中vertical-type 为left、right 或nil（表示没有垂直滚动条）。horizo​​ntal-type 为bottom 或nil（表示没有水平滚动条）滚动条）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: frame-scroll-bar-width &amp;optional frame ¶
+</pre></div>
+<p>此函数返回帧的垂直滚动条的宽度（以像素为单位）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: frame-scroll-bar-height &amp;optional frame ¶
+</pre></div>
+<p>此函数返回帧的水平滚动条的高度（以像素为单位）。
+</p>
+<p>您可以使用以下函数覆盖单个窗口的框架特定设置：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-window-scroll-bars window &amp;optional width vertical-type height horizontal-type persistent ¶
+</pre></div>
+<p>此函数设置窗口窗口的宽度和/或高度以及滚动条的类型。如果 window 为 nil，则使用选定的窗口。
+</p>
+<p>width 以像素为单位指定垂直滚动条的宽度（nil 表示使用为框架指定的宽度）。vertical-type 指定是否有垂直滚动条，如果有，在哪里。可能的值是 left、right、t，这意味着使用框架的默认值，nil 表示没有垂直滚动条。
+</p>
+<p>height 以像素为单位指定水平滚动条的高度（nil 表示使用为框架指定的高度）。Horizo​​ntal-type 指定是否有水平滚动条。可能的值是bottom，t，表示使用框架的默认值，nil 表示没有水平滚动条。请注意，对于迷你窗口，值 t 与 nil 具有相同的含义，即不显示水平滚动条。您必须明确指定底部才能在迷你窗口中显示水平滚动条。
+</p>
+<p>如果窗口不够大，无法容纳所需尺寸的滚动条，则相应的滚动条将保持不变。
+</p>
+<p>此处指定的值可以稍后通过在 window 上调用 set-window-buffer（请参阅缓冲区和 Windows）及其 keep-margins 参数 nil 或省略来覆盖。但是，如果可选的第五个参数 persistent 为非 nil 并且其他参数已成功处理，则此处指定的值将无条件地在随后的 set-window-buffer 调用中存活。
+</p>
+<p>使用 set-window-scroll-bars 和 set-window-fringes 的持久参数（请参阅边缘大小和位置），您可以通过将以下代码段添加到您早期的init 文件（请参阅初始化文件）。
+</p>
+<div class="lisp">
+<pre class="lisp">(add-hook 'after-make-frame-functions
+          (lambda (frame)
+            (set-window-scroll-bars
+             (minibuffer-window frame) 0 nil 0 nil t)
+            (set-window-fringes
+             (minibuffer-window frame) 0 0 nil t)))
+</pre></div>
+<p>以下四个函数将默认为所选窗口的实时窗口作为参数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-scroll-bars &amp;optional window ¶
+</pre></div>
+<p>这个函数返回一个列表的形式（宽度列垂直类型高度线水平类型持久）。
+</p>
+<p>值 width 是为垂直滚动条的宽度指定的值（可能为 nil）；  columns 是垂直滚动条实际占据的（可能是四舍五入的）列数。
+</p>
+<p>值 height 是为水平滚动条的高度指定的值（可能为 nil）；  lines 是水平滚动条实际占用的（可能是四舍五入的）行数。
+</p>
+<p>persistent 的值是最后一次成功调用 set-window-scroll-bars 时为 window 指定的值，如果从未有过，则为 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-current-scroll-bars &amp;optional window ¶
+</pre></div>
+<p>此函数报告窗口窗口的滚动条类型。该值是一个 cons 单元格（垂直类型。水平类型）。与 window-scroll-bars 不同，这会报告实际使用的滚动条类型，一旦考虑到框架默认值和滚动条模式。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-scroll-bar-width &amp;optional window ¶
+</pre></div>
+<p>此函数返回窗口垂直滚动条的宽度（以像素为单位）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-scroll-bar-height &amp;optional window ¶
+</pre></div>
+<p>此函数返回窗口水平滚动条的高度（以像素为单位）。
+</p>
+<p>如果不通过 set-window-scroll-bars 指定窗口的滚动条设置，缓冲区中的缓冲区局部变量 vertical-scroll-bar、horizo​​ntal-scroll-bar、scroll-bar-width 和 scroll-bar-height正在显示控制窗口的滚动条。函数 set-window-buffer 检查这些变量。如果在窗口中已经可见的缓冲区中更改它们，则可以通过调用 set-window-buffer 指定已显示的相同缓冲区来使窗口记录新值。
+</p>
+<p>您可以通过设置以下变量来控制特定缓冲区的滚动条的外观，这些变量在设置时会自动变为缓冲区本地。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: vertical-scroll-bar ¶
+</pre></div>
+<p>此变量指定垂直滚动条的位置。可能的值是 left、right、t，表示使用框架的默认值，nil 表示没有滚动条。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: horizontal-scroll-bar ¶
+</pre></div>
+<p>此变量指定水平滚动条的位置。可能的值是bottom，t，表示使用框架的默认值，nil 表示没有滚动条。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: scroll-bar-width ¶
+</pre></div>
+<p>此变量指定缓冲区垂直滚动条的宽度，以像素为单位。nil 值表示使用框架指定的值。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: scroll-bar-height ¶
+</pre></div>
+<p>此变量指定缓冲区的水平滚动条的高度，以像素为单位。nil 值表示使用框架指定的值。
+</p>
+<p>最后，您可以通过自定义变量滚动条模式和水平滚动条模式来切换所有帧上滚动条的显示。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: scroll-bar-mode ¶
+</pre></div>
+<p>此变量控制是否以及在所有帧中放置垂直滚动条的位置。没有滚动条的可能值为 nil，left 将滚动条放在左侧，right 将滚动条放在右侧。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: horizontal-scroll-bar-mode ¶
+</pre></div>
+<p>此变量控制是否在所有帧上显示水平滚动条。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.15_窗口分隔线.html">窗口分隔线</a>, Previous: <a href="40.13.6_叠加箭头.html">叠加箭头</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

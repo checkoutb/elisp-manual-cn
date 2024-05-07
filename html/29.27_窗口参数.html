@@ -1,0 +1,120 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>29.27 窗口参数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">29.27 窗口参数</h2>
+<div class="nav-panel"><p>Next: <a href="29.28_窗口滚动和改变的钩子.html">窗口滚动和改变的钩子</a>, Previous: <a href="29.26_窗口配置.html">窗口配置</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍可用于将附加信息与窗口相关联的窗口参数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-parameter window parameter ¶
+</pre></div>
+<p>此函数返回窗口的参数值。窗口的默认值是选定的窗口。如果 window 没有设置参数，这个函数返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-parameters &amp;optional window ¶
+</pre></div>
+<p>此函数返回窗口的所有参数及其值。窗口的默认值是选定的窗口。返回值要么是 nil，要么是一个关联列表，其元素的形式为（参数 .value）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-window-parameter window parameter value ¶
+</pre></div>
+<p>该函数将窗口的参数值设置为值并返回值。窗口的默认值是选定的窗口。
+</p>
+<p>默认情况下，保存和恢复窗口配置或窗口状态的函数（请参阅窗口配置）不关心窗口参数。  这意味着，当您更改保存窗口游览主体内的参数值时，该宏退出时不会恢复先前的值。  这也意味着当您通过 window-state-put 恢复之前由 window-state-get 保存的窗口状态时，所有克隆的窗口都将其参数重置为 nil。  以下变量允许您覆盖标准行为：
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: window-persistent-parameters ¶
+</pre></div>
+<p>此变量是一个列表，指定哪些参数由 current-window-configuration 和 window-state-get 保存，随后由 set-window-configuration 和 window-state-put 恢复。请参阅窗口配置。
+</p>
+<p>此列表的每个条目的 CAR 是指定参数的符号。CDR 应为以下之一：
+</p>
+<div class="lisp">
+<pre class="lisp">nil
+</pre></div>
+<p>该值表示该参数既不是由 window-state-get 也不是由 current-window-configuration 保存。
+</p><div class="lisp">
+<pre class="lisp">t
+</pre></div>
+<p>此值指定参数由 current-window-configuration 保存，并且（如果其可写参数为 nil）由 window-state-get 保存。
+</p><div class="lisp">
+<pre class="lisp">writable
+</pre></div>
+<p>这意味着参数被当前窗口配置和窗口状态获取无条件地保存。此值不应用于其值没有读取语法的参数。否则，在另一个会话中调用 window-state-put 可能会因无效读取语法错误而失败。
+</p>
+<p>某些函数（特别是 delete-window、delete-other-windows 和 split-window）可能会在其 window 参数指定的窗口具有名称与函数名称相同的参数时表现特殊。您可以通过将以下变量绑定到非零值来覆盖此类特殊行为：
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: ignore-window-parameters ¶
+</pre></div>
+<p>如果此变量不为 nil，则某些标准函数不会处理窗口参数。目前受此影响的功能是 split-window、delete-window、delete-other-windows 和 other-window。
+</p>
+<p>应用程序可以在调用这些函数时将此变量绑定到一个非零值。如果这样做，应用程序将完全负责在退出该功能时正确分配所有相关窗口的参数。
+</p>
+<p>窗口管理代码当前使用以下参数：
+</p>
+<div class="lisp">
+<pre class="lisp">delete-window ¶
+</pre></div>
+<p>此参数影响 delete-window 的执行（请参阅删除窗口）。
+</p><div class="lisp">
+<pre class="lisp">delete-other-windows ¶
+</pre></div>
+<p>此参数影响 delete-other-windows 的执行（请参阅删除 Windows）。
+</p><div class="lisp">
+<pre class="lisp">no-delete-other-windows ¶
+</pre></div>
+<p>此参数将窗口标记为不可被 delete-other-windows 删除（请参阅删除窗口）。
+</p><div class="lisp">
+<pre class="lisp">split-window ¶
+</pre></div>
+<p>此参数影响拆分窗口的执行（请参阅拆分窗口）。
+</p><div class="lisp">
+<pre class="lisp">other-window ¶
+</pre></div>
+<p>该参数影响 other-window 的执行（参见 Cyclic Ordering of Windows）。
+</p><div class="lisp">
+<pre class="lisp">no-other-window ¶
+</pre></div>
+<p>此参数将窗口标记为其他窗口不可选择（请参阅窗口的循环排序）。
+</p><div class="lisp">
+<pre class="lisp">clone-of ¶
+</pre></div>
+<p>此参数指定从中克隆该窗口的窗口。它由 window-state-get 安装（请参阅窗口配置）。
+</p><div class="lisp">
+<pre class="lisp">window-preserved-size ¶
+</pre></div>
+<p>此参数指定缓冲区、nil 表示垂直和 t 水平的方向以及以像素为单位的大小。如果这个窗口显示指定的缓冲区并且它在指定方向上的大小等于这个参数指定的大小，那么 Emacs 将尝试在指定方向上保持这个窗口的大小。此参数由函数 window-preserve-size 安装和更新（请参阅保留窗口大小）。
+</p><div class="lisp">
+<pre class="lisp">quit-restore ¶
+</pre></div>
+<p>此参数由缓冲区显示函数安装（请参阅选择用于显示缓冲区的窗口）并由 quit-restore-window 查询（请参阅退出窗口）。它是一个由四个元素组成的列表，详细信息请参见退出 Windows 中的 quit-restore-window 描述。
+</p><div class="lisp">
+<pre class="lisp">window-side ¶
+window-slot
+</pre></div>
+<p>这些参数在内部用于实现侧窗（请参阅侧窗）。
+</p><div class="lisp">
+<pre class="lisp">window-atom ¶
+</pre></div>
+<p>此参数在内部用于实现原子窗口，请参阅原子窗口。
+</p><div class="lisp">
+<pre class="lisp">mode-line-format ¶
+</pre></div>
+<p>每当显示此窗口时，此参数都会替换此窗口缓冲区的缓冲区局部变量 mode-line-format（请参阅模式行基础）的值。符号 none 表示禁止显示此窗口的模式行。显示此缓冲区的其他窗口上的模式行的显示和内容不受影响。
+</p><div class="lisp">
+<pre class="lisp">header-line-format ¶
+</pre></div>
+<p>每当显示此窗口时，此参数都会替换此窗口缓冲区的缓冲区局部变量 header-line-format（请参阅模式行基础）的值。符号 none 表示禁止显示此窗口的标题行。显示此缓冲区的其他窗口上的标题行的显示和内容不受影响。
+</p><div class="lisp">
+<pre class="lisp">tab-line-format ¶
+</pre></div>
+<p>每当显示此窗口时，此参数都会替换此窗口缓冲区的缓冲区局部变量 tab-line-format（请参阅模式行基础）的值。符号 none 表示禁止显示此窗口的制表符行。显示此缓冲区的其他窗口上的选项卡行的显示和内容不受影响。
+</p><div class="lisp">
+<pre class="lisp">min-margins ¶
+</pre></div>
+<p>此参数的值是一个 cons 单元格，其 CAR 和 CDR，如果非零，则指定此窗口左右边距的最小值（以列为单位）（请参阅在边距中显示。当存在时，Emacs 将使用这些值而不是实际的边距宽度，用于确定窗口是否可以水平拆分或缩小。
+</p>
+<p>Emacs 在拆分或调整大小后从不自动调整任何窗口的边距。任何应用程序设置此参数来调整此窗口的边距以及由于拆分而​​继承此窗口边距的任何新窗口的边距是所有应用程序的唯一责任。应为此目的使用 window-configuration-change-hook 和 window-size-change-functions （请参阅 Hooks for Window Scrolling and Changes）。
+</p>
+<p>此参数是在 Emacs 版本 25.1 中引入的，以支持使用大边距在窗口中居中缓冲文本的应用程序，并且应谨慎使用这些应用程序。在 Emacs 的未来版本中，它可能会被改进的解决方案所取代。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="29.28_窗口滚动和改变的钩子.html">窗口滚动和改变的钩子</a>, Previous: <a href="29.26_窗口配置.html">窗口配置</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

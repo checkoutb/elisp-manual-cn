@@ -1,0 +1,67 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>13.9 访问函数单元格内容</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">13.9 访问函数单元格内容</h2>
+<div class="nav-panel"><p>Next: <a href="13.10_闭包.html">闭包</a>, Previous: <a href="13.8_泛型函数.html">泛型函数</a>, Up: <a href="13_函数.html">函数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>符号的函数定义是存储在符号的函数单元中的对象。此处描述的功能访问、测试和设置符号的功能单元。
+</p>
+<p>另见函数间接函数。请参见间接函数的定义。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: symbol-function symbol ¶
+</pre></div>
+<p>这将返回符号函数单元格中的对象。它不检查返回的对象是否是合法函数。
+</p>
+<p>如果函数单元格为 void，则返回值为 nil。要区分为 void 的函数单元格和设置为 nil 的函数单元格，请使用 fboundp（见下文）。
+</p><div class="lisp">
+<pre class="lisp">
+
+(defun bar (n) (+ n 2))
+(symbol-function 'bar)
+     ⇒ (lambda (n) (+ n 2))
+
+(fset 'baz 'bar)
+     ⇒ bar
+
+(symbol-function 'baz)
+     ⇒ bar
+</pre></div>
+<p>如果您从未给符号任何函数定义，我们说该符号的函数单元格是无效的。换句话说，函数单元格中没有任何 Lisp 对象。如果您尝试将符号作为函数调用，Emacs 会发出 void-function 错误信号。
+</p>
+<p>请注意，void 与 nil 或符号 void 不同。符号 nil 和 void 是 Lisp 对象，并且可以像任何其他对象一样存储到函数单元中（如果您依次使用 defun 定义它们，它们可以是有效函数）。空函数单元格不包含任何对象。
+</p>
+<p>您可以使用 fboundp 测试符号函数定义的无效性。给符号定义函数后，可以使用 fmakunbound 再次使其无效。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: fboundp symbol ¶
+</pre></div>
+<p>如果符号在其函数单元格中有对象，则此函数返回 t，否则返回 nil。它不检查对象是否是合法函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: fmakunbound symbol ¶
+</pre></div>
+<p>此函数使符号的函数单元格无效，因此随后尝试访问此单元格将导致无效函数错误。它返回符号。（另见 makunbound，在当变量为空时。）
+</p><div class="lisp">
+<pre class="lisp">(defun foo (x) x)
+(foo 1)
+     ⇒1
+
+(fmakunbound 'foo)
+     ⇒ foo
+
+(foo 1)
+error→ Symbol's function definition is void: foo
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: fset symbol definition ¶
+</pre></div>
+<p>该函数将定义存储在符号的函数单元中。结果是定义。通常定义应该是一个函数或一个函数的名称，但这不被检查。参数符号是一个普通的评估参数。
+</p>
+<p>此函数的主要用途是作为定义或更改函数的构造的子例程，例如 defun 或advice-add（请参阅Advising Emacs Lisp Functions）。您还可以使用它为符号提供不是函数的函数定义，例如键盘宏（请参阅键盘宏）：
+</p>
+<div class="lisp">
+<pre class="lisp">;; Define a named keyboard macro.
+(fset 'kill-two-lines "\^u2\^k")
+     ⇒ "\^u2\^k"
+</pre></div>
+<p>如果您希望使用 fset 为函数创建备用名称，请考虑改用 defalias。请参见defalias 的定义。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="13.10_闭包.html">闭包</a>, Previous: <a href="13.8_泛型函数.html">泛型函数</a>, Up: <a href="13_函数.html">函数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

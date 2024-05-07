@@ -1,0 +1,340 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>附录 F 标准错误</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h1 class="chapter">附录 F 标准错误</h1>
+<div class="nav-panel"><p>Next: <a href="附录_G_标准键盘映射.html">G_标准键盘映射</a>, Previous: <a href="0E.9_对象内部.html">对象内部</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这是标准 <code>Emacs</code> 中更重要的错误符号列表，按概念分组。该列表包括每个符号的消息和对如何发生错误的描述的交叉引用。
+</p>
+<p>每个错误符号都有一组父错误条件，即符号列表。通常这个列表包括错误符号本身和错误符号。有时它包括附加符号，它们是中间分类，比错误更窄但比单个错误符号更宽。例如，所有访问文件的错误都有条件file-error。如果我们在这里不说某个错误符号有额外的错误条件，那就意味着它没有。
+</p>
+<p>作为一个特殊的例外，错误符号 <code>quit</code> 和 <code>minibuffer-quit</code> 没有条件错误，因为退出不被视为错误。
+</p>
+<p>这些错误符号大部分是在 <code>C</code> 中定义的（主要是 <code>data.c</code> ），但也有一些是在 <code>Lisp</code> 中定义的。例如，文件 <code>userlock.el</code> 定义了文件锁定和文件取代错误。与 <code>Emacs</code> 一起分发的几个专用 <code>Lisp</code> 库定义了它们自己的错误符号。我们不打算在这里列出所有这些。
+</p>
+<p>有关如何生成和处理错误的说明，请参阅错误。
+</p>
+<p>#+begin<em>_src</em>~ emacs-lisp
+ error
+#+end<em>_src</em>
+</p>
+<p>  消息是 <code>错误</code> 。请参阅错误。
+#+begin<em>_src</em>~ emacs-lisp
+ quit
+#+end<em>_src</em>
+</p>
+<p>  消息是 <code>退出</code> 。请参阅退出。
+#+begin<em>_src</em>~ emacs-lisp
+ minibuffer-quit
+#+end<em>_src</em>
+</p>
+<p>  消息是 <code>退出</code> 。这是退出的子类别。请参阅退出。
+#+begin<em>_src</em>~ emacs-lisp
+ args-out-of-range
+#+end<em>_src</em>
+</p>
+<p>  消息是Args <code>超出范围</code> 。当试图访问超出序列、缓冲区或其他容器类对象范围的元素时，就会发生这种情况。请参阅序列、数组和向量，并参阅文本。
+#+begin<em>_src</em>~ emacs-lisp
+ arith-error
+#+end<em>_src</em>
+</p>
+<p>  消息是 <code>算术错误</code> 。尝试执行整数除以零时会发生这种情况。请参阅数值转换和算术运算。
+#+begin<em>_src</em>~ emacs-lisp
+ beginning-of-buffer
+#+end<em>_src</em>
+</p>
+<p>  消息是 <code>缓冲区开始</code> 。请参阅按字符移动。
+#+begin<em>_src</em>~ emacs-lisp
+ buffer-read-only
+#+end<em>_src</em>
+</p>
+<p>  消息是 <code>缓冲区是只读的</code> 。请参阅只读缓冲区。
+#+begin<em>_src</em>~ emacs-lisp
+ circular-list
+#+end<em>_src</em>
+</p>
+<p>  消息是 <code>列表包含一个循环</code> 。当遇到圆形结构时会发生这种情况。请参阅循环对象的读取语法。
+#+begin<em>_src</em>~ emacs-lisp
+ cl-assertion-failed
+#+end<em>_src</em>
+</p>
+<p>  消息是 <code>断言失败</code> 。当 <code>cl-assert</code> 宏未通过测试时会发生这种情况。请参阅 <code>Common Lisp Extensions</code> 中的断言。
+#+begin<em>_src</em>~ emacs-lisp
+ coding-system-error
+#+end<em>_src</em>
+</p>
+<p> 消息是无效的编码系统 。请参阅 <code>Lisp</code> 中的编码系统。
+#+begin<em>_src</em>~ emacs-lisp
+ cyclic-function-indirection
+#+end<em>_src</em>
+</p>
+<p> 消息是符号的函数间接链包含一个循环。请参阅符号函数间接。
+#+begin<em>_src</em>~ emacs-lisp
+ cyclic-variable-indirection
+#+end<em>_src</em>
+</p>
+<p> 消息是符号的变量间接链包含一个循环。请参见变量别名。
+#+begin<em>_src</em>~ emacs-lisp
+ dbus-error
+#+end<em>_src</em>
+</p>
+<p> 消息是D-Bus <code>错误</code> 。请参阅 <code>Emacs</code> 中 <code>D-Bus</code> 集成中的错误和事件。
+#+begin<em>_src</em>~ emacs-lisp
+ end-of-buffer
+#+end<em>_src</em>
+</p>
+<p> 消息是缓冲区结束。请参阅按字符移动。
+#+begin<em>_src</em>~ emacs-lisp
+ end-of-file
+#+end<em>_src</em>
+</p>
+<p> 消息是 <code>解析期间文件结束</code> 。请注意，这不是文件错误的子类别，因为它与 <code>Lisp</code> 阅读器有关，而不是文件 <code>I/O</code>  。请参阅输入函数。
+#+begin<em>_src</em>~ emacs-lisp
+ file-already-exists
+#+end<em>_src</em>
+</p>
+<p> 这是文件错误的子类别。请参阅写入文件。
+#+begin<em>_src</em>~ emacs-lisp
+ file-date-error
+#+end<em>_src</em>
+</p>
+<p>  这是文件错误的子类别。当 <code>copy-file</code> 尝试设置输出文件的最后修改时间但失败时会发生这种情况。请参阅更改文件名和属性。
+#+begin<em>_src</em>~ emacs-lisp
+ file-error
+#+end<em>_src</em>
+</p>
+<p>  我们没有列出此错误及其子类别的错误字符串，因为当错误条件 <code>file-error</code> 存在时，错误消息通常仅由数据项构成。因此，错误字符串不是很相关。但是，这些错误符号确实具有错误消息属性，如果未提供数据，则使用错误消息属性。请参阅文件。
+#+begin<em>_src</em>~ emacs-lisp
+ file-missing
+#+end<em>_src</em>
+</p>
+<p>  这是文件错误的子类别。当操作尝试对丢失的文件执行操作时会发生这种情况。请参阅更改文件名和属性。
+#+begin<em>_src</em>~ emacs-lisp
+ compression-error
+#+end<em>_src</em>
+</p>
+<p>这是文件错误的一个子类别，它是由处理压缩文件的问题引起的。请参阅程序如何加载。
+</p><div class="lisp">
+<pre class="lisp">file-locked
+</pre></div>
+<p>这是文件错误的子类别。请参阅文件锁。
+</p><div class="lisp">
+<pre class="lisp">file-supersession
+</pre></div>
+<p>这是文件错误的子类别。请参阅缓冲区修改时间。
+</p><div class="lisp">
+<pre class="lisp">file-notify-error
+</pre></div>
+<p>这是文件错误的子类别。当无法监视文件的更改时，就会发生这种情况。请参阅文件更改通知。
+</p><div class="lisp">
+<pre class="lisp">remote-file-error
+</pre></div>
+<p>这是文件错误的一个子类别，它是由于访问远程文件时出现问题而导致的。请参阅 GNU Emacs 手册中的远程文件。通常，当计时器、进程过滤器、进程标记或特殊事件通常尝试访问远程文件并与另一个远程文件操作发生冲突时，就会出现此错误。一般来说，写一个错误报告是个好主意。请参阅 GNU Emacs 手册中的错误。
+</p><div class="lisp">
+<pre class="lisp">ftp-error
+</pre></div>
+<p>这是 remote-file-error 的一个子类别，它是由于使用 ftp 访问远程文件时出现问题而导致的。请参阅 GNU Emacs 手册中的远程文件。
+</p><div class="lisp">
+<pre class="lisp">invalid-function
+</pre></div>
+<p>消息是 <code>无效功能</code> 。请参阅符号函数间接。
+</p><div class="lisp">
+<pre class="lisp">invalid-read-syntax
+</pre></div>
+<p>该消息通常是 <code>无效的读取语法</code> 。请参阅打印表示和读取语法。当表达式后面有文本时，类似 eval-expression 的命令也会引发此错误。在这种情况下，消息是 <code>尾随垃圾表达式</code> 。
+</p><div class="lisp">
+<pre class="lisp">invalid-regexp
+</pre></div>
+<p>消息是 <code>无效的正则表达式</code> 。请参阅正则表达式。
+</p><div class="lisp">
+<pre class="lisp">mark-inactive
+</pre></div>
+<p>消息是 <code>标记现在未激活</code> 。见标记。
+</p><div class="lisp">
+<pre class="lisp">no-catch
+</pre></div>
+<p>消息是 <code>没有捕获标记</code> 。请参阅显式非本地退出：catch and throw。
+</p><div class="lisp">
+<pre class="lisp">range-error
+</pre></div>
+<p>消息是算术范围错误。
+</p><div class="lisp">
+<pre class="lisp">overflow-error
+</pre></div>
+<p>消息是 <code>算术溢出错误</code> 。这是范围误差的一个子类别。这可能发生在整数超过整数宽度限制的情况下。请参阅整数基础。
+</p><div class="lisp">
+<pre class="lisp">scan-error
+</pre></div>
+<p>消息是 <code>扫描错误</code> 。当某些语法解析函数发现无效的语法或不匹配的括号时，就会发生这种情况。通常使用三个参数提出：人类可读的错误消息，无法移动的障碍物的开始，以及障碍物的结束。请参阅移动平衡表达式，并参阅解析表达式。
+</p><div class="lisp">
+<pre class="lisp">search-failed
+</pre></div>
+<p>消息是 <code>搜索失败</code> 。请参阅搜索和匹配。
+</p><div class="lisp">
+<pre class="lisp">setting-constant
+</pre></div>
+<p>消息是 <code>尝试设置一个常量符号</code> 。当尝试将值分配给 nil、t、most-positive-fixnum、most-negative-fixnum 和关键字符号时，会发生这种情况。当尝试将值分配给启用多字节字符和由于某种原因不允许直接分配的其他一些符号时，也会发生这种情况。请参阅永不改变的变量。
+</p><div class="lisp">
+<pre class="lisp">text-read-only
+</pre></div>
+<p>消息是 <code>文本是只读的</code> 。这是缓冲区只读的子类别。请参阅具有特殊含义的属性。
+</p><div class="lisp">
+<pre class="lisp">undefined-color
+</pre></div>
+<p>消息是 <code>未定义的颜色</code> 。请参阅颜色名称。
+</p><div class="lisp">
+<pre class="lisp">user-error
+</pre></div>
+<p>消息是空字符串。请参阅如何发出错误信号。
+</p><div class="lisp">
+<pre class="lisp">user-search-failed
+</pre></div>
+<p>这就像 <code>搜索失败</code> ，但不会触发调试器，如 <code>用户错误</code> 。请参阅如何发出错误信号，并参阅搜索和匹配。这用于在 Info 文件中搜索，请参阅在 Info 中搜索文本。
+</p><div class="lisp">
+<pre class="lisp">void-function
+</pre></div>
+<p>消息是 <code>符号的函数定义无效</code> 。请参阅访问函数单元格内容。
+</p><div class="lisp">
+<pre class="lisp">void-variable
+</pre></div>
+<p>消息是 <code>符号的值作为变量是无效的</code> 。请参阅访问变量值。
+</p><div class="lisp">
+<pre class="lisp">wrong-number-of-arguments
+</pre></div>
+<p>消息是 <code>参数数量错误</code> 。请参阅参数列表的功能。
+</p><div class="lisp">
+<pre class="lisp">wrong-type-argument
+</pre></div>
+<p>消息是 <code>错误类型参数</code> 。请参阅类型谓词。
+</p><div class="lisp">
+<pre class="lisp">unknown-image-type
+</pre></div>
+<p>消息是 <code>无法确定图像类型</code> 。见图像。
+</p><div class="lisp">
+<pre class="lisp">inhibited-interaction
+</pre></div>
+<p>消息是 <code>用户交互被禁止</code> 。当禁止交互为非零并且调用用户交互函数（如从迷你缓冲区读取）时，会发出此错误信号。
+</p>
+<hr size="6"/>
+<a name="SEC_Contents"></a>
+<table border="0" cellpadding="1" cellspacing="1" class="header">
+<tr><td align="left" valign="middle">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
+<td align="left" valign="middle">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td align="left" valign="middle">[Index]</td>
+<td align="left" valign="middle">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h1>Table of Contents</h1>
+<div class="contents">
+<ul class="no-bullet">
+<li><a href="#g_t_9644_5f55-F-_6807_51c6_9519_8bef" name="toc-Fu-Lu--F-Biao-Zhun-Cuo-Wu-">1 附录 F 标准错误</a></li>
+</ul>
+</div>
+<hr/>
+<a name="SEC_About"></a>
+<table border="0" cellpadding="1" cellspacing="1" class="header">
+<tr><td align="left" valign="middle">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
+<td align="left" valign="middle">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td align="left" valign="middle">[Index]</td>
+<td align="left" valign="middle">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h1>About This Document</h1>
+<p>
+  This document was generated on <i>May 7, 2024</i> using <a href="http://www.nongnu.org/texi2html/"><i>texi2html 5.0</i></a>.
+</p>
+<p>
+  The buttons in the navigation panels have the following meaning:
+</p>
+<table border="1">
+<tr>
+<th> Button </th>
+<th> Name </th>
+<th> Go to </th>
+<th> From 1.2.3 go to</th>
+</tr>
+<tr>
+<td align="center"> [ &lt;&lt; ] </td>
+<td align="center">FastBack</td>
+<td>Beginning of this chapter or previous chapter</td>
+<td>1</td>
+</tr>
+<tr>
+<td align="center"> [ &lt; ] </td>
+<td align="center">Back</td>
+<td>Previous section in reading order</td>
+<td>1.2.2</td>
+</tr>
+<tr>
+<td align="center"> [ Up ] </td>
+<td align="center">Up</td>
+<td>Up section</td>
+<td>1.2</td>
+</tr>
+<tr>
+<td align="center"> [ &gt; ] </td>
+<td align="center">Forward</td>
+<td>Next section in reading order</td>
+<td>1.2.4</td>
+</tr>
+<tr>
+<td align="center"> [ &gt;&gt; ] </td>
+<td align="center">FastForward</td>
+<td>Next chapter</td>
+<td>2</td>
+</tr>
+<tr>
+<td align="center"> [Top] </td>
+<td align="center">Top</td>
+<td>Cover (top) of document</td>
+<td>   </td>
+</tr>
+<tr>
+<td align="center"> [Contents] </td>
+<td align="center">Contents</td>
+<td>Table of contents</td>
+<td>   </td>
+</tr>
+<tr>
+<td align="center"> [Index] </td>
+<td align="center">Index</td>
+<td>Index</td>
+<td>   </td>
+</tr>
+<tr>
+<td align="center"> [ ? ] </td>
+<td align="center">About</td>
+<td>About (help)</td>
+<td>   </td>
+</tr>
+</table>
+<p>
+  where the <strong> Example </strong> assumes that the current position is at <strong> Subsubsection One-Two-Three </strong> of a document of the following structure:
+</p>
+<ul>
+<li> 1. Section One
+    <ul>
+<li>1.1 Subsection One-One
+        <ul>
+<li>...</li>
+</ul>
+</li>
+<li>1.2 Subsection One-Two
+        <ul>
+<li>1.2.1 Subsubsection One-Two-One</li>
+<li>1.2.2 Subsubsection One-Two-Two</li>
+<li>1.2.3 Subsubsection One-Two-Three    
+            <strong>&lt;== Current Position </strong></li>
+<li>1.2.4 Subsubsection One-Two-Four</li>
+</ul>
+</li>
+<li>1.3 Subsection One-Three
+        <ul>
+<li>...</li>
+</ul>
+</li>
+<li>1.4 Subsection One-Four</li>
+</ul>
+</li>
+</ul>
+<hr/>
+<p>
+<font size="-1">
+  This document was generated on <i>May 7, 2024</i> using <a href="http://www.nongnu.org/texi2html/"><i>texi2html 5.0</i></a>.
+ </font>
+<br/>
+</p>
+<div class="nav-panel"><p>Next: <a href="附录_G_标准键盘映射.html">G_标准键盘映射</a>, Previous: <a href="0E.9_对象内部.html">对象内部</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

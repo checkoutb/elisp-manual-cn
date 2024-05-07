@@ -1,0 +1,21 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>19.2.9 评估</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">19.2.9 评估</h3>
+<div class="nav-panel"><p>Next: <a href="19.2.10_评估列表缓冲区.html">评估列表缓冲区</a>, Previous: <a href="19.2.8_调试视图.html">调试视图</a>, Up: <a href="19.2_调试.html">调试.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在 Edebug 中，您可以评估表达式，就像 Edebug 没有运行一样。Edebug 试图对表达式的评估和打印不可见。除了 Edebug 显式保存和恢复的数据更改之外，导致副作用的表达式的评估将按预期工作。有关此过程的详细信息，请参阅外部环境。
+</p>
+<div class="lisp">
+<pre class="lisp">C-x C-e
+</pre></div>
+<p>在 Edebug 之外的上下文中计算表达式 exp (edebug-eval-expression)。也就是说，Edebug 会尽量减少对评估的干扰。
+</p><div class="lisp">
+<pre class="lisp">M-: exp RET
+</pre></div>
+<p>在 Edebug 本身的上下文中计算表达式 exp (eval-expression)。
+</p><div class="lisp">
+<pre class="lisp">e exp RET
+</pre></div>
+<p>在 Edebug 之外的上下文 (edebug-eval-last-sexp) 中计算点之前的表达式。使用零前缀参数 (Cu 0 Cx Ce)，不要缩短长项目（如字符串和列表）。
+</p>
+<p>Edebug 支持对包含对由 cl.el 中的以下构造创建的词法绑定符号的引用的表达式求值：lexical-let、macrolet 和 symbol-macrolet。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="19.2.10_评估列表缓冲区.html">评估列表缓冲区</a>, Previous: <a href="19.2.8_调试视图.html">调试视图</a>, Up: <a href="19.2_调试.html">调试.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

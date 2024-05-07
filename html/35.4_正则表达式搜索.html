@@ -1,0 +1,146 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>35.4 正则表达式搜索</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">35.4 正则表达式搜索</h2>
+<div class="nav-panel"><p>Next: <a href="35.5_POSIX正则表达式搜索.html">POSIX正则表达式搜索</a>, Previous: <a href="35.3.5_正则表达式的问题.html">正则表达式的问题</a>, Up: <a href="35_搜索和匹配.html">搜索和匹配.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在 GNU Emacs 中，您可以递增或不递增地搜索正则表达式的下一个匹配项（请参阅正则表达式语法）。有关增量搜索命令，请参阅 GNU Emacs 手册中的正则表达式搜索。这里我们只描述程序中有用的搜索功能。主要的是重新搜索。
+</p>
+<p>如果缓冲区是多字节的，这些搜索函数会将正则表达式转换为多字节；  如果缓冲区是单字节的，它们会将正则表达式转换为单字节。请参阅文本表示。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: re-search-forward regexp &amp;optional limit noerror count ¶
+</pre></div>
+<p>此函数在当前缓冲区中向前搜索与正则表达式 regexp 匹配的文本字符串。该函数跳过任何数量的正则表达式不匹配的文本，并在找到的第一个匹配项的末尾留下点。它返回点的新值。
+</p>
+<p>如果 limit 不为零，则它必须是当前缓冲区中的一个位置。它指定搜索的上限。在该位置之后不接受任何匹配。如果 limit 被省略或为零，则默认为缓冲区可访问部分的末尾。
+</p>
+<p>搜索失败时 re-search-forward 的作用取决于 noerror 的值：
+</p>
+<div class="lisp">
+<pre class="lisp">nil
+</pre></div>
+<p>发出搜索失败错误信号。
+</p><div class="lisp">
+<pre class="lisp">t
+</pre></div>
+<p>什么都不做，返回 nil。
+</p><div class="lisp">
+<pre class="lisp">anything else
+</pre></div>
+<p>将点移动到限制（或缓冲区可访问部分的末尾）并返回 nil。
+</p>
+<p>参数 noerror 仅影响无法找到匹配项的有效搜索。不管 noerror 是什么，无效的参数都会导致错误。
+</p>
+<p>如果count是正数n，则搜索n次；  每个连续的搜索都从前一个匹配的结尾开始。如果所有这些连续搜索成功，则函数调用成功，移动点并返回其新值。否则函数调用失败，结果取决于 noerror 的值，如上所述。如果 count 是负数 -n，则在相反（向后）方向上进行 n 次搜索。
+</p>
+<p>在以下示例中，点最初位于 <code>T</code> 之前。评估搜索调用将点移动到该行的末尾（在 ’hat’ 的 ’t’ 和换行符之间）。
+</p><div class="lisp">
+<pre class="lisp">
+
+---------- Buffer: foo ----------
+I read "∗The cat in the hat
+comes back" twice.
+---------- Buffer: foo ----------
+
+
+(re-search-forward "[a-z]+" nil t 5)
+     ⇒ 27
+
+---------- Buffer: foo ----------
+I read "The cat in the hat∗
+comes back" twice.
+---------- Buffer: foo ----------
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Command: re-search-backward regexp &amp;optional limit noerror count ¶
+</pre></div>
+<p>此函数在当前缓冲区中向后搜索与正则表达式 regexp 匹配的文本字符串，将 point 留在找到的第一个文本的开头。
+</p>
+<p>此功能类似于重新搜索转发，但它们不是简单的镜像。re-search-forward 查找起点尽可能接近起点的匹配。如果re-search-backward是一个完美的镜像，它会找到末端尽可能接近的匹配。然而，实际上它会找到开始尽可能接近（但在起点之前结束）的匹配。原因是在给定位置匹配正则表达式总是从头到尾工作，并且从指定的开始位置开始。
+</p>
+<p>re-search-forward 的真正镜像将需要一个特殊的功能来匹配正则表达式从头到尾。不值得为实现它而烦恼。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: string-match regexp string &amp;optional start ¶
+</pre></div>
+<p>此函数返回字符串中正则表达式 regexp 的第一个匹配项的开始索引，如果没有匹配项，则返回 nil。如果 start 不为零，则搜索从字符串中的该索引开始。
+</p>
+<p>例如，
+</p><div class="lisp">
+<pre class="lisp">(string-match
+ "quick" "The quick brown fox jumped quickly.")
+     ⇒ 4
+
+(string-match
+ "quick" "The quick brown fox jumped quickly." 8)
+     ⇒ 27
+</pre></div>
+<p>字符串第一个字符的索引为 0，第二个字符的索引为 1，以此类推。
+</p>
+<p>如果此函数找到匹配项，则匹配项之外的第一个字符的索引可用作 (match-end 0)。请参阅匹配数据。
+</p>
+<div class="lisp">
+<pre class="lisp">(string-match
+ "quick" "The quick brown fox jumped quickly." 8)
+     ⇒ 27
+
+(match-end 0)
+     ⇒ 32
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: string-match-p regexp string &amp;optional start ¶
+</pre></div>
+<p>这个谓词函数做了字符串匹配所做的事情，但它避免了修改匹配数据。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: looking-at regexp ¶
+</pre></div>
+<p>此函数确定当前缓冲区中紧跟 point 的文本是否与正则表达式 regexp 匹配。 <code>直接跟随</code> 的意思就是：搜索是 <code>锚定的</code> ，只有从跟随点的第一个字符开始才能成功。如果是，则结果为 t，否则为 nil。
+</p>
+<p>此函数不会移动点，但会更新匹配数据。请参阅匹配数据。如果您需要在不修改匹配数据的情况下测试匹配，请使用 looking-at-p，如下所述。
+</p>
+<p>在此示例中，点直接位于 <code>T</code> 之前。如果它在其他任何地方，结果将为零。
+</p><div class="lisp">
+<pre class="lisp">---------- Buffer: foo ----------
+I read "∗The cat in the hat
+comes back" twice.
+---------- Buffer: foo ----------
+
+(looking-at "The cat in the hat$")
+     ⇒ t
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: looking-back regexp limit &amp;optional greedy ¶
+</pre></div>
+<p>如果正则表达式匹配点之前的文本（即在点结束），则此函数返回 t，否则返回 nil。
+</p>
+<p>因为正则表达式匹配只能向前工作，所以这是通过从点向后搜索以点结束的匹配来实现的。如果它必须搜索很长的距离，那可能会很慢。您可以通过为limit指定一个非零值来限制所需的时间，这表示在限制之前不要搜索。在这种情况下，找到的匹配必须在 limit 处或之后开始。这是一个例子：
+</p>
+<div class="lisp">
+<pre class="lisp">
+
+---------- Buffer: foo ----------
+I read "∗The cat in the hat
+comes back" twice.
+---------- Buffer: foo ----------
+
+(looking-back "read \"" 3)
+     ⇒ t
+(looking-back "read \"" 4)
+     ⇒ nil
+</pre></div>
+<p>如果 greedy 不为零，则此函数尽可能向后扩展匹配，当单个附加的前一个字符不能成为正则表达式匹配的一部分时停止。当比赛延长时，允许其起始位置出现在限制之前。
+</p>
+<p>作为一般建议，尽量避免使用回溯，因为它很慢。出于这个原因，没有计划添加回顾-p 功能。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: looking-at-p regexp ¶
+</pre></div>
+<p>此谓词函数的工作方式类似于查看，但不更新匹配数据。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: search-spaces-regexp ¶
+</pre></div>
+<p>如果这个变量不是零，它应该是一个正则表达式，说明如何搜索空格。在这种情况下，正在搜索的正则表达式中的任何一组空格都代表使用该正则表达式。但是，诸如 ’[…]’ 和 ’*’、’+’、’?’ 等结构内部的空格 不受搜索空间正则表达式的影响。
+</p>
+<p>由于此变量影响所有正则表达式搜索和匹配结构，因此您应该将其临时绑定到尽可能小的代码部分。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="35.5_POSIX正则表达式搜索.html">POSIX正则表达式搜索</a>, Previous: <a href="35.3.5_正则表达式的问题.html">正则表达式的问题</a>, Up: <a href="35_搜索和匹配.html">搜索和匹配.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

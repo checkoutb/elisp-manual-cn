@@ -1,0 +1,50 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>41.5 时间</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">41.5 时间</h2>
+<div class="nav-panel"><p>Next: <a href="41.6_时区规则.html">时区规则</a>, Previous: <a href="41.4_用户识别.html">用户识别</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节说明如何确定当前时间和时区。
+</p>
+<p>当前时间和文件属性等许多函数返回计数秒数的 Lisp 时间戳值，并且可以通过从 1970-01-01 00:00:00 UTC 的纪元开始计数秒来表示绝对时间。
+</p>
+<p>尽管传统上 Lisp 时间戳是整数对，但它们的形式已经发展，程序通常不应该依赖于当前的默认形式。如果您的程序需要特定的时间戳形式，您可以使用 time-convert 函数将其转换为所需的形式。请参阅时间转换。
+</p>
+<p>目前有三种形式的 Lisp 时间戳，每一种都代表秒数：
+</p>
+<p>一个整数。虽然这是最简单的形式，但它不能表示亚秒级时间戳。
+一对整数（记号 .hz），其中 hz 为正数。这表示滴答/hz 秒，如果 hz 为 1，则与普通滴答时间相同。对于纳秒分辨率时钟，hz 的常见值为 1000000000。27
+四个整数的列表（高低微 pico），其中 0≤low&lt;65536、0≤micro&lt;1000000 和 0≤pico&lt;1000000。这表示使用以下公式的秒数：high * 2**16 + low + micro * 10**-6 + pico * 10**-12。在某些情况下，函数可能默认返回两个或三个元素的列表，省略的 micro 和 pico 组件默认为零。在所有当前机器上，pico 是 1000 的倍数，但随着更高分辨率时钟的可用，这可能会发生变化。
+</p>
+<p>函数参数，例如，当前时间字符串的时间参数，接受更通用的时间值格式，可以是 Lisp 时间戳、当前时间的 nil、秒的单个浮点数或列表 ( high low micro) 或 (high low)，它是一个截断的列表时间戳，缺少的元素被视为零。
+</p>
+<p>时间值可以与日历和其他形式相互转换。其中一些转换依赖于限制可能时间值范围的操作系统功能，如果超出限制，则会发出错误信号，例如 <code>指定时间不可表示</code> 。例如，系统可能不支持 1970 年之前的年份、1901 年之前的年份或遥远的未来年份。您可以使用 format-time-string 将时间值转换为人类可读的字符串，使用 time-convert 将时间值转换为 Lisp 时间戳，并使用 decode-time 和 float-time 将其转换为其他形式。这些功能将在以下部分中描述。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: current-time-string &amp;optional time zone ¶
+</pre></div>
+<p>此函数将当前时间和日期作为人类可读的字符串返回。字符串的初始部分的格式没有变化，其中包含按顺序排列的星期几、月份、月份中的日期和时间：用于这些字段的字符数始终相同，尽管（除非无论语言环境如何，您都需要英文工作日或月份缩写）通常使用格式时间字符串比从当前时间字符串的输出中提取字段更方便，因为年份可能不完全是四位数字，以及其他信息可能有一天会在最后添加。
+</p>
+<p>如果给定参数时间，则指定要格式化的时间，而不是当前时间。可选参数 zone 默认为当前时区规则。请参阅时区规则。操作系统限制时间和区域值的范围。
+</p>
+<div class="lisp">
+<pre class="lisp">(current-time-string)
+     ⇒ "Fri Nov  1 15:59:49 2019"
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: current-time ¶
+</pre></div>
+<p>此函数以 Lisp 时间戳的形式返回当前时间。尽管时间戳在当前 Emacs 版本中采用（高低微 pico）形式，但计划在未来的 Emacs 版本中进行更改。您可以使用 time-convert 函数将时间戳转换为其他形式。请参阅时间转换。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: float-time &amp;optional time ¶
+</pre></div>
+<p>此函数将当前时间作为自纪元以来的浮点秒数返回。如果给定可选参数 time，则指定要转换的时间而不是当前时间。
+</p>
+<p>警告：由于结果是浮点数，因此可能不准确。如果需要精确的时间戳，请勿使用此功能。例如，在典型系统上（浮点时间 ’(1 . 10)）显示为 ’0.1’ 但略大于 1/10。
+</p>
+<p>time-to-seconds 是此函数的别名。
+</p>
+<p>脚注
+(27)
+</p>
+<p>当前 hz 应该至少为 65536 以避免在将时间戳传递给标准函数时出现兼容性警告，因为以前版本的 Emacs 由于向后兼容性问题会以不同方式解释此类时间戳。这些警告旨在在未来的 Emacs 版本中删除。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="41.6_时区规则.html">时区规则</a>, Previous: <a href="41.4_用户识别.html">用户识别</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

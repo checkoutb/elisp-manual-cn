@@ -1,0 +1,47 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>31.2.2 词动</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">31.2.2 词动</h3>
+<div class="nav-panel"><p>Next: <a href="31.2.3_移动到缓冲区末端.html">移动到缓冲区末端</a>, Previous: <a href="31.2.1_角色动作.html">角色动作</a>, Up: <a href="31.2_运动.html">运动.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>下面描述的解析单词的函数使用语法表和 char-script-table 来确定给定字符是否是单词的一部分。请参阅语法表和字符属性。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: forward-word &amp;optional count ¶
+</pre></div>
+<p>此函数将点向前移动 count 个字（如果 count 为负数则向后移动）。如果 count 被省略或为零，则默认为 1。在交互式调用中，count 由数字前缀参数指定。
+</p>
+<p><code>移动一个单词</code> 是指移动直到点与一个单词组成字符交叉，该字符表示单词的开头，然后继续移动直到单词结束。默认情况下，开始和结束单词的字符，称为单词边界，由当前缓冲区的语法表定义（参见语法类表），但模式可以通过设置合适的 find-word-boundary-function-table 来覆盖它， 如下面所描述的。属于不同脚本的字符（由 char-script-table 定义）也定义了单词边界（请参阅字符属性）。在任何情况下，此函数都不能将点移动到缓冲区可访问部分的边界之外，或者跨越字段边界（请参阅定义和使用字段）。字段边界最常见的情况是小缓冲区中提示的结尾。
+</p>
+<p>如果可以移动 count 个字，而不会被缓冲区边界或字段边界提前停止，则值为 t。否则，返回值为 nil 并且点在缓冲区边界或字段边界处停止。
+</p>
+<p>如果 inhibitor-field-text-motion 不为零，则此函数将忽略字段边界。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: backward-word &amp;optional count ¶
+</pre></div>
+<p>这个函数就像 forward-word 一样，只是它向后移动直到遇到一个单词的前面，而不是向前。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: words-include-escapes ¶
+</pre></div>
+<p>这个变量影响前向词和后向词的行为，以及所有使用它们的东西。如果它不为 nil，则转义和字符引用语法类中的字符算作单词的一部分。否则，他们不会。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: inhibit-field-text-motion ¶
+</pre></div>
+<p>如果此变量非零，则某些运动函数（包括 forward-word、forward-sentence 和 forward-paragraph）会忽略字段边界。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: find-word-boundary-function-table ¶
+</pre></div>
+<p>这个变量影响前向词和后向词的行为，以及所有使用它们的东西。它的值是用于搜索单词边界的函数的字符表（请参阅字符表）。如果一个字符在此表中有一个非零条目，那么当一个单词以该字符开头或结尾时，将使用 2 个参数调用相应的函数：pos 和 limit。该函数应返回另一个单词边界的位置。具体来说，如果 pos 小于 limit，则 pos 位于单词的开头，函数应该返回单词最后一个字符之后的位置；  否则， pos 位于单词的最后一个字符，并且该函数应返回该单词的第一个字符的位置。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: forward-word-strictly &amp;optional count ¶
+</pre></div>
+<p>此功能类似于 forward-word，但不受 find-word-boundary-function-table 的影响。当设置该表的模式（例如 subword-mode）修改单词移动时，不应改变行为的 Lisp 程序应该使用此函数而不是 forward-word。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: backward-word-strictly &amp;optional count ¶
+</pre></div>
+<p>这个函数类似于backward-word，但不受find-word-boundary-function-table的影响。与 forward-word-strictly 一样，当单词移动只考虑语法表时，使用此函数而不是 back-word。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="31.2.3_移动到缓冲区末端.html">移动到缓冲区末端</a>, Previous: <a href="31.2.1_角色动作.html">角色动作</a>, Up: <a href="31.2_运动.html">运动.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

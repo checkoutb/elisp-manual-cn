@@ -1,0 +1,27 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.1 刷新屏幕</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">40.1 刷新屏幕</h2>
+<div class="nav-panel"><p>Next: <a href="40.2_强制重新显示.html">强制重新显示</a>, Previous: <a href="40_Emacs显示.html">Emacs显示</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>函数 redraw-frame 清除并重新显示给定帧的全部内容（请参阅帧）。如果屏幕损坏，这很有用。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: redraw-frame &amp;optional frame ¶
+</pre></div>
+<p>该函数清除并重新显示帧帧。如果 frame 被省略或为零，它会重绘选定的帧。
+</p>
+<p>更强大的是重绘显示：
+</p>
+<div class="lisp">
+<pre class="lisp">Command: redraw-display ¶
+</pre></div>
+<p>此函数清除并重新显示所有可见帧。
+</p>
+<p>在 Emacs 中，处理用户输入优先于重新显示。如果在输入可用时调用这些函数，它们不会立即重新显示，但请求的重新显示最终会发生——在所有输入都已处理之后。
+</p>
+<p>在文本终端上，挂起和恢复 Emacs 通常也会刷新屏幕。一些终端仿真器为 Emacs 等面向显示的程序和普通的顺序显示记录单独的内容。如果您正在使用这样的终端，您可能希望在恢复时禁止重新显示。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: no-redraw-on-reenter ¶
+</pre></div>
+<p>此变量控制 Emacs 在暂停和恢复后是否重绘整个屏幕。Non-nil 表示不需要重绘，nil 表示需要重绘。默认值为无。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.2_强制重新显示.html">强制重新显示</a>, Previous: <a href="40_Emacs显示.html">Emacs显示</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

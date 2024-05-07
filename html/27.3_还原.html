@@ -1,0 +1,91 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>27.3 还原</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">27.3 还原</h2>
+<div class="nav-panel"><p>Next: <a href="28_缓冲区.html">缓冲区</a>, Previous: <a href="27.2_自动保存.html">自动保存</a>, Up: <a href="27_备份和自动保存.html">备份和自动保存.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>如果您对文件进行了大量更改，然后改变主意，您可以通过使用 revert-buffer 命令读取文件的先前版本来摆脱它们。请参阅 GNU Emacs 手册中的恢复缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: revert-buffer &amp;optional ignore-auto noconfirm preserve-modes ¶
+</pre></div>
+<p>此命令将缓冲区文本替换为磁盘上已访问文件的文本。此操作将撤消自访问或保存文件以来的所有更改。
+</p>
+<p>默认情况下，如果最新的自动保存文件比访问的文件更新，并且参数 ignore-auto 为 nil，revert-buffer 会询问用户是否使用该自动保存。当您以交互方式调用此命令时，如果没有数字前缀参数，则 ignore-auto 为 t；  因此，交互默认是不检查自动保存文件。
+</p>
+<p>通常，revert-buffer 在更改缓冲区之前会要求确认；  但如果参数 noconfirm 不为零，revert-buffer 不会要求确认。
+</p>
+<p>通常，此命令使用 normal-mode 重新初始化缓冲区的主要和次要模式。但如果 preserve-modes 不为零，则模式保持不变。
+</p>
+<p>还原尝试通过使用插入文件内容的替换功能来保留缓冲区中的标记位置。如果在还原操作之前缓冲区内容和文件内容相同，则还原会保留所有标记。如果它们不相同，则还原确实会更改缓冲区；  在这种情况下，它会在缓冲区的开头和结尾处保留未更改文本（如果有）中的标记。保留任何额外的标记都是有问题的。
+</p>
+<p>从非文件源恢复时，通常不会保留标记，但这取决于特定的恢复缓冲区功能实现。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: revert-buffer-in-progress-p ¶
+</pre></div>
+<p>revert-buffer 在工作时将此变量绑定到非零值。
+</p>
+<p>您可以通过设置本节其余部分中描述的变量来自定义 revert-buffer 的工作方式。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: revert-without-query ¶
+</pre></div>
+<p>此变量包含应在不进行查询的情况下还原的文件列表。该值是一个正则表达式列表。如果访问的文件名与这些正则表达式之一匹配，并且文件在磁盘上已更改但缓冲区未修改，则 revert-buffer 会在不询问用户确认的情况下恢复文件。
+</p>
+<p>一些主要模式通过为这些变量进行缓冲区本地绑定来自定义恢复缓冲区：
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: revert-buffer-function ¶
+</pre></div>
+<p>此变量的值是用于恢复此缓冲区的函数。它应该是一个带有两个可选参数的函数来完成恢复工作。两个可选参数，ignore-auto 和 noconfirm，是 revert-buffer 接收到的参数。
+</p>
+<p>在 Dired 模式等模式下，正在编辑的文本不包含文件的内容，但可以以其他方式重新生成，可以为该变量提供一个缓冲区本地值，该值是重新生成内容的特殊函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: revert-buffer-insert-file-contents-function ¶
+</pre></div>
+<p>此变量的值指定在恢复此缓冲区时用于插入更新内容的函数。该函数接收两个参数：首先是要使用的文件名；  其次，如果用户要求读取自动保存文件，则为 t。
+</p>
+<p>模式更改此变量而不是 revert-buffer-function 的原因是避免重复或替换 revert-buffer 所做的其余部分：请求确认、清除撤消列表、确定正确的主要模式和运行挂钩下面列出。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: before-revert-hook ¶
+</pre></div>
+<p>在插入修改的内容之前，这个普通的钩子由默认的 revert-buffer-function 运行。自定义的 revert-buffer-function 可能会也可能不会运行这个钩子。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: after-revert-hook ¶
+</pre></div>
+<p>这个普通的钩子在插入修改的内容后由默认的 revert-buffer-function 运行。自定义的 revert-buffer-function 可能会也可能不会运行这个钩子。
+</p>
+<p>Emacs 可以自动恢复缓冲区。默认情况下，它对访问文件的缓冲区执行此操作。下面介绍如何添加对自动恢复新类型缓冲区的支持。
+</p>
+<p>首先，此类缓冲区必须定义合适的恢复缓冲区功能和缓冲区陈旧功能。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: buffer-stale-function ¶
+</pre></div>
+<p>这个变量的值指定一个函数来调用来检查缓冲区是否需要恢复。默认值仅通过检查其修改时间来处理正在访问文件的缓冲区。不访问文件的缓冲区需要一个可选参数 noconfirm 的自定义函数。如果应该恢复缓冲区，该函数应该返回非零。调用此函数时，缓冲区是当前的。
+</p>
+<p>虽然此功能主要用于自动恢复，但它也可以用于其他目的。例如，如果未启用自动恢复，它可以用来警告用户缓冲区需要恢复。noconfirm 参数背后的想法是，如果要在不询问用户的情况下恢复缓冲区，则它应该是 t，如果函数只是用于警告用户缓冲区已过期，它应该是 nil。特别是，对于自动恢复的使用，noconfirm 是 t。如果该函数仅用于自动恢复，则可以忽略 noconfirm 参数。
+</p>
+<p>如果您只想每隔 auto-revert-interval 秒自动恢复（如缓冲区菜单），请使用：
+</p><div class="lisp">
+<pre class="lisp">(setq-local buffer-stale-function
+     (lambda (&amp;optional noconfirm) 'fast))
+</pre></div>
+<p>在缓冲区的模式功能中。
+</p>
+<p>特殊的返回值 <code>fast</code> 告诉调用者是否需要恢复，但恢复缓冲区的速度很快。它还告诉 Auto Revert 不打印任何恢复消息，即使 auto-revert-verbose 不为零。这很重要，因为每隔 auto-revert-interval 秒获取恢复消息可能非常烦人。如果出于自动恢复以外的目的查询该函数，则此返回值提供的信息也可能很有用。
+</p>
+<p>一旦缓冲区具有合适的恢复缓冲区功能和缓冲区陈旧功能，通常会存在几个问题。
+</p>
+<p>缓冲区仅在标记为未修改时才会自动恢复。因此，当且仅当缓冲区包含可能因恢复而丢失的信息，或者有理由相信用户可能因自动恢复而感到不便时，您必须确保各种函数将缓冲区标记为已修改，因为他正在积极处理缓冲区。用户总是可以通过手动调整缓冲区的修改状态来覆盖它。为了支持这一点，在标记为未修改的缓冲区上调用 revert-buffer-function 应始终保持标记为未修改的缓冲区。
+</p>
+<p>重要的是要确保该点不会由于自动恢复而不断跳跃。当然，如果缓冲区发生根本变化，移动点可能是不可避免的。
+</p>
+<p>您应该确保 revert-buffer-function 不会打印不必要地重复 Auto Revert 自己的消息的消息，如果 auto-revert-verbose 为 t 则显示，并有效地覆盖 auto-revert-verbose 的 nil 值。因此，适应自动恢复模式通常涉及摆脱此类消息。这对于每隔 auto-revert-interval 秒自动恢复的缓冲区尤为重要。
+</p>
+<p>如果新的自动恢复是 Emacs 的一部分，您应该在 global-auto-revert-non-file-buffers 的文档字符串中提及它。
+</p>
+<p>同样，您应该在 Emacs 手册中记录添加的内容。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="28_缓冲区.html">缓冲区</a>, Previous: <a href="27.2_自动保存.html">自动保存</a>, Up: <a href="27_备份和自动保存.html">备份和自动保存.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

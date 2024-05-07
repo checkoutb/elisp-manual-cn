@@ -1,0 +1,50 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.4.2 模式行的数据结构</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">24.4.2 模式行的数据结构</h3>
+<div class="nav-panel"><p>Next: <a href="24.4.3_顶层模式线控制.html">顶层模式线控制</a>, Previous: <a href="24.4.1_模式线基础.html">模式线基础</a>, Up: <a href="24.4_模式线格式.html">模式线格式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>模式行内容由称为模式行结构的数据结构控制，由保存在缓冲区局部变量中的列表、字符串、符号和数字组成。每种数据类型对模式线外观都有特定的含义，如下所述。相同的数据结构用于构造框架标题（参见框架标题）和标题行（参见窗口标题行）。
+</p>
+<p>模式行构造可能与固定的文本字符串一样简单，但它通常指定如何将固定字符串与变量的值组合以构造文本。许多这些变量本身被定义为具有模式线构造作为它们的值。
+</p>
+<p>以下是作为模式线结构的各种数据类型的含义：
+</p>
+<div class="lisp">
+<pre class="lisp">string
+</pre></div>
+<p>作为模式行构造的字符串逐字显示，但其中的 %-constructs 除外。这些代表其他数据的替代；  请参阅模式行中的 %-Constructs。
+</p>
+<p>如果字符串的某些部分具有面属性，则它们控制文本的显示，就像它们控制缓冲区中的文本一样。默认情况下，任何没有面属性的字符都显示在面模式行或模式行非活动中（参见 GNU Emacs 手册中的标准面）。string 中的 help-echo 和 keymap 属性有特殊含义。请参阅模式行中的属性。
+</p><div class="lisp">
+<pre class="lisp">symbol
+</pre></div>
+<p>作为模式线结构的符号代表它的值。symbol 的值用作模式线构造，代替 symbol。但是，符号 t 和 nil 被忽略，任何值为 void 的符号也是如此。
+</p>
+<p>有一个例外：如果 symbol 的值是一个字符串，它会逐字显示：%-constructs 无法识别。
+</p>
+<p>除非符号被标记为有风险的（即，它具有非零风险局部变量属性），否则符号值中指定的所有文本属性都将被忽略。这包括符号值中字符串的文本属性，以及其中的所有 :eval 和 :properize 形式。（这样做的原因是安全性：可以从文件变量中自动设置非风险变量，而无需提示用户。）
+</p><div class="lisp">
+<pre class="lisp">(string rest…)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">(list rest…)
+</pre></div>
+<p>第一个元素是字符串或列表的列表意味着递归处理所有元素并将结果连接起来。这是最常见的模式线构造形式。（请注意，在模式行中显示字符串时，会专门处理文本属性（出于效率原因）：仅考虑字符串第一个字符上的文本属性，然后将它们用于整个字符串。如果您需要具有不同文本属性的字符串，您必须使用特殊的 :properize 模式行构造。）
+</p><div class="lisp">
+<pre class="lisp">(:eval form)
+</pre></div>
+<p>一个列表，其第一个元素是符号 :eval 表示评估表单，并将结果用作要显示的字符串。确保此评估无法加载任何文件，因为这样做可能会导致无限递归。
+</p><div class="lisp">
+<pre class="lisp">(:propertize elt props…)
+</pre></div>
+<p>第一个元素是符号 :properize 的列表表示递归处理模式行构造 elt，然后将 props 指定的文本属性添加到结果中。参数 props 应该包含零个或多个文本属性值对。如果 elt 是或产生一个具有文本属性的字符串，则该字符串的所有字符都应该具有相同的属性，否则其中一些可能会被 :properize 删除。
+</p><div class="lisp">
+<pre class="lisp">(symbol then else)
+</pre></div>
+<p>第一个元素是不是关键字的符号的列表指定条件。它的含义取决于符号的值。如果 symbol 具有非 nil 值，则第二个元素将作为模式行构造递归处理。否则，递归处理第三个元素else。你可以省略其他；  那么如果 symbol 的值为 nil 或 void，则模式行构造不显示任何内容。
+</p><div class="lisp">
+<pre class="lisp">(width rest…)
+</pre></div>
+<p>第一个元素是整数的列表指定剩余结果的截断或填充。其余元素 rest 作为模式线构造递归处理并连接在一起。当宽度为正时，如果其宽度小于宽度，则结果是在右侧填充空间。当宽度为负时，如果其宽度超过 -width，则结果在右侧被截断到 -width 列。
+</p>
+<p>例如，显示窗口顶部上方缓冲区百分比的常用方法是使用如下列表：(-3 "%p")。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="24.4.3_顶层模式线控制.html">顶层模式线控制</a>, Previous: <a href="24.4.1_模式线基础.html">模式线基础</a>, Up: <a href="24.4_模式线格式.html">模式线格式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

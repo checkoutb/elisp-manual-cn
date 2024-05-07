@@ -1,0 +1,82 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>3.4 数字比较</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">3.4 数字比较</h2>
+<div class="nav-panel"><p>Next: <a href="03.5_数值转换.html">数值转换</a>, Previous: <a href="03.3_数字的类型谓词.html">数字的类型谓词</a>, Up: <a href="03_数字.html">数字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>要测试数字是否相等，通常应该使用 = 而不是非数字比较谓词，如 eq、eql 和 equal。不同的浮点数和大整数对象可以在数值上相等。如果你用 eq 来比较它们，你测试它们是否是同一个对象；  如果使用 eql 或 equal，则测试它们的值是否无法区分。相反，= 使用数字比较，当非数字比较返回 nil 时，有时会返回 t，反之亦然。请参阅浮点基础知识。
+</p>
+<p>在 Emacs Lisp 中，如果两个 fixnum 在数值上相等，则它们是同一个 Lisp 对象。也就是说，eq 等价于 = on fixnums。有时使用 eq 比较未知值与固定值比较方便，因为如果未知值不是数字，eq 不会报告错误——它接受任何类型的参数。相反，如果参数不是数字或标记，则 = 表示错误。但是，如果可以，最好使用 =，即使是比较整数也是如此。
+</p>
+<p>有时将数字与 eql 或相等进行比较很有用，如果两个数字具有相同的数据类型（均为整数，或均为浮点数）和相同的值，则将它们视为相等。相比之下，= 可以将整数和浮点数视为相等。请参见等式谓词。
+</p>
+<p>还有另一个问题：因为浮点运算并不精确，所以检查浮点值是否相等通常是个坏主意。通常最好测试近似相等。这是一个执行此操作的函数：
+</p>
+<div class="lisp">
+<pre class="lisp">(defvar fuzz-factor 1.0e-6)
+(defun approx-equal (x y)
+  (or (= x y)
+      (&lt; (/ (abs (- x y))
+            (max (abs x) (abs y)))
+         fuzz-factor)))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: = number-or-marker &amp;rest number-or-markers
+</pre></div>
+<p>此函数测试其所有参数在数值上是否相等，如果相等则返回 t，否则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: eql value1 value2
+</pre></div>
+<p>此函数的作用类似于 eq，除非两个参数都是数字。它按类型和数值比较数字，因此 (eql 1.0 1) 返回 nil，但 (eql 1.0 1.0) 和 (eql 1 1) 都返回 t。这可用于比较大整数和小整数。具有相同符号、指​​数和分数的浮点值是 eql。这与数值比较不同：(eql 0.0 -0.0) 返回 nil，(eql 0.0e+NaN 0.0e+NaN) 返回 t，而 = 则相反。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: /= number-or-marker1 number-or-marker2
+</pre></div>
+<p>此函数测试其参数在数值上是否相等，如果不相等则返回 t，如果相等则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: &lt; number-or-marker &amp;rest number-or-markers
+</pre></div>
+<p>此函数测试每个参数是否严格小于以下参数。如果是，则返回 t，否则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: &lt;= number-or-marker &amp;rest number-or-markers
+</pre></div>
+<p>此函数测试每个参数是否小于或等于以下参数。如果是，则返回 t，否则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: &gt; number-or-marker &amp;rest number-or-markers
+</pre></div>
+<p>此函数测试每个参数是否严格大于以下参数。如果是，则返回 t，否则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: &gt;= number-or-marker &amp;rest number-or-markers
+</pre></div>
+<p>此函数测试每个参数是否大于或等于以下参数。如果是，则返回 t，否则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: max number-or-marker &amp;rest numbers-or-markers
+</pre></div>
+<p>此函数返回其参数中的最大值。
+</p>
+<div class="lisp">
+<pre class="lisp">(max 20)
+     ⇒ 20
+(max 1 2.5)
+     ⇒ 2.5
+(max 1 3 2.5)
+     ⇒ 3
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: min number-or-marker &amp;rest numbers-or-markers
+</pre></div>
+<p>此函数返回其参数中的最小者。
+</p>
+<div class="lisp">
+<pre class="lisp">(min -4 1)
+     ⇒ -4
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: abs number
+</pre></div>
+<p>该函数返回数字的绝对值。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="03.5_数值转换.html">数值转换</a>, Previous: <a href="03.3_数字的类型谓词.html">数字的类型谓词</a>, Up: <a href="03_数字.html">数字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

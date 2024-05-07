@@ -1,0 +1,28 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>16.6 重复加载</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">16.6 重复加载</h2>
+<div class="nav-panel"><p>Next: <a href="16.7_特征.html">特征</a>, Previous: <a href="16.5.2_何时使用自动加载.html">何时使用自动加载</a>, Up: <a href="16_加载.html">加载.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>您可以在 Emacs 会话中多次加载给定文件。例如，在通过在缓冲区中编辑函数定义并重新安装函数定义后，您可能希望返回到原始版本；  您可以通过重新加载它来自的文件来做到这一点。
+</p>
+<p>当您加载或重新加载文件时，请记住 load 和 load-library 函数会自动加载字节编译的文件，而不是类似名称的非编译文件。如果你重写了一个你打算保存并重新安装的文件，你需要对新版本进行字节编译；  否则 Emacs 将加载旧的、字节编译的文件，而不是新的、未编译的文件！  如果发生这种情况，加载文件时显示的消息包括 <code>（已编译；注意，源较新）</code> ，以提醒您重新编译它。
+</p>
+<p>在 Lisp 库文件中编写表单时，请记住该文件可能会被多次加载。例如，考虑在重新加载库时是否应该重新初始化每个变量；  如果变量已经初始化，defvar 不会更改值。（请参阅定义全局变量。）
+</p>
+<p>将元素添加到 alist 的最简单方法是这样的：
+</p>
+<div class="lisp">
+<pre class="lisp">(push '(leif-mode " Leif") minor-mode-alist)
+</pre></div>
+<p>但是，如果重新加载库，这将添加多个元素。为避免此问题，请使用 add-to-list（请参阅修改列表变量）：
+</p>
+<div class="lisp">
+<pre class="lisp">(add-to-list 'minor-mode-alist '(leif-mode " Leif"))
+</pre></div>
+<p>有时你会想要明确地测试一个库是否已经被加载。如果库使用 provide 来提供命名功能，您可以在文件的前面使用 featurep 来测试之前是否执行过提供调用（请参阅功能）。或者，您可以使用以下内容：
+</p><div class="lisp">
+<pre class="lisp">(defvar foo-was-loaded nil)
+
+(unless foo-was-loaded
+  execute-first-time-only
+  (setq foo-was-loaded t))
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="16.7_特征.html">特征</a>, Previous: <a href="16.5.2_何时使用自动加载.html">何时使用自动加载</a>, Up: <a href="16_加载.html">加载.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

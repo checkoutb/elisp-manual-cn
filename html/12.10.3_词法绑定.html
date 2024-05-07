@@ -1,0 +1,54 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>12.10.3 词法绑定</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">12.10.3 词法绑定</h3>
+<div class="nav-panel"><p>Next: <a href="12.10.4_使用词法绑定.html">使用词法绑定</a>, Previous: <a href="12.10.2_正确使用动态绑定.html">正确使用动态绑定</a>, Up: <a href="12.10_变量绑定的作用域规则.html">变量绑定的作用域规则.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>词法绑定作为可选功能被引入 Emacs，在 24.1 版本中。我们预计它的重要性会随着时间的推移而增加。词法绑定为优化提供了更多机会，因此使用它的程序可能会在未来的 Emacs 版本中运行得更快。词法绑定也更兼容并发，它是在 Emacs 26.1 版本中添加的。
+</p>
+<p>词法绑定变量具有词法范围，这意味着对该变量的任何引用都必须以文本形式位于绑定构造中。这是一个示例（请参阅使用词法绑定，了解如何实际启用词法绑定）：
+</p><div class="lisp">
+<pre class="lisp">(let ((x 1))    ; x is lexically bound.
+  (+ x 3))
+     ⇒ 4
+
+(defun getx ()
+  x)            ; x is used free in this function.
+
+(let ((x 1))    ; x is lexically bound.
+  (getx))
+error→ Symbol's value as variable is void: x
+</pre></div>
+<p>这里，变量 x 没有全局值。当它被词汇绑定在一个 let 形式中时，它可以在该 let 形式的文本范围内使用。但它不能在从 let 形式调用的 getx 函数中使用，因为 getx 的函数定义发生在 let 形式本身之外。
+</p>
+<p>以下是词法绑定的工作原理。每个绑定构造定义一个词法环境，指定绑定在构造内的变量及其本地值。当 Lisp 求值器想要一个变量的当前值时，它首先在词法环境中查找；  如果没有在其中指定变量，它会在符号的值单元格中查找，其中存储了动态值。
+</p>
+<p>（在内部，词法环境是一个符号值对的列表，列表中的最后一个元素是符号 t 而不是一个 cons 单元格。这样的列表可以作为第二个参数传递给 eval 函数，以便指定评估表单的词法环境。请参阅 Eval。然而，大多数 Emacs Lisp 程序不应该以这种方式直接与词法环境交互；只有专门的程序，如调试器。）
+</p>
+<p>词法绑定有无限的范围。即使在绑定结构完成执行之后，它的词法环境也可以“保留”在称为闭包的 Lisp 对象中。当您定义启用了词法绑定的命名或匿名函数时，将创建一个闭包。有关详细信息，请参阅闭包。
+</p>
+<p>当闭包作为函数调用时，其定义中的任何词法变量引用都使用保留的词法环境。这是一个例子：
+</p><div class="lisp">
+<pre class="lisp">(defvar my-ticker nil)   ; We will use this dynamically bound
+                         ; variable to store a closure.
+
+(let ((x 0))             ; x is lexically bound.
+  (setq my-ticker (lambda ()
+                    (setq x (1+ x)))))
+    ⇒ (closure ((x . 0) t) ()
+          (setq x (1+ x)))
+
+(funcall my-ticker)
+    ⇒ 1
+
+(funcall my-ticker)
+    ⇒ 2
+
+(funcall my-ticker)
+    ⇒ 3
+
+x                        ; Note that x has no global value.
+error→ Symbol's value as variable is void: x
+</pre></div>
+<p>let 绑定定义了一个词法环境，其中变量 x 本地绑定到 0。在这个绑定构造中，我们定义了一个 lambda 表达式，它将 x 递增 1 并返回递增后的值。这个 lambda 表达式会自动变成一个闭包，即使在 let 绑定结构退出之后，词法环境仍然存在。每次我们评估闭包时，它都会增加 x，使用 x 在该词法环境中的绑定。
+</p>
+<p>请注意，与绑定到符号对象本身的动态变量不同，词法变量和符号之间的关系仅存在于解释器（或编译器）中。因此，接受符号参数的函数（如符号值、boundp 和集合）只能检索或修改变量的动态绑定（即，其符号值单元格的内容）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="12.10.4_使用词法绑定.html">使用词法绑定</a>, Previous: <a href="12.10.2_正确使用动态绑定.html">正确使用动态绑定</a>, Up: <a href="12.10_变量绑定的作用域规则.html">变量绑定的作用域规则.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

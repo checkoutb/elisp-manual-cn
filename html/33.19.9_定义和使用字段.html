@@ -1,0 +1,64 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.19.9 定义和使用字段</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">33.19.9 定义和使用字段</h3>
+<div class="nav-panel"><p>Next: <a href="33.19.10_为什么文本属性不是区间.html">为什么文本属性不是区间</a>, Previous: <a href="33.19.8_定义可点击文本.html">定义可点击文本</a>, Up: <a href="33.19_文本属性.html">文本属性.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>字段是缓冲区中的一系列连续字符，这些字符通过与字段属性（文本属性或覆盖属性）具有相同值（与 eq 比较）来标识。本节介绍可用于对字段进行操作的特殊功能。
+</p>
+<p>您指定具有缓冲区位置的字段 pos。我们认为每个字段都包含一系列缓冲区位置，因此您指定的位置代表包含该位置的字段。
+</p>
+<p>当 pos 之前和之后的字符属于同一个字段时，毫无疑问哪个字段包含 pos：这两个字符都属于哪个字段。当 pos 处于字段之间的边界时，它属于哪个字段取决于周围两个字符的字段属性的粘性（参见文本属性的粘性）。其属性将被插入到 pos 的文本继承的字段是包含 pos 的字段。
+</p>
+<p>有一种异常情况，在 pos 处新插入的文本不会从任一侧继承 field 属性。如果前一个字符的字段属性不是后粘性，并且下一个字符的字段属性不是前粘性，则会发生这种情况。在这种情况下，pos既不属于前面的字段也不属于后面的字段；  字段函数将其视为属于一个空字段，其开头和结尾都在 pos。
+</p>
+<p>在所有这些函数中，如果 pos 被省略或为 nil，则默认使用 point 的值。如果变窄有效，则 pos 应落在可访问部分内。请参阅收窄。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: field-beginning &amp;optional pos escape-from-edge limit ¶
+</pre></div>
+<p>此函数返回由 pos 指定的字段的开头。
+</p>
+<p>如果 pos 位于其字段的开头，并且 escape-from-edge 不为零，则返回值始终是在 pos 结束的前一个字段的开头，而不管 pos 周围的字段属性的粘性如何。
+</p>
+<p>如果limit是非零，它是一个缓冲位置；  如果字段的开头在限制之前，则将返回限制。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: field-end &amp;optional pos escape-from-edge limit ¶
+</pre></div>
+<p>此函数返回由 pos 指定的字段的结尾。
+</p>
+<p>如果 pos 位于其字段的末尾，并且 escape-from-edge 不为零，则返回值始终是从 pos 开始的下一个字段的末尾，而不管 pos 周围的字段属性的粘性如何。
+</p>
+<p>如果limit是非零，它是一个缓冲位置；  如果字段的结尾在限制之后，则将返回限制。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: field-string &amp;optional pos ¶
+</pre></div>
+<p>此函数以字符串形式返回由 pos 指定的字段的内容。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: field-string-no-properties &amp;optional pos ¶
+</pre></div>
+<p>此函数将 pos 指定的字段的内容作为字符串返回，丢弃文本属性。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: delete-field &amp;optional pos ¶
+</pre></div>
+<p>此函数删除由 pos 指定的字段的文本。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: constrain-to-field new-pos old-pos &amp;optional escape-from-edge only-in-line inhibit-capture-property ¶
+</pre></div>
+<p>此函数将 new-pos 约束到 old-pos 所属的字段——换句话说，它返回与 old-pos 位于同一字段中的最接近 new-pos 的位置。
+</p>
+<p>如果 new-pos 为 nil，则 constrain-to-field 使用 point 的值，并将 point 移动到结果位置，并返回该位置。
+</p>
+<p>如果 old-pos 位于两个字段的边界，则可接受的最终位置取决于参数 escape-from-edge。如果 escape-from-edge 为 nil，则 new-pos 必须位于其字段属性等于在 old-pos 处插入的新字符将继承的字段中。（这取决于 old-pos 之前和之后字符的 field 属性的粘性。）如果 escape-from-edge 不为零，new-pos 可以是两个相邻字段中的任何位置。此外，如果两个字段被具有特殊值边界的另一个字段分隔，则该特殊字段内的任何点也被认为在边界上。
+</p>
+<p>像 Ca 这样没有参数的命令，通常会向后移动到特定类型的位置并在那里停留一次，可能应该指定 nil 用于从边缘逃逸。检查字段的其他运动命令可能应该通过 t。
+</p>
+<p>如果可选参数 only-in-line 不是 nil，并且以通常的方式约束 new-pos 会将其移动到不同的行，则 new-pos 将不受约束地返回。这用于逐行移动的命令，例如下一行和行首，以便它们仅在它们仍然可以移动到正确行的情况下尊重字段边界。
+</p>
+<p>如果可选参数 inhibitor-capture-property 为非 nil，并且 old-pos 具有该名称的非 nil 属性，则忽略任何字段边界。
+</p>
+<p>您可以通过将变量 inhibitor-field-text-motion 绑定到非零值来使约束到字段忽略所有字段边界（因此从不约束任何内容）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.19.10_为什么文本属性不是区间.html">为什么文本属性不是区间</a>, Previous: <a href="33.19.8_定义可点击文本.html">定义可点击文本</a>, Up: <a href="33.19_文本属性.html">文本属性.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

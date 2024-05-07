@@ -1,0 +1,266 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.12.12 低级字体表示</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.12.12 低级字体表示</h3>
+<div class="nav-panel"><p>Next: <a href="40.13_条纹.html">条纹</a>, Previous: <a href="40.12.11_字体集.html">字体集</a>, Up: <a href="40.12_面.html">面.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>通常，没有必要直接操作字体。如果您需要这样做，本节将说明如何进行。
+</p>
+<p>在 Emacs Lisp 中，字体使用三种不同的 Lisp 对象类型来表示：字体对象、字体规范和字体实体。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: fontp object &amp;optional type ¶
+</pre></div>
+<p>如果 object 是字体对象、字体规范或字体实体，则返回 t。否则，返回零。
+</p>
+<p>可选参数类型，如果非零，则确定要检查的 Lisp 对象的确切类型。在这种情况下，类型应该是 font-object、font-spec 或 font-entity 之一。
+</p>
+<p>字体对象是一个 Lisp 对象，它表示 Emacs 已打开的字体。字体对象不能在 Lisp 中修改，但可以检查。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: font-at position &amp;optional window string ¶
+</pre></div>
+<p>返回用于在窗口窗口中位置位置显示字符的字体对象。如果 window 为 nil，则默认为选定的窗口。如果 string 为 nil，则 position 指定当前缓冲区中的位置；  否则，string 应该是一个字符串，并且 position 指定该字符串中的一个位置。
+</p>
+<p>字体规范是一个 Lisp 对象，它包含一组可用于查找字体的规范。不止一种字体可能与字体规范中的规范相匹配。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: font-spec &amp;rest arguments ¶
+</pre></div>
+<p>使用参数中的规范返回一个新的字体规范，它应该以属性值对的形式出现。可能的规格如下：
+</p>
+<div class="lisp">
+<pre class="lisp">:name
+</pre></div>
+<p>字体名称（字符串），采用 XLFD、Fontconfig 或 GTK+ 格式。请参阅 GNU Emacs 手册中的字体。
+</p><div class="lisp">
+<pre class="lisp">:family
+</pre></div>
+<div class="lisp">
+<pre class="lisp">:foundry
+</pre></div>
+<div class="lisp">
+<pre class="lisp">:weight
+</pre></div>
+<div class="lisp">
+<pre class="lisp">:slant
+</pre></div>
+<div class="lisp">
+<pre class="lisp">:width
+</pre></div>
+<p>这些与同名的面属性具有相同的含义。请参见面属性。:family 和 :foundry 是字符串，而其他三个是符号。作为示例值， :slant 可以是斜体， :weight 可以是粗体， :width 可以是正常的。
+</p><div class="lisp">
+<pre class="lisp">:size
+</pre></div>
+<p>字体大小——可以是指定像素大小的非负整数，也可以是指定点大小的浮点数。
+</p><div class="lisp">
+<pre class="lisp">:adstyle
+</pre></div>
+<p>字体的附加排版样式信息，例如 <code>sans</code> 。该值应该是字符串或符号。
+</p><div class="lisp">
+<pre class="lisp">:registry
+</pre></div>
+<p>字符集注册表和字体的编码，例如 <code>iso8859-1</code> 。该值应该是字符串或符号。
+</p><div class="lisp">
+<pre class="lisp">:dpi
+</pre></div>
+<p>字体设计的分辨率（以每英寸点数为单位）。该值必须是非负数。
+</p><div class="lisp">
+<pre class="lisp">:spacing
+</pre></div>
+<p>字体间距：proportional、dual、mono 或 charcell。该值应该是整数（0 表示比例，90 表示双，100 表示单声道，110 表示 charcell）或单字母符号（P、D、M 或 C 之一）。
+</p><div class="lisp">
+<pre class="lisp">:avgwidth
+</pre></div>
+<p>字体的平均宽度，以 1/10 像素为单位。该值应该是一个非负数。
+</p><div class="lisp">
+<pre class="lisp">:script
+</pre></div>
+<p>字体必须支持的脚本（符号）。
+</p><div class="lisp">
+<pre class="lisp">:lang
+</pre></div>
+<p>字体应支持的语言。该值应该是一个符号，其名称是一个由两个字母组成的 ISO-639 语言名称。在 X 上，该值与字体的 XLFD 名称的 <code>附加样式</code> 字段匹配（如果它不为空）。在 MS-Windows 上，需要符合规范的字体才能支持该语言所需的代码页。目前，此属性仅支持一小部分 CJK 语言： <code>ja</code> 、 <code>ko</code> 和 <code>zh</code> 。
+</p><div class="lisp">
+<pre class="lisp">:otf ¶
+</pre></div>
+<p>字体必须是支持这些 OpenType 功能的 OpenType 字体，前提是 Emacs 使用库编译，例如 GNU/Linux 上的 <code>libotf</code> ，该库支持需要的脚本的复杂文本布局。该值必须是表单的列表
+</p><div class="lisp">
+<pre class="lisp">(script-tag langsys-tag gsub gpos)
+</pre></div>
+<p>其中 script-tag 是 OpenType 脚本标签符号；  langsys-tag 是 OpenType 语言系统标签符号，或 nil 使用默认语言系统；  gsub 是 OpenType GSUB 功能标记符号的列表，如果不需要，则为 nil；  gpos 是 OpenType GPOS 功能标签符号的列表，如果不需要，则为 nil。如果 gsub 或 gpos 是一个列表，则该列表中的 nil 元素意味着该字体不得与任何剩余的标记符号匹配。gpos 元素可以省略。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: font-put font-spec property value ¶
+</pre></div>
+<p>将 font-spec font-spec 中的 font 属性设置为 value。
+</p>
+<p>字体实体是对不需要打开的字体的引用。它的属性介于字体对象和字体规范之间：就像字体对象，与字体规范不同，它指的是单一的、特定的字体。与字体对象不同，创建字体实体不会将该字体的内容加载到计算机内存中。Emacs 可以从一个引用可缩放字体的字体实体打开多个不同大小的字体对象。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: find-font font-spec &amp;optional frame ¶
+</pre></div>
+<p>此函数返回与框架框架上的字体规范 font-spec 最匹配的字体实体。如果 frame 为 nil，则默认为选定的帧。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: list-fonts font-spec &amp;optional frame num prefer ¶
+</pre></div>
+<p>此函数返回与字体规范 font-spec 匹配的所有字体实体的列表。
+</p>
+<p>可选参数 frame，如果非 nil，指定显示字体的框架。可选参数 num，如果非零，应该是一个整数，指定返回列表的最大长度。可选参数prefer，如果非零，应该是另一个字体规范，用于控制返回列表的顺序；  返回的字体实体按与该字体规范的接近程度递减的顺序排序。
+</p>
+<p>如果您调用 set-face-attribute 并将字体规范、字体实体或字体名称字符串作为 :font 属性的值传递，Emacs 会打开可用于显示的最佳匹配字体。然后它将相应的字体对象存储为该面的 :font 属性的实际值。
+</p>
+<p>以下函数可用于获取有关字体的信息。对于这些函数，字体参数可以是字体对象、字体实体或字体规范。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: font-get font property ¶
+</pre></div>
+<p>此函数返回字体的字体属性值。
+</p>
+<p>如果 font 是字体规范并且字体规范没有指定属性，则返回值为 nil。如果 font 是字体对象或字体实体， :script 属性的值可能是字体支持的脚本列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: font-face-attributes font &amp;optional frame ¶
+</pre></div>
+<p>此函数返回与字体对应的面属性列表。可选参数 frame 指定要显示字体的框架。如果为 nil，则使用选定的帧。返回值的形式为
+</p><div class="lisp">
+<pre class="lisp">(:family family :height height :weight weight
+   :slant slant :width width)
+</pre></div>
+<p>其中family、height、weight、slant、width的值为面属性值。如果这些键-属性对中的某些未由字体指定，则它们可能会从列表中省略。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: font-xlfd-name font &amp;optional fold-wildcards ¶
+</pre></div>
+<p>此函数返回 XLFD（X 逻辑字体描述符），一个字符串，匹配字体。有关 XLFD 的信息，请参阅 GNU Emacs 手册中的字体。如果名称对于 XLFD 来说太长（最多可以包含 255 个字符），则函数返回 nil。
+</p>
+<p>如果可选参数 fold-wildcards 不为零，则 XLFD 中的连续通配符将折叠为一个。
+</p>
+<p>以下两个函数返回有关字体的重要信息。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: font-info name &amp;optional frame ¶
+</pre></div>
+<p>此函数返回有关由其名称指定的字体的信息，一个字符串，因为它在框架上使用。如果 frame 被省略或为零，则默认为选定的框架。
+</p>
+<p>函数返回的值是一个形式为[opened-name full-name size height baseline-offset relative-compose default-ascent max-width ascent descent space-width average-width filename capability]的向量。这是该向量的每个组件的描述：
+</p>
+<div class="lisp">
+<pre class="lisp">opened-name
+</pre></div>
+<p>用于打开字体的名称，一个字符串。
+</p><div class="lisp">
+<pre class="lisp">full-name
+</pre></div>
+<p>字体的全名，一个字符串。
+</p><div class="lisp">
+<pre class="lisp">size
+</pre></div>
+<p>字体的像素大小。
+</p><div class="lisp">
+<pre class="lisp">height
+</pre></div>
+<p>字体的高度（以像素为单位）。
+</p><div class="lisp">
+<pre class="lisp">baseline-offset
+</pre></div>
+<p>从 ASCII 基线的像素偏移量，正向上。
+</p><div class="lisp">
+<pre class="lisp">relative-compose
+</pre></div>
+<div class="lisp">
+<pre class="lisp">default-ascent
+</pre></div>
+<p>数字控制如何组成字符。
+</p><div class="lisp">
+<pre class="lisp">max-width
+</pre></div>
+<p>字体的最大前进宽度。
+</p><div class="lisp">
+<pre class="lisp">ascent
+</pre></div>
+<div class="lisp">
+<pre class="lisp">descent
+</pre></div>
+<p>这种字体的上升和下降。这两个数字的总和应该等于上面的高度值。
+</p><div class="lisp">
+<pre class="lisp">space-width
+</pre></div>
+<p>字体空格字符的宽度（以像素为单位）。
+</p><div class="lisp">
+<pre class="lisp">average-width
+</pre></div>
+<p>字体字符的平均宽度。如果该值为零，则 Emacs 在计算显示的文本布局时使用 space-width 的值。
+</p><div class="lisp">
+<pre class="lisp">filename
+</pre></div>
+<p>字体的文件名作为字符串。如果字体后端不提供查找字体文件名的方法，则此值可以为零。
+</p><div class="lisp">
+<pre class="lisp">capability
+</pre></div>
+<p>一个列表，其第一个元素是表示字体类型的符号，x、opentype、truetype、type1、pcf 或 bdf 之一。对于 OpenType 字体，该列表包括 2 个附加元素，用于描述该字体支持的 GSUB 和 GPOS 功能。这些元素中的每一个都是 ((script (langsys feature …) …) …) 形式的列表，其中 script 是表示 OpenType 脚本标记的符号，langsys 是表示 OpenType langsys 标记的符号（或 nil，代表默认的 langsys），每个特征都是一个符号，代表一个 OpenType 特征标签。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: query-font font-object ¶
+</pre></div>
+<p>此函数返回有关字体对象的信息。（这与 font-info 形成对比，它以字体名称、字符串作为参数。）
+</p>
+<p>函数返回的值是 [name filename pixel-size max-width ascent descent space-width average-width capability] 形式的向量。这是该向量的每个组件的描述：
+</p>
+<div class="lisp">
+<pre class="lisp">name
+</pre></div>
+<p>字体名称，一个字符串。
+</p><div class="lisp">
+<pre class="lisp">filename
+</pre></div>
+<p>字体的文件名作为字符串。如果字体后端不提供查找字体文件名的方法，则此值可以为零。
+</p><div class="lisp">
+<pre class="lisp">pixel-size
+</pre></div>
+<p>用于打开字体的字体像素大小。
+</p><div class="lisp">
+<pre class="lisp">max-width
+</pre></div>
+<p>字体的最大前进宽度。
+</p><div class="lisp">
+<pre class="lisp">ascent
+</pre></div>
+<div class="lisp">
+<pre class="lisp">descent
+</pre></div>
+<p>这种字体的上升和下降。这两个数字的总和给出了字体高度。
+</p><div class="lisp">
+<pre class="lisp">space-width
+</pre></div>
+<p>字体空格字符的宽度（以像素为单位）。
+</p><div class="lisp">
+<pre class="lisp">average-width
+</pre></div>
+<p>字体字符的平均宽度。如果该值为零，则 Emacs 在计算显示的文本布局时使用 space-width 的值。
+</p><div class="lisp">
+<pre class="lisp">capability
+</pre></div>
+<p>一个列表，其第一个元素是表示字体类型的符号，x、opentype、truetype、type1、pcf 或 bdf 之一。对于 OpenType 字体，该列表包括 2 个附加元素，用于描述该字体支持的 GSUB 和 GPOS 功能。这些元素中的每一个都是 ((script (langsys feature …) …) …) 形式的列表，其中 script 是表示 OpenType 脚本标记的符号，langsys 是表示 OpenType langsys 标记的符号（或 nil，代表默认的 langsys），每个特征都是一个符号，代表一个 OpenType 特征标签。
+</p>
+<p>以下四个函数返回有关各种面使用的字体的大小信息，允许在 Lisp 程序中考虑各种布局。这些函数会考虑面重新映射，如果有问题的面被重新映射，则返回有关重新映射的面的信息。请参阅面重映射。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: default-font-width ¶
+</pre></div>
+<p>此函数返回当前缓冲区默认面所使用字体的平均宽度（以像素为单位），因为该面是为选定帧定义的。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: default-font-height ¶
+</pre></div>
+<p>此函数返回当前缓冲区的默认面所使用的字体的高度（以像素为单位），因为该面是为选定帧定义的。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-font-width &amp;optional window face ¶
+</pre></div>
+<p>此函数返回窗口中面使用的字体的平均宽度（以像素为单位）。指定的窗口必须是活动窗口。如果 nil 或省略，window 默认为选中的窗口，face 默认为 window 中的默认面。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-font-height &amp;optional window face ¶
+</pre></div>
+<p>此函数返回窗口中面使用的字体的高度（以像素为单位）。指定的窗口必须是活动窗口。如果 nil 或省略，window 默认为选中的窗口，face 默认为 window 中的默认面。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.13_条纹.html">条纹</a>, Previous: <a href="40.12.11_字体集.html">字体集</a>, Up: <a href="40.12_面.html">面.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

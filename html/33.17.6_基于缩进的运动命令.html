@@ -1,0 +1,21 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.17.6 基于缩进的运动命令</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">33.17.6 基于缩进的运动命令</h3>
+<div class="nav-panel"><p>Next: <a href="33.18_案例变更.html">案例变更</a>, Previous: <a href="33.17.5_可调制表位.html">可调制表位</a>, Up: <a href="33.17_缩进.html">缩进.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这些主要用于交互使用的命令基于文本中的缩进执行。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: back-to-indentation ¶
+</pre></div>
+<p>此命令将点移动到当前行（即点所在的行）中的第一个非空白字符。它返回零。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: backward-to-indentation &amp;optional arg ¶
+</pre></div>
+<p>此命令将点向后移动 arg 行，然后移动到该行上的第一个非空白字符。它返回零。如果 arg 被省略或为零，则默认为 1。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: forward-to-indentation &amp;optional arg ¶
+</pre></div>
+<p>此命令将点向前移动 arg 行，然后移动到该行上的第一个非空白字符。它返回零。如果 arg 被省略或为零，则默认为 1。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.18_案例变更.html">案例变更</a>, Previous: <a href="33.17.5_可调制表位.html">可调制表位</a>, Up: <a href="33.17_缩进.html">缩进.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

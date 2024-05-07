@@ -1,0 +1,81 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.8.6 杂项事件输入功能</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">22.8.6 杂项事件输入功能</h3>
+<div class="nav-panel"><p>Next: <a href="22.9_特别活动.html">特别活动</a>, Previous: <a href="22.8.5_引用字符输入.html">引用字符输入</a>, Up: <a href="22.8_读数输入.html">读数输入.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍如何在不使用它们的情况下提前查看事件、如何检查待处理的输入以及如何丢弃待处理的输入。另请参阅函数 read-passwd（请参阅读取密码）。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: unread-command-events ¶
+</pre></div>
+<p>此变量保存等待作为命令输入读取的事件列表。事件按照它们在列表中出现的顺序使用，并在使用时一一删除。
+</p>
+<p>该变量是必需的，因为在某些情况下，函数会读取一个事件，然后决定不使用它。将事件存储在此变量中会导致它被命令循环或函数正常处理以读取命令输入。
+</p>
+<p>例如，实现数字前缀参数的函数读取任意数量的数字。当它发现一个非数字事件时，它必须取消读取该事件，以便它可以被命令循环正常读取。同样，增量搜索使用此功能在搜索中未读没有特殊含义的事件，因为这些事件应该退出搜索然后正常执行。
+</p>
+<p>从键序列中提取事件以将它们放入未读命令事件中的可靠且简单的方法是使用 listify-key-sequence（见下文）。
+</p>
+<p>通常，您将事件添加到此列表的前面，以便首先重新读取最近未读的事件。
+</p>
+<p>从此列表中读取的事件通常不会添加到当前命令的键序列（由例如 this-command-keys 返回），因为事件在第一次读取时已经添加了一次。(t . event) 形式的元素强制将事件添加到当前命令的键序列中。
+</p>
+<p>从此列表中读取的元素通常由记录保存功能记录（请参阅记录输入）并在定义键盘宏时（请参阅键盘宏）。但是，表单元素 (no-record . event) 会导致事件正常处理而不记录它。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: listify-key-sequence key ¶
+</pre></div>
+<p>此函数将字符串或向量键转换为单个事件的列表，您可以将其放入未读命令事件中。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: input-pending-p &amp;optional check-timers ¶
+</pre></div>
+<p>此函数确定当前是否有任何命令输入可供读取。它立即返回，如果有可用的输入则返回值 t，否则返回 nil。在极少数情况下，当没有可用输入时，它可能会返回 t。
+</p>
+<p>如果可选参数 check-timers 不为 nil，那么如果没有可用的输入，Emacs 就会运行任何准备好的计时器。请参阅延迟执行的计时器。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: last-input-event ¶
+</pre></div>
+<p>此变量记录最后读取的终端输入事件，无论是作为命令的一部分还是由 Lisp 程序显式读取。
+</p>
+<p>在下面的示例中，Lisp 程序读取字符 1，ASCII 码 49。它成为 last-input-event 的值，而 Ce（我们假设使用 Cx Ce 命令来评估这个表达式）仍然是 last-command 的值-事件。
+</p>
+<div class="lisp">
+<pre class="lisp">(progn (print (read-char))
+       (print last-command-event)
+       last-input-event)
+     -| 49
+     -| 5
+     ⇒ 49
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Macro: while-no-input body… ¶
+</pre></div>
+<p>此构造运行主体表单并返回最后一个表单的值——但前提是没有输入到达。如果在执行主体表单期间有任何输入到达，它将中止它们（工作很像退出）。while-no-input 形式如果被真正的退出中止，则返回 nil，如果因其他输入的到来而中止，则返回 t。
+</p>
+<p>如果身体的一部分将禁止退出绑定到非零，则在这些部分期间输入的到达不会导致中止，直到该部分结束。
+</p>
+<p>如果您希望能够将 body 计算的所有可能值与两种中止条件区分开来，请编写如下代码：
+</p>
+<div class="lisp">
+<pre class="lisp">(while-no-input
+  (list
+    (progn . body)))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Variable: while-no-input-ignore-events ¶
+</pre></div>
+<p>此变量允许设置在无输入时应忽略哪些特殊事件。它是一个事件符号列表（参见事件示例）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: discard-input ¶
+</pre></div>
+<p>此函数丢弃终端输入缓冲区的内容并取消可能在定义过程中的任何键盘宏。它返回零。
+</p>
+<p>在以下示例中，用户可以在开始评估表单后立即键入多个字符。在 sleep-for 完成睡眠后，discard-input 会丢弃在睡眠期间键入的所有字符。
+</p>
+<div class="lisp">
+<pre class="lisp">(progn (sleep-for 2)
+       (discard-input))
+     ⇒ nil
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.9_特别活动.html">特别活动</a>, Previous: <a href="22.8.5_引用字符输入.html">引用字符输入</a>, Up: <a href="22.8_读数输入.html">读数输入.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

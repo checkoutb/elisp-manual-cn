@@ -1,0 +1,11 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>7.2 向后兼容性</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">7.2 向后兼容性</h2>
+<div class="nav-panel"><p>Next: <a href="08_哈希表.html">哈希表</a>, Previous: <a href="07.1_记录功能.html">记录功能</a>, Up: <a href="07_记录.html">记录.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>使用旧版本的不使用记录的 cl-defstruct 编译的代码在新 Emacs 中使用时可能会遇到问题。为了缓解这种情况，Emacs 会检测何时使用旧的 cl-defstruct，并启用一种模式，在该模式中 type-of 处理旧的结构对象，就好像它们是记录一样。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: cl-old-struct-compat-mode arg
+</pre></div>
+<p>如果 arg 为正，则启用与旧式结构的向后兼容性。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="08_哈希表.html">哈希表</a>, Previous: <a href="07.1_记录功能.html">记录功能</a>, Up: <a href="07_记录.html">记录.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

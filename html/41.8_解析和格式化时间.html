@@ -1,0 +1,265 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>41.8 解析和格式化时间</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">41.8 解析和格式化时间</h2>
+<div class="nav-panel"><p>Next: <a href="41.9_处理器运行时间.html">处理器运行时间</a>, Previous: <a href="41.7_时间转换.html">时间转换</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这些函数将时间值转换为字符串中的文本，反之亦然。时间值包括 nil、数字和 Lisp 时间戳（请参阅时间）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: date-to-time string ¶
+</pre></div>
+<p>该函数解析时间字符串并返回相应的 Lisp 时间戳。参数字符串应表示日期时间，并且应采用 parse-time-string 识别的形式之一（见下文）。如果字符串缺少明确的时区信息，则此函数采用世界时间。操作系统限制时间和区域值的范围。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: parse-time-string string ¶
+</pre></div>
+<p>此函数将时间字符串解析为以下形式的列表：
+</p>
+<div class="lisp">
+<pre class="lisp">(sec min hour day mon year dow dst tz)
+</pre></div>
+<p>此列表的格式与 decode-time 接受的格式相同（请参阅时间转换），并在此处进行了更详细的描述。任何无法从输入中确定的 dst 元素设置为 -1，任何其他未知元素设置为 nil。参数字符串应类似于 RFC 822（或更高版本）或 ISO 8601 字符串，例如 <code>Fri, 25 Mar 2016 16:24:56 +0100</code> 或 <code>1998-09-12T12:21:54-0200</code> ，但此函数也将尝试解析格式不太好的时间字符串。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: iso8601-parse string ¶
+</pre></div>
+<p>对于更严格的函数（在输入无效时会出错），可以使用此函数代替。它可以解析 ISO 8601 标准的所有变体，因此除了上述格式之外，它还解析诸如 <code>1998W45-3</code> （周数）和 <code>1998-245</code> （序数天数）之类的内容。要解析持续时间，有 iso8601-parse-duration，要解析间隔，有 iso8601-parse-interval。所有这些函数都返回解码的时间结构，除了最后一个，它返回其中的三个（开始、结束和持续时间）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: format-time-string format-string &amp;optional time zone ¶
+</pre></div>
+<p>此函数根据格式字符串将时间（或当前时间，如果时间省略或为零）转换为字符串。转换使用时区规则 zone，默认为当前时区规则。请参阅时区规则。参数格式字符串可能包含 ’%’ 序列，表示替换部分时间。以下是 ’%’ 序列的含义表：
+</p>
+<div class="lisp">
+<pre class="lisp">‘%a’
+</pre></div>
+<p>这代表星期几的缩写名称。
+</p><div class="lisp">
+<pre class="lisp">‘%A’
+</pre></div>
+<p>这代表星期几的全名。
+</p><div class="lisp">
+<pre class="lisp">‘%b’
+</pre></div>
+<p>这代表月份的缩写名称。
+</p><div class="lisp">
+<pre class="lisp">‘%B’
+</pre></div>
+<p>这代表月份的全名。
+</p><div class="lisp">
+<pre class="lisp">‘%c’
+</pre></div>
+<p>这是 <code>%x %X</code> 的同义词。
+</p><div class="lisp">
+<pre class="lisp">‘%C’
+</pre></div>
+<p>这代表世纪，即年份除以 100，向零截断。默认字段宽度为 2。
+</p><div class="lisp">
+<pre class="lisp">‘%d’
+</pre></div>
+<p>这代表一个月中的一天，零填充。
+</p><div class="lisp">
+<pre class="lisp">‘%D’
+</pre></div>
+<p>这是 ’%m/%d/%y’ 的同义词。
+</p><div class="lisp">
+<pre class="lisp">‘%e’
+</pre></div>
+<p>这代表月份的日期，空白填充。
+</p><div class="lisp">
+<pre class="lisp">‘%F’
+</pre></div>
+<p>这代表 ISO 8601 日期格式，类似于 ’%+4Y-%m-%d’，除了任何标志或字段宽度覆盖 <code>+</code> 和（减去 6 后） <code>4</code> 。
+</p><div class="lisp">
+<pre class="lisp">‘%g’ ¶
+</pre></div>
+<p>这代表对应于当前 ISO 周数的没有世纪 (00–99) 的年份。ISO 周从星期一开始，到星期日结束。如果一个 ISO 周从一年开始并在另一年结束，那么关于 ’%g’ 将产生哪一年的规则很复杂，此处不再赘述；  但是，一般来说，如果一周中的大部分时间都在结束年份，则 ’%g’ 将产生那一年。
+</p><div class="lisp">
+<pre class="lisp">‘%G’
+</pre></div>
+<p>这代表与当前 ISO 周数对应的带有世纪的年份。
+</p><div class="lisp">
+<pre class="lisp">‘%h’
+</pre></div>
+<p>这是 ’%b’ 的同义词。
+</p><div class="lisp">
+<pre class="lisp">‘%H’
+</pre></div>
+<p>这代表小时 (00–23)。
+</p><div class="lisp">
+<pre class="lisp">‘%I’
+</pre></div>
+<p>这代表小时 (01–12)。
+</p><div class="lisp">
+<pre class="lisp">‘%j’
+</pre></div>
+<p>这代表一年中的某一天 (001–366)。
+</p><div class="lisp">
+<pre class="lisp">‘%k’
+</pre></div>
+<p>这代表小时（0-23），空白填充。
+</p><div class="lisp">
+<pre class="lisp">‘%l’
+</pre></div>
+<p>这代表小时（1-12），空白填充。
+</p><div class="lisp">
+<pre class="lisp">‘%m’
+</pre></div>
+<p>这代表月份 (01–12)。
+</p><div class="lisp">
+<pre class="lisp">‘%M’
+</pre></div>
+<p>这代表分钟 (00–59)。
+</p><div class="lisp">
+<pre class="lisp">‘%n’
+</pre></div>
+<p>这代表换行符。
+</p><div class="lisp">
+<pre class="lisp">‘%N’
+</pre></div>
+<p>这代表纳秒 (000000000–999999999)。要要求更少的数字，请使用 ’%3N’ 表示毫秒，使用 ’%6N’ 表示微秒等。任何多余的数字都将被丢弃，不进行四舍五入。
+</p><div class="lisp">
+<pre class="lisp">‘%p’
+</pre></div>
+<p>这代表 <code>AM</code> 或 <code>PM</code> ，视情况而定。
+</p><div class="lisp">
+<pre class="lisp">‘%q’
+</pre></div>
+<p>这代表日历季度 (1-4)。
+</p><div class="lisp">
+<pre class="lisp">‘%r’
+</pre></div>
+<p>这是 ’%I:%M:%S %p’ 的同义词。
+</p><div class="lisp">
+<pre class="lisp">‘%R’
+</pre></div>
+<p>这是 ’%H:%M’ 的同义词。
+</p><div class="lisp">
+<pre class="lisp">‘%s’
+</pre></div>
+<p>这代表自纪元以来的整数秒数。
+</p><div class="lisp">
+<pre class="lisp">‘%S’
+</pre></div>
+<p>这代表秒（在支持闰秒的平台上为 00-59 或 00-60）。
+</p><div class="lisp">
+<pre class="lisp">‘%t’
+</pre></div>
+<p>这代表制表符。
+</p><div class="lisp">
+<pre class="lisp">‘%T’
+</pre></div>
+<p>这是 ’%H:%M:%S’ 的同义词。
+</p><div class="lisp">
+<pre class="lisp">‘%u’
+</pre></div>
+<p>这代表一周中的数字天 (1–7)。星期一是第 1 天。
+</p><div class="lisp">
+<pre class="lisp">‘%U’
+</pre></div>
+<p>这代表一年中的第几周（01-52），假设星期从星期日开始。
+</p><div class="lisp">
+<pre class="lisp">‘%V’
+</pre></div>
+<p>根据 ISO 8601，这代表一年中的一周。
+</p><div class="lisp">
+<pre class="lisp">‘%w’
+</pre></div>
+<p>这代表数字星期几 (0–6)。星期日是第 0 天。
+</p><div class="lisp">
+<pre class="lisp">‘%W’
+</pre></div>
+<p>这代表一年中的一周（01-52），假设周从星期一开始。
+</p><div class="lisp">
+<pre class="lisp">‘%x’
+</pre></div>
+<p>这具有特定于语言环境的含义。在默认语言环境（名为 <code>C</code> ）中，它等同于 <code>%D</code> 。
+</p><div class="lisp">
+<pre class="lisp">‘%X’
+</pre></div>
+<p>这具有特定于语言环境的含义。在默认语言环境（名为 <code>C</code> ）中，它等同于 <code>%T</code> 。
+</p><div class="lisp">
+<pre class="lisp">‘%y’
+</pre></div>
+<p>这代表没有世纪的年份（00-99）。
+</p><div class="lisp">
+<pre class="lisp">‘%Y’
+</pre></div>
+<p>这代表有世纪的年份。
+</p><div class="lisp">
+<pre class="lisp">‘%Z’
+</pre></div>
+<p>这代表时区缩写（例如， <code>EST</code> ）。
+</p><div class="lisp">
+<pre class="lisp">‘%z’
+</pre></div>
+<p>这代表时区数字偏移量。 <code>z</code> 前面可以有一个、两个或三个冒号；  如果简单的 <code>%z</code> 代表 <code>-0500</code> ，那么 <code>%:z</code> 代表 <code>-05:00</code> ， <code>%::z</code> 代表 <code>-05:00:00</code> ， <code>%::</code>  :z’ 与 ’%::z’ 类似，只是它抑制了 ’:00’ 的尾随实例，因此在同一个示例中它代表 ’-05’。
+</p><div class="lisp">
+<pre class="lisp">‘%%’
+</pre></div>
+<p>这代表单个 <code>％</code> 。
+</p>
+<p>一个或多个标志字符可以紧跟在 ’%’ 之后。’0’ 用零填充，” 用零填充，并且在多于四位的非负年份数字之前放置 ”，’_’ 用空格填充，’-’ 禁止填充，’^’ 大写字母， ’#’ 反转字母的大小写。
+</p>
+<p>您还可以为这些 ’%’ 序列中的任何一个指定字段宽度和填充类型。这与在 printf 中一样工作：您将字段宽度写为 ’%’ 序列中的数字，在任何标志之后。例如，’%S’ 指定从分钟开始的秒数；  ’%03S’ 表示用零填充到 3 个位置，’%<em>_3S</em>’ 用空格填充到 3 个位置。普通的 ’%3S’ 用零填充，因为这就是 ’%S’ 通常填充到两个位置的方式。
+</p>
+<p>当在 <code>%</code> 序列中的任何标志和字段宽度之后使用时，字符 <code>E</code> 和 <code>O</code> 充当修饰符。’E’ 指定使用当前语言环境的替代版本的日期和时间。例如，在日本语言环境中，%Ex 可能会生成基于日本天皇在位的日期格式。在 <code>%Ec</code> 、 <code>%EC</code> 、 <code>%Ex</code> 、 <code>%EX</code> 、 <code>%Ey</code> 和 <code>%EY</code> 中允许使用 <code>E</code> 。
+</p>
+<p>’O’ 表示使用当前语言环境的替代数字表示，而不是普通的十进制数字。大多数字母都允许这样做，所有输出数字的字母。
+</p>
+<p>为了帮助调试程序，无法识别的 ’%’ 序列代表它们自己并按原样输出。程序不应依赖这种行为，因为未来版本的 Emacs 可能会将新的 ’%’ 序列识别为扩展。
+</p>
+<p>该函数使用 C 库函数 strftime（参见 GNU C 库参考手册中的格式化日历时间）来完成大部分工作。为了与该函数进行通信，它首先将时间和区域转换为内部形式；  操作系统限制时间和区域值的范围。此函数还使用由 locale-coding-system 指定的编码系统对格式字符串进行编码（请参阅区域设置）；  在 strftime 返回结果字符串后，此函数使用相同的编码系统对字符串进行解码。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: format-seconds format-string seconds ¶
+</pre></div>
+<p>该函数根据 format-string 将其参数 seconds 转换为由年、日、小时等组成的字符串。参数格式字符串可能包含控制转换的 <code>%</code> 序列。以下是 ’%’ 序列的含义表：
+</p>
+<div class="lisp">
+<pre class="lisp">‘%y’
+</pre></div>
+<div class="lisp">
+<pre class="lisp">‘%Y’
+</pre></div>
+<p>365 天年的整数。
+</p><div class="lisp">
+<pre class="lisp">‘%d’
+</pre></div>
+<div class="lisp">
+<pre class="lisp">‘%D’
+</pre></div>
+<p>整数天数。
+</p><div class="lisp">
+<pre class="lisp">‘%h’
+</pre></div>
+<div class="lisp">
+<pre class="lisp">‘%H’
+</pre></div>
+<p>整数小时数。
+</p><div class="lisp">
+<pre class="lisp">‘%m’
+</pre></div>
+<div class="lisp">
+<pre class="lisp">‘%M’
+</pre></div>
+<p>整数分钟数。
+</p><div class="lisp">
+<pre class="lisp">‘%s’
+</pre></div>
+<div class="lisp">
+<pre class="lisp">‘%S’
+</pre></div>
+<p>秒数。如果使用了可选的’,’参数，它是一个浮点数，’,’后面的数字指定使用多少个小数。’%,2s’ 表示 <code>使用两位小数</code> 。
+</p><div class="lisp">
+<pre class="lisp">‘%z’
+</pre></div>
+<p>非打印控制标志。使用时，其他说明符必须按大小递减的顺序给出，即年在天之前，小时在分钟之前，等等。在’%z’左侧的结果字符串中不会产生任何内容，直到第一个非遇到零转换。例如 emacs-uptime 使用的默认格式（见 emacs-uptime） <code>%Y, %D, %H, %M, %z%S</code>  表示总是会产生秒数，但会产生年数、天数、小时和分钟仅在非零时才会显示。
+</p><div class="lisp">
+<pre class="lisp">‘%%’
+</pre></div>
+<p>产生一个文字 ’%’。
+</p>
+<p>大写格式序列除了数字之外还产生单位，小写格式只产生数字。
+</p>
+<p>您还可以通过在 <code>％</code> 后面加上数字来指定字段宽度；  较短的数字将用空格填充。宽度请求零填充之前的可选时间段。例如， <code>%.3Y</code> 可能会产生 <code>004 年</code> 。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="41.9_处理器运行时间.html">处理器运行时间</a>, Previous: <a href="41.7_时间转换.html">时间转换</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

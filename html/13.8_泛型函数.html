@@ -1,0 +1,178 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>13.8 泛型函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">13.8 泛型函数</h2>
+<div class="nav-panel"><p>Next: <a href="13.9_访问函数单元格内容.html">访问函数单元格内容</a>, Previous: <a href="13.7_匿名函数.html">匿名函数</a>, Up: <a href="13_函数.html">函数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>使用 defun 定义的函数对其参数的类型和预期值有一组硬编码假设。例如，如果使用任何其他类型的值（例如向量或字符串）调用其参数值（数字或数字列表）的函数，该函数将失败或发出错误信号。发生这种情况是因为函数的实现没有准备好处理设计期间假定的类型以外的类型。
+</p>
+<p>相比之下，面向对象的程序使用多态函数：一组具有相同名称的专用函数，每个函数都是为一组特定的参数类型编写的。实际调用哪个函数是在运行时根据实际参数的类型决定的。
+</p>
+<p>Emacs 提供对多态性的支持。与其他 Lisp 环境一样，尤其是 Common Lisp 及其 Common Lisp 对象系统 (CLOS)，这种支持基于通用函数。Emacs 泛型函数紧跟 CLOS，包括使用相似的名称，所以如果您有 CLOS 的经验，本节的其余部分听起来会非常熟悉。
+</p>
+<p>泛型函数通过定义其名称和参数列表来指定抽象操作，但（通常）没有实现。几个特定类的参数的实际实现由方法提供，这些方法应该单独定义。实现泛型函数的每个方法都与泛型函数具有相同的名称，但是方法的定义通过专门化泛型函数定义的参数来指示它可以处理哪些类型的参数。这些论点专家可能或多或少是具体的。例如，字符串类型比更一般的类型（如序列）更具体。
+</p>
+<p>请注意，与基于消息的 OO 语言（例如 C++ 和 Simula）不同，实现泛型函数的方法不属于一个类，它们属于它们实现的泛型函数。
+</p>
+<p>调用泛型函数时，它通过将调用者传递的实际参数与每个方法的参数专用器进行比较来选择适用的方法。如果调用的实际参数与方法的专用程序兼容，则该方法适用。如果有不止一种方法适用，则使用某些规则将它们组合在一起，如下所述，然后组合处理调用。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: cl-defgeneric name arguments [documentation] [options-and-methods…] &amp;rest body ¶
+</pre></div>
+<p>此宏定义具有指定名称和参数的通用函数。如果 body 存在，它提供默认实现。如果存在文档（应该总是存在），它会以 (:documentation docstring) 的形式指定通用函数的文档字符串。可选的选项和方法可以是以下形式之一：
+</p>
+<div class="lisp">
+<pre class="lisp">(:method [qualifiers…] args &amp;rest body)
+</pre></div>
+<p>声明表格，如声明表格中所述。
+</p><div class="lisp">
+<pre class="lisp">(:argument-precedence-order &amp;rest args)
+</pre></div>
+<p>这种形式会影响组合适用方法的排序顺序。通常，在组合过程中比较两个方法时，从左到右检查方法参数，并且参数专门化器更具体的第一个方法将排在另一个之前。这种形式定义的顺序会覆盖它，并且根据它们在这种形式中的顺序检查参数，而不是从左到右。
+</p><div class="lisp">
+<pre class="lisp">(:method [qualifiers…] args &amp;rest body)
+</pre></div>
+<p>这种形式定义了一个类似 cl-defmethod 的方法。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: cl-defmethod name [extra] [qualifier] arguments [&amp;context (expr spec)…] &amp;rest [docstring] body ¶
+</pre></div>
+<p>该宏定义了名为 name 的通用函数的特定实现。实现代码由 body 给出。如果存在，则 docstring 是该方法的文档字符串。参数列表在实现泛型函数的所有方法中必须相同，并且必须与该函数的参数列表匹配，提供形式为 (arg spec) 的参数专用器，其中 arg 是在 cl 中指定的参数名称-defgeneric 调用，而 spec 是以下特殊形式之一：
+</p>
+<div class="lisp">
+<pre class="lisp">type
+</pre></div>
+<p>此专用程序要求参数为给定类型，是下面描述的类型层次结构中的类型之一。
+</p><div class="lisp">
+<pre class="lisp">(eql object)
+</pre></div>
+<p>此专门工具要求参数是给定对象的 eql。
+</p><div class="lisp">
+<pre class="lisp">(head object)
+</pre></div>
+<p>参数必须是一个 cons 单元格，其 car 是 eql 到 object。
+</p><div class="lisp">
+<pre class="lisp">struct-type
+</pre></div>
+<p>参数必须是使用 cl-defstruct 定义的名为 struct-type 的类的实例（请参阅 GNU Emacs Lisp 的 Common Lisp Extensions 中的结构）或其子类之一。
+</p>
+<p>方法定义可以使用新的参数列表关键字 &amp;context，它引入了额外的专门工具，在方法运行时测试环境。此关键字应出现在必需参数列表之后，但在任何 &amp;rest 或 &amp;optional 关键字之前。&amp;context 专用器看起来很像常规参数专用器（expr spec），除了 expr 是要在当前上下文中评估的表达式，而 spec 是要比较的值。例如，&amp;context (overwrite-mode (eql t)) 将使该方法仅在打开 overwrite-mode 时适用。&amp;context 关键字后面可以跟任意数量的上下文特化器。因为上下文特化器不是泛型函数的参数签名的一部分，所以它们可以在不需要它们的方法中被省略。
+</p>
+<p>类型专用器 (arg type) 可以指定以下列表中的系统类型之一。当指定父类型时，类型是其更具体的子类型中的任何一个的参数，以及孙子、孙子孙等也将是兼容的。
+</p>
+<div class="lisp">
+<pre class="lisp">integer
+</pre></div>
+<p>父类型：数字。
+</p><div class="lisp">
+<pre class="lisp">number
+</pre></div>
+<div class="lisp">
+<pre class="lisp">null
+</pre></div>
+<p>父类型：符号
+</p><div class="lisp">
+<pre class="lisp">symbol
+</pre></div>
+<div class="lisp">
+<pre class="lisp">string
+</pre></div>
+<p>父类型：数组。
+</p><div class="lisp">
+<pre class="lisp">array
+</pre></div>
+<p>父类型：序列。
+</p><div class="lisp">
+<pre class="lisp">cons
+</pre></div>
+<p>父类型：列表。
+</p><div class="lisp">
+<pre class="lisp">list
+</pre></div>
+<p>父类型：序列。
+</p><div class="lisp">
+<pre class="lisp">marker
+</pre></div>
+<div class="lisp">
+<pre class="lisp">overlay
+</pre></div>
+<div class="lisp">
+<pre class="lisp">float
+</pre></div>
+<p>父类型：数字。
+</p><div class="lisp">
+<pre class="lisp">window-configuration
+</pre></div>
+<div class="lisp">
+<pre class="lisp">process
+</pre></div>
+<div class="lisp">
+<pre class="lisp">window
+</pre></div>
+<div class="lisp">
+<pre class="lisp">subr
+</pre></div>
+<div class="lisp">
+<pre class="lisp">compiled-function
+</pre></div>
+<div class="lisp">
+<pre class="lisp">buffer
+</pre></div>
+<div class="lisp">
+<pre class="lisp">char-table
+</pre></div>
+<p>父类型：数组。
+</p><div class="lisp">
+<pre class="lisp">bool-vector
+</pre></div>
+<p>父类型：数组。
+</p><div class="lisp">
+<pre class="lisp">vector
+</pre></div>
+<p>父类型：数组。
+</p><div class="lisp">
+<pre class="lisp">frame
+</pre></div>
+<div class="lisp">
+<pre class="lisp">hash-table
+</pre></div>
+<div class="lisp">
+<pre class="lisp">font-spec
+</pre></div>
+<div class="lisp">
+<pre class="lisp">font-entity
+</pre></div>
+<div class="lisp">
+<pre class="lisp">font-object
+</pre></div>
+<p>可选的额外元素，表示为 ’:extra string’，允许您为相同的专用符和限定符添加更多方法，以字符串区分。
+</p>
+<p>可选限定符允许组合几种适用的方法。如果不存在，则定义的方法是主要方法，负责为专用参数提供泛型函数的主要实现。您还可以使用以下值之一作为限定符来定义辅助方法：
+</p>
+<div class="lisp">
+<pre class="lisp">:before
+</pre></div>
+<p>此辅助方法将在主要方法之前运行。更准确地说，所有 :before 方法都将在主要方法之前以最具体的优先顺序运行。
+</p><div class="lisp">
+<pre class="lisp">:after
+</pre></div>
+<p>此辅助方法将在主要方法之后运行。更准确地说，所有这些方法都将在主要方法之后以最具体的最后顺序运行。
+</p><div class="lisp">
+<pre class="lisp">:around
+</pre></div>
+<p>此辅助方法将代替主要方法运行。最具体的此类方法将在任何其他方法之前运行。此类方法通常使用 cl-call-next-method（如下所述）来调用其他辅助或主要方法。
+</p>
+<p>使用 cl-defmethod 定义的函数不能通过向它们添加交互形式来实现交互，即命令（参见定义命令）。如果您需要多态命令，我们建议定义一个普通命令，该命令调用通过 cl-defgeneric 和 cl-defmethod 定义的多态函数。
+</p>
+<p>每次调用泛型函数时，它都会通过组合为函数定义的适用方法来构建将处理此调用的有效方法。寻找适用方法并产生有效方法的过程称为调度。适用的方法是那些其所有特工都与调用的实际参数兼容的方法。由于所有参数都必须与专用器兼容，因此它们都决定了方法是否适用。显式特化多个参数的方法称为多分派方法。
+</p>
+<p>适用的方法按它们组合的顺序排序。最左边的参数专门化器是最具体的方法将按顺序排在第一位。（指定 :argument-precedence-order 作为 cl-defmethod 的一部分会覆盖它，如上所述。）如果方法主体调用 cl-call-next-method，则将运行下一个最具体的方法。如果有适用的 :around 方法，它们中最具体的将首先运行；  它应该调用 cl-call-next-method 来运行任何不太具体的 :around 方法。接下来，:before 方法按照它们的特殊性顺序运行，然后是主要方法，最后是 :after 方法，按照它们特殊性的相反顺序运行。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: cl-call-next-method &amp;rest args ¶
+</pre></div>
+<p>当从主方法或 :around 辅助方法的词法体中调用时，为同一个泛型函数调用下一个适用的方法。通常，它被调用时不带参数，这意味着使用与调用方法相同的参数来调用下一个适用的方法。否则，将使用指定的参数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: cl-next-method-p ¶
+</pre></div>
+<p>当从主方法或 :around 辅助方法的词法体中调用此函数时，如果有下一个方法要调用，则返回非 nil。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="13.9_访问函数单元格内容.html">访问函数单元格内容</a>, Previous: <a href="13.7_匿名函数.html">匿名函数</a>, Up: <a href="13_函数.html">函数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

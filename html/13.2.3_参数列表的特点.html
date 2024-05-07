@@ -1,0 +1,48 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>13.2.3 参数列表的特点</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">13.2.3 参数列表的特点</h3>
+<div class="nav-panel"><p>Next: <a href="13.2.4_函数的文档字符串.html">函数的文档字符串</a>, Previous: <a href="13.2.2_一个简单的_Lambda_表达式示例.html">一个简单的_Lambda_表达式示例</a>, Up: <a href="13.2_Lambda_表达式.html">Lambda_表达式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>我们的简单示例函数 (lambda (abc) (+ abc)) 指定了三个参数变量，因此必须用三个参数调用它：如果你试图只用两个参数或四个参数调用它，你会得到一个错误的数字-of-arguments 错误（请参阅错误）。
+</p>
+<p>编写一个允许省略某些参数的函数通常很方便。例如，函数 substring 接受三个参数——字符串、开始索引和结束索引——但如果省略第三个参数，则默认为字符串的长度。某些函数也可以方便地接受不定数量的参数，就像函数 list 和 + 所做的那样。
+</p>
+<p>要指定在调用函数时可以省略的可选参数，只需在可选参数之前包含关键字 &amp;optional 即可。要指定零个或多个额外参数的列表，请在最后一个参数之前包含关键字 &amp;rest。
+</p>
+<p>因此，参数列表的完整语法如下：
+</p><div class="lisp">
+<pre class="lisp">(required-vars…
+ [&amp;optional [optional-vars…]]
+ [&amp;rest rest-var])
+</pre></div>
+<p>方括号表示 &amp;optional 和 &amp;rest 子句以及它们后面的变量是可选的。
+</p>
+<p>对函数的调用需要每个必需变量的一个实际参数。可能有零个或多个可选变量的实际参数，除此之外不能有任何实际参数，除非 lambda 列表使用 &amp;rest。在这种情况下，可能有任意数量的额外实际参数。
+</p>
+<p>如果省略了可选变量和剩余变量的实际参数，则它们始终默认为 nil。该函数无法区分 nil 的显式参数和省略的参数。但是，函数体可以自由地将 nil 视为其他一些有意义值的缩写。这就是子字符串的作用；  nil 作为 substring 的第三个参数意味着使用提供的字符串的长度。
+</p>
+<p>Common Lisp 注意：Common Lisp 允许函数指定在省略可选参数时使用的默认值；  Emacs Lisp 总是使用 nil。Emacs Lisp 不支持提供的-p 变量来告诉您参数是否被显式传递。
+</p>
+<p>例如，如下所示的参数列表：
+</p>
+<div class="lisp">
+<pre class="lisp">(a b &amp;optional c d &amp;rest e)
+</pre></div>
+<p>将 a 和 b 绑定到前两个实际参数，这是必需的。如果提供了一个或两个以上参数，则 c 和 d 分别绑定到它们；  前四个之后的任何参数都被收集到一个列表中，并且 e 绑定到该列表。因此，如果只有两个参数，c、d 和 e 为零；  如果两个或三个参数，d 和 e 为零；  如果四个参数或更少，e 为零。请注意，恰好为 e 提供了具有显式 nil 参数的五个参数将导致该 nil 参数作为具有一个元素 (nil) 的列表传递，与 e 的任何其他单个值一样。
+</p>
+<p>没有办法在可选参数后面加上必需的参数——这是没有意义的。要了解为什么必须如此，假设示例中的 c 是可选的，而 d 是必需的。假设给出了三个实际参数；  第三个参数用于哪个变量？  它将用于 c 还是 d？  人们可以为这两种可能性争论不休。同样，在 &amp;rest 参数之后再添加任何参数（必需的或可选的）也没有任何意义。
+</p>
+<p>以下是参数列表和正确调用的一些示例：
+</p>
+<div class="lisp">
+<pre class="lisp">(funcall (lambda (n) (1+ n))        ; One required:
+         1)                         ; requires exactly one argument.
+     ⇒ 2
+(funcall (lambda (n &amp;optional n1)   ; One required and one optional:
+           (if n1 (+ n n1) (1+ n))) ; 1 or 2 arguments.
+         1 2)
+     ⇒ 3
+(funcall (lambda (n &amp;rest ns)       ; One required and one rest:
+           (+ n (apply '+ ns)))     ; 1 or more arguments.
+         1 2 3 4 5)
+     ⇒ 15
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="13.2.4_函数的文档字符串.html">函数的文档字符串</a>, Previous: <a href="13.2.2_一个简单的_Lambda_表达式示例.html">一个简单的_Lambda_表达式示例</a>, Up: <a href="13.2_Lambda_表达式.html">Lambda_表达式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

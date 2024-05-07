@@ -1,0 +1,122 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>19.1.10 调试器的内部结构</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">19.1.10 调试器的内部结构</h3>
+<div class="nav-panel"><p>Next: <a href="19.2_调试.html">调试</a>, Previous: <a href="19.1.9_调用调试器.html">调用调试器</a>, Up: <a href="19.1_Lisp_调试器.html">Lisp_调试器.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍调试器内部使用的函数和变量。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: debugger ¶
+</pre></div>
+<p>这个变量的值是调用调试器的函数。它的值必须是任意数量的参数的函数，或者更典型的是函数的名称。这个函数应该调用某种调试器。变量的默认值为调试。
+</p>
+<p>Lisp 传递给函数的第一个参数表明了它被调用的原因。参数的约定在调试的描述中有详细说明（请参阅调用调试器）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: backtrace ¶
+</pre></div>
+<p>此函数打印当前活动的 Lisp 函数调用的跟踪。跟踪与调试将在 <strong>Backtrace</strong> 缓冲区中显示的跟踪相同。返回值始终为零。
+</p>
+<p>在以下示例中，Lisp 表达式显式调用回溯。这会将回溯打印到流标准输出，在这种情况下，它是缓冲区 <code>回溯输出</code> 。
+</p>
+<p>回溯的每一行代表一个函数调用。该行显示了函数，然后是函数参数值的列表（如果它们都是已知的）；  如果它们仍在计算中，则该行由一个包含函数及其未评估参数的列表组成。长列表或深度嵌套的结构可能会被省略。
+</p><div class="lisp">
+<pre class="lisp">(with-output-to-temp-buffer "backtrace-output"
+  (let ((var 1))
+    (save-excursion
+      (setq var (eval '(progn
+                         (1+ var)
+                         (list 'testing (backtrace))))))))
+
+     ⇒ (testing nil)
+
+
+----------- Buffer: backtrace-output ------------
+  backtrace()
+  (list 'testing (backtrace))
+
+  (progn ...)
+  eval((progn (1+ var) (list 'testing (backtrace))))
+  (setq ...)
+  (save-excursion ...)
+  (let ...)
+  (with-output-to-temp-buffer ...)
+  eval((with-output-to-temp-buffer ...))
+  eval-last-sexp-1(nil)
+
+  eval-last-sexp(nil)
+  call-interactively(eval-last-sexp)
+----------- Buffer: backtrace-output ------------
+</pre></div>
+<div class="lisp">
+<pre class="lisp">User Option: debugger-stack-frame-as-list ¶
+</pre></div>
+<p>如果此变量不为零，则回溯的每个堆栈帧都显示为列表。这旨在以特殊形式不再与常规函数调用在视觉上有所不同为代价来提高回溯的可读性。
+</p>
+<p>使用 debugger-stack-frame-as-list 非 nil 时，上面的示例如下所示：
+</p><div class="lisp">
+<pre class="lisp">----------- Buffer: backtrace-output ------------
+  (backtrace)
+  (list 'testing (backtrace))
+
+  (progn ...)
+  (eval (progn (1+ var) (list 'testing (backtrace))))
+  (setq ...)
+  (save-excursion ...)
+  (let ...)
+  (with-output-to-temp-buffer ...)
+  (eval (with-output-to-temp-buffer ...))
+  (eval-last-sexp-1 nil)
+
+  (eval-last-sexp nil)
+  (call-interactively eval-last-sexp)
+----------- Buffer: backtrace-output ------------
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Variable: debug-on-next-call ¶
+</pre></div>
+<p>如果这个变量不为零，它表示在下一次 eval、apply 或 funcall 之前调用调试器。进入调试器会将 debug-on-next-call 设置为 nil。
+</p>
+<p>调试器中的 d 命令通过设置此变量来工作。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: backtrace-debug level flag ¶
+</pre></div>
+<p>此函数将堆栈帧级别的 debug-on-exit 标志设置为堆栈的下一级，并为其赋予 value 标志。如果 flag 不为零，这将导致在该帧稍后退出时进入调试器。即使是通过该帧的非本地退出也会进入调试器。
+</p>
+<p>此函数仅供调试器使用。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: command-debug-status ¶
+</pre></div>
+<p>该变量记录当前交互命令的调试状态。每次以交互方式调用命令时，此变量都绑定为 nil。调试器可以设置此变量，以便在同一命令调用期间为将来的调试器调用留下信息。
+</p>
+<p>使用这个变量而不是普通的全局变量的优点是数据永远不会转移到后续的命令调用中。
+</p>
+<p>此变量已过时，将在未来版本中删除。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: backtrace-frame frame-number &amp;optional base ¶
+</pre></div>
+<p>函数 backtrace-frame 旨在用于 Lisp 调试器。它返回有关在堆栈帧帧号级别向下发生的计算的信息。
+</p>
+<p>如果该框架尚未评估参数，或者是特殊形式，则值为 (nil function arg-forms…)。
+</p>
+<p>如果该框架已评估其参数并已调用其函数，则返回值为 (t function arg-values…)。
+</p>
+<p>在返回值中，function 是作为评估列表的 CAR 提供的任何内容，或者在宏调用的情况下是 lambda 表达式。如果函数具有 &amp;rest 参数，则表示为列表 arg-values 的尾部。
+</p>
+<p>如果指定了基数，则帧数相对于函数为基数的最顶层帧计数。
+</p>
+<p>如果 frame-number 超出范围，则 backtrace-frame 返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: mapbacktrace function &amp;optional base ¶
+</pre></div>
+<p>函数 mapbacktrace 为回溯中的每一帧调用一次函数，从函数为 base 的第一帧开始（如果 base 省略或为零，则从顶部开始）。
+</p>
+<p>使用四个参数调用函数：evald、func、args 和 flags。
+</p>
+<p>如果一个框架还没有评估它的参数或者是一个特殊的形式，那么 evald 是 nil 并且 args 是一个形式的列表。
+</p>
+<p>如果一个框架已经评估了它的参数并调用了它的函数，那么 evald 是 t 并且 args 是一个值列表。flags 是当前帧的属性列表：目前，唯一支持的属性是 :debug-on-exit，如果设置了堆栈帧的 debug-on-exit 标志，则为 t。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="19.2_调试.html">调试</a>, Previous: <a href="19.1.9_调用调试器.html">调用调试器</a>, Up: <a href="19.1_Lisp_调试器.html">Lisp_调试器.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

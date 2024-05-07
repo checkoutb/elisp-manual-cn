@@ -1,0 +1,34 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>42.4 创建和维护包档案</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">42.4 创建和维护包档案</h2>
+<div class="nav-panel"><p>Next: <a href="42.5_与存档_Web_服务器的接口.html">与存档_Web_服务器的接口</a>, Previous: <a href="42.3_多文件包.html">多文件包</a>, Up: <a href="42_准备分发的Lisp代码.html">准备分发的Lisp代码.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>通过包菜单，用户可以从包档案中下载包。此类档案由变量 package-archives 指定，其默认值列出了托管在 GNU ELPA 和非 GNU ELPA 上的档案。本节介绍如何设置和维护包存档。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: package-archives ¶
+</pre></div>
+<p>此变量的值是 Emacs 包管理器识别的包存档列表。
+</p>
+<p>每个 alist 元素对应一个档案，并且应该具有格式 (id . location)，其中 id 是档案的名称（一个字符串），而 location 是它的基本位置（一个字符串）。
+</p>
+<p>如果基本位置以 <code>http:</code> 或 <code>https:</code> 开头，则将其视为 HTTP(S) URL，并通过 HTTP(S) 从该存档下载包（默认 GNU 存档就是这种情况） .
+</p>
+<p>否则，基本位置应该是目录名称。在这种情况下，Emacs 通过普通文件访问从这个归档中检索包。这样的本地档案主要用于测试。
+</p>
+<p>包存档只是一个目录，其中存储了包文件和相关文件。如果您希望存档可通过 HTTP 访问，则此目录必须可供 Web 服务器访问；  请参阅与存档 Web 服务器的接口。
+</p>
+<p>设置和更新包存档的一种便捷方法是通过 package-x 库。这包含在 Emacs 中，但默认情况下不加载；  输入 Mx load-library RET package-x RET 来加载它，或者添加 (require ’package-x) 到你的 init 文件。请参阅 GNU Emacs 手册中的 Lisp 库。
+</p>
+<p>创建存档后，请记住，除非它位于 package-archives 中，否则无法在 Package Menu 界面中访问它。
+</p>
+<p>维护公共包档案需要一定程度的责任。当 Emacs 用户从您的存档安装包时，这些包可能会导致 Emacs 以安装用户的权限运行任意代码。（这对于一般的 Emacs 代码来说是正确的，而不仅仅是对于包。）所以你应该确保你的归档得到很好的维护并保持托管系统的安全。
+</p>
+<p>提高包安全性的一种方法是使用加密密钥对其进行签名。如果您生成了一个私有/公共 gpg 密钥对，您可以使用 gpg 对包进行签名，如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">gpg -ba -o file.sig file
+</pre></div>
+<p>对于单文件包，file 是包 Lisp 文件；  对于多文件包，它是包 tar 文件。您也可以以相同的方式签署存档的内容文件。使 .sig 文件在与包相同的位置可用。您还应该使您的公钥可供人们下载；  例如，通过将其上传到密钥服务器，例如 <a href="https://pgp.mit.edu/。当人们从您的档案中安装软件包时，他们可以使用您的公钥来验证签名">https://pgp.mit.edu/。当人们从您的档案中安装软件包时，他们可以使用您的公钥来验证签名</a>。
+</p>
+<p>对这些事项的完整解释超出了本手册的范围。有关加密密钥和签名的更多信息，请参阅 The GNU Privacy Guard Manual 中的 GnuPG。Emacs 带有一个到 GNU Privacy Guard 的接口，请参阅 Emacs EasyPG 助手手册中的 EasyPG。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="42.5_与存档_Web_服务器的接口.html">与存档_Web_服务器的接口</a>, Previous: <a href="42.3_多文件包.html">多文件包</a>, Up: <a href="42_准备分发的Lisp代码.html">准备分发的Lisp代码.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

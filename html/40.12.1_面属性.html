@@ -1,0 +1,174 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.12.1 面属性</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.12.1 面属性</h3>
+<div class="nav-panel"><p>Next: <a href="40.12.2_定义面.html">定义面</a>, Previous: <a href="40.12_面.html">面</a>, Up: <a href="40.12_面.html">面.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>面属性决定了面的视觉外观。下表列出了所有面属性、它们的可能值及其效果。
+</p>
+<p>除了下面给出的值之外，每个面属性都可以具有未指定的值。这个特殊值意味着面不直接指定该属性。一个未指定的属性告诉 Emacs 引用父面（参见下面的描述 :inherit 属性）；  或者，如果失败，则到底层面（请参阅显示面）。默认面必须指定所有属性。
+</p>
+<p>其中一些属性仅在某些类型的显示器上有意义。如果您的显示器无法处理某个属性，则该属性将被忽略。
+</p>
+<div class="lisp">
+<pre class="lisp">:family
+</pre></div>
+<p>字体系列名称（字符串）。有关字体系列的更多信息，请参阅 GNU Emacs 手册中的字体。函数 font-family-list（见下文）返回可用家族名称的列表。
+</p><div class="lisp">
+<pre class="lisp">:foundry
+</pre></div>
+<p>由 :family 属性（字符串）指定的字体系列的字体代工厂的名称。请参阅 GNU Emacs 手册中的字体。
+</p><div class="lisp">
+<pre class="lisp">:width
+</pre></div>
+<p>相对字符宽度。这应该是超压缩、超压缩、压缩、半压缩、正常、半扩展、扩展、超扩展或超扩展的符号之一。
+</p><div class="lisp">
+<pre class="lisp">:height
+</pre></div>
+<p>字体的高度。在最简单的情况下，这是一个以 1/10 点为单位的整数。
+</p>
+<p>该值也可以是浮点数或函数，它指定相对于底层面的高度（请参阅显示面）。浮点值指定底层面高度的缩放量。使用一个参数调用函数值，即底层面的高度，并返回新面的高度。如果函数被传递一个整数参数，它必须返回一个整数。
+</p>
+<p>必须使用整数指定默认面的高度；  不允许使用浮点和函数值。
+</p><div class="lisp">
+<pre class="lisp">:weight
+</pre></div>
+<p>字体粗细——符号之一（从最密集到最微弱）超粗体、超粗体、粗体、半粗体、正常、半轻、轻、超轻或超轻。在支持可变亮度文本的文本终端上，任何大于正常的粗细都显示为超亮，而任何小于正常的粗细都显示为半亮。
+</p><div class="lisp">
+<pre class="lisp">:slant
+</pre></div>
+<p>字体倾斜 - 斜体、斜体、正常、反斜体或反斜体符号之一。在支持可变亮度文本的文本终端上，倾斜的文本显示为半亮。
+</p><div class="lisp">
+<pre class="lisp">:foreground
+</pre></div>
+<p>前景色，一个字符串。该值可以是系统定义的颜色名称，也可以是十六进制颜色规范。请参阅颜色名称。在黑白显示器上，某些灰色阴影由点画图案实现。
+</p><div class="lisp">
+<pre class="lisp">:distant-foreground
+</pre></div>
+<p>替代前景色，一个字符串。这就像 :foreground 但仅当背景颜色接近本应使用的前景时，颜色才用作前景。例如，这在标记文本（即区域面）时很有用。如果文本具有区域面可见的前景，则使用该前景。如果前景靠近区域面背景，则使用 :distant-foreground 代替，以便文本可读。
+</p><div class="lisp">
+<pre class="lisp">:background
+</pre></div>
+<p>背景颜色，一个字符串。该值可以是系统定义的颜色名称，也可以是十六进制颜色规范。请参阅颜色名称。
+</p><div class="lisp">
+<pre class="lisp">:underline
+</pre></div>
+<p>字符是否应该加下划线，以及以什么方式。:underline 属性的可能值是：
+</p>
+<div class="lisp">
+<pre class="lisp">:overline
+</pre></div>
+<p>不要下划线。
+</p><div class="lisp">
+<pre class="lisp">:strike-through
+</pre></div>
+<p>用脸部的前景色划线。
+</p><div class="lisp">
+<pre class="lisp">:box
+</pre></div>
+<p>是否应围绕字符绘制框、其颜色、框线的宽度和 3D 外观。以下是 :box 属性的可能值及其含义：
+</p>
+<div class="lisp">
+<pre class="lisp">nil
+</pre></div>
+<p>不要画一个盒子。
+</p><div class="lisp">
+<pre class="lisp">t
+</pre></div>
+<p>用前景色绘制一个宽度为 1 的框。
+</p><div class="lisp">
+<pre class="lisp">color
+</pre></div>
+<p>用颜色颜色画一个宽度为 1 的线框。
+</p><div class="lisp">
+<pre class="lisp">(:line-width (vwidth . hwidth) :color color :style style)
+</pre></div>
+<p>这样，您可以明确指定框的所有方面。vwidth 和 hwidth 值分别指定要绘制的垂直线和水平线的宽度；  它们默认为 (1 . 1)。负的水平或垂直宽度 -n 表示绘制一条宽度为 n 的线，占据底层文本的空间，从而避免字符高度或宽度的任何增加。为简化起见，可以仅使用单个数字 n 而不是列表来指定宽度，这种情况等效于 ((abs n) . n)。
+</p>
+<p>值样式指定是否绘制 3D 框。如果它是释放按钮，则该框看起来像未按下的 3D 按钮。如果它是按下按钮，则该框看起来像被按下的 3D 按钮。如果它是 nil、flat-button 或省略，则使用普通的 2D 框。
+</p>
+<p>值 color 指定要绘制的颜色。默认为 3D 框和平面按钮的面的背景颜色，以及其他框的面的前景色。
+</p>
+<div class="lisp">
+<pre class="lisp">:inverse-video
+</pre></div>
+<p>字符是否应该被覆盖，以及用什么颜色。如果值为 t，则覆盖使用面的前景色。如果该值是字符串，则上划线使用该颜色。值 nil 表示不上划线。
+</p><div class="lisp">
+<pre class="lisp">:stipple
+</pre></div>
+<p>字符是否应该被删除，以及用什么颜色。该值的使用与 :overline 类似。
+</p><div class="lisp">
+<pre class="lisp">:font
+</pre></div>
+<p>是否应围绕字符绘制框、其颜色、框线的宽度和 3D 外观。以下是 :box 属性的可能值及其含义：
+</p>
+<div class="lisp">
+<pre class="lisp">nil
+</pre></div>
+<p>不要画一个盒子。
+</p><div class="lisp">
+<pre class="lisp">t
+</pre></div>
+<p>用前景色绘制一个宽度为 1 的框。
+</p><div class="lisp">
+<pre class="lisp">color
+</pre></div>
+<p>用颜色颜色画一个宽度为 1 的线框。
+</p><div class="lisp">
+<pre class="lisp">(:color color :style style)
+</pre></div>
+<p>这样，您可以明确指定框的所有方面。vwidth 和 hwidth 值分别指定要绘制的垂直线和水平线的宽度；  它们默认为 (1 . 1)。负的水平或垂直宽度 -n 表示绘制一条宽度为 n 的线，占据底层文本的空间，从而避免字符高度或宽度的任何增加。为简化起见，可以仅使用单个数字 n 而不是列表来指定宽度，这种情况等效于 ((abs n) . n)。
+</p>
+<p>值样式指定是否绘制 3D 框。如果它是释放按钮，则该框看起来像未按下的 3D 按钮。如果它是按下按钮，则该框看起来像被按下的 3D 按钮。如果它是 nil、flat-button 或省略，则使用普通的 2D 框。
+</p>
+<p>值 color 指定要绘制的颜色。默认为 3D 框和平面按钮的面的背景颜色，以及其他框的面的前景色。
+</p>
+<div class="lisp">
+<pre class="lisp">:inverse-video
+</pre></div>
+<p>字符是否应以反向视频显示。该值应为 t（是）或 nil（否）。
+</p><div class="lisp">
+<pre class="lisp">:stipple
+</pre></div>
+<p>背景点画，位图。
+</p>
+<p>值可以是字符串；  这应该是包含外部格式 X 位图数据的文件的名称。该文件位于变量 x-bitmap-file-path 中列出的目录中。
+</p>
+<p>或者，该值可以直接指定位图，带有表格的列表（宽度高度数据）。这里，宽度和高度以像素为单位指定大小，数据是包含位图原始位的字符串，逐行。每行占用字符串中的 (width + 7) / 8 个连续字节（为了获得最佳结果，应该是单字节字符串）。这意味着每一行总是占据至少一个完整的字节。
+</p>
+<p>如果值为 nil，则表示不使用点画图案。
+</p>
+<p>通常不需要设置点画属性，因为它会自动用于处理某些灰色阴影。
+</p><div class="lisp">
+<pre class="lisp">:font
+</pre></div>
+<p>用于显示面的字体。它的值应该是一个字体对象或一个字体集。如果它是一个字体对象，它指定了面用来显示 ASCII 字符的字体。有关字体对象、字体规范和字体实体的信息，请参阅低级字体表示。有关字体集的信息，请参阅字体集。
+</p>
+<p>当使用 set-face-attribute 或 set-face-font 指定此属性时（请参阅 Face Attribute Functions），您还可以提供字体规范、字体实体或字符串。Emacs 将这些值转换为适当的字体对象，并将该字体对象存储为实际的属性值。如果你指定一个字符串，字符串的内容应该是一个字体名称（参见 GNU Emacs 手册中的字体）；  如果字体名称是包含通配符的 XLFD，Emacs 会选择第一个匹配这些通配符的字体。指定此属性还会更改 :family、:foundry、:width、:height、:weight 和 :slant 属性的值。
+</p><div class="lisp">
+<pre class="lisp">:inherit
+</pre></div>
+<p>要从中继承属性的面的名称，或面名称的列表。继承面的属性会像底层面一样合并到面中，优先级高于底层面（请参阅显示面）。如果未指定要继承的面，则将其视为 nil，因为 Emacs 从不合并 :inherit 属性。如果使用面列表，则列表中较早面的属性会覆盖后面面的属性。
+</p><div class="lisp">
+<pre class="lisp">:extend
+</pre></div>
+<p>此面是否会超出行尾并影响行尾和窗口边缘之间的空白区域的显示。值应该是 t 以使用此面显示行尾和窗口边缘之间的空白空间，或者 nil 不使用此面作为行尾和窗口边缘之间的空间。当 Emacs 合并几个面以显示超出行尾的空白空间时，只有那些具有 :extend 非 nil 的面会被合并。默认情况下，只有少数面，特别是区域，具有此属性集。此属性与其他属性的不同之处在于，当主题没有为面指定显式值时，将继承由 defface 定义的原始面定义的值（请参阅定义面）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: font-family-list &amp;optional frame ¶
+</pre></div>
+<p>此函数返回可用字体系列名称的列表。可选参数 frame 指定显示文本的框架；  如果为 nil，则使用选定的帧。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: underline-minimum-offset ¶
+</pre></div>
+<p>此变量指定显示下划线文本时基线和下划线之间的最小距离（以像素为单位）。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: x-bitmap-file-path ¶
+</pre></div>
+<p>此变量为 :stipple 属性指定用于搜索位图文件的目录列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: bitmap-spec-p object ¶
+</pre></div>
+<p>如果 object 是有效的位图规范，则返回 t，适合与 :stipple 一起使用（见上文）。否则返回 nil 。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.12.2_定义面.html">定义面</a>, Previous: <a href="40.12_面.html">面</a>, Up: <a href="40.12_面.html">面.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

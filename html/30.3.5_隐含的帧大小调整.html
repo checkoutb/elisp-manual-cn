@@ -1,0 +1,23 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>30.3.5 隐含的帧大小调整</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">30.3.5 隐含的帧大小调整</h3>
+<div class="nav-panel"><p>Next: <a href="30.4_帧参数.html">帧参数</a>, Previous: <a href="30.3.4_帧大小.html">帧大小</a>, Up: <a href="30.3_帧几何.html">帧几何.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>默认情况下，Emacs 尝试保持帧文本区域的行数和列数不变，例如，切换菜单或工具栏、更改其默认字体或设置任何滚动条的宽度。这意味着在这种情况下，Emacs 必须要求窗口管理器调整帧窗口的大小以适应大小变化。
+</p>
+<p>有时，这种隐含的帧调整大小可能是不需要的，例如，当一个帧被最大化或全屏时（默认情况下它被关闭）。通常，用户可以使用以下选项禁用隐式调整大小：
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: frame-inhibit-implied-resize ¶
+</pre></div>
+<p>如果此选项为零，则更改帧的字体、菜单栏、工具栏、内部边框、边缘或滚动条可能会调整其外部帧的大小，以保持其文本区域的列数或行数不变。如果此选项为 t，则不会进行此类调整大小。
+</p>
+<p>该选项的值也可以是帧参数列表。在这种情况下，对于出现在此列表中的参数的更改，将禁止隐式调整大小。此选项当前处理的参数是字体、字体后端、内部边框宽度、菜单栏线和工具栏线。
+</p>
+<p>更改滚动条宽度、滚动条高度、垂直滚动条、水平滚动条、左边缘和右边缘帧参数中的任何一个都会被处理，就好像帧只包含一个实时窗口一样。这意味着，例如，如果此选项为 nil，则在包含多个并排窗口的帧上删除垂直滚动条会将外部帧宽度缩小一个滚动条的宽度，如果此选项为 t 或列表，则保持不变包含垂直滚动条。
+</p>
+<p>Lucid、Motif 和 MS-Windows 的默认值是 (tab-bar-lines tool-bar-lines)（这意味着在那里添加/删除工具或标签栏不会改变外框高度），（标签栏-lines) 在所有其他窗口系统上，包括 GTK+（这意味着更改上面列出的任何参数，除了 tab-bar-lines 可能会更改外框的大小），否则 t（这意味着外框大小当没有窗口系统支持时，永远不会隐式更改）。
+</p>
+<p>请注意，当一个帧不足以容纳上面列出的任何参数的更改时，Emacs 可能会尝试放大帧，即使此选项为非零。
+</p>
+<p>另请注意，窗口管理器在更改外部菜单或工具栏占用的行数时通常不会要求调整帧的大小。通常，当用户水平缩小帧时会发生这种 <code>环绕</code> ，从而无法显示其菜单或工具栏的所有元素。它们也可能是由于主模式的改变改变了菜单或工具栏的项目数。任何此类换行都可能隐式更改帧文本区域的行数，并且不受此选项设置的影响。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="30.4_帧参数.html">帧参数</a>, Previous: <a href="30.3.4_帧大小.html">帧大小</a>, Up: <a href="30.3_帧几何.html">帧几何.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

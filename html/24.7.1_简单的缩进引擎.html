@@ -1,0 +1,371 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.7.1 简单的缩进引擎</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">24.7.1 简单的缩进引擎</h3>
+<div class="nav-panel"><p>Next: <a href="24.8_桌面保存模式.html">桌面保存模式</a>, Previous: <a href="24.7_代码自动缩进.html">代码自动缩进</a>, Up: <a href="24.7_代码自动缩进.html">代码自动缩进.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>SMIE 是一个提供通用导航和缩进引擎的包。基于使用运算符优先语法的非常简单的解析器，它允许主要模式将 Lisp 的基于 sexp 的导航扩展到非 Lisp 语言，并提供简单易用但可靠的自动缩进。
+</p>
+<p>与编译器中使用的一些更常见的技术相比，运算符优先语法是一种非常原始的解析技术。它具有以下特点：其解析能力非常有限，并且在很大程度上无法检测语法错误，但它具有算法高效且能够向前和向后解析的优点。在实践中，这意味着 SMIE 可以将其用于基于反向解析的缩进，它可以提供 forward-sexp 和 back-sexp 功能，并且它自然会在语法不正确的代码上工作，而无需任何额外的努力。不利的一面是，这也意味着大多数编程语言无法使用 SMIE 正确解析，至少在不诉诸一些特殊技巧的情况下无法正确解析（参见 Living With a Weak Parser）。
+</p>
+<p>SMIE 设置和功能
+</p>
+<ol>
+<li>
+24.7.1.1 SMIE 设置和功能
+
+
+<p>SMIE 旨在成为结构导航和各种其他功能的一站式商店，这些功能依赖于代码的句法结构，特别是自动缩进。主要入口点是 smie-setup，这是一个通常在设置主模式时调用的函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: smie-setup grammar rules-function &amp;rest keywords ¶
+</pre></div>
+<p>设置 SMIE 导航和缩进。语法是smie-prec2-&gt;grammar生成的语法表。rules-function 是一组用于 smie-rules-function 的缩进规则。关键字是附加参数，可以包括以下关键字：
+</p>
+<p>:forward-token fun：指定要使用的正向词法分析器。
+:backward-token fun：指定要使用的反向词法分析器。
+</p>
+<p>调用此函数足以使诸如 forward-sexp、backward-sexp 和 transpose-sexps 之类的命令能够正确处理结构元素，而不仅仅是已经由语法表处理的成对括号。例如，如果提供的语法足够精确，则 transpose-sexps 可以正确转置 + 运算符的两个参数，同时考虑到语言的优先规则。
+</p>
+<p>调用 smie-setup 也足以使 TAB 缩进以预期的方式工作，扩展 blink-matching-paren 以应用于像 begin…end 这样的元素，并提供一些可以在主模式键盘映射中绑定的命令。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: smie-close-block ¶
+</pre></div>
+<p>此命令关闭最近打开（但尚未关闭）的块。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: smie-down-list &amp;optional arg ¶
+</pre></div>
+<p>此命令类似于 down-list，但它也注意括号以外的标记的嵌套，例如 begin…end。
+</p>
+</li><li>
+24.7.1.2 运算符优先级文法
+
+
+<p>SMIE 的优先语法只是给每个标记一对优先级：左优先和右优先。如果令牌 T1 的右优先级小于令牌 T2 的左优先级，我们说 T1 &lt; T2。阅读此 &lt; 的一种好方法是作为一种括号：如果我们找到 … T1 某物 T2 … 那么应该将其解析为 … T1 (某物 T2 … 而不是 … T1 某物) T2 …. 如果我们有 T1 &gt; T2，则后一种解释将是这种情况。如果我们有 T1 = T2，这意味着令牌 T2 在相同的句法结构中跟随令牌 T1，所以通常我们有 <code>开始</code> = <code>结束</code> 。这样的优先级对足以表达中缀运算符的左结合性或右结合性、括号等标记的嵌套以及许多其他情况。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: smie-prec2-&gt;grammar table ¶
+</pre></div>
+<p>此函数采用 prec2 语法表并返回适合在 smie-setup 中使用的 alist。prec2 表本身就是由以下函数之一构建的。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: smie-merge-prec2s &amp;rest tables ¶
+</pre></div>
+<p>这个函数需要几个 prec2 表并将它们合并到一个新的 prec2 表中。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: smie-precs-&gt;prec2 precs ¶
+</pre></div>
+<p>此函数从优先级 precs 表构建 prec2 表。precs 应该是一个列表，按优先级排序（例如 <code>+</code> 将在 <code>*</code> 之前），形式为 (assoc op …) 的元素，其中每个 op 是充当运算符的标记；  assoc 是它们的关联性，可以是左、右、关联或非关联。给定元素中的所有运算符共享相同的优先级和关联性。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: smie-bnf-&gt;prec2 bnf &amp;rest resolvers ¶
+</pre></div>
+<p>此函数允许您使用 BNF 表示法指定语法。它接受语法的 bnf 描述以及一组冲突解决规则解析器，并返回一个 prec2 表。
+</p>
+<p>bnf 是 (nonterm rhs1 rhs2 …) 形式的非终结定义列表，其中每个 rhs 是终结（又名标记）或非终结的（非空）列表。
+</p>
+<p>并非所有语法都被接受：
+</p>
+<p>rhs 不能是空列表（永远不需要空列表，因为 SMIE 无论如何都允许所有非终结符匹配空字符串）。
+一个 rhs 不能有 2 个连续的非终结符：每对非终结符都需要用一个终结符（又名令牌）分隔。这是运算符优先语法的一个基本限制。
+</p>
+<p>此外，可能会发生冲突：
+</p>
+<p>返回的 prec2 表包含标记对之间的约束，对于任何给定的标记对，只能存在一个约束：T1 &lt; T2、T1 = T2 或 T1 &gt; T2。
+标记可以是开启符（类似于 open-paren）、关闭符（如 close-paren）或两者都不是（例如，中缀运算符或像 <code>else</code> 这样的内部标记）。
+</p>
+<p>优先级冲突可以通过解析器解决，它是一个 precs 表的列表（参见 smie-precs-&gt;prec2）：对于每个优先级冲突，如果这些 precs 表指定了一个特定的约束，那么可以通过使用这个约束来解决冲突，否则报告一个冲突，并且任意选​​择一个冲突的约束，而其他的则被简单地忽略。
+</p>
+</li><li>
+24.7.1.3 定义语言的语法
+
+
+<p>定义语言的 SMIE 语法的常用方法是定义一个新的全局变量，该变量通过给出一组 BNF 规则来保存优先表。例如，类似 Pascal 的小型语言的语法定义可能如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">
+
+(require 'smie)
+(defvar sample-smie-grammar
+  (smie-prec2-&gt;grammar
+   (smie-bnf-&gt;prec2
+
+    '((id)
+      (inst ("begin" insts "end")
+            ("if" exp "then" inst "else" inst)
+            (id ":=" exp)
+            (exp))
+      (insts (insts ";" insts) (inst))
+      (exp (exp "+" exp)
+           (exp "*" exp)
+           ("(" exps ")"))
+      (exps (exps "," exps) (exp)))
+
+    '((assoc ";"))
+    '((assoc ","))
+    '((assoc "+") (assoc "*")))))
+</pre></div>
+<p>需要注意的几点：
+</p>
+<p>上面的语法没有明确提到函数调用的语法：SMIE 将自动允许任何sexp 序列，例如标识符、平衡括号或开始…结束块无论如何都出现在任何地方。
+语法类别 id 没有右手边：这并不意味着它只能匹配空字符串，因为如前所述，任何 sexps 序列都可以出现在任何地方。
+因为非终结符在BNF文法中不能连续出现，所以很难正确处理充当终结符的记号，所以上述文法把 <code>;</code>   作为语句分隔符，SMIE 可以很好地处理。
+序列中使用的分隔符（例如上面的 <code>，</code> 和 <code>;</code> ）最好用 BNF 规则定义，例如 (foo (foo "separator" foo) …)，这些规则会产生优先级冲突，然后通过给它们一个显式的来解决（关联 <code>分隔符</code> ）。
+("(" exps ")") 规则不需要配对括号，因为 SMIE 将配对语法表中标记为具有括号语法的任何字符。这条规则的作用（连同 exps 的定义）是为了明确 <code>，</code> 不应出现在括号之外。
+与其使用单个 precs 表来解决冲突，不如使用多个表，以便让语法的 BNF 部分尽可能指定相对优先级。
+除非有充分的理由偏爱左或右，否则通常最好使用 assoc 将运算符标记为关联。出于这个原因， <code>+</code> 和 <code>*</code> 在上面被定义为 assoc，尽管语言将它们正式定义为左结合。
+</p>
+</li><li>
+24.7.1.4 定义令牌
+
+
+<p>SMIE 带有一个预定义的词法分析器，它以下列方式使用语法表：任何具有单词或符号语法的字符序列都被视为标记，任何具有标点语法的字符序列也是如此。这个默认的词法分析器通常是一个很好的起点，但对于任何给定的语言实际上很少是正确的。例如，它将认为 <code>2,+3</code> 由 3 个标记组成： <code>2</code> 、 <code>,+</code> 和 <code>3</code> 。
+</p>
+<p>要将您的语言的词法规则描述为 SMIE，您需要 2 个函数，一个用于获取下一个标记，另一个用于获取前一个标记。这些函数通常会首先跳过空格和注释，然后查看下一个文本块，看看它是否是一个特殊的标记。如果是这样，它应该跳过令牌并返回此令牌的描述。通常这只是从缓冲区中提取的字符串，但它可以是您想要的任何内容。例如：
+</p><div class="lisp">
+<pre class="lisp">
+
+(defvar sample-keywords-regexp
+  (regexp-opt '("+" "*" "," ";" "&gt;" "&gt;=" "&lt;" "&lt;=" ":=" "=")))
+
+(defun sample-smie-forward-token ()
+  (forward-comment (point-max))
+  (cond
+   ((looking-at sample-keywords-regexp)
+    (goto-char (match-end 0))
+    (match-string-no-properties 0))
+   (t (buffer-substring-no-properties
+       (point)
+       (progn (skip-syntax-forward "w_")
+              (point))))))
+
+(defun sample-smie-backward-token ()
+  (forward-comment (- (point)))
+  (cond
+   ((looking-back sample-keywords-regexp (- (point) 2) t)
+    (goto-char (match-beginning 0))
+    (match-string-no-properties 0))
+   (t (buffer-substring-no-properties
+       (point)
+       (progn (skip-syntax-backward "w_")
+              (point))))))
+</pre></div>
+<p>注意这些词法分析器在括号前面时如何返回空字符串。这是因为 SMIE 会自动处理语法表中定义的括号。更具体地说，如果词法分析器返回 nil 或空字符串，SMIE 会尝试根据语法表将相应的文本作为 sexp 处理。
+</p>
+</li><li>
+24.7.1.5 使用弱解析器
+
+
+<p>SMIE 使用的解析技术不允许令牌在不同的上下文中表现不同。对于大多数编程语言，这表现为转换 BNF 语法时的优先级冲突。
+</p>
+<p>有时，可以通过稍微不同的语法表达来解决这些冲突。例如，对于 Modula-2，BNF 语法看起来很自然，如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">...
+(inst ("IF" exp "THEN" insts "ELSE" insts "END")
+      ("CASE" exp "OF" cases "END")
+      ...)
+(cases (cases "|" cases)
+       (caselabel ":" insts)
+       ("ELSE" insts))
+...
+</pre></div>
+<p>但这会为 <code>ELSE</code> 造成冲突：一方面，IF 规则暗示（除其他外） <code>ELSE</code> = <code>END</code> ；  但另一方面，由于 <code>ELSE</code> 出现在 <code>END</code> 左侧的案例中，我们也有 <code>ELSE</code> &gt; <code>END</code> 。我们可以通过以下方式解决冲突：
+</p>
+<div class="lisp">
+<pre class="lisp">...
+(inst ("IF" exp "THEN" insts "ELSE" insts "END")
+      ("CASE" exp "OF" cases "END")
+      ("CASE" exp "OF" cases "ELSE" insts "END")
+      ...)
+(cases (cases "|" cases) (caselabel ":" insts))
+...
+</pre></div>
+<p>或者
+</p><div class="lisp">
+<pre class="lisp">...
+(inst ("IF" exp "THEN" else "END")
+      ("CASE" exp "OF" cases "END")
+      ...)
+(else (insts "ELSE" insts))
+(cases (cases "|" cases) (caselabel ":" insts) (else))
+...
+</pre></div>
+<p>重新编写语法以尝试解决冲突有其缺点，因为 SMIE 假设语法反映了代码的逻辑结构，因此最好使 BNF 更接近预期的抽象语法树。
+</p>
+<p>其他时候，经过仔细考虑，您可能会得出结论，这些冲突并不严重，只需通过 smie-bnf-&gt;prec2 的解析器参数解决它们。通常这是因为语法只是模棱两可的：冲突不会影响语法所描述的程序集，而只会影响这些程序的解析方式。这通常是分隔符和关联中缀运算符的情况，您希望在其中添加像 ’((assoc "|")) 这样的解析器。另一种可能发生这种情况的情况是经典的悬空 else 问题，您将在其中使用 ’((assoc "else" "then"))。它也可能发生在冲突是真实存在且无法真正解决的情况下，但在实践中不太可能造成问题。
+</p>
+<p>最后，在许多情况下，尽管努力重构语法，一些冲突仍然存在。不要绝望：虽然解析器不能变得更聪明，但你可以让词法分析器变得更聪明。因此，解决方案是查看冲突中涉及的令牌并将这些令牌中的一个拆分为 2 个（或更多）不同的令牌。例如，如果语法需要区分标记 <code>begin</code> 的两种不兼容用法，则根据它找到的 <code>begin</code> 类型，让词法分析器返回不同的标记（比如 <code>begin-fun</code> 和 <code>begin-plain</code> ）。这将区分不同案例的工作推给了词法分析器，因此词法分析器必须查看周围的文本以找到临时线索。
+</p>
+</li><li>
+24.7.1.6 指定缩进规则
+
+
+<p>根据提供的语法，SMIE 将能够提供自动缩进，而无需任何额外的努力。但在实践中，这种默认的缩进样式可能还不够好。您将需要在许多不同的情况下对其进行调整。
+</p>
+<p>SMIE 缩进基于缩进规则应尽可能本地化的理念。为此，它依赖于虚拟缩进的思想，即如果特定程序点位于行首时，它会具有的缩进。当然，如果该程序点确实在行首，那么它的虚拟缩进就是它的当前缩进。但如果不是，则 SMIE 使用缩进算法来计算该点的虚拟缩进。现在在实践中，程序点的虚拟缩进不必与我们在它之前插入换行符时的缩进相同。要了解它是如何工作的，在 C 中 { 之后的缩进的 SMIE 规则并不关心 { 是站在它自己的一行上还是在前一行的末尾。相反，这些不同的情况在缩进规则中处理，该规则决定如何在 { 之前缩进。
+</p>
+<p>另一个重要的概念是 parent 的概念：token 的 parent 是最近的封闭句法结构的头 token。例如，else 的父级是它所属的 if，而 if 的父级又是周围构造的前导标记。命令backward-sexp 从一个标记跳转到它的父级，但有一些警告：对于开启者（启动一个构造的标记，如 if），您需要从标记之前的点开始，而对于其他人，您需要从指向令牌之后。如果它是感兴趣的令牌的开启者，则backward-sexp在父令牌之前的点停止，否则它在父令牌之后的点停止。
+</p>
+<p>SMIE 缩进规则是使用带有两个参数 method 和 arg 的函数指定的，其中 arg 的含义和预期的返回值取决于方法。
+</p>
+<p>方法可以是：
+</p>
+<p>:after，在这种情况下，arg 是一个标记，函数应该返回偏移量以用于 arg 之后的缩进。
+:before，在这种情况下，arg 是一个标记，函数应该返回偏移量以用于缩进 arg 本身。
+:elem，在这种情况下，函数应该返回用于缩进函数参数的偏移量（如果 arg 是符号 arg）或基本缩进步骤（如果 arg 是基本符号）。
+:list-intro，在这种情况下，arg 是一个标记，如果标记后面是表达式列表（不被任何标记分隔）而不是表达式，则函数应该返回非零。
+</p>
+<p>当 arg 是一个标记时，该函数在该标记之前的点被调用。返回值 nil 总是意味着回退到默认行为，因此函数应该为它不期望的参数返回 nil。
+</p>
+<p>偏移量可以是：
+</p>
+<p>nil：使用默认的缩进规则。
+(column .column)：缩进到column column。
+number：按数字偏移，相对于基础令牌，该基础令牌是 :after 的当前令牌及其 :before 的父令牌。
+</p>
+</li><li>
+24.7.1.7 缩进规则的辅助函数
+
+
+<p>SMIE 提供了各种专门设计用于缩进规则功能的功能（如果在其他上下文中使用，其中一些功能会中断）。这些函数都以前缀 smie-rule- 开头。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: smie-rule-bolp ¶
+</pre></div>
+<p>如果当前令牌是行中的第一个，则返回非零。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: smie-rule-hanging-p ¶
+</pre></div>
+<p>如果当前令牌挂起，则返回非零。如果一个令牌是行上的最后一个令牌并且它前面有其他令牌，则该令牌正在挂起：一行上的一个单独的令牌没有挂起。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: smie-rule-next-p &amp;rest tokens ¶
+</pre></div>
+<p>如果下一个标记在标记中，则返回非零。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: smie-rule-prev-p &amp;rest tokens ¶
+</pre></div>
+<p>如果前一个令牌在令牌中，则返回非零。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: smie-rule-parent-p &amp;rest parents ¶
+</pre></div>
+<p>如果当前令牌的父级在父级之间，则返回非零。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: smie-rule-sibling-p ¶
+</pre></div>
+<p>如果当前令牌的父级实际上是兄弟级，则返回非零。例如，当 <code>，</code> 的父级只是前一个 <code>，</code> 时就是这种情况。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: smie-rule-parent &amp;optional offset ¶
+</pre></div>
+<p>返回正确的偏移量以将当前标记与父标记对齐。如果非零，偏移量应该是一个整数，给出一个额外的偏移量来应用。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: smie-rule-separator method ¶
+</pre></div>
+<p>缩进当前标记作为分隔符。
+</p>
+<p>分隔符在这里是指一个标记，其唯一目的是分隔某个封闭句法结构中的各种元素，并且它本身没有任何语义意义（即，它通常不会作为抽象句法树中的节点存在）。
+</p>
+<p>这样的标记应具有关联语法并与其语法父级密切相关。典型的例子是参数列表中的 <code>，</code> （括在括号内），或 <code>;</code>   在指令序列中（包含在 {…} 或 begin…end 块中）。
+</p>
+<p>method 应该是传递给 smie-rules-function 的方法名称。
+</p>
+</li><li>
+24.7.1.8 缩进规则示例
+
+
+<p>下面是一个缩进函数的例子：
+</p>
+<div class="lisp">
+<pre class="lisp">(defun sample-smie-rules (kind token)
+  (pcase (cons kind token)
+    (`(:elem . basic) sample-indent-basic)
+    (`(,_ . ",") (smie-rule-separator kind))
+    (`(:after . ":=") sample-indent-basic)
+    (`(:before . ,(or `"begin" `"(" `"{"))
+     (if (smie-rule-hanging-p) (smie-rule-parent)))
+    (`(:before . "if")
+     (and (not (smie-rule-bolp)) (smie-rule-prev-p "else")
+          (smie-rule-parent)))))
+</pre></div>
+<p>需要注意的几点：
+</p>
+<p>第一种情况表示要使用的基本缩进增量。如果 sample-indent-basic 为 nil，则 SMIE 使用全局设置 smie-indent-basic。主要模式可以设置 smie-indent-basic buffer-locally，但不鼓励这样做。
+标记 <code>，</code> 的规则使 SMIE 在逗号分隔符放在行首时尝试更聪明。它尝试突出分隔符以对齐逗号后的代码；  例如：
+</p>
+<div class="lisp">
+<pre class="lisp">x = longfunctionname (
+        arg1
+      , arg2
+    );
+</pre></div>
+<p>":=" 之后的缩进规则存在，因为否则 SMIE 会将 ":=" 视为中缀运算符，并将右参数与左参数对齐。
+ <code>begin</code> 之前的缩进规则是使用虚拟缩进的一个例子：该规则仅在 <code>begin</code> 挂起时使用，只有当 <code>begin</code> 不在行首时才会发生。因此，在缩进 <code>开始</code> 本身时不使用它，而仅在缩进与该 <code>开始</code> 相关的内容时使用。具体来说，这条规则改变了缩进：
+</p>
+<div class="lisp">
+<pre class="lisp">if x &gt; 0 then begin
+           dosomething(x);
+       end
+</pre></div>
+<p>到
+</p><div class="lisp">
+<pre class="lisp">if x &gt; 0 then begin
+    dosomething(x);
+end
+</pre></div>
+<p>"if" 之前的缩进规则类似于 "begin" 的规则，但目的是将 "else if" 视为一个单元，以便对齐一系列测试而不是将每个测试进一步缩进对。此函数仅在 <code>if</code> 没有放在单独的行上的情况下执行此操作，因此是 smie-rule-bolp 测试。
+</p>
+<p>如果我们知道 "else" 总是与其 "if" 对齐并且总是在行首，我们可以使用更有效的规则：
+</p><div class="lisp">
+<pre class="lisp">((equal token "if")
+ (and (not (smie-rule-bolp))
+      (smie-rule-prev-p "else")
+      (save-excursion
+        (sample-smie-backward-token)
+        (cons 'column (current-column)))))
+</pre></div>
+<p>这个公式的优点是它重用了前一个 <code>else</code> 的缩进，而不是一直回到序列的第一个 <code>if</code> 。
+</p>
+</li><li>
+24.7.1.9 自定义缩进
+
+
+<p>如果您使用的是由 SMIE 提供缩进的模式，您可以自定义缩进以满足您的喜好。您可以基于每个模式（使用选项 smie-config）或每个文件（使用文件局部变量规范中的函数 smie-config-local）来执行此操作。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: smie-config ¶
+</pre></div>
+<p>此选项允许您基于每个模式自定义缩进。它是一个具有表单元素的列表（模式.规则）。有关规则的精确形式，请参阅变量的文档；  但您可能会发现使用命令 smie-config-guess 更容易。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: smie-config-guess ¶
+</pre></div>
+<p>此命令尝试制定适当的设置以产生您喜欢的缩进样式。只需在访问以您的样式缩进的文件时调用该命令。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: smie-config-save ¶
+</pre></div>
+<p>使用 smie-config-guess 后调用此命令，以保存您的设置以供将来的会话使用。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: smie-config-show-indent &amp;optional move ¶
+</pre></div>
+<p>此命令显示用于缩进当前行的规则。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: smie-config-set-indent ¶
+</pre></div>
+<p>此命令添加一个本地规则来调整当前行的缩进。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: smie-config-local rules ¶
+</pre></div>
+<p>此函数将规则添加为当前缓冲区的缩进规则。这些添加到由 smie-config 选项定义的任何特定于模式的规则。要为特定文件指定自定义缩进规则，请在文件的局部变量中添加一个条目，格式为：eval: (smie-config-local ’(rules))。
+</p></li></ol>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="24.8_桌面保存模式.html">桌面保存模式</a>, Previous: <a href="24.7_代码自动缩进.html">代码自动缩进</a>, Up: <a href="24.7_代码自动缩进.html">代码自动缩进.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>12.10.4 使用词法绑定</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">12.10.4 使用词法绑定</h3>
+<div class="nav-panel"><p>Next: <a href="12.10.5_转换为词法绑定.html">转换为词法绑定</a>, Previous: <a href="12.10.3_词法绑定.html">词法绑定</a>, Up: <a href="12.10_变量绑定的作用域规则.html">变量绑定的作用域规则.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在加载 Emacs Lisp 文件或评估 Lisp 缓冲区时，如果缓冲区局部变量 lexical-binding 为非 nil，则启用词法绑定：
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: lexical-binding ¶
+</pre></div>
+<p>如果这个缓冲区局部变量不为 nil，Emacs Lisp 文件和缓冲区将使用词法绑定而不是动态绑定进行评估。（但是，特殊变量仍然是动态绑定的；见下文。）如果为 nil，则动态绑定用于所有局部变量。此变量通常为整个 Emacs Lisp 文件设置为文件局部变量（请参阅文件局部变量）。请注意，与其他此类变量不同，此变量必须在文件的第一行中设置。 
+</p>
+<p>当使用 eval 调用直接评估 Emacs Lisp 代码时，如果 eval 的词法参数不为零，则启用词法绑定。见评估。
+</p>
+<p>在 Lisp Interaction 和 IELM 模式下也启用了词法绑定，用于 <strong>scratch</strong> 和 <strong>ielm</strong> 缓冲区，以及通过 M-: (eval-expression) 评估表达式以及处理 –eval 命令行选项时Emacs（参见 The GNU Emacs Manual 中的 Action Arguments）和 emacsclient（参见 The GNU Emacs Manual 中的 emacsclient Options）。
+</p>
+<p>即使启用了词法绑定，某些变量仍将继续被动态绑定。这些被称为特殊变量。使用 defvar、defcustom 或 defconst 定义的每个变量都是特殊变量（请参阅定义全局变量）。所有其他变量都受词法绑定。
+</p>
+<p>使用不带值的 defvar，可以将变量动态绑定到一个文件中，或者仅在文件的一部分中，同时仍以词法方式将其绑定到其他地方。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">(let (_)
+  (defvar x)      ; Let-bindings of x will be dynamic within this let.
+  (let ((x -99))  ; This is a dynamic binding of x.
+    (defun get-dynamic-x ()
+      x)))
+
+(let ((x 'lexical)) ; This is a lexical binding of x.
+  (defun get-lexical-x ()
+    x))
+
+(let (_)
+  (defvar x)
+  (let ((x 'dynamic))
+    (list (get-lexical-x)
+          (get-dynamic-x))))
+    ⇒ (lexical dynamic)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: special-variable-p symbol ¶
+</pre></div>
+<p>如果 symbol 是特殊变量（即，它具有 defvar、defcustom 或 defconst 变量定义），则此函数返回非 nil。否则，返回值为 nil。
+</p>
+<p>请注意，由于这是一个函数，它只能为永久特殊的变量返回非 nil，但不能为仅在当前词法范围内特殊的变量返回非 nil。 
+</p>
+<p>不支持在函数中使用特殊变量作为形式参数。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="12.10.5_转换为词法绑定.html">转换为词法绑定</a>, Previous: <a href="12.10.3_词法绑定.html">词法绑定</a>, Up: <a href="12.10_变量绑定的作用域规则.html">变量绑定的作用域规则.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

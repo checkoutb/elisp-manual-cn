@@ -1,0 +1,32 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>15.5 应用自定义</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">15.5 应用自定义</h2>
+<div class="nav-panel"><p>Next: <a href="15.6_自定义主题.html">自定义主题</a>, Previous: <a href="15.4.5_定义新类型.html">定义新类型</a>, Up: <a href="15_自定义设置.html">自定义设置.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>以下函数分别负责安装用户对变量和面的自定义设置。当用户在 Customize 界面中调用 <code>Save for future sessions</code> 时，通过将 custom-set-variables 和/或 custom-set-faces 表单写入自定义文件来生效，以便在 Emacs 下次启动时进行评估。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: custom-set-variables &amp;rest args ¶
+</pre></div>
+<p>此函数安装由 args 指定的变量自定义。args 中的每个参数都应具有以下形式
+</p>
+<div class="lisp">
+<pre class="lisp">(var expression [now [request [comment]]])
+</pre></div>
+<p>var 是一个变量名（一个符号），而 expression 是一个计算结果为所需自定义值的表达式。
+</p>
+<p>如果在这个 custom-set-variables 调用之前已经评估了 var 的 defcustom 形式，则立即评估表达式，并将变量的值设置为结果。否则，表达式将存储到变量的保存值属性中，以便在调用相关的 defcustom 时进行评估（通常在定义该变量的库加载到 Emacs 时）。
+</p>
+<p>now、request 和 comment 条目仅供内部使用，可以省略。现在，如果非零，则意味着现在设置变量的值，即使尚未评估变量的 defcustom 形式。request 是要立即加载的功能列表（请参阅功能）。注释是描述自定义的字符串。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: custom-set-faces &amp;rest args ¶
+</pre></div>
+<p>此函数安装由 args 指定的面部自定义。args 中的每个参数都应具有以下形式
+</p>
+<div class="lisp">
+<pre class="lisp">(face spec [now [comment]])
+</pre></div>
+<p>face 是一个面名称（一个符号），而 spec 是该面的自定义面规范（请参阅定义面）。
+</p>
+<p>now 和 comment 条目仅供内部使用，可以省略。现在，如果非零，则意味着现在安装面规范，即使尚未评估去面形式。注释是描述自定义的字符串。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="15.6_自定义主题.html">自定义主题</a>, Previous: <a href="15.4.5_定义新类型.html">定义新类型</a>, Up: <a href="15_自定义设置.html">自定义设置.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>29.8 删除窗口</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">29.8 删除窗口</h2>
+<div class="nav-panel"><p>Next: <a href="29.9_重新组合窗口.html">重新组合窗口</a>, Previous: <a href="29.7_分割窗口.html">分割窗口</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>删除窗口会将其从 <code>帧</code> ( <code>frame</code> )的窗口树中删除。如果窗口是活动窗口，它会从屏幕上消失。如果窗口是一个内部窗口，它的子窗口也会被删除。
+</p>
+<p>即使在一个窗口被删除之后，它仍然作为一个 Lisp 对象存在，直到不再有对它的引用。可以通过恢复保存的窗口配置来撤销窗口删除（请参阅窗口配置）。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: delete-window &amp;optional window ¶
+</pre></div>
+<p>此函数从显示中删除窗口并返回 nil。如果 window 被省略或为零，则默认为选定的窗口。
+</p>
+<p>如果删除窗口将不会在窗口树中留下更多窗口（例如，如果它是 <code>帧</code> ( <code>frame</code> )中唯一的活动窗口）或窗口 <code>帧</code> ( <code>frame</code> )上的所有剩余窗口都是侧窗口（请参阅侧窗口），则会发出错误信号。如果窗口是原子窗口的一部分（请参阅原子窗口），则此函数尝试删除该原子窗口的根。
+</p>
+<p>默认情况下，窗口占用的空间将分配给其相邻的兄弟窗口之一（如果有）。但是，如果变量 window-combination-resize 不为零，则空间将按比例分布在同一窗口组合中的任何剩余窗口中。请参阅重新组合 Windows。
+</p>
+<p>只要变量 ignore-window-parameters 为 nil，此函数的行为可能会被 window 的窗口参数改变。如果 delete-window 窗口参数的值为 t，此函数将忽略所有其他窗口参数。否则，如果 delete-window window 参数的值是一个函数，则使用参数 window 调用该函数，以代替 delete-window 的通常操作。请参见窗口参数。
+</p>
+<p>当 delete-window 删除其 <code>帧</code> ( <code>frame</code> )的选定窗口时，它必须使另一个窗口成为该 <code>帧</code> ( <code>frame</code> )的新选定窗口。以下选项允许配置选择哪个窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: delete-window-choose-selected ¶
+</pre></div>
+<p>此选项允许指定在 delete-window 删除先前选定的窗口后哪个窗口应成为 <code>帧</code> ( <code>frame</code> )的选定窗口。可能的选择是
+</p>
+<p>mru（默认）选择该 <code>帧</code> ( <code>frame</code> )上最近使用的窗口。
+pos 选择包含该帧上先前选择的窗口的点的帧坐标的窗口。
+nil 选择该帧上的第一个窗口（由 frame-first-window 返回的窗口）。
+</p>
+<p>只有当该帧上的所有其他窗口也将该参数设置为非零值时，才会选择具有非零 no-other-window 参数的窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: delete-other-windows &amp;optional window ¶
+</pre></div>
+<p>此功能使窗口填充其 <code>帧</code> ( <code>frame</code> )，并根据需要删除其他窗口。如果 window 被省略或为零，则默认为选定的窗口。如果窗口是侧窗（请参阅侧窗），则会发出错误信号。如果窗口是原子窗口的一部分（请参阅原子窗口），则此函数会尝试使该原子窗口的根填充其 <code>帧</code> ( <code>frame</code> )。返回值为零。
+</p>
+<p>只要变量 ignore-window-parameters 为 nil，此函数的行为可能会被 window 的窗口参数改变。如果 delete-other-windows 窗口参数的值为 t，则此函数忽略所有其他窗口参数。否则，如果 delete-other-windows 窗口参数的值是一个函数，则使用参数 window 调用该函数，以代替 delete-other-windows 的通常操作。请参见窗口参数。
+</p>
+<p>此外，如果 ignore-window-parameters 为 nil，则此函数不会删除 no-delete-other-windows 参数为非 nil 的任何窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: delete-windows-on &amp;optional buffer-or-name frame ¶
+</pre></div>
+<p>此函数通过在这些窗口上调用 delete-window 来删除所有显示缓冲区或名称的窗口。buffer-or-name 应该是一个缓冲区，或者是一个缓冲区的名称；  如果省略或为零，则默认为当前缓冲区。如果没有显示指定缓冲区的窗口，则此函数不执行任何操作。如果指定的缓冲区是迷你缓冲区，则会发出错误信号。
+</p>
+<p>如果有一个显示缓冲区的专用窗口，并且该窗口是其 <code>帧</code> ( <code>frame</code> )上的唯一窗口，则此功能还会删除该 <code>帧</code> ( <code>frame</code> )，如果它不是终端上的唯一 <code>帧</code> ( <code>frame</code> )。
+</p>
+<p>可选参数 frame 指定要对哪些帧进行操作：
+</p>
+<p>nil 表示对所有帧进行操作。
+t 表示对选定的帧进行操作。
+可见意味着对所有可见帧进行操作。
+0 表示对所有可见或图标化的帧进行​​操作。
+帧表示对该帧进行操作。
+</p>
+<p>请注意，此参数与扫描所有活动窗口的其他函数的含义不同（请参阅 Windows 的循环排序）。具体来说，这里 t 和 nil 的含义与它们在其他函数中的含义相反。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="29.9_重新组合窗口.html">重新组合窗口</a>, Previous: <a href="29.7_分割窗口.html">分割窗口</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

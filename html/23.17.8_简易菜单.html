@@ -1,0 +1,90 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>23.17.8 简易菜单</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">23.17.8 简易菜单</h3>
+<div class="nav-panel"><p>Next: <a href="24_主要和次要模式.html">主要和次要模式</a>, Previous: <a href="23.17.7_修改菜单.html">修改菜单</a>, Up: <a href="23.17_菜单键映射.html">菜单键映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>以下宏提供了一种方便的方式来定义弹出菜单和/或菜单栏菜单。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: easy-menu-define symbol maps doc menu ¶
+</pre></div>
+<p>该宏定义了一个弹出菜单和/或菜单栏子菜单，其内容由 menu 给出。
+</p>
+<p>如果 symbol 不是 nil，它应该是一个符号；  那么这个宏将 symbol 定义为一个弹出菜单的函数（参见 Pop-Up Menus），其中 doc 作为它的文档字符串。符号不应被引用。
+</p>
+<p>无论 symbol 的值如何，如果 maps 是一个键映射，则菜单将添加到该键映射，作为菜单栏的顶级菜单（请参阅菜单栏）。它也可以是键映射列表，在这种情况下，菜单将单独添加到每个键映射。
+</p>
+<p>menu 的第一个元素必须是一个字符串，用作菜单标签。它后面可以跟任意数量的以下关键字-参数对：
+</p>
+<div class="lisp">
+<pre class="lisp">:filter function
+</pre></div>
+<p>function 必须是一个函数，如果使用一个参数（其他菜单项的列表）调用该函数，则返回要在菜单中显示的实际项目。
+</p><div class="lisp">
+<pre class="lisp">:visible include
+</pre></div>
+<p>include 是一个表达式；  如果计算结果为 nil，则菜单不可见。:included 是 :visible 的别名。
+</p><div class="lisp">
+<pre class="lisp">:active enable
+</pre></div>
+<p>enable 是一个表达式；  如果计算结果为 nil，则菜单不可选择。:enable 是 :active 的别名。
+</p>
+<p>menu 中的其余元素是菜单项。
+</p>
+<p>菜单项可以是三个元素的向量，[名称回调启用]。name 是菜单项名称（字符串）。回调是选择项目时要运行的命令或要评估的表达式。enable 是一个表达式；  如果它评估为 nil，则禁用该项目以供选择。
+</p>
+<p>或者，菜单项可能具有以下形式：
+</p><div class="lisp">
+<pre class="lisp">[ name callback [ keyword arg ]... ]
+</pre></div>
+<p>其中 name 和 callback 的含义与上述相同，并且每个可选关键字和 arg 对应为以下之一：
+</p>
+<div class="lisp">
+<pre class="lisp">:keys keys
+</pre></div>
+<p>keys 是一个字符串，显示为与菜单项等效的键盘。这通常不需要，因为键盘等效项是自动计算的。键在显示之前使用替换命令键进行扩展（请参阅文档中的替换键绑定）。
+</p><div class="lisp">
+<pre class="lisp">:key-sequence keys
+</pre></div>
+<p>keys 是一个提示，指示将哪个键序列显示为等效键盘，以防命令绑定到多个键序列。如果键未绑定到与此菜单项相同的命令，则无效。
+</p><div class="lisp">
+<pre class="lisp">:active enable
+</pre></div>
+<p>enable 是一个表达式；  如果评估为 nil，则该项目不可选择。:enable 是 :active 的别名。
+</p><div class="lisp">
+<pre class="lisp">:visible include
+</pre></div>
+<p>include 是一个表达式；  如果它的计算结果为 nil，则该项目是不可见的。:included 是 :visible 的别名。
+</p><div class="lisp">
+<pre class="lisp">:label form
+</pre></div>
+<p>form 是一个表达式，它被评估以获得一个用作菜单项标签的值（默认为名称）。
+</p><div class="lisp">
+<pre class="lisp">:suffix form
+</pre></div>
+<p>form 是一个动态计算的表达式，其值与菜单项的标签连接。
+</p><div class="lisp">
+<pre class="lisp">:style style
+</pre></div>
+<p>style 是描述菜单项类型的符号；  它应该是切换（复选框）或单选（单选按钮）或其他任何内容（意味着普通菜单项）。
+</p><div class="lisp">
+<pre class="lisp">:selected selected
+</pre></div>
+<p>selected 是一个表达式；  只要表达式的值为非零，复选框或单选按钮就会被选中。
+</p><div class="lisp">
+<pre class="lisp">:help help
+</pre></div>
+<p>help 是描述菜单项的字符串。
+</p>
+<p>或者，菜单项可以是字符串。然后该字符串作为不可选择的文本出现在菜单中。由破折号组成的字符串显示为分隔符（请参阅菜单分隔符）。
+</p>
+<p>或者，菜单项可以是与菜单格式相同的列表。这是一个子菜单。
+</p>
+<p>这是一个使用 easy-menu-define 定义菜单的示例，该菜单类似于菜单栏中示例中定义的菜单：
+</p>
+<div class="lisp">
+<pre class="lisp">(easy-menu-define words-menu global-map
+  "Menu for word navigation commands."
+  '("Words"
+     ["Forward word" forward-word]
+     ["Backward word" backward-word]))
+</pre></div>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="24_主要和次要模式.html">主要和次要模式</a>, Previous: <a href="23.17.7_修改菜单.html">修改菜单</a>, Up: <a href="23.17_菜单键映射.html">菜单键映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

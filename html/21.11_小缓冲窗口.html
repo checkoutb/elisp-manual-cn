@@ -1,0 +1,62 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>21.11 小缓冲窗口</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">21.11 小缓冲窗口</h2>
+<div class="nav-panel"><p>Next: <a href="21.12_小缓冲区内容.html">小缓冲区内容</a>, Previous: <a href="21.10_小缓冲区命令.html">小缓冲区命令</a>, Up: <a href="21_小缓冲区.html">小缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这些函数访问和选择 minibuffer 窗口，测试它们是否处于活动状态并控制它们如何调整大小。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: minibuffer-window &amp;optional frame ¶
+</pre></div>
+<p>此函数返回用于帧帧的 minibuffer 窗口。如果 frame 为 nil，则表示选定的帧。
+</p>
+<p>请注意，一个帧使用的 minibuffer 窗口不必是该帧的一部分——一个没有自己的 minibuffer 的帧必须使用某个其他帧的 minibuffer 窗口。可以通过设置该帧的 minibuffer frame 参数来更改 minibuffer-less 帧的 minibuffer 窗口（请参阅缓冲区参数）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-minibuffer-window window ¶
+</pre></div>
+<p>此函数将 window 指定为要使用的 minibuffer 窗口。如果您将文本放入其中而不调用通常的 minibuffer 命令，这会影响 minibuffer 的显示位置。它对通常的 minibuffer 输入函数没有影响，因为它们都是从根据所选帧选择 minibuffer 窗口开始的。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-minibuffer-p &amp;optional window ¶
+</pre></div>
+<p>如果 window 是 minibuffer 窗口，此函数返回 t。窗口默认为选定的窗口。
+</p>
+<p>以下函数返回显示当前活动的 minibuffer 的窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: active-minibuffer-window ¶
+</pre></div>
+<p>此函数返回当前活动的 minibuffer 的窗口，如果没有活动的 minibuffer，则返回 nil。
+</p>
+<p>通过将给定窗口与 (minibuffer-window) 的结果进行比较来确定给定窗口是否显示当前活动的 minibuffer 是不够的，因为如果有超过一帧，则可能有多个 minibuffer 窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: minibuffer-window-active-p window ¶
+</pre></div>
+<p>如果窗口显示当前活动的 minibuffer，此函数返回非 nil。
+</p>
+<p>以下两个选项控制是否自动调整 minibuffer 窗口的大小以及在此过程中它们可以变得多大。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: resize-mini-windows ¶
+</pre></div>
+<p>此选项指定是否自动调整 minibuffer 窗口的大小。默认值是 grow-only，这意味着默认情况下，minibuffer 窗口会自动扩展以适应它显示的文本，并在 minibuffer 变空后立即缩回一行。如果值为 t，Emacs 将始终尝试使 minibuffer 窗口的高度适合它显示的文本（最少一行）。如果该值为 nil，则 minibuffer 窗口永远不会自动更改大小。在这种情况下，窗口大小调整命令（请参阅调整窗口大小）可用于调整其高度。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: max-mini-window-height ¶
+</pre></div>
+<p>此选项为自动调整 minibuffer 窗口大小提供了最大高度。浮点数将最大高度指定为框​​架高度的一部分；  一个整数指定以框架的规范字符高度为单位的最大高度（请参阅框架字体）。默认值为 0.25。
+</p>
+<p>请注意，上述两个变量的值在显示时生效，因此将它们绑定在产生回显区域消息的代码周围将不起作用。如果您想在显示长消息时阻止调整 minibuffer 窗口的大小，请改为绑定 message-truncate-lines 变量（请参阅回声区域自定义）。
+</p>
+<p>选项 resize-mini-windows 不会影响 minibuffer-only 帧的行为（请参阅帧布局）。以下选项也允许自动调整此类框架的大小。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: resize-mini-frames ¶
+</pre></div>
+<p>如果为 nil，则永远不会自动调整 minibuffer-only 帧的大小。
+</p>
+<p>如果这是一个函数，则调用该函数并使用仅用于调整大小的 minibuffer 帧作为唯一参数。在调用此函数时，该帧的 minibuffer 窗口的缓冲区是下次重新显示该窗口时将显示其内容的缓冲区。该函数有望以某种适当的方式使帧适合缓冲区。
+</p>
+<p>任何其他非零值意味着通过调用 fit-mini-frame-to-buffer 来调整仅 minibuffer 帧的大小，该函数的行为类似于 fit-frame-to-buffer（请参阅调整窗口大小），但不会去除前导或尾随空缓冲区文本中的行。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="21.12_小缓冲区内容.html">小缓冲区内容</a>, Previous: <a href="21.10_小缓冲区命令.html">小缓冲区命令</a>, Up: <a href="21_小缓冲区.html">小缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

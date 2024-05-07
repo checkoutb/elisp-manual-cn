@@ -1,0 +1,16 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>36.2 语法描述符</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">36.2 语法描述符</h2>
+<div class="nav-panel"><p>Next: <a href="36.2.1_语法类表.html">语法类表</a>, Previous: <a href="36.1_语法表概念.html">语法表概念</a>, Up: <a href="36_语法表.html">语法表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>字符的句法类别描述了它的句法角色。每个语法表指定每个字符的语法类。一个语法表中的字符类与其在任何其他表中的类之间没有必然的关系。
+</p>
+<p>每个语法类都由一个助记符指定，当您需要指定一个类时，该助记符用作类的名称。通常，这个指示符字符是一个经常被分配到该类的字符；  但是，它作为指示符的含义是不变的，并且与该字符当前具有的语法无关。因此，’\’ 作为指示符字符始终代表转义字符语法，无论 ’\’ 字符在当前语法表中是否实际具有该语法。有关语法类及其指示符字符的列表，请参见语法类表。
+</p>
+<p>语法描述符是一个 Lisp 字符串，它描述了一个字符的语法类和其他语法属性。当您想要修改字符的语法时，可以通过调用函数 modify-syntax-entry 并将语法描述符作为其参数之一传递来完成（请参阅语法表函数）。
+</p>
+<p>语法描述符中的第一个字符必须是语法类指示符字符。第二个字符，如果存在，指定一个匹配字符（例如，在 Lisp 中，’(’ 的匹配字符是 ’)’）；  空格指定没有匹配的字符。然后是指定附加语法属性的字符（请参阅语法标志）。
+</p>
+<p>如果不需要匹配字符或标志，则只需一个字符（指定语法类）就足够了。
+</p>
+<p>例如，在 C 模式下，字符 ’*’ 的语法描述符是 <code>.23</code> （即标点符号、未使用的匹配字符槽、comment-starter 的第二个字符、comment-ender 的第一个字符），并且条目因为’/’是’。14’（即，标点符号、未使用的匹配字符槽、评论起始符的第一个字符、评论结束符的第二个字符）。
+</p>
+<p>Emacs 还定义了原始语法描述符，用于描述较低级别的语法类。请参阅语法表内部结构。
+</p>
+<div class="nav-panel"><p>Next: <a href="36.2.1_语法类表.html">语法类表</a>, Previous: <a href="36.1_语法表概念.html">语法表概念</a>, Up: <a href="36_语法表.html">语法表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

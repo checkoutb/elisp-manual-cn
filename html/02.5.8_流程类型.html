@@ -1,0 +1,14 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>2.5.8 流程类型</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">2.5.8 流程类型</h3>
+<div class="nav-panel"><p>Next: <a href="02.5.9_线程类型.html">线程类型</a>, Previous: <a href="02.5.7_帧配置类型.html">帧配置类型</a>, Up: <a href="02.5_编辑类型.html">编辑类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>进程一词通常表示正在运行的程序。Emacs 本身就是在这种进程中运行的。但是，在 Emacs Lisp 中，进程是一个 Lisp 对象，它指定由 Emacs 进程创建的子进程。shell、GDB、ftp 和编译器等程序在 Emacs 的子进程中运行，扩展了 Emacs 的功能。Emacs 子进程从 Emacs 获取文本输入并将文本输出返回给 Emacs 以供进一步操作。Emacs 也可以向子进程发送信号。
+</p>
+<p>进程对象没有读取语法。它们以哈希表示法打印，并给出进程的名称：
+</p>
+<div class="lisp">
+<pre class="lisp">(process-list)
+       ⇒ (#&lt;process shell&gt;)
+</pre></div>
+<p>有关创建、删除、返回有关信息、向进程发送输入或信号以及从进程接收输出的函数的信息，请参阅进程。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="02.5.9_线程类型.html">线程类型</a>, Previous: <a href="02.5.7_帧配置类型.html">帧配置类型</a>, Up: <a href="02.5_编辑类型.html">编辑类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

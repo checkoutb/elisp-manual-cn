@@ -1,0 +1,31 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>31.2.1 角色动作</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">31.2.1 角色动作</h3>
+<div class="nav-panel"><p>Next: <a href="31.2.2_词动.html">词动</a>, Previous: <a href="31.2_运动.html">运动</a>, Up: <a href="31.2_运动.html">运动.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这些函数根据字符数移动点。goto-char 是基本原语；  其他功能使用它。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: goto-char position ¶
+</pre></div>
+<p>此函数将当前缓冲区中的点设置为值位置。
+</p>
+<p>如果窄化生效，位置仍然从缓冲区的开头开始计数，但点不能超出可访问部分。如果位置超出范围，则 goto-char 将点移动到可访问部分的开头或结尾。
+</p>
+<p>当以交互方式调用此函数时，位置是数字前缀参数（如果提供）；  否则从 minibuffer 中读取。
+</p>
+<p>goto-char 返回位置。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: forward-char &amp;optional count ¶
+</pre></div>
+<p>此函数将点计数字符向前移动，朝向缓冲区的末尾（或向后，朝向缓冲区的开头，如果 count 为负数）。如果 count 为 nil，则默认为 1。
+</p>
+<p>如果这试图越过缓冲区的开始或结束（或可访问部分的限制，当缩小生效时），它会用错误符号缓冲区开始或缓冲区结束发出错误信号。
+</p>
+<p>在交互式调用中，count 是数字前缀参数。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: backward-char &amp;optional count ¶
+</pre></div>
+<p>这就像 forward-char 一样，只是它朝相反的方向移动。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="31.2.2_词动.html">词动</a>, Previous: <a href="31.2_运动.html">运动</a>, Up: <a href="31.2_运动.html">运动.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

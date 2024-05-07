@@ -1,0 +1,92 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>26.2 保存缓冲区</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">26.2 保存缓冲区</h2>
+<div class="nav-panel"><p>Next: <a href="26.3_从文件中读取.html">从文件中读取</a>, Previous: <a href="26.1.2_访问子程序.html">访问子程序</a>, Up: <a href="26_文件.html">文件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当你在 Emacs 中编辑一个文件时，你实际上是在一个正在访问该文件的缓冲区上工作——也就是说，文件的内容被复制到缓冲区中，而副本就是你编辑的内​​容。在保存缓冲区之前，对缓冲区的更改不会更改文件，这意味着将缓冲区的内容复制到文件中。从某种意义上说，不访问文件的缓冲区仍然可以 <code>保存</code> ，使用缓冲区本地 write-contents-functions 挂钩中的函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: save-buffer &amp;optional backup-option ¶
+</pre></div>
+<p>如果缓冲区自上次访问或保存后已被修改，则此函数将当前缓冲区的内容保存在其访问的文件中。否则它什么也不做。
+</p>
+<p>save-buffer 负责制作备份文件。通常，backup-option 为 nil，并且 save-buffer 仅当这是自访问文件后的第一次保存时才会创建备份文件。backup-option 的其他值要求在其他情况下制作备份文件：
+</p>
+<p>使用 4 或 64 的参数，反映 1 或 3 个 C-u，save-buffer 函数标记此版本的文件，以便在下次保存缓冲区时备份。
+使用 16 或 64 的参数，反映 2 或 3 个 C-u，save-buffer 函数在保存之前无条件地备份文件的先前版本。
+参数为 0 时，无条件不制作任何备份文件。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: save-some-buffers &amp;optional save-silently-p pred ¶
+</pre></div>
+<p>此命令保存一些修改后的文件访问缓冲区。通常它会询问用户每个缓冲区。但是如果 save-silently-p 不为 nil，它会保存所有文件访问缓冲区而不查询用户。
+</p>
+<p>可选的 pred 参数提供了一个谓词，该谓词控制要询问的缓冲区（或者如果 save-silently-p 不为零，则静默保存）。如果 pred 为 nil，这意味着使用 save-some-buffers-default-predicate 的值而不是 pred。如果结果为 nil，则意味着只询问文件访问缓冲区。如果它是 t，这意味着还提供保存某些其他非文件缓冲区 - 那些具有非 nil 缓冲区本地值 buffer-offer-save 的缓冲区（请参阅 Killing Buffers）。要求对保存非文件缓冲区说 <code>是</code> 的用户指定要使用的文件名。save-buffers-kill-emacs 函数将值 t 传递给 pred。
+</p>
+<p>如果谓词既不是 t 也不是 nil，那么它应该是一个没有参数的函数。它将在每个缓冲区中调用以决定是否提供保存该缓冲区。如果它在某个缓冲区中返回一个非零值，这意味着确实提供了保存该缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: write-file filename &amp;optional confirm ¶
+</pre></div>
+<p>此函数将当前缓冲区写入文件 filename，使缓冲区访问该文件，并将其标记为未修改。然后它根据文件名重命名缓冲区，如有必要，附加一个类似 ’&lt;2&gt;’ 的字符串以创建唯一的缓冲区名称。它通过调用 set-visited-file-name（请参阅缓冲区文件名）和保存缓冲区来完成大部分工作。
+</p>
+<p>如果确认是非零，这意味着在覆盖现有文件之前要求确认。交互地，需要确认，除非用户提供前缀参数。
+</p>
+<p>如果 filename 是目录名称（请参阅目录名称），则 write-file 使用目录 filename 中访问文件的名称。如果缓冲区没有访问文件，则使用缓冲区名称代替。
+</p>
+<p>保存缓冲区会运行几个挂钩。它还执行格式转换（请参阅文件格式转换）。请注意，下面描述的这些挂钩仅由保存缓冲区运行，它们不会由将缓冲区文本写入文件的其他原语和函数运行，特别是自动保存（请参阅自动保存）不会运行这些挂钩.
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: write-file-functions ¶
+</pre></div>
+<p>此变量的值是在将缓冲区写入其访问文件之前要调用的函数列表。如果其中一个返回非 nil，则认为该文件已写入，并且不会调用其余函数，也不会执行用于写入文件的常用代码。
+</p>
+<p>如果 write-file-functions 中的函数返回非 nil，则它负责制作备份文件（如果合适的话）。为此，请执行以下代码：
+</p>
+<div class="lisp">
+<pre class="lisp">(or buffer-backed-up (backup-buffer))
+</pre></div>
+<p>您可能希望保存备份缓冲区返回的文件模式值并使用它（如果非零）来设置您写入的文件的模式位。这是保存缓冲区通常所做的。请参阅制作备份文件。
+</p>
+<p>write-file-functions 中的钩子函数还负责对数据进行编码（如果需要）：它们必须选择合适的编码系统和行尾转换（参见 Lisp 中的编码系统），执行编码（参见显式编码）和解码），并将 last-coding-system-used 设置为使用的编码系统（请参阅编码和 I/O）。
+</p>
+<p>如果您在缓冲区中本地设置此挂钩，则假定它与文件相关联或获取缓冲区内容的方式。因此，该变量被标记为永久局部变量，因此更改主模式不会改变缓冲区局部值。另一方面，调用 set-visited-file-name 将重置它。如果这不是您想要的，您可能希望改用 write-contents-functions。
+</p>
+<p>即使这不是一个普通的钩子，您也可以使用 add-hook 和 remove-hook 来操作列表。请参阅挂钩。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: write-contents-functions ¶
+</pre></div>
+<p>这就像 write-file-functions 一样工作，但它适用于与缓冲区内容相关的钩子，而不是与特定访问的文件或其位置相关的钩子，并且可用于为不访问文件的缓冲区创建任意保存过程一点也不。此类挂钩通常由主要模式设置，作为此变量的缓冲区本地绑定。每当设置此变量时，它都会自动变为缓冲区本地；  切换到新的主要模式总是会重置此变量，但调用 set-visited-file-name 不会。
+</p>
+<p>如果此钩子中的任何函数返回非 nil，则认为文件已写入，其余的不会被调用，write-file-functions 中的函数也不会。
+</p>
+<p>当使用这个钩子保存不访问文件的缓冲区（例如，特殊模式缓冲区）时，请记住，如果函数无法正确保存并返回 nil 值，save-buffer 将继续提示用户用于保存缓冲区的文件。如果这是不可取的，请考虑通过引发错误使函数失败。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: before-save-hook ¶
+</pre></div>
+<p>这个正常的钩子在缓冲区被保存到其访问的文件之前运行，无论是正常完成还是通过上述钩子之一完成。例如，copyright.el 程序使用此挂钩来确保您保存的文件在其版权声明中具有当前年份。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: after-save-hook ¶
+</pre></div>
+<p>这个普通的钩子在一个缓冲区被保存在它的访问文件中之后运行。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: file-precious-flag ¶
+</pre></div>
+<p>如果此变量不为 nil，则 save-buffer 在保存时通过将新文件写入临时名称而不是它应该具有的名称来防止 I/O 错误，然后将其重命名为预期的名称。明确没有错误。此过程可防止因磁盘空间不足等问题导致文件无效。
+</p>
+<p>作为副作用，备份必须通过复制进行。请参阅通过重命名或通过复制进行备份？。然而，与此同时，保存珍贵的文件总是会破坏您保存的文件与其他文件名之间的所有硬链接。
+</p>
+<p>某些模式在特定缓冲区中为该变量提供非零缓冲区本地值。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: require-final-newline ¶
+</pre></div>
+<p>此变量确定是否可以写出不以换行符结尾的文件。如果变量的值是 t，那么只要它还没有以 1 结尾，save-buffer 就会在缓冲区的末尾默默地添加一个换行符。如果值是访问，Emacs 会在访问文件后添加一个缺少的换行符。如果值为 visit-save，Emacs 会在访问和保存时添加一个缺失的换行符。对于任何其他非 nil 值，每次出现这种情况时，save-buffer 都会询问用户是否添加换行符。
+</p>
+<p>如果变量的值为 nil，则 save-buffer 根本不添加换行符。nil 是默认值，但一些主要模式在特定缓冲区中将其设置为 t。
+</p>
+<p>另请参阅函数 set-visited-file-name（请参阅缓冲区文件名）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="26.3_从文件中读取.html">从文件中读取</a>, Previous: <a href="26.1.2_访问子程序.html">访问子程序</a>, Up: <a href="26_文件.html">文件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

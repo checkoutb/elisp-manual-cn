@@ -1,0 +1,76 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.13.4 边缘位图</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.13.4 边缘位图</h3>
+<div class="nav-panel"><p>Next: <a href="40.13.5_自定义边缘位图.html">自定义边缘位图</a>, Previous: <a href="40.13.3_边缘光标.html">边缘光标</a>, Up: <a href="40.13_条纹.html">条纹.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>边缘位图是实际位图，代表截断或连续行、缓冲区边界、覆盖箭头等的逻辑边缘指示符。每个位图由一个符号表示。这些符号由变量 fringe-indicator-alist 引用，它将边缘指示器映射到位图（请参阅边缘指示器），以及将边缘光标映射到位图的变量 fringe-cursor-alist（请参阅边缘光标）。
+</p>
+<p>Lisp 程序也可以直接在左边缘或右边缘显示位图，方法是对出现在行中的字符之一使用显示属性（请参阅其他显示规范）。这样的显示规范具有以下形式
+</p>
+<div class="lisp">
+<pre class="lisp">(fringe bitmap [face])
+</pre></div>
+<p>边缘是符号左边缘或右边缘。位图是标识要显示的位图的符号。可选的面命名一个面，其前景色和背景色将用于显示位图，使用边缘面的属性来表示面未指定的颜色。如果 face 被省略，这意味着将默认面的属性用于边缘面未指定的颜色。对于不依赖于默认面和边缘面属性的可预测结果，我们建议您永远不要省略面，而始终提供特定面。特别是，如果您希望位图始终显示在边缘面上，请使用边缘作为面。
+</p>
+<p>例如，要在左边缘显示一个箭头，使用警告面，您可以这样说：
+</p>
+<div class="lisp">
+<pre class="lisp">(overlay-put
+ (make-overlay (point) (point))
+ 'before-string (propertize
+                 "x" 'display
+                 `(left-fringe right-arrow warning)))
+</pre></div>
+<p>这是 Emacs 中定义的标准边缘位图列表，以及它们当前在 Emacs 中的使用方式（通过 fringe-indicator-alist 和 fringe-cursor-alist）：
+</p>
+<div class="lisp">
+<pre class="lisp">left-arrow, right-arrow
+</pre></div>
+<p>用于表示截断的行。
+</p><div class="lisp">
+<pre class="lisp">left-curly-arrow, right-curly-arrow
+</pre></div>
+<p>用于表示连续行。
+</p><div class="lisp">
+<pre class="lisp">right-triangle, left-triangle
+</pre></div>
+<p>前者由覆盖箭头使用。后者未使用。
+</p><div class="lisp">
+<pre class="lisp">up-arrow, down-arrow
+</pre></div>
+<div class="lisp">
+<pre class="lisp">bottom-left-angle, bottom-right-angle
+</pre></div>
+<div class="lisp">
+<pre class="lisp">top-left-angle, top-right-angle
+</pre></div>
+<div class="lisp">
+<pre class="lisp">left-bracket, right-bracket
+</pre></div>
+<div class="lisp">
+<pre class="lisp">empty-line
+</pre></div>
+<p>用于指示缓冲区边界。
+</p><div class="lisp">
+<pre class="lisp">filled-rectangle, hollow-rectangle
+</pre></div>
+<div class="lisp">
+<pre class="lisp">filled-square, hollow-square
+</pre></div>
+<div class="lisp">
+<pre class="lisp">vertical-bar, horizontal-bar
+</pre></div>
+<p>用于不同类型的边缘光标。
+</p><div class="lisp">
+<pre class="lisp">exclamation-mark, question-mark
+</pre></div>
+<p>不被核心 Emacs 功能使用。
+</p>
+<p>下一小节描述如何定义您自己的边缘位图。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: fringe-bitmaps-at-pos &amp;optional pos window ¶
+</pre></div>
+<p>该函数返回窗口窗口中包含位置 pos 的显示行的边缘位图。返回值的形式为 (left right ov)，其中 left 是左边缘中边缘位图的符号（如果没有位图，则为 nil），right 与右边缘相似，如果有则 ov 为非 nil左边缘的叠加箭头。
+</p>
+<p>如果 pos 在窗口中不可见，则该值为 nil。如果 window 为 nil，则表示选定的窗口。如果 pos 为 nil，则表示窗口中点的值。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.13.5_自定义边缘位图.html">自定义边缘位图</a>, Previous: <a href="40.13.3_边缘光标.html">边缘光标</a>, Up: <a href="40.13_条纹.html">条纹.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

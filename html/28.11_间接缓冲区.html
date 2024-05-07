@@ -1,0 +1,37 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>28.11 间接缓冲区</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">28.11 间接缓冲区</h2>
+<div class="nav-panel"><p>Next: <a href="28.12_在两个缓冲区之间交换文本.html">在两个缓冲区之间交换文本</a>, Previous: <a href="28.10_终止缓冲区.html">终止缓冲区</a>, Up: <a href="28_缓冲区.html">缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>间接缓冲区共享某个其他缓冲区的文本，该缓冲区称为间接缓冲区的基本缓冲区。在某些方面，对于缓冲区，它类似于文件之间的符号链接。基本缓冲区本身可能不是间接缓冲区。
+</p>
+<p>间接缓冲区的文本始终与其基本缓冲区的文本相同；  通过编辑其中一个所做的更改会立即在另一个中可见。这包括文本属性以及字符本身。
+</p>
+<p>在所有其他方面，间接缓冲区和它的基本缓冲区是完全分开的。它们具有不同的名称、独立的点值、独立的缩小、独立的标记和覆盖（尽管在任一缓冲区中插入或删除文本都会重新定位两者的标记和覆盖）、独立的主要模式和独立的缓冲区局部变量绑定。
+</p>
+<p>间接缓冲区不能访问文件，但其基本缓冲区可以。如果您尝试保存间接缓冲区，那实际上会保存基本缓冲区。
+</p>
+<p>杀死间接缓冲区对其基本缓冲区没有影响。杀死基本缓冲区有效地杀死了间接缓冲区，因为它不能再次成为当前缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: make-indirect-buffer base-buffer name &amp;optional clone inhibit-buffer-hooks ¶
+</pre></div>
+<p>这将创建并返回一个名为 name 的间接缓冲区，其基本缓冲区是 base-buffer。参数 base-buffer 可以是活动缓冲区或现有缓冲区的名称（字符串）。如果 name 是现有缓冲区的名称，则会发出错误信号。
+</p>
+<p>如果 clone 为非 nil，则间接缓冲区最初共享基本缓冲区的状态，例如主要模式、次要模式、缓冲区局部变量等。如果省略 clone 或 nil ，则间接缓冲区的状态设置为新缓冲区的默认状态。
+</p>
+<p>如果 base-buffer 是间接缓冲区，则其基本缓冲区用作新缓冲区的基础。此外，如果 clone 不是 nil，则初始状态是从实际的基本缓冲区复制的，而不是从基本缓冲区复制的。
+</p>
+<p>有关禁止缓冲区挂钩的含义，请参见创建缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: clone-indirect-buffer newname display-flag &amp;optional norecord ¶
+</pre></div>
+<p>此函数创建并返回一个新的间接缓冲区，该缓冲区共享当前缓冲区的基本缓冲区并复制当前缓冲区的其余属性。（如果当前缓冲区不是间接的，则将其用作基本缓冲区。）
+</p>
+<p>如果 display-flag 不是 nil，就像在交互式调用中一样，这意味着通过调用 pop-to-buffer 来显示新的缓冲区。如果 norecord 为非 nil，则表示不将新缓冲区放在缓冲区列表的前面。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: buffer-base-buffer &amp;optional buffer ¶
+</pre></div>
+<p>该函数返回缓冲区的基本缓冲区，默认为当前缓冲区。如果缓冲区不是间接的，则值为 nil。否则，该值是另一个缓冲区，它永远不是间接缓冲区。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="28.12_在两个缓冲区之间交换文本.html">在两个缓冲区之间交换文本</a>, Previous: <a href="28.10_终止缓冲区.html">终止缓冲区</a>, Up: <a href="28_缓冲区.html">缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

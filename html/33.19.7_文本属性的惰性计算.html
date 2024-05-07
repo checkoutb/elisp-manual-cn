@@ -1,0 +1,26 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.19.7 文本属性的惰性计算</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">33.19.7 文本属性的惰性计算</h3>
+<div class="nav-panel"><p>Next: <a href="33.19.8_定义可点击文本.html">定义可点击文本</a>, Previous: <a href="33.19.6_文本属性的粘性.html">文本属性的粘性</a>, Up: <a href="33.19_文本属性.html">文本属性.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>您可以安排计算部分文本的文本属性，而不是计算缓冲区中所有文本的文本属性。
+</p>
+<p>从缓冲区中提取文本及其属性的原语是缓冲区子字符串。在检查属性之前，该函数运行异常的钩子buffer-access-fontify-functions。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: buffer-access-fontify-functions ¶
+</pre></div>
+<p>此变量包含用于计算文本属性的函数列表。在 buffer-substring 复制缓冲区的一部分的 text 和 text 属性之前，它会调用此列表中的所有函数。每个函数都接收两个参数，它们指定正在访问的缓冲区的范围。（缓冲区本身始终是当前缓冲区。）
+</p>
+<p>函数 buffer-substring-no-properties 不会调用这些函数，因为它无论如何都会忽略文本属性。
+</p>
+<p>为了防止对缓冲区的同一部分多次调用挂钩函数，可以使用变量 buffer-access-fontified-property。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: buffer-access-fontified-property ¶
+</pre></div>
+<p>如果此变量的值为非零，则它是一个用作文本属性名称的符号。该文本属性的非零值意味着该字符的其他文本属性已经被计算。
+</p>
+<p>如果为 buffer-substring 指定的范围内的所有字符都具有此属性的非 nil 值，则 buffer-substring 不会调用 buffer-access-fontify-functions 函数。它假定这些字符已经具有正确的文本属性，并且只是复制它们已经具有的属性。
+</p>
+<p>使用此功能的正常方法是 buffer-access-fontify-functions 函数将此属性以及其他属性添加到它们操作的字符中。这样，他们就可以避免被一遍又一遍地调用相同的文本。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.19.8_定义可点击文本.html">定义可点击文本</a>, Previous: <a href="33.19.6_文本属性的粘性.html">文本属性的粘性</a>, Up: <a href="33.19_文本属性.html">文本属性.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

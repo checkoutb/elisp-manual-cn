@@ -1,0 +1,8 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>35.6 匹配数据</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">35.6 匹配数据</h2>
+<div class="nav-panel"><p>Next: <a href="35.6.1_替换匹配的文本.html">替换匹配的文本</a>, Previous: <a href="35.5_POSIX正则表达式搜索.html">POSIX正则表达式搜索</a>, Up: <a href="35_搜索和匹配.html">搜索和匹配.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 跟踪搜索过程中找到的文本段的开始和结束位置；  这称为匹配数据。借助匹配数据，您可以搜索复杂的模式，例如邮件消息中的日期，然后在模式的控制下提取部分匹配。
+</p>
+<p>因为匹配数据通常只描述最近的搜索，所以您必须注意不要在您希望返回的搜索和匹配数据的使用之间无意中进行另一次搜索。如果您无法避免另一次介入搜索，则必须保存并恢复其周围的匹配数据，以防止其被覆盖。
+</p>
+<p>请注意，所有函数都可以覆盖匹配数据，除非明确记录不这样做。结果是在后台隐式运行的函数（请参阅延迟执行的计时器和空闲计时器）可能应该显式地保存和恢复匹配数据。
+</p>
+<div class="nav-panel"><p>Next: <a href="35.6.1_替换匹配的文本.html">替换匹配的文本</a>, Previous: <a href="35.5_POSIX正则表达式搜索.html">POSIX正则表达式搜索</a>, Up: <a href="35_搜索和匹配.html">搜索和匹配.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

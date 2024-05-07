@@ -1,0 +1,121 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.20.1 抽象显示函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.20.1 抽象显示函数</h3>
+<div class="nav-panel"><p>Next: <a href="40.20.2_抽象显示示例.html">抽象显示示例</a>, Previous: <a href="40.20_抽象显示.html">抽象显示</a>, Up: <a href="40.20_抽象显示.html">抽象显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在本小节中，ewoc 和 node 代表上述结构（参见 Abstract Display），而 data 代表用作数据元素的任意 Lisp 对象。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ewoc-create pretty-printer &amp;optional header footer nosep ¶
+</pre></div>
+<p>这构造并返回一个新的 ewoc，没有节点（因此没有数据元素）。pretty-printer 应该是一个函数，它接受一个参数，一个您计划在此 ewoc 中使用的数据元素，并使用 insert 将其文本描述插入点（并且永远不要在标记之前插入，因为这会干扰Ewoc 包的内部机制）。
+</p>
+<p>通常，在页眉、页脚和每个节点的文本描述之后会自动插入换行符。如果nosep 为非零，则不插入换行符。例如，这对于在单行上显示整个 ewoc 或通过安排漂亮打印机对这些节点不执行任何操作来使节点不可见可能很有用。
+</p>
+<p>一个 ewoc 在创建它时将其文本保存在当前的缓冲区中，因此在调用 ewoc-create 之前切换到预期的缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ewoc-buffer ewoc ¶
+</pre></div>
+<p>这将返回 ewoc 维护其文本的缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ewoc-get-hf ewoc ¶
+</pre></div>
+<p>这将返回一个由 ewoc 的页眉和页脚组成的 cons 单元格（页眉。页脚）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ewoc-set-hf ewoc header footer ¶
+</pre></div>
+<p>这会将 ewoc 的页眉和页脚分别设置为字符串页眉和页脚。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ewoc-enter-first ewoc data ¶
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: ewoc-enter-last ewoc data ¶
+</pre></div>
+<p>这些添加了一个封装数据的新节点，将其分别放在 ewoc 节点链的开头或结尾。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ewoc-enter-before ewoc node data ¶
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: ewoc-enter-after ewoc node data ¶
+</pre></div>
+<p>这些添加了一个封装数据的新节点，分别在节点之前或之后将其添加到 ewoc。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ewoc-prev ewoc node ¶
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: ewoc-next ewoc node ¶
+</pre></div>
+<p>这些分别返回 ewoc 中节点的前一个节点和下一个节点。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ewoc-nth ewoc n ¶
+</pre></div>
+<p>这将返回 ewoc 中在从零开始的索引 n 处找到的节点。负数表示从末尾开始计数。如果 n 超出范围，ewoc-nth 返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ewoc-data node ¶
+</pre></div>
+<p>这会提取节点封装的数据并返回。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ewoc-set-data node data ¶
+</pre></div>
+<p>这会将节点封装的数据设置为数据。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ewoc-locate ewoc &amp;optional pos guess ¶
+</pre></div>
+<p>这将确定 ewoc 中包含点（或 pos，如果指定）的节点，并返回该节点。如果 ewoc 没有节点，则返回 nil。如果 pos 在第一个节点之前，则返回第一个节点；  如果 pos 在最后一个节点之后，则返回最后一个节点。可选的第三个参数猜测应该是可能靠近 pos 的节点；  这不会改变结果，但会使函数运行得更快。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ewoc-location node ¶
+</pre></div>
+<p>这将返回节点的起始位置。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ewoc-goto-prev ewoc arg ¶
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: ewoc-goto-next ewoc arg ¶
+</pre></div>
+<p>这些移动分别指向 ewoc 中的上一个或下一个 argth 节点。如果 ewoc-goto-prev 已经在第一个节点或 ewoc 为空，则不会移动，而 ewoc-goto-next 会经过最后一个节点，返回 nil。除了这种特殊情况，这些函数返回移动到的节点。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ewoc-goto-node ewoc node ¶
+</pre></div>
+<p>这将指向 ewoc 中节点的开头。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ewoc-refresh ewoc ¶
+</pre></div>
+<p>此函数重新生成 ewoc 的文本。它的工作原理是删除页眉和页脚之间的文本，即所有数据元素的表示，然后按顺序为每个节点一个接一个地调用漂亮打印机函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ewoc-invalidate ewoc &amp;rest nodes ¶
+</pre></div>
+<p>这类似于 ewoc-refresh，只是只更新 ewoc 中的节点而不是整个集合。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ewoc-delete ewoc &amp;rest nodes ¶
+</pre></div>
+<p>这将从 ewoc 中删除节点中的每个节点。
+</p><div class="lisp">
+<pre class="lisp">Function: ewoc-filter ewoc predicate &amp;rest args ¶
+</pre></div>
+<p>这会为 ewoc 中的每个数据元素调用谓词，并删除谓词返回 nil 的那些节点。任何参数都传递给谓词。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ewoc-collect ewoc predicate &amp;rest args ¶
+</pre></div>
+<p>这将为 ewoc 中的每个数据元素调用谓词，并返回谓词返回非零的那些元素的列表。列表中的元素按缓冲区中的顺序排列。任何参数都传递给谓词。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ewoc-map map-function ewoc &amp;rest args ¶
+</pre></div>
+<p>这会为 ewoc 中的每个数据元素调用 map-function，并更新那些 map-function 返回非 nil 的节点。任何 args 都会传递给 map-function。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.20.2_抽象显示示例.html">抽象显示示例</a>, Previous: <a href="40.20_抽象显示.html">抽象显示</a>, Up: <a href="40.20_抽象显示.html">抽象显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

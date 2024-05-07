@@ -1,0 +1,23 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>34.8 扫描字符集</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">34.8 扫描字符集</h2>
+<div class="nav-panel"><p>Next: <a href="34.9_字符翻译.html">字符翻译</a>, Previous: <a href="34.7_字符集.html">字符集</a>, Up: <a href="34_非ASCII字符.html">非ASCII字符.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>有时找出特定字符属于哪个字符集很有用。这样做的一个用途是确定哪些编码系统（参见编码系统）能够表示所有相关文本；  另一个是确定显示该文本的字体。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: charset-after &amp;optional pos ¶
+</pre></div>
+<p>此函数返回最高优先级的字符集，其中包含当前缓冲区中位置 pos 处的字符。如果 pos 被省略或为零，则默认为 point 的当前值。如果 pos 超出范围，则值为 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: find-charset-region beg end &amp;optional translation ¶
+</pre></div>
+<p>此函数返回最高优先级的字符集列表，其中包含当前缓冲区中位置 beg 和 end 之间的字符。
+</p>
+<p>可选参数 translation 指定用于扫描文本的转换表（请参阅字符转换）。如果它不为 nil，则区域中的每个字符都通过此表进行翻译，返回的值描述了翻译后的字符，而不是缓冲区中实际存在的字符。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: find-charset-string string &amp;optional translation ¶
+</pre></div>
+<p>此函数返回包含字符串中字符的最高优先级字符集列表。它就像 find-charset-region 一样，只是它适用于字符串的内容而不是当前缓冲区的一部分。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="34.9_字符翻译.html">字符翻译</a>, Previous: <a href="34.7_字符集.html">字符集</a>, Up: <a href="34_非ASCII字符.html">非ASCII字符.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

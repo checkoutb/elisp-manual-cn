@@ -1,0 +1,10 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>E.4 堆栈分配的对象</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">E.4 堆栈分配的对象</h2>
+<div class="nav-panel"><p>Next: <a href="0E.5_内存使用.html">内存使用</a>, Previous: <a href="0E.3_垃圾收集.html">垃圾收集</a>, Up: <a href="附录_E_GNU_Emacs内部结构.html">E_GNU_Emacs内部结构.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>上述垃圾收集器用于管理从 Lisp 程序可见的数据，以及 Lisp 解释器内部使用的大部分数据。有时使用解释器的 C 堆栈分配临时内部对象可能很有用。这有助于提高性能，因为堆栈分配通常比使用堆内存分配和垃圾收集器释放更快。缺点是在这些对象被释放后使用它们会导致未定义的行为，因此使用应该经过深思熟虑并通过使用 GC_CHECK_MARKED_OBJECTS 功能仔细调试（参见 src/alloc.c）。特别是，堆栈分配的对象不应该对用户 Lisp 代码可见。
+</p>
+<p>目前，可以通过这种方式分配 cons 单元格和字符串。这是由 AUTO_CONS 和 AUTO_STRING 等 C 宏实现的，它们定义了具有块生命周期的命名 Lisp_Object。这些对象不会被垃圾收集器释放；  相反，它们具有自动存储持续时间，即，它们像局部变量一样被分配，并在定义对象的 C 块执行结束时自动释放。
+</p>
+<p>出于性能原因，堆栈分配的字符串仅限于 ASCII 字符，其中许多字符串是不可变的，即，对它们调用 ASET 会产生未定义的行为。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="0E.5_内存使用.html">内存使用</a>, Previous: <a href="0E.3_垃圾收集.html">垃圾收集</a>, Up: <a href="附录_E_GNU_Emacs内部结构.html">E_GNU_Emacs内部结构.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

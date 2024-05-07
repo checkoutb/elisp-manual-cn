@@ -1,0 +1,68 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>28.10 终止缓冲区</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">28.10 终止缓冲区</h2>
+<div class="nav-panel"><p>Next: <a href="28.11_间接缓冲区.html">间接缓冲区</a>, Previous: <a href="28.9_创建缓冲区.html">创建缓冲区</a>, Up: <a href="28_缓冲区.html">缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>杀死一个缓冲区会使 Emacs 不知道它的名字，并使它占用的内存空间可用于其他用途。
+</p>
+<p>只要有任何东西引用它，已被终止的缓冲区的缓冲区对象就一直存在，但它被特别标记，因此您无法使其成为当前或显示它。然而，被杀死的缓冲区保留了它们的身份；  如果你杀死两个不同的缓冲区，它们根据 eq 保持不同，尽管两者都死了。
+</p>
+<p>如果你杀死一个当前的或显示在窗口中的缓冲区，Emacs 会自动选择或显示一些其他的缓冲区。这意味着杀死缓冲区可以更改当前缓冲区。因此，当你杀死一个缓冲区时，你还应该采取与更改当前缓冲区相关的预防措施（除非你碰巧知道被杀死的缓冲区不是当前的）。请参阅当前缓冲区。
+</p>
+<p>如果您终止一个缓冲区，该缓冲区是一个或多个间接缓冲区的基本缓冲区（请参阅间接缓冲区），那么间接缓冲区也会被自动终止。
+</p>
+<p>当且仅当缓冲区被杀死时，缓冲区的缓冲区名称为 nil。未被杀死的缓冲区称为活动缓冲区。要测试缓冲区是活动的还是终止的，请使用函数 buffer-live-p（见下文）。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: kill-buffer &amp;optional buffer-or-name ¶
+</pre></div>
+<p>此函数会杀死缓冲区 buffer-or-name，释放其所有内存以供其他用途或返回给操作系统。如果 buffer-or-name 为 nil 或省略，它会终止当前缓冲区。
+</p>
+<p>任何将此缓冲区作为进程缓冲区的进程都会发送 SIGHUP（挂起）信号，这通常会导致它们终止。请参阅向进程发送信号。
+</p>
+<p>如果缓冲区正在访问一个文件并且包含未保存的更改，kill-buffer 会在缓冲区被杀死之前要求用户确认。即使不以交互方式调用它也会这样做。为防止请求确认，请在调用 kill-buffer 之前清除修改标志。请参阅缓冲区修改。
+</p>
+<p>此函数调用 replace-buffer-in-windows 来清理当前显示要被杀死的缓冲区的所有窗口。
+</p>
+<p>杀死一个已经死亡的缓冲区没有任何效果。
+</p>
+<p>如果它实际上杀死了缓冲区，则此函数返回 t。如果用户拒绝确认或者 buffer-or-name 已经失效，则返回 nil。
+</p><div class="lisp">
+<pre class="lisp">(kill-buffer "foo.unchanged")
+     ⇒ t
+(kill-buffer "foo.changed")
+
+---------- Buffer: Minibuffer ----------
+Buffer foo.changed modified; kill anyway? (yes or no) yes
+---------- Buffer: Minibuffer ----------
+
+     ⇒ t
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Variable: kill-buffer-query-functions ¶
+</pre></div>
+<p>在确认未保存的更改之前，kill-buffer 按出现的顺序调用列表 kill-buffer-query-functions 中的函数，不带参数。被杀死的缓冲区是调用它们时的当前缓冲区。此功能的想法是这些功能将要求用户确认。如果其中任何一个返回 nil，kill-buffer 会保留缓冲区的生命。
+</p>
+<p>对于由 get-buffer-create 或 generate-new-buffer 使用非 nil 参数禁止缓冲区钩子创建的内部或临时缓冲区，不会运行此挂钩。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: kill-buffer-hook ¶
+</pre></div>
+<p>这是一个正常的钩子，由 kill-buffer 在询问了它要问的所有问题之后，在实际杀死缓冲区之前运行。当钩子函数运行时，要杀死的缓冲区是当前的。请参阅挂钩。这个变量是一个永久的局部变量，所以它的局部绑定不会通过改变主要模式来清除。
+</p>
+<p>对于由 get-buffer-create 或 generate-new-buffer 使用非 nil 参数禁止缓冲区钩子创建的内部或临时缓冲区，不会运行此挂钩。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: buffer-offer-save ¶
+</pre></div>
+<p>该变量，如果在特定缓冲区中非零，则告诉 save-buffers-kill-emacs 提供保存该缓冲区，就像它提供保存文件访问缓冲区一样。如果在第二个可选参数设置为 t 的情况下调用 save-some-buffers，它也会提供保存缓冲区。最后，如果此变量始终设置为符号，则 save-buffers-kill-emacs 和 save-some-buffers 将始终提供保存。请参阅保存一些缓冲区的定义。变量 buffer-offer-save 在出于任何原因设置时会自动变为缓冲区本地。请参阅缓冲区局部变量。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: buffer-save-without-query ¶
+</pre></div>
+<p>此变量，如果在特定缓冲区中非零，则告诉 save-buffers-kill-emacs 和 save-some-buffers 保存此缓冲区（如果已修改）而不询问用户。当出于任何原因设置时，该变量会自动变为缓冲区本地。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: buffer-live-p object ¶
+</pre></div>
+<p>如果 object 是活动缓冲区（尚未被杀死的缓冲区），则此函数返回 t，否则返回 nil。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="28.11_间接缓冲区.html">间接缓冲区</a>, Previous: <a href="28.9_创建缓冲区.html">创建缓冲区</a>, Up: <a href="28_缓冲区.html">缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

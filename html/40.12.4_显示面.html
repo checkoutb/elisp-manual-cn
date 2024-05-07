@@ -1,0 +1,18 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.12.4 显示面</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.12.4 显示面</h3>
+<div class="nav-panel"><p>Next: <a href="40.12.5_面重映射.html">面重映射</a>, Previous: <a href="40.12.3_面属性函数.html">面属性函数</a>, Up: <a href="40.12_面.html">面.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当 Emacs 显示一段给定的文本时，文本的视觉外观可能由来自不同来源的面决定。如果这些不同的来源一起为特定字符指定了多个面，Emacs 会合并各种面的属性。这是 Emacs 合并面的顺序，从最高优先级到最低优先级：
+</p>
+<p>如果文本由特殊字形组成，则字形可以指定特定的面。请参见字形。
+如果文本位于活动区域内，Emacs 会使用区域面突出显示它。请参阅 GNU Emacs 手册中的标准面。
+如果文本位于具有非零面属性的覆盖层内，Emacs 将应用该属性指定的面。如果覆盖层具有 mouse-face 属性并且鼠标离覆盖层足够近，Emacs 将应用由 mouse-face 属性指定的 face 或 face 属性。请参见叠加属性。
+</p>
+<p>当多个覆盖覆盖一个字符时，具有较高优先级的覆盖覆盖具有较低优先级的覆盖。请参见叠加。
+如果文本包含 face 或 mouse-face 属性，Emacs 会应用指定的 faces 和 face 属性。请参阅具有特殊含义的属性。（这就是字体锁定模式面的应用方式。请参阅字体锁定模式。）
+如果文本位于选定窗口的模式行内，Emacs 将应用模式行面。对于未选中窗口的模式线，Emacs 应用模式线非活动面。对于标题行，Emacs 应用标题行面。对于制表符行，Emacs 应用制表符行面。
+如果文本来自覆盖字符串通过前字符串或后字符串属性（请参阅覆盖属性），或来自显示字符串（请参阅其他显示规范），并且该字符串不包含 face 或 mouse-face 属性，或者这些属性没有定义一些面属性，但是受覆盖/显示属性影响的缓冲区文本确实定义了一个面或那些属性，Emacs 应用了 <code>底层</code> 缓冲文本的面属性。请注意，即使覆盖或显示字符串显示在显示边距中也是如此（请参阅在边距中显示）。
+如果在前面的步骤中没有指定任何给定的属性，Emacs 将应用默认面的属性。
+</p>
+<p>在每个阶段，如果一个面具有有效的 :inherit 属性，Emacs 将任何具有未指定值的属性视为具有从父面提取的相应值。请参见面属性。请注意，父面也可能未指定属性；  在这种情况下，该属性在下一级面合并中保持未指定。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.12.5_面重映射.html">面重映射</a>, Previous: <a href="40.12.3_面属性函数.html">面属性函数</a>, Up: <a href="40.12_面.html">面.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

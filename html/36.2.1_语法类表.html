@@ -1,0 +1,89 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>36.2.1 语法类表</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">36.2.1 语法类表</h3>
+<div class="nav-panel"><p>Next: <a href="36.2.2_语法标志.html">语法标志</a>, Previous: <a href="36.2_语法描述符.html">语法描述符</a>, Up: <a href="36.2_语法描述符.html">语法描述符.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这是一个语法类表、指定它们的字符、它们的含义以及它们的使用示例。
+</p>
+<div class="lisp">
+<pre class="lisp">Whitespace characters: ‘ ’ or ‘-’
+</pre></div>
+<p>将符号和单词彼此分开的字符。通常，空白字符没有其他语法意义，多个空白字符在语法上等同于一个。空格、制表符和换页符在几乎所有主要模式中都被归类为空白。
+</p>
+<p>这个语法类可以用’ ’或’-’来指定。两个指示符是等效的。
+</p><div class="lisp">
+<pre class="lisp">Word constituents: ‘w’
+</pre></div>
+<p>人类语言中的部分单词。这些通常用于程序中的变量和命令名称。所有大写和小写字母以及数字通常都是单词组成部分。
+</p><div class="lisp">
+<pre class="lisp">Symbol constituents: ‘_’
+</pre></div>
+<p>变量和命令名称中使用的额外字符以及单词成分。示例包括 Lisp 模式中的字符 ’$&amp;*+-&lt;&gt;’，即使它们不是英文单词的一部分，它也可能是符号名称的一部分。在标准 C 中，符号中唯一有效的非单词组成字符是下划线 (”)。
+</p><div class="lisp">
+<pre class="lisp">Punctuation characters: ‘.’
+</pre></div>
+<p>在人类语言中用作标点符号或在编程语言中用于分隔符号的字符。一些编程语言模式，例如 Emacs Lisp 模式，在这个类中没有字符，因为少数不是符号或单词成分的字符都有其他用途。其他编程语言模式，例如 C 模式，对运算符使用标点语法。
+</p><div class="lisp">
+<pre class="lisp">Open parenthesis characters: ‘(’
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Close parenthesis characters: ‘)’
+</pre></div>
+<p>成对使用不同的字符来包围句子或表达。这样的分组以左括号字符开始并以结束字符结束。每个左括号字符匹配一个特定的右括号字符，反之亦然。通常，当您插入右括号时，Emacs 会立即指示匹配的左括号。请参阅闪烁括号。
+</p>
+<p>在人类语言和 C 代码中，括号对是 <code>()</code> 、 <code>[]</code> 和 <code>{}</code> 。在 Emacs Lisp 中，列表和向量的分隔符（’()’ 和 ’[]’）被归类为括号字符。
+</p><div class="lisp">
+<pre class="lisp">String quotes: ‘"’
+</pre></div>
+<p>用于分隔字符串常量的字符。相同的字符串引号字符出现在字符串的开头和结尾。这种带引号的字符串不会嵌套。
+</p>
+<p>Emacs 的解析工具将字符串视为单个标记。字符串中字符的通常句法含义被抑制。
+</p>
+<p>Lisp 模式有两个字符串引号字符：双引号 (’"’) 和竖线 (’|’)。’|’  在 Emacs Lisp 中不使用，但在 Common Lisp 中使用。C 也有两个字符串引号字符：双引号表示字符串，撇号 (”’) 表示字符常量。
+</p>
+<p>人类文本没有字符串引号字符。我们不希望引号关闭引号中其他字符的常用句法属性。
+</p><div class="lisp">
+<pre class="lisp">Escape-syntax characters: ‘\’
+</pre></div>
+<p>开始转义序列的字符，例如在字符串和字符常量中使用的字符。字符 ’\’ 在 C 和 Lisp 中都属于这个类。（在 C 中，它只在字符串中使用，但事实证明，在整个 C 代码中以这种方式处理它不会造成麻烦。）
+</p>
+<p>如果 words-include-escapes 不为零，则此类中的字符计为单词的一部分。见词动。
+</p><div class="lisp">
+<pre class="lisp">Character quotes: ‘/’
+</pre></div>
+<p>用于引用以下字符的字符，使其失去其正常的句法含义。这与转义字符的不同之处在于，只有紧随其后的字符才会受到影响。
+</p>
+<p>如果 words-include-escapes 不为零，则此类中的字符计为单词的一部分。见词动。
+</p>
+<p>此类用于 TeX 模式下的反斜杠。
+</p><div class="lisp">
+<pre class="lisp">Paired delimiters: ‘$’
+</pre></div>
+<p>类似于字符串引号字符，不同之处在于分隔符之间的字符的句法属性不被抑制。目前只有 TeX 模式使用成对的分隔符——进入和离开数学模式的 <code>$</code> 。
+</p><div class="lisp">
+<pre class="lisp">Expression prefixes: ‘'’
+</pre></div>
+<p>用于语法运算符的字符，如果它们出现在一个旁边，则被视为表达式的一部分。在 Lisp 模式中，这些字符包括撇号、”’（用于引用）、逗号、’,’（用于宏）和 ’#’（用于某些数据类型的读取语法）。
+</p><div class="lisp">
+<pre class="lisp">Comment starters: ‘&lt;’ ¶
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Comment enders: ‘&gt;’
+</pre></div>
+<p>各种语言中用于分隔注释的字符。人类文本没有注释字符。在 Lisp 中，分号 (’;’) 开始注释，换行符或换页符结束注释。
+</p><div class="lisp">
+<pre class="lisp">Inherit standard syntax: ‘@’
+</pre></div>
+<p>这个语法类没有指定特定的语法。它说在父语法表中查找该字符的语法。
+</p><div class="lisp">
+<pre class="lisp">Generic comment delimiters: ‘!’
+</pre></div>
+<p>（这个语法类也称为 <code>comment-fence</code> 。）开始或结束一种特殊注释的字符。任何通用注释定界符匹配任何通用注释定界符，但它们不能匹配注释起始符或注释终止符；  通用注释分隔符只能相互匹配。
+</p>
+<p>此语法类主要用于语法表文本属性（请参阅语法属性）。通过将范围语法表属性的第一个和最后一个字符标识为通用注释分隔符，您可以将任何范围的字符标记为形成注释。
+</p><div class="lisp">
+<pre class="lisp">Generic string delimiters: ‘|’
+</pre></div>
+<p>（此语法类也称为 <code>string-fence</code> 。）开始或结束字符串的字符。此类与字符串引号类的不同之处在于，任何通用字符串定界符都可以匹配任何其他通用字符串定界符；  但它们不匹配普通的字符串引号字符。
+</p>
+<p>此语法类主要用于语法表文本属性（请参阅语法属性）。通过将范围语法表属性的第一个和最后一个字符标识为通用字符串分隔符，您可以将任何范围的字符标记为形成一个字符串常量。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="36.2.2_语法标志.html">语法标志</a>, Previous: <a href="36.2_语法描述符.html">语法描述符</a>, Up: <a href="36.2_语法描述符.html">语法描述符.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

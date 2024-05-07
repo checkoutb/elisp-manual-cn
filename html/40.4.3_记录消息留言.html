@@ -1,0 +1,28 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.4.3 记录消息留言</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.4.3 记录消息留言</h3>
+<div class="nav-panel"><p>Next: <a href="40.4.4_回显区自定义.html">回显区自定义</a>, Previous: <a href="40.4.2_上报操作进度.html">上报操作进度</a>, Up: <a href="40.4_回显区.html">回显区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>几乎所有显示在回显区域的消息也都记录在 <strong>Messages</strong> 缓冲区中，以便用户可以参考它们。这包括与 message 一起输出的所有消息。默认情况下，这个缓冲区是只读的并且使用主要模式messages-buffer-mode。没有什么可以阻止用户杀死 <strong>Messages</strong> 缓冲区，但下一次显示的消息会重新创建它。任何需要直接访问 <strong>Messages</strong> 缓冲区并希望确保它存在的 Lisp 代码都应该使用函数消息缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: messages-buffer ¶
+</pre></div>
+<p>此函数返回 <strong>Messages</strong> 缓冲区。如果它不存在，它会创建它，并将其切换到消息缓冲区模式。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: message-log-max ¶
+</pre></div>
+<p>此变量指定在 <strong>Messages</strong> 缓冲区中保留多少行。值 t 表示保留多少行没有限制。值 nil 完全禁用消息记录。以下是显示消息并防止其被记录的方法：
+</p>
+<div class="lisp">
+<pre class="lisp">(let (message-log-max)
+  (message …))
+</pre></div>
+<p>为了使 <strong>Messages</strong> 对用户更方便，日志记录工具结合了连续的相同消息。为了两种情况，它还结合了连续的相关消息：问题后接答案，以及一系列进度消息。
+</p>
+<p>一个问题后面跟着一个答案有两条消息，就像 y-or-np 产生的那样：第一个是 <code>问题</code> ，第二个是 <code>问题...答案</code> 。除了第二条消息之外，第一条消息没有传达任何其他信息，因此记录第二条消息会丢弃日志中的第一条消息。
+</p>
+<p>一系列进度消息具有连续的消息，例如由 make-progress-reporter 生成的消息。它们具有 <code>base...how-far</code> 的形式，其中 base 每次都相同，而 how-far 则不同。记录系列中的每条消息都会丢弃前一条，前提是它们是连续的。
+</p>
+<p>函数 make-progress-reporter 和 y-or-np 无需执行任何特殊操作即可激活消息日志组合功能。每当记录两个连续的消息，它们共享一个以 <code>...</code> 结尾的公共前缀时，它就会运行。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.4.4_回显区自定义.html">回显区自定义</a>, Previous: <a href="40.4.2_上报操作进度.html">上报操作进度</a>, Up: <a href="40.4_回显区.html">回显区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>12.11.1 缓冲区局部变量简介</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">12.11.1 缓冲区局部变量简介</h3>
+<div class="nav-panel"><p>Next: <a href="12.11.2_创建和删除缓冲区本地绑定.html">创建和删除缓冲区本地绑定</a>, Previous: <a href="12.11_缓冲区局部变量.html">缓冲区局部变量</a>, Up: <a href="12.11_缓冲区局部变量.html">缓冲区局部变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>缓冲区局部变量具有与特定缓冲区关联的缓冲区局部绑定。当该缓冲区为当前时，绑定生效；  否则，它不会生效。如果在缓冲区本地绑定生效时设置变量，则新值将进入该绑定，因此其其他绑定保持不变。这意味着更改仅在您进行更改的缓冲区中可见。
+</p>
+<p>变量的普通绑定，不与任何特定缓冲区关联，称为默认绑定。在大多数情况下，这是全局绑定。
+</p>
+<p>变量可以在某些缓冲区中具有缓冲区本地绑定，但在其他缓冲区中则不能。默认绑定由没有自己的变量绑定的所有缓冲区共享。（这包括所有新创建的缓冲区。）如果将变量设置在没有缓冲区本地绑定的缓冲区中，则会设置默认绑定，因此新值在所有看到默认值的缓冲区中可见捆绑。
+</p>
+<p>缓冲区局部绑定最常见的用途是主要模式更改控制命令行为的变量。例如，C 模式和 Lisp 模式都设置变量paragraph-start 来指定只有空行分隔段落。他们通过在被放入 C 模式或 Lisp 模式的缓冲区中使变量缓冲区本地化，然后将其设置为该模式的新值来做到这一点。请参阅主要模式。
+</p>
+<p>进行缓冲区本地绑定的常用方法是使用 make-local-variable，这是主要模式命令通常使用的。这仅影响当前缓冲区；  所有其他缓冲区（包括尚未创建的缓冲区）将继续共享默认值，除非它们被明确地赋予自己的缓冲区本地绑定。
+</p>
+<p>更强大的操作是通过调用 make-variable-buffer-local 将变量标记为自动缓冲区本地。您可以将其视为在所有缓冲区中使变量成为本地变量，即使是那些尚未创建的缓冲区。更准确地说，效果是自动设置变量使变量成为当前缓冲区的本地变量，如果它还不是这样的话。所有缓冲区一开始都像往常一样共享变量的默认值，但设置变量会为当前缓冲区创建一个缓冲区本地绑定。新值存储在缓冲区本地绑定中，而默认绑定保持不变。这意味着不能在任何缓冲区中使用 setq 更改默认值；  改变它的唯一方法是使用 setq-default。
+</p>
+<p>警告：当一个变量在一个或多个缓冲区中具有缓冲区本地绑定时，让重新绑定当前有效的绑定。例如，如果当前缓冲区有一个缓冲区本地值，那么 let 临时重新绑定它。如果没有缓冲区本地绑定生效，让重新绑定默认值。如果在 let 内部，您然后更改为不同的当前缓冲区，其中不同的绑定有效，您将不会再看到 let 绑定。如果您在另一个缓冲区中退出 let ，您将不会看到解除绑定发生（尽管它会正确发生）。下面是一个例子来说明：
+</p>
+<div class="lisp">
+<pre class="lisp">
+
+(setq foo 'g)
+(set-buffer "a")
+(make-local-variable 'foo)
+
+(setq foo 'a)
+(let ((foo 'temp))
+  ;; foo ⇒ 'temp  ; let binding in buffer ‘a’
+  (set-buffer "b")
+  ;; foo ⇒ 'g     ; the global value since foo is not local in ‘b’
+  body…)
+
+foo ⇒ 'g        ; exiting restored the local value in buffer ‘a’,
+                 ; but we don’t see that in buffer ‘b’
+
+(set-buffer "a") ; verify the local value was restored
+foo ⇒ 'a
+</pre></div>
+<p>请注意，正文中对 foo 的引用访问缓冲区“b”的缓冲区本地绑定。
+</p>
+<p>当文件指定局部变量值时，当您访问该文件时，这些值将成为缓冲区局部值。请参阅 GNU Emacs 手册中的文件变量。
+</p>
+<p>不能将缓冲区局部变量设为终端局部（请参阅多个终端）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="12.11.2_创建和删除缓冲区本地绑定.html">创建和删除缓冲区本地绑定</a>, Previous: <a href="12.11_缓冲区局部变量.html">缓冲区局部变量</a>, Up: <a href="12.11_缓冲区局部变量.html">缓冲区局部变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

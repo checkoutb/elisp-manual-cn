@@ -1,0 +1,56 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>19.1.1 出错时进入调试器</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">19.1.1 出错时进入调试器</h3>
+<div class="nav-panel"><p>Next: <a href="19.1.2_调试无限循环.html">调试无限循环</a>, Previous: <a href="19.1_Lisp_调试器.html">Lisp_调试器</a>, Up: <a href="19.1_Lisp_调试器.html">Lisp_调试器.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>进入调试器最重要的时间是发生 Lisp 错误的时候。这使您可以调查错误的直接原因。
+</p>
+<p>但是，进入调试器并不是错误的正常结果。许多命令在调用不当时会发出 Lisp 错误信号，并且在普通编辑期间，每次发生这种情况时进入调试器会非常不方便。因此，如果您希望错误进入调试器，请将变量 debug-on-error 设置为非零。（toggle-debug-on-error 命令提供了一种简单的方法来执行此操作。）
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: debug-on-error ¶
+</pre></div>
+<p>此变量确定在发出错误信号但未处理时是否调用调试器。如果 debug-on-error 为 t，则所有类型的错误都会调用调试器，除了 debug-ignored-errors 中列出的错误（见下文）。如果为 nil，则没有人调用调试器。
+</p>
+<p>该值也可以是错误条件列表（请参阅如何发出错误信号）。然后仅针对此列表中的错误条件调用调试器（除了那些也在 debug-ignored-errors 中列出的情况）。例如，如果您将 debug-on-error 设置为列表 (void-variable)，则调试器只会针对没有值的变量的错误调用。
+</p>
+<p>请注意， eval-expression-debug-on-error 在某些情况下会覆盖此变量；  见下文。
+</p>
+<p>当这个变量不为 nil 时，Emacs 不会围绕进程过滤函数和哨兵创建错误处理程序。因此，这些函数中的错误也会调用调试器。请参阅进程。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: debug-ignored-errors ¶
+</pre></div>
+<p>此变量指定不应进入调试器的错误，无论 debug-on-error 的值如何。它的值是错误条件符号和/或正则表达式的列表。如果错误具有这些条件符号中的任何一个，或者如果错误消息与任何正则表达式匹配，则该错误不会进入调试器。
+</p>
+<p>此变量的正常值包括用户错误，以及在编辑过程中经常发生但很少由 Lisp 程序中的错误引起的几个错误。然而， <code>很少</code> 不是 <code>从不</code> ；  如果您的程序因与此列表匹配的错误而失败，您可以尝试更改此列表以调试错误。最简单的方法通常是将 debug-ignored-errors 设置为 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: eval-expression-debug-on-error ¶
+</pre></div>
+<p>如果此变量具有非 nil 值（默认值），则运行命令 eval-expression 会导致 debug-on-error 临时绑定到 t。请参阅 GNU Emacs 手册中的 Emacs Lisp 表达式求值。
+</p>
+<p>如果 eval-expression-debug-on-error 为 nil，则在 eval-expression 期间不会更改 debug-on-error 的值。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: debug-on-signal ¶
+</pre></div>
+<p>通常，条件案例捕获的错误永远不会调用调试器。在调试器有机会之前，条件案例有机会处理错误。
+</p>
+<p>如果您将 debug-on-signal 更改为非 nil 值，则无论是否存在条件情况，调试器都会在每个错误中获得第一次机会。（要调用调试器，错误仍必须满足 debug-on-error 和 debug-ignored-errors 指定的条件。）
+</p>
+<p>例如，设置此变量对于从 emacsclient 的 –eval 选项评估的代码中获取回溯很有用。如果由 emacsclient 评估的 Lisp 代码在此变量为非 nil 时发出错误信号，则回溯将在运行的 Emacs 中弹出。
+</p>
+<p>警告：将此变量设置为非零可能会产生烦人的效果。Emacs 的各个部分在正常的事务过程中捕获错误，您甚至可能没有意识到错误发生在那里。如果您需要调试包含在条件案例中的代码，请考虑使用条件案例除非调试（请参阅编写代码以处理错误）。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: debug-on-event ¶
+</pre></div>
+<p>如果将 debug-on-event 设置为特殊事件（请参阅特殊事件），Emacs 将在收到此事件后立即尝试进入调试器，绕过特殊事件映射。目前，唯一支持的值对应于信号 SIGUSR1 和 SIGUSR2（这是默认值）。当设置了禁止退出并且 Emacs 没有以其他方式响应时，这会很有帮助。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: debug-on-message ¶
+</pre></div>
+<p>如果将 debug-on-message 设置为正则表达式，则 Emacs 如果在回显区域显示匹配的消息，将进入调试器。例如，这在尝试查找特定消息的原因时很有用。
+</p>
+<p>要调试在加载初始化文件期间发生的错误，请使用选项 <code>--debug-init</code> 。这会在加载 init 文件时将 debug-on-error 绑定到 t，并绕过通常在 init 文件中捕获错误的条件情况。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="19.1.2_调试无限循环.html">调试无限循环</a>, Previous: <a href="19.1_Lisp_调试器.html">Lisp_调试器</a>, Up: <a href="19.1_Lisp_调试器.html">Lisp_调试器.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>26.13.3 零碎规格</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">26.13.3 零碎规格</h3>
+<div class="nav-panel"><p>Next: <a href="27_备份和自动保存.html">备份和自动保存</a>, Previous: <a href="26.13.2_往返规范.html">往返规范</a>, Up: <a href="26.13_文件格式转换.html">文件格式转换.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>与上一小节中描述的往返规范（参见往返规范）相比，您可以使用变量 after-insert-file-functions 和 write-region-annotate-functions 分别控制各自的读写转换.
+</p>
+<p>转换从一种表示开始并产生另一种表示。当只有一次转换要做时，从什么开始就不会有冲突。但是，当涉及到多个转换时，当两个转换需要从相同的数据开始时可能会出现冲突。
+</p>
+<p>在写入区域期间转换文本属性的上下文中可以最好地理解这种情况。例如，缓冲区中位置 42 处的字符是具有文本属性 foo 的 <code>X</code> 。如果 foo 的转换是通过插入缓冲区来完成的，比如 <code>FOO:</code> ，那么这会将位置 42 处的字符从 <code>X</code> 更改为 <code>F</code> 。下一次转换将立即从错误的数据开始。
+</p>
+<p>为避免冲突，协同转换不会修改缓冲区，而是指定注释，即表单的元素列表（位置.字符串），按位置递增的顺序排序。
+</p>
+<p>如果有多个转换，write-region 会破坏性地将它们的注释合并到一个排序列表中。稍后，当缓冲区中的文本实际写入文件时，它会在相应位置混合指定的注释。所有这些都发生在不修改缓冲区的情况下。
+</p>
+<p>相反，在阅读时，与文本混合的注释会立即处理。insert-file-contents 设置指向要转换的某些文本的开头，然后使用该文本的长度调用转换函数。这些函数应始终在插入文本的开头返回点。这种方法对阅读很有意义，因为第一个转换器删除的注释不会被后面的转换器错误地处理。每个转换函数都应该扫描它识别的注释，删除注释，修改缓冲区文本（例如设置文本属性），并返回文本的更新长度，因为它在这些更改之后保持不变。一个函数返回的值成为下一个函数的参数。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: write-region-annotate-functions ¶
+</pre></div>
+<p>write-region 要调用的函数列表。列表中的每个函数都使用两个参数调用：要写入的区域的开始和结束。这些函数不应该改变缓冲区的内容。相反，它们应该返回注释。
+</p>
+<p>作为一种特殊情况，函数可能会以不同的缓冲电流返回。Emacs 认为这意味着当前缓冲区包含要输出的已更改文本。因此，它更改了 write-region 调用的开始和结束参数，分别为它们提供了新缓冲区中的 point-min 和 point-max 的值。它还丢弃所有以前的注释，因为它们应该由这个函数处理。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: write-region-post-annotation-function ¶
+</pre></div>
+<p>这个变量的值，如果非零，应该是一个函数。在 write-region 完成后调用此函数，不带参数。
+</p>
+<p>如果 write-region-annotate-functions 中的任何函数返回不同的缓冲区电流，Emacs 会多次调用 write-region-post-annotation-function。Emacs 使用当前的最后一个缓冲区调用它，然后再次使用之前的缓冲区调用它，以此类推回到原始缓冲区。
+</p>
+<p>因此，write-region-annotate-functions 中的函数可以创建一个缓冲区，为该变量赋予该缓冲区中 kill-buffer 的本地值，使用更改的文本设置缓冲区，并使缓冲区成为当前缓冲区。缓冲区将在写入区域完成后被杀死。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: after-insert-file-functions ¶
+</pre></div>
+<p>此列表中的每个函数都由 insert-file-contents 调用，其参数为插入的字符数，点位于插入文本的开头。每个函数都应保持 point 不变，并返回描述插入文本的新字符数，该字符数由函数修改。
+</p>
+<p>我们邀请用户编写 Lisp 程序来存储和检索文件中的文本属性，使用这些钩子，从而尝试各种数据格式并找到好的格式。最终，我们希望用户能够生成可以安装在 Emacs 中的良好、通用的扩展。
+</p>
+<p>我们建议不要尝试将任意 Lisp 对象作为文本属性名称或值来处理——因为一般的程序可能很难编写，而且速度很慢。相反，选择一组相当灵活且不太难编码的可能数据类型。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="27_备份和自动保存.html">备份和自动保存</a>, Previous: <a href="26.13.2_往返规范.html">往返规范</a>, Up: <a href="26.13_文件格式转换.html">文件格式转换.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

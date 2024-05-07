@@ -1,0 +1,97 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.12.2 定义面</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.12.2 定义面</h3>
+<div class="nav-panel"><p>Next: <a href="40.12.3_面属性函数.html">面属性函数</a>, Previous: <a href="40.12.1_面属性.html">面属性</a>, Up: <a href="40.12_面.html">面.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>定义面的常用方法是通过 defface 宏。此宏将面名称（符号）与默认面规格相关联。面规范是一种构造，它指定面在任何给定终端上应具有的属性；  例如，面规范可能会在高颜色终端上指定一种前景色，在低颜色终端上指定不同的前景色。
+</p>
+<p>人们有时很想创建一个值是面名称的变量。在绝大多数情况下，这不是必需的；  通常的程序是用 defface 定义一个面，然后直接使用它的名字。
+</p>
+<p>请注意，一旦定义了一个面（通常使用 defface），以后就不能安全地取消定义这个面，除非重新启动 Emacs。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: defface face spec doc [keyword value]… ¶
+</pre></div>
+<p>这个宏将 face 声明为一个命名的 face，其默认的 face spec 由 spec 给出。您不应引用符号 face，并且不应以 <code>-face</code> 结尾（这将是多余的）。参数 doc 是面的文档字符串。附加的关键字参数与 defgroup 和 defcustom 中的含义相同（请参阅通用项关键字）。
+</p>
+<p>如果 face 已经有一个默认的 face spec，这个宏什么也不做。
+</p>
+<p>当没有自定义生效时，默认面规格确定面的外观（请参阅自定义设置）。如果面已经被自定义（通过自定义主题或通过从 init 文件中读取的自定义），则其外观由自定义面规范确定，该规范会覆盖默认面规范规范。但是，如果随后删除了自定义，则面外观将再次由其默认面规格确定。
+</p>
+<p>作为例外，如果您在 Emacs Lisp 模式下使用 <code>C-M x</code> (eval-defun) 或 <code>C-x C-e</code> (eval-last-sexp) 评估 defface 表单，这些命令的一个特殊功能会覆盖面上的任何自定义面规范，从而导致face 以准确反映 deface 所说的内容。
+</p>
+<p>spec 参数是一个面规范，它说明面应该如何出现在不同类型的终端上。它应该是一个 alist，其每个元素都具有以下形式
+</p>
+<div class="lisp">
+<pre class="lisp">(display . plist)
+</pre></div>
+<p>display 指定了一类终端（见下文）。plist 是面属性及其值的属性列表，指定面在此类终端上的显示方式。为了向后兼容，您还可以将元素编写为 (display plist)。
+</p>
+<p>spec 元素的显示部分决定了该元素匹配的终端。如果规范的多个元素与给定终端匹配，则匹配的第一个元素是用于该终端的元素。有三种显示方式：
+</p>
+<div class="lisp">
+<pre class="lisp">default
+</pre></div>
+<p>该规范元素不匹配任何终端；  相反，它指定适用于所有终端的默认值。如果使用此元素，则必须是规范的第一个元素。以下每个元素都可以覆盖任何或所有这些默认值。
+</p><div class="lisp">
+<pre class="lisp">t
+</pre></div>
+<p>该规范元素匹配所有终端。因此，从不使用 spec 的任何后续元素。通常 t 用在 spec 的最后一个（或唯一一个）元素中。
+</p><div class="lisp">
+<pre class="lisp">a list
+</pre></div>
+<p>如果 display 是一个列表，那么每个元素都应该有形式（特征值…）。这里的特性指定了一种对终端进行分类的方式，这些值是显示应该适用的可能分类。以下是特征的可能值：
+</p>
+<div class="lisp">
+<pre class="lisp">type
+</pre></div>
+<p>终端使用的窗口系统类型——图形（任何支持图形的显示器）、x、pc（用于 MS-DOS 控制台）、w32（用于 MS Windows 9X/NT/2K/XP）或 tty（非-图形显示）。请参阅窗口系统。
+</p><div class="lisp">
+<pre class="lisp">class
+</pre></div>
+<p>终端支持哪种颜色——彩色、灰度或单色。
+</p><div class="lisp">
+<pre class="lisp">background
+</pre></div>
+<p>背景的种类——浅色或深色。
+</p><div class="lisp">
+<pre class="lisp">min-colors
+</pre></div>
+<p>一个整数，表示终端应支持的最小颜色数。如果终端的 display-color-cells 值至少是指定的整数，则它匹配终端。
+</p><div class="lisp">
+<pre class="lisp">supports
+</pre></div>
+<p>终端是否可以显示 value 中给出的面属性…（参见面属性）。请参阅显示面属性测试，了解有关此测试具体如何完成的更多信息。
+</p>
+<p>如果显示元素为给定特性指定了多个值，则这些值中的任何一个都是可接受的。如果 display 有多个元素，每个元素都应该指定不同的特性；  那么终端的每个特征都必须匹配在显示中为其指定的值之一。
+</p>
+<p>例如，下面是标准面高光的定义：
+</p>
+<div class="lisp">
+<pre class="lisp">(defface highlight
+  '((((class color) (min-colors 88) (background light))
+     :background "darkseagreen2")
+    (((class color) (min-colors 88) (background dark))
+     :background "darkolivegreen")
+    (((class color) (min-colors 16) (background light))
+     :background "darkseagreen2")
+    (((class color) (min-colors 16) (background dark))
+     :background "darkolivegreen")
+    (((class color) (min-colors 8))
+     :background "green" :foreground "black")
+    (t :inverse-video t))
+  "Basic face for highlighting."
+  :group 'basic-faces)
+</pre></div>
+<p>在内部，Emacs 将每个面的默认规范存储在其 face-defface-spec 符号属性中（请参阅符号属性）。saved-face 属性存储用户使用自定义缓冲区保存的任何面规格；  custom-face 属性存储了为当前会话定制的面规格，但没有保存；  theme-face 属性存储一个列表，将活动的自定义设置和自定义主题与该面的面规格相关联。面的文档字符串存储在 face-documentation 属性中。
+</p>
+<p>通常，使用 defface 只声明一次面，对其外观的任何进一步更改都使用 Customize 框架（例如，通过 Customize 用户界面或通过 custom-set-faces 功能；请参阅应用自定义），或通过面重映射（请参阅面重映射）。在极少数情况下，您需要直接从 Lisp 更改面规范，您可以使用 face-spec-set 函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: face-spec-set face spec &amp;optional spec-type ¶
+</pre></div>
+<p>此函数将规格用作面的面规格。spec 应该是一个面规范，如上面的 defface 文档中所述。
+</p>
+<p>如果 face 还不是一个，此函数还将 face 定义为有效的 face name，并（重新）计算其在现有帧上的属性。
+</p>
+<p>可选参数 spec-type 确定要设置的规范。如果省略或 nil 或 face-override-spec，此函数设置覆盖规范，它覆盖下面提到的所有其他类型的 face 上的面规范。这在自定义代码之外调用此函数时很有用。如果spec-type是customized-face或者saved-face，这个函数分别设置自定义的spec或者保存的自定义spec。如果是face-defface-spec，这个函数设置默认的face spec（和defface设置的一样）。如果重置，此函数会清除所有自定义规范并覆盖面中的规范（在这种情况下，忽略规范的值）。spec-type 的任何其他值对 face specs 的影响保留供内部使用，但该函数仍将定义 face 本身并重新计算其属性，如上所述。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.12.3_面属性函数.html">面属性函数</a>, Previous: <a href="40.12.1_面属性.html">面属性</a>, Up: <a href="40.12_面.html">面.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

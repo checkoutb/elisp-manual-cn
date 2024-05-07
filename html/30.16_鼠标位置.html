@@ -1,0 +1,61 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>30.16 鼠标位置</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">30.16 鼠标位置</h2>
+<div class="nav-panel"><p>Next: <a href="30.17_弹出菜单.html">弹出菜单</a>, Previous: <a href="30.15_鼠标跟踪.html">鼠标跟踪</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>函数 mouse-position 和 set-mouse-position 可以访问鼠标的当前位置。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: mouse-position ¶
+</pre></div>
+<p>此函数返回鼠标位置的描述。该值看起来像 (frame x . y)，其中 x 和 y 是整数，给出相对于 frame 的原始位置（参见 Frame Geometry）的帧默认字符大小的倍数（可能是四舍五入的）位置（参见 Frame Font） .
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: mouse-position-function ¶
+</pre></div>
+<p>如果非零，则此变量的值是鼠标位置调用的函数。mouse-position 在返回之前调用这个函数，它的正常返回值作为唯一的参数，它返回这个函数返回给它的任何东西。
+</p>
+<p>这个异常钩子的存在是为了像 xt-mouse.el 这样需要在 Lisp 级别进行鼠标处理的包。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: tty-menu-calls-mouse-position-function ¶
+</pre></div>
+<p>如果非零，TTY 菜单将调用鼠标位置函数，如上所述。这存在于 TTY 菜单调用 mouse-position-function 不安全的情况下，例如它是否可以触发重新显示。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-mouse-position frame x y ¶
+</pre></div>
+<p>此函数将鼠标扭曲到帧中的 x、y 位置。参数 x 和 y 是整数，以帧的默认字符大小（请参阅帧字体）相对于帧的原始位置（请参阅帧几何）的倍数给出位置。
+</p>
+<p>生成的鼠标位置被限制在 frame 的原生帧内。如果帧不可见，则此函数不执行任何操作。返回值不重要。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: mouse-pixel-position ¶
+</pre></div>
+<p>此函数类似于 mouse-position，不同之处在于它以像素为单位返回坐标，而不是以字符为单位。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-mouse-pixel-position frame x y ¶
+</pre></div>
+<p>这个函数像 set-mouse-position 一样扭曲鼠标，除了 x 和 y 是像素单位而不是字符单位。
+</p>
+<p>生成的鼠标位置不受帧的本机帧的限制。如果帧不可见，则此函数不执行任何操作。返回值不重要。
+</p>
+<p>在图形终端上，以下两个函数允许检索和设置鼠标光标的绝对位置。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: mouse-absolute-pixel-position ¶
+</pre></div>
+<p>此函数返回鼠标光标位置坐标的 cons 单元格 (x . y)，以像素为单位，相对于所选帧显示的位置 (0, 0)。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-mouse-absolute-pixel-position x y ¶
+</pre></div>
+<p>此函数将鼠标光标移动到位置 (x, y)。坐标 x 和 y 以相对于所选帧显示的位置 (0, 0) 的像素为单位进行解释。
+</p>
+<p>以下函数可以判断鼠标光标当前是否在帧上可见：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: frame-pointer-visible-p &amp;optional frame ¶
+</pre></div>
+<p>如果显示在帧上的鼠标指针可见，则此谓词函数返回非零；  否则返回零。frame 省略或 nil 表示选择的帧。这在 make-pointer-invisible 设置为 t 时很有用：它允许您知道指针是否已被隐藏。请参阅 Emacs 手册中的鼠标避免。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="30.17_弹出菜单.html">弹出菜单</a>, Previous: <a href="30.15_鼠标跟踪.html">鼠标跟踪</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

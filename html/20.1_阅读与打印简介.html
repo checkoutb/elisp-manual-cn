@@ -1,0 +1,20 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>20.1 阅读与打印简介</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">20.1 阅读与打印简介</h2>
+<div class="nav-panel"><p>Next: <a href="20.2_输入流.html">输入流</a>, Previous: <a href="20_阅读和打印_Lisp_对象.html">阅读和打印_Lisp_对象</a>, Up: <a href="20_阅读和打印_Lisp_对象.html">阅读和打印_Lisp_对象.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>读取 Lisp 对象意味着以文本形式解析 Lisp 表达式并生成相应的 Lisp 对象。这就是 Lisp 程序从 Lisp 代码文件进入 Lisp 的方式。我们将文本称为对象的读取语法。例如，文本 ’(a . 5)’ 是 CAR 为 a 且 CDR 为数字 5 的 cons 单元格的读取语法。
+</p>
+<p>打印 Lisp 对象意味着生成表示该对象的文本——将对象转换为其打印表示（请参阅打印表示和读取语法）。打印上述 cons 单元格会生成文本 <code>(a . 5)</code> 。
+</p>
+<p>读取和打印或多或少是逆操作：打印读取给定文本的对象通常会生成相同的文本，而读取打印对象的文本通常会生成外观相似的对象。例如，打印符号 foo 会生成文本 <code>foo</code> ，读取该文本会返回符号 foo。打印元素为 a 和 b 的列表会生成文本 <code>(ab)</code> ，读取该文本会生成包含元素 a 和 b 的列表（但不是同一个列表）。
+</p>
+<p>然而，这两个操作并不完全相反。有以下三种例外情况：
+</p>
+<ul>
+<li>
+打印会产生无法阅读的文本。例如，缓冲区、窗口、框架、子进程和标记打印为以 <code>#</code> 开头的文本；  如果您尝试阅读此文本，则会收到错误消息。没有办法读取这些数据类型。
+</li><li>
+一个对象可以有多个文本表示。例如，’1’ 和 ’01’ 代表同一个整数，而 ’(ab)’ 和 ’(a . (b))’ 代表同一个列表。阅读将接受任何替代方案，但印刷必须选择其中之一。
+</li><li>
+注释可以出现在对象读取序列中间的某些点，而不会影响读取结果。
+</li></ul>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="20.2_输入流.html">输入流</a>, Previous: <a href="20_阅读和打印_Lisp_对象.html">阅读和打印_Lisp_对象</a>, Up: <a href="20_阅读和打印_Lisp_对象.html">阅读和打印_Lisp_对象.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

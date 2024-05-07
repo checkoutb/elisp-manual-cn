@@ -1,0 +1,159 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.7.4 点击事件</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">22.7.4 点击事件</h3>
+<div class="nav-panel"><p>Next: <a href="22.7.5_拖动事件.html">拖动事件</a>, Previous: <a href="22.7.3_鼠标事件.html">鼠标事件</a>, Up: <a href="22.7_输入事件.html">输入事件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当用户按下鼠标按钮并在同一位置释放它时，会生成一个单击事件。根据您的窗口系统报告鼠标滚轮事件的方式，转动鼠标滚轮可以生成鼠标单击或鼠标滚轮事件。所有鼠标事件共享相同的格式：
+</p>
+<div class="lisp">
+<pre class="lisp">(event-type position click-count)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">event-type
+</pre></div>
+<p>这是一个符号，表示使用了哪个鼠标按钮。它是鼠标 1、鼠标 2、… 的符号之一，其中按钮从左到右编号。对于鼠标滚轮事件，它可以是上滚轮或下滚轮。
+</p>
+<p>您还可以使用前缀 <code>A-</code> 、 <code>C-</code> 、 <code>H-</code> 、 <code>M-</code> 、 <code>S-</code> 和 <code>s-</code> 作为修饰符 alt、control、hyper、meta、shift 和 super，就像你会用功能键。
+</p>
+<p>该符号也用作事件的事件类型。键绑定按类型描述事件；  因此，如果有 mouse-1 的键绑定，则该绑定将应用于事件类型为 mouse-1 的所有事件。
+</p><div class="lisp">
+<pre class="lisp">position ¶
+</pre></div>
+<p>这是一个鼠标位置列表，指定鼠标事件发生的位置；  详情见下文。
+</p><div class="lisp">
+<pre class="lisp">click-count
+</pre></div>
+<p>这是迄今为止快速重复按下同一鼠标按钮的次数或重复转动滚轮的次数。请参阅重复事件。
+</p>
+<p>要在鼠标事件的位置槽中访问鼠标位置列表的内容，通常应该使用访问鼠标事件中记录的函数。
+</p>
+<p>列表的显式格式取决于事件发生的位置。对于文本区域、模式行、标题行、制表行或边缘或边缘区域中的单击，鼠标位置列表具有以下形式
+</p>
+<div class="lisp">
+<pre class="lisp">(window pos-or-area (x . y) timestamp
+ object text-pos (col . row)
+ image (dx . dy) (width . height))
+</pre></div>
+<p>这些列表元素的含义如下：
+</p>
+<div class="lisp">
+<pre class="lisp">window
+</pre></div>
+<p>发生鼠标事件的窗口。
+</p><div class="lisp">
+<pre class="lisp">pos-or-area
+</pre></div>
+<p>点击字符在文本区域的缓冲位置；  或者，如果事件在文本区域之外，则为它发生的窗口区域。它是模式行、标题行、制表行、垂直行、左边距、右边距、左边缘或右边缘的符号之一。
+</p>
+<p>在一种特殊情况下，pos-or-area 是一个包含符号（上面列出的符号之一）的列表，而不仅仅是符号。这发生在 Emacs 注册事件的假想前缀键之后。请参阅按键序列输入。
+</p><div class="lisp">
+<pre class="lisp">x, y
+</pre></div>
+<p>事件的相对像素坐标。对于窗口文本区域中的事件，坐标原点 (0 . 0) 被视为文本区域的左上角。请参阅窗口大小。对于模式行、标题行或标签行中的事件，坐标原点是窗口本身的左上角。对于边缘、边距和垂直边框，x 没有有意义的数据。对于边缘和边距，y 相对于标题行的底部边缘。在所有情况下，x 和 y 坐标分别向右和向下增加。
+</p><div class="lisp">
+<pre class="lisp">timestamp
+</pre></div>
+<p>事件发生的时间，从与系统相关的初始时间开始的整数毫秒数。
+</p><div class="lisp">
+<pre class="lisp">object
+</pre></div>
+<p>要么是 nil，这意味着事件发生在缓冲区文本上，要么是形式为 (string . string-pos) 的 cons 单元格，如果在事件位置存在来自文本属性或覆盖的字符串。
+</p>
+<p>细绳
+</p>
+<p>     单击的字符串，包括任何属性。
+字符串位置
+</p>
+<p>发生单击的字符串中的位置。
+</p>
+<div class="lisp">
+<pre class="lisp">text-pos
+</pre></div>
+<p>对于边缘区域或边缘的单击，这是窗口中相应行中第一个可见字符的缓冲区位置。对于模式行、标题行或制表行的点击，这是 nil。对于其他事件，它是最接近点击的缓冲区位置。
+</p><div class="lisp">
+<pre class="lisp">col, row
+</pre></div>
+<p>这些是 x、y 位置下字形的实际列和行坐标数。如果 x 位于其行上实际文本的最后一列之外，则通过添加具有默认字符宽度的虚构额外列来报告 col。如果窗口有一个标题行，则将第 0 行作为标题行，如果窗口也有标签行，则将第 1 行作为标题行，否则将作为文本区域的最顶行。第 0 列被视为文本区域的最左侧列，用于单击窗口文本区域，或最左侧的模式行或标题行列，用于单击那里。对于边缘或垂直边界的点击，这些没有有意义的数据。对于边距上的点击，col 是从边距区域的左边缘开始测量的，而 row 是从边距区域的顶部开始测量的。
+</p><div class="lisp">
+<pre class="lisp">image
+</pre></div>
+<p>如果单击位置有图像，则这是 find-image 返回的图像对象（请参阅定义图像）；  否则这是零。
+</p><div class="lisp">
+<pre class="lisp">dx, dy
+</pre></div>
+<p>这些是点击的像素坐标，相对于对象的左上角，即 (0 . 0)。如果 object 为 nil，代表缓冲区，则坐标相对于单击的字符字形的左上角。
+</p><div class="lisp">
+<pre class="lisp">width, height
+</pre></div>
+<p>如果单击的是字符，无论是来自缓冲区文本还是来自覆盖或显示字符串，这些都是该字符字形的像素宽度和高度；  否则它们是点击的对象的尺寸。
+</p>
+<p>对于滚动条上的点击，位置具有以下形式：
+</p>
+<div class="lisp">
+<pre class="lisp">(window area (portion . whole) timestamp part)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">window
+</pre></div>
+<p>单击其滚动条的窗口。
+</p><div class="lisp">
+<pre class="lisp">area
+</pre></div>
+<p>这是符号垂直滚动条。
+</p><div class="lisp">
+<pre class="lisp">portion
+</pre></div>
+<p>从滚动条顶部到点击位置的像素数。在某些工具包上，包括 GTK+，Emacs 无法提取此数据，因此该值始终为 0。
+</p><div class="lisp">
+<pre class="lisp">whole
+</pre></div>
+<p>滚动条的总长度（以像素为单位）。在某些工具包上，包括 GTK+，Emacs 无法提取此数据，因此该值始终为 0。
+</p><div class="lisp">
+<pre class="lisp">timestamp
+</pre></div>
+<p>事件发生的时间，以毫秒为单位。在某些工具包上，包括 GTK+，Emacs 无法提取此数据，因此该值始终为 0。
+</p><div class="lisp">
+<pre class="lisp">part
+</pre></div>
+<p>发生单击的滚动条部分。它是句柄（滚动条句柄）、上句柄（句柄上方区域）、下句柄（句柄下方区域）、向上（滚动条一端的向上箭头）、或向下（滚动条一端的向下箭头）。
+</p>
+<p>对于框架的内部边框（参见框架布局）、框架的工具栏（参见工具栏）或标签栏的点击，位置具有以下形式：
+</p>
+<div class="lisp">
+<pre class="lisp">(frame part (X . Y) timestamp)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">frame
+</pre></div>
+<p>单击其内部边框或工具栏或选项卡栏的框架。
+</p><div class="lisp">
+<pre class="lisp">part
+</pre></div>
+<p>被点击的框架部分。这可以是以下之一：
+</p>
+<div class="lisp">
+<pre class="lisp">tool-bar
+</pre></div>
+<p>框架有一个工具栏，事件在工具栏区域。
+</p><div class="lisp">
+<pre class="lisp">tab-bar
+</pre></div>
+<p>框架有一个标签栏，事件在标签栏区域。
+</p><div class="lisp">
+<pre class="lisp">left-edge
+top-edge
+right-edge
+bottom-edge
+</pre></div>
+<p>点击是在相应的边界上，距离边界最近的角至少有一个规范字符的偏移量。
+</p><div class="lisp">
+<pre class="lisp">top-left-corner
+top-right-corner
+bottom-right-corner
+bottom-left-corner
+</pre></div>
+<p>单击是在内部边框的相应角上。
+</p><div class="lisp">
+<pre class="lisp">nil
+</pre></div>
+<p>框架没有内部边框，并且事件不在选项卡栏或工具栏上。这通常发生在文本模式框架上。如果框架没有将其 drag-internal-border 参数（请参阅鼠标拖动参数）设置为非零值，则这也可能发生在具有内部边框的 GUI 框架上。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.7.5_拖动事件.html">拖动事件</a>, Previous: <a href="22.7.3_鼠标事件.html">鼠标事件</a>, Up: <a href="22.7_输入事件.html">输入事件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

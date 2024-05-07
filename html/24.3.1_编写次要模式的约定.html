@@ -1,0 +1,71 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.3.1 编写次要模式的约定</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">24.3.1 编写次要模式的约定</h3>
+<div class="nav-panel"><p>Next: <a href="24.3.2_键盘映射和次要模式.html">键盘映射和次要模式</a>, Previous: <a href="24.3_次要模式.html">次要模式</a>, Up: <a href="24.3_次要模式.html">次要模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>编写次要模式有一些约定，就像主要模式一样（请参阅主要模式）。这些约定如下所述。遵循它们的最简单方法是使用宏define-minor-mode。请参阅定义次要模式。
+</p>
+<p>定义一个名称以 <code>-mode</code> 结尾的变量。我们称之为模式变量。次要模式命令应设置此变量。如果模式被禁用，该值将为 nil，如果模式被启用，则值为非 nil。如果次要模式是缓冲区本地，则该变量应该是缓冲区本地。
+</p>
+<p>此变量与 minor-mode-alist 结合使用，以在模式行中显示次要模式名称。它还通过 minor-mode-map-alist 确定次要模式键盘映射是否处于活动状态（请参阅控制活动键盘映射）。单独的命令或钩​​子也可以检查它的值。
+定义一个命令，称为模式命令，其名称与模式变量相同。它的工作是设置模式变量的值，以及实际启用或禁用模式功能所需执行的任何其他操作。
+</p>
+<p>mode 命令应该接受一个可选参数。如果在没有前缀参数的情况下交互调用，它应该切换模式（即，如果它被禁用，则启用，如果它被启用，则禁用）。如果使用前缀参数交互调用，则如果参数为正，则应启用该模式，否则禁用该模式。
+</p>
+<p>如果从 Lisp 调用模式命令（即非交互方式），如果参数被省略或为零，它应该启用模式；  如果参数是符号切换，它应该切换模式；  否则，它应该以与带有数字前缀参数的交互式调用相同的方式处理该参数，如上所述。
+</p>
+<p>以下示例显示了如何实现此行为（它类似于由 define-minor-mode 宏生成的代码）：
+</p><div class="lisp">
+<pre class="lisp">(interactive (list (or current-prefix-arg 'toggle)))
+(let ((enable
+       (if (eq arg 'toggle)
+           (not foo-mode) ; this is the mode’s mode variable
+         (&gt; (prefix-numeric-value arg) 0))))
+  (if enable
+      do-enable
+    do-disable))
+</pre></div>
+<p>这种有点复杂的行为的原因是它让用户可以轻松地交互切换次要模式，并且还可以在模式挂钩中轻松启用次要模式，如下所示：
+</p><div class="lisp">
+<pre class="lisp">(add-hook 'text-mode-hook 'foo-mode)
+</pre></div>
+<p>无论 foo-mode 是否已经启用，这都会正确运行，因为 foo-mode mode 命令在从 Lisp 调用时无条件启用次要模式，没有参数。在模式挂钩中禁用次要模式有点难看：
+</p>
+<div class="lisp">
+<pre class="lisp">(add-hook 'text-mode-hook (lambda () (foo-mode -1)))
+</pre></div>
+<p>但是，这并不常见。
+</p>
+<p>连续两次启用或禁用次要模式不应失败，并且应该与仅启用或禁用一次相同。换句话说，次要模式命令应该是幂等的。
+如果要在模式行中指示次要模式，请为每个次要模式添加一个元素到次要模式（请参阅次要模式的定义）。此元素应为以下形式的列表：
+</p>
+<div class="lisp">
+<pre class="lisp">(mode-variable string)
+</pre></div>
+<p>这里 mode-variable 是控制次要模式启用的变量，而 string 是一个短字符串，以空格开头，表示模式行中的模式。这些字符串必须很短，以便有空间同时容纳几个。
+</p>
+<p>将元素添加到 minor-mode-alist 时，使用 assq 检查现有元素，以避免重复。例如：
+</p><div class="lisp">
+<pre class="lisp">(unless (assq 'leif-mode minor-mode-alist)
+  (push '(leif-mode " Leif") minor-mode-alist))
+</pre></div>
+<p>或者像这样，使用 add-to-list （请参阅修改列表变量）：
+</p><div class="lisp">
+<pre class="lisp">(add-to-list 'minor-mode-alist '(leif-mode " Leif"))
+</pre></div>
+<p>此外，一些主要模式约定（请参阅主要模式约定）也适用于次要模式：关于全局符号名称、在初始化函数末尾使用挂钩以及使用键映射和其他表的那些。
+</p>
+<p>如果可能，次要模式应支持通过自定义启用和禁用（请参阅自定义设置）。为此，模式变量应使用 defcustom 定义，通常使用 :type ’boolean.  如果仅设置变量不足以启用该模式，您还应该指定一个 :set 方法，该方法通过调用 mode 命令来启用该模式。请注意，在变量的文档字符串中，通过自定义以外的方式设置变量可能不会生效。此外，使用自动加载 cookie 标记定义（请参阅自动加载 cookie），并指定 :require 以便自定义变量将加载定义模式的库。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">;;;###autoload
+(defcustom msb-mode nil
+  "Toggle msb-mode.
+Setting this variable directly does not take effect;
+use either \\[customize] or the function `msb-mode'."
+  :set 'custom-set-minor-mode
+  :initialize 'custom-initialize-default
+  :version "20.4"
+  :type    'boolean
+  :group   'msb
+  :require 'msb)
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="24.3.2_键盘映射和次要模式.html">键盘映射和次要模式</a>, Previous: <a href="24.3_次要模式.html">次要模式</a>, Up: <a href="24.3_次要模式.html">次要模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

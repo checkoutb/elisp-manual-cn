@@ -1,0 +1,26 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.17.1 图像格式</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.17.1 图像格式</h3>
+<div class="nav-panel"><p>Next: <a href="40.17.2_图像描述符.html">图像描述符</a>, Previous: <a href="40.17_图像.html">图像</a>, Up: <a href="40.17_图像.html">图像.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 可以显示许多不同的图像格式。仅当安装了特定的支持库时才支持其中一些图像格式。在某些平台上，Emacs 可以按需加载支持库；  如果是这样，变量 dynamic-library-alist 可用于修改这些动态库的已知名称集。请参阅动态加载的库。
+</p>
+<p>支持的图像格式（以及所需的支持库）包括 PBM 和 XBM（它们不依赖于支持库并且始终可用）、XPM (libXpm)、GIF (libgif 或 libungif)、JPEG (libjpeg)、TIFF (libtiff)、 PNG (libpng) 和 SVG (librsvg)。
+</p>
+<p>这些图像格式中的每一种都与图像类型符号相关联。上述格式的符号分别为 pbm、xbm、xpm、gif、jpeg、tiff、png 和 svg。
+</p>
+<p>此外，如果您使用 ImageMagick (libMagickWand) 支持构建 Emacs，Emacs 可以显示 ImageMagick 可以显示的任何图像格式。请参阅 ImageMagick 图像。通过 ImageMagick 显示的所有图像都有类型符号 imagemagick。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: image-types ¶
+</pre></div>
+<p>此变量包含当前配置中可能支持的图像格式的类型符号列表。
+</p>
+<p><code>可能</code> 意味着 Emacs 知道图像类型，不一定知道它们可以使用（例如，它们可能依赖于不可用的动态库）。要知道哪些图像类型真正可用，请使用 image-type-available-p。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: image-type-available-p type ¶
+</pre></div>
+<p>如果可以加载和显示类型类型的图像，则此函数返回非 nil。type 必须是图像类型符号。
+</p>
+<p>对于支持库静态链接的图像类型，此函数始终返回 t。对于动态加载支持库的图像类型，如果可以加载库，则返回 t ，否则返回 nil 。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.17.2_图像描述符.html">图像描述符</a>, Previous: <a href="40.17_图像.html">图像</a>, Up: <a href="40.17_图像.html">图像.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

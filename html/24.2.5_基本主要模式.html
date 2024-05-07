@@ -1,0 +1,33 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.2.5 基本主要模式</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">24.2.5 基本主要模式</h3>
+<div class="nav-panel"><p>Next: <a href="24.2.6_模式挂钩.html">模式挂钩</a>, Previous: <a href="24.2.4_定义派生模式.html">定义派生模式</a>, Up: <a href="24.2_主要模式.html">主要模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>除基本模式外，其他主要模式通常源自三种主要模式：文本模式、程序模式和特殊模式。虽然 Text 模式本身很有用（例如，用于编辑以 .txt 结尾的文件），但 Prog 模式和 Special 模式的存在主要是为了让其他模式从中派生。
+</p>
+<p>应尽可能直接或间接地从这三种模式中的一种派生出新的主要模式。一个原因是这允许用户为整个系列的相关模式（例如，所有编程语言模式）定制单个模式挂钩（例如，prog-mode-hook）。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: text-mode ¶
+</pre></div>
+<p>文本模式是编辑人类语言的主要模式。它将 ’"’ 和 ’\’ 字符定义为具有标点语法（参见语法类表），并将 M-TAB 绑定到 ispell-complete-word（参见 GNU Emacs 手册中的拼写）。
+</p>
+<p>从文本模式派生的主要模式的一个示例是 HTML 模式。请参阅 GNU Emacs 手册中的 SGML 和 HTML 模式。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: prog-mode ¶
+</pre></div>
+<p>Prog 模式是包含编程语言源代码的缓冲区的基本主要模式。Emacs 中内置的大部分编程语言主要模式都是从它衍生而来的。
+</p>
+<p>Prog 模式将 parse-sexp-ignore-comments 绑定到 t（参见基于解析的运动命令）和从左到右的双向段落方向（参见双向显示）。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: special-mode ¶
+</pre></div>
+<p>特殊模式是包含由 Emacs 专门生成的文本的缓冲区的基本主要模式，而不是直接从文件中生成。从特殊模式派生的主要模式被赋予特殊的模式类属性（请参阅主要模式约定）。
+</p>
+<p>特殊模式将缓冲区设置为只读。它的键映射定义了几个常见的绑定，包括 q 用于退出窗口和 g 用于恢复缓冲区（请参阅 Reverting）。
+</p>
+<p>从特殊模式派生的主要模式的一个示例是缓冲区菜单模式，它由 <strong>Buffer List</strong> 缓冲区使用。请参阅 GNU Emacs 手册中的列出现有缓冲区。
+</p>
+<p>此外，制表数据缓冲区的模式可以继承自制表模式，而制表模式又派生自特殊模式。请参阅列表模式。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="24.2.6_模式挂钩.html">模式挂钩</a>, Previous: <a href="24.2.4_定义派生模式.html">定义派生模式</a>, Up: <a href="24.2_主要模式.html">主要模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,18 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>39.16 数据报</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">39.16 数据报</h2>
+<div class="nav-panel"><p>Next: <a href="39.17_低级网络访问.html">低级网络访问</a>, Previous: <a href="39.15_网络服务器.html">网络服务器</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>数据报连接与单个数据包而不是数据流进行通信。对 process-send 的每次调用都会发送一个数据报包（请参阅向进程发送输入），并且收到的每个数据报都会导致对过滤器函数的一次调用。
+</p>
+<p>数据报连接不必一直与同一个远程对等方通信。它有一个远程对等地址，它指定将数据报发送到哪里。每次传入的数据报被传递给过滤函数时，对端地址被设置为数据报来自的地址；  这样，如果过滤器函数发送了一个数据报，它就会回到那个地方。您可以在使用 :remote 关键字创建数据报连接时指定远程对等地址。您可以稍后通过调用 set-process-datagram-address 来更改它。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: process-datagram-address process ¶
+</pre></div>
+<p>如果进程是数据报连接或服务器，则此函数返回其远程对等地址。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-process-datagram-address process address ¶
+</pre></div>
+<p>如果进程是数据报连接或服务器，则此函数将其远程对等地址设置为地址。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="39.17_低级网络访问.html">低级网络访问</a>, Previous: <a href="39.15_网络服务器.html">网络服务器</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

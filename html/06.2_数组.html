@@ -1,0 +1,36 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>6.2 数组</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">6.2 数组</h2>
+<div class="nav-panel"><p>Next: <a href="06.3_操作数组的函数.html">操作数组的函数</a>, Previous: <a href="06.1_序列.html">序列</a>, Up: <a href="06_序列、数组和向量.html">序列、数组和向量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>一个数组对象有多个槽，其中包含许多其他的 Lisp 对象，称为数组的元素。可以在恒定时间内访问数组的任何元素。相反，访问列表元素的时间与该元素在列表中的位置成正比。
+</p>
+<p>Emacs 定义了四种类型的数组，都是一维的：字符串（参见字符串类型）、向量（参见向量类型）、布尔向量（参见布尔向量类型）和字符表（参见字符表类型）。向量和字符表可以保存任何类型的元素，但字符串只能保存字符，而布尔向量只能保存 t 和 nil。
+</p>
+<p>所有四种阵列都具有以下特征：
+</p>
+<ul>
+<li>
+数组的第一个元素的索引为零，第二个元素的索引为 1，依此类推。这称为零原点索引。例如，一个包含四个元素的数组的索引为 0、1、2 和 3。
+</li><li>
+数组的长度在创建后是固定的；  您不能更改现有数组的长度。
+</li><li>
+出于求值的目的，数组是一个常数——即，它对自身求值。
+</li><li>
+数组的元素可以分别用函数 aref 和 aset 引用或更改（请参阅对数组进行操作的函数）。
+</li></ul>
+<p>当你创建一个数组时，除了一个字符表，你必须指定它的长度。您不能指定字符表的长度，因为这是由字符代码的范围决定的。
+</p>
+<p>原则上，如果你想要一个文本字符数组，你可以使用字符串或向量。在实践中，我们总是为此类应用选择字符串，原因有四个：
+</p>
+<ul>
+<li>
+它们占据相同元素向量空间的四分之一。
+</li><li>
+字符串以文本形式更清晰地显示内容的方式打印。
+</li><li>
+字符串可以保存文本属性。请参阅文本属性。
+</li><li>
+Emacs 的许多专门的编辑和 I/O 工具只接受字符串。例如，您不能像插入字符串那样将字符向量插入缓冲区。请参阅字符串和字符。
+</li></ul>
+<p>相比之下，对于键盘输入字符数组（例如键序列），可能需要一个向量，因为许多键盘输入字符超出了适合字符串的范围。请参阅按键序列输入。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="06.3_操作数组的函数.html">操作数组的函数</a>, Previous: <a href="06.1_序列.html">序列</a>, Up: <a href="06_序列、数组和向量.html">序列、数组和向量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>30.8 查找所有帧</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">30.8 查找所有帧</h2>
+<div class="nav-panel"><p>Next: <a href="30.9_小缓冲区和帧.html">小缓冲区和帧</a>, Previous: <a href="30.7_删除帧.html">删除帧</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><div class="lisp">
+<pre class="lisp">Function: frame-list ¶
+</pre></div>
+<p>该函数返回所有活动帧的列表，即那些未被删除的帧。它类似于缓冲区的缓冲区列表，并包括所有终端上的帧。您获得的列表是新创建的，因此修改列表不会对 Emacs 的内部产生任何影响。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: visible-frame-list ¶
+</pre></div>
+<p>此函数返回仅包含当前可见帧的列表。请参阅帧的可见性。文本终端上的帧始终被视为可见，即使实际上只显示了选定的帧。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: frame-list-z-order &amp;optional display ¶
+</pre></div>
+<p>此函数以 Z（堆叠）顺序返回 Emacs 的帧列表（请参阅提升、降低和重新堆叠帧）。可选参数 display 指定轮询哪个显示器。display 应该是一个帧或一个显示名称（一个字符串）。如果省略或为零，则表示所选帧的显示。如果 display 不包含 Emacs 帧，则返回 nil。
+</p>
+<p>帧从最顶部（第一个）到最底部（最后一个）列出。作为一种特殊情况，如果 display 不为零并指定一个活动帧，它会以 Z（堆叠）顺序返回该帧的子帧。
+</p>
+<p>此功能在文本终端上没有意义。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: next-frame &amp;optional frame minibuf ¶
+</pre></div>
+<p>此功能可让您从任意起点方便地循环浏览特定终端上的所有帧。它在帧的终端上返回所有活动帧列表中的下一帧。参数帧必须指定一个实时帧并默认为选定的帧。它永远不会返回 no-other-frame 参数（请参阅帧交互参数）为非零的帧。
+</p>
+<p>第二个参数 minibuf 表示在决定下一帧应该是什么时要考虑哪些帧：
+</p>
+<div class="lisp">
+<pre class="lisp">nil
+</pre></div>
+<p>考虑除 minibuffer-only 帧之外的所有帧。
+</p><div class="lisp">
+<pre class="lisp">visible
+</pre></div>
+<p>只考虑可见帧。
+</p><div class="lisp">
+<pre class="lisp">0
+</pre></div>
+<p>只考虑可见或图标化的帧。
+</p><div class="lisp">
+<pre class="lisp">a window
+</pre></div>
+<p>仅考虑使用该特定窗口作为其迷你缓冲区窗口的帧。
+</p><div class="lisp">
+<pre class="lisp">anything else
+</pre></div>
+<p>考虑所有帧。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: previous-frame &amp;optional frame minibuf ¶
+</pre></div>
+<p>与下一帧类似，但以相反方向循环遍历所有帧。
+</p>
+<p>另请参阅 Windows 的循环排序中的下一个窗口和上一个窗口。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="30.9_小缓冲区和帧.html">小缓冲区和帧</a>, Previous: <a href="30.7_删除帧.html">删除帧</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

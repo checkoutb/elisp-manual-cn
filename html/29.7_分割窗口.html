@@ -1,0 +1,84 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>29.7 分割窗口</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">29.7 分割窗口</h2>
+<div class="nav-panel"><p>Next: <a href="29.8_删除窗口.html">删除窗口</a>, Previous: <a href="29.6_保留窗口大小.html">保留窗口大小</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍通过拆分现有窗口创建新窗口的功能。请注意，某些窗口是特殊的，因为这些函数可能无法按照此处所述拆分它们。此类窗口的示例是侧窗（请参阅侧窗）和原子窗（请参阅原子窗）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: split-window &amp;optional window size side pixelwise ¶
+</pre></div>
+<p>此函数在窗口窗口旁边创建一个新的实时窗口。如果 window 被省略或为零，则默认为选定的窗口。该窗口被拆分并缩小。该空间被新窗口占用，并被返回。
+</p>
+<p>可选的第二个参数大小确定窗口和/或新窗口的大小。如果省略或为零，则两个窗口的大小相同；  如果有奇数行，则分配给新窗口。如果 size 为正数，则窗口的大小为行（或列，取决于 side 的值）。如果 size 是负数，则新窗口被赋予 -size 行（或列）。
+</p>
+<p>如果 size 为 nil，则此函数遵循变量 window-min-height 和 window-min-width（请参阅窗口大小）。因此，如果拆分会导致窗口小于这些变量指定的值，则会发出错误信号。但是，大小的非零值会导致这些变量被忽略；  在这种情况下，最小的允许窗口被认为是具有容纳一行高和/或两列宽的文本空间的窗口。
+</p>
+<p>因此，如果指定了大小，则调用者有责任检查发出的窗口是否足够大以包含它们的所有装饰，例如模式行或滚动条。函数window-min-size（参见Window Sizes）可用于确定window在这方面的最低要求。由于新窗口通常从窗口继承模式行或滚动条等区域，因此该函数也是新窗口最小尺寸的一个很好的猜测。只有在下一次重新显示之前相应地删除继承区域时，调用者才应指定较小的大小。
+</p>
+<p>可选的第三个参数 side 确定新窗口相对于窗口的位置。如果为 nil 或更低，则新窗口放置在窗口下方。如果在上方，则新窗口位于窗口上方。在这两种情况下，大小都指定了总窗口高度，以行为单位。
+</p>
+<p>如果 side 为 t 或 right，则新窗口放置在窗口的右侧。如果 side 位于左侧，则新窗口放置在窗口的左侧。在这两种情况下，size 都指定了总窗口宽度，以列为单位。
+</p>
+<p>可选的第四个参数pixelwise，如果非零，意味着以像素为单位解释大小，而不是行和列。
+</p>
+<p>如果 window 是活动窗口，则新窗口会继承它的各种属性，包括边距和滚动条。如果 window 是内部窗口，则新窗口将继承在窗口 <code>帧</code> ( <code>frame</code> )内选择的窗口的属性。
+</p>
+<p>只要变量 ignore-window-parameters 为 nil，此函数的行为可能会被 window 的窗口参数改变。如果拆分窗口窗口参数的值为 t，则此函数忽略所有其他窗口参数。否则，如果拆分窗口窗口参数的值是一个函数，则使用参数窗口、大小和边调用该函数，以代替拆分窗口的通常操作。否则，此函数遵循 window-atom 或 window-side window 参数（如果有）。请参见窗口参数。
+</p>
+<p>例如，这里是一系列拆分窗口调用，它们产生了在 Windows 和 Frames 中讨论的窗口配置。此示例演示了拆分实时窗口以及拆分内部窗口。我们从一个包含单个窗口（活动根窗口）的 <code>帧</code> ( <code>frame</code> )开始，我们用 W4 表示。调用 (split-window W4) 产生这个窗口配置：
+</p><div class="lisp">
+<pre class="lisp"> ______________________________________
+| ____________________________________ |
+||                                    ||
+||                                    ||
+||                                    ||
+||_________________W4_________________||
+| ____________________________________ |
+||                                    ||
+||                                    ||
+||                                    ||
+||_________________W5_________________||
+|__________________W3__________________|
+
+</pre></div>
+<p>split-window 调用创建了一个新的实时窗口，用 W5 表示。它还创建了一个新的内部窗口，用 W3 表示，它成为 W4 和 W5 的根窗口和父窗口。
+</p>
+<p>接下来，我们调用 (split-window W3 nil ’left)，将内部窗口 W3 作为参数传递。结果：
+</p>
+<div class="lisp">
+<pre class="lisp"> ______________________________________
+| ______  ____________________________ |
+||      || __________________________ ||
+||      |||                          |||
+||      |||                          |||
+||      |||                          |||
+||      |||____________W4____________|||
+||      || __________________________ ||
+||      |||                          |||
+||      |||                          |||
+||      |||____________W5____________|||
+||__W2__||_____________W3_____________ |
+|__________________W1__________________|
+
+</pre></div>
+<p>在内部窗口 W3 的左侧创建一个新的实时窗口 W2。创建一个新的内部窗口 W1，成为新的根窗口。
+</p>
+<p>对于交互式使用，Emacs 提供了两个命令，它们总是分割选定的窗口。这些在内部调用拆分窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: split-window-right &amp;optional size ¶
+</pre></div>
+<p>此函数将选定的窗口拆分为两个并排的窗口，将选定的窗口放在左侧。如果 size 为正，则左侧窗口获取 size 列；  如果 size 为负数，则右侧窗口将获得 -size 列。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: split-window-below &amp;optional size ¶
+</pre></div>
+<p>此函数将选定的窗口拆分为两个窗口，一个在另一个之上，使上面的窗口处于选中状态。如果 size 为正，则上部窗口获取大小线；  如果 size 为负数，则下部窗口将获得 -size 行。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: split-window-keep-point ¶
+</pre></div>
+<p>如果此变量的值为非零（默认值），则 split-window-below 的行为如上所述。
+</p>
+<p>如果它为 nil，split-window-below 会调整两个窗口中的每个窗口中的点以最小化重新显示。（这在慢速终端上很有用。）它选择包含该点先前所在的屏幕行的任何窗口。请注意，这仅影响 split-window-below，而不影响较低级别的拆分窗口功能。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="29.8_删除窗口.html">删除窗口</a>, Previous: <a href="29.6_保留窗口大小.html">保留窗口大小</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

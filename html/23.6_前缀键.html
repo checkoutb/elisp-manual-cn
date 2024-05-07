@@ -1,0 +1,68 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>23.6 前缀键</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">23.6 前缀键</h2>
+<div class="nav-panel"><p>Next: <a href="23.7_活动键盘映射.html">活动键盘映射</a>, Previous: <a href="23.5_继承和键映射.html">继承和键映射</a>, Up: <a href="23_键盘映射.html">键盘映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>前缀键是一个键序列，其绑定是一个键映射。键映射定义了如何处理扩展前缀键的键序列。例如，Cx 是一个前缀键，它使用一个也存储在变量 ctl-x-map 中的键映射。此键映射定义以 Cx 开头的键序列的绑定。
+</p>
+<p>一些标准的 Emacs 前缀键使用也可以在 Lisp 变量中找到的键映射：
+</p>
+<ol>
+<li>
+esc-map 是 ESC 前缀键的全局键映射。因此，所有元字符的全局定义实际上都可以在这里找到。这个映射也是ESC-prefix的函数定义。
+</li><li>
+help-map 是 Ch 前缀键的全局键映射。
+</li><li>
+mode-specific-map 是前缀键 Cc 的全局键映射。这个映射实际上是全局的，而不是特定于模式的，但它的名称在 Ch b（显示绑定）的输出中提供了有关 Cc 的有用信息，因为此前缀键的主要用途是用于特定于模式的绑定。
+</li><li>
+ctl-x-map 是用于 Cx 前缀键的全局键映射。该映射是通过符号 Control-X-prefix 的功能单元找到的。
+</li><li>
+mule-keymap 是用于 Cx RET 前缀键的全局键映射。
+</li><li>
+ctl-x-4-map 是用于 Cx 4 前缀键的全局键映射。
+</li><li>
+ctl-x-5-map 是用于 Cx 5 前缀键的全局键映射。
+</li><li>
+2C-mode-map 是用于 Cx 6 前缀键的全局键映射。
+</li><li>
+tab-prefix-map 是用于 Cx t 前缀键的全局键映射。
+</li><li>
+vc-prefix-map 是用于 Cx v 前缀键的全局键映射。
+</li><li>
+goto-map 是用于 Mg 前缀键的全局键映射。
+</li><li>
+search-map 是用于 Ms 前缀键的全局键映射。
+</li><li>
+其他 Emacs 前缀键是 Cx @、Cx ai、Cx ESC 和 ESC ESC。他们使用没有特殊名称的键盘映射。
+</li></ol>
+<p>前缀键的键映射绑定用于查找前缀键之后的事件。（它可能是一个符号，其功能定义是一个键映射。效果是一样的，但符号用作前缀键的名称。）因此，Cx的绑定是符号Control-X-prefix，其功能单元格保存 Cx 命令的键盘映射。（同样的keymap也是ctl-x-map的值。）
+</p>
+<p>前缀键定义可以出现在任何活动的键盘映射中。Cc、Cx、Ch 和 ESC 作为前缀键的定义出现在全局映射中，因此这些前缀键始终可用。主要和次要模式可以通过在本地映射或次要模式的映射中放置前缀键定义来将键重新定义为前缀。请参阅活动键盘映射。
+</p>
+<p>如果一个键在多个活动映射中被定义为前缀，那么它的各种定义实际上是合并的：在次要模式键映射中定义的命令首先出现，然后是本地映射前缀定义中的命令，然后是来自全球地图。
+</p>
+<p>在下面的示例中，我们将 Cp 作为本地键映射中的前缀键，这样 Cp 与 Cx 相同。那么 Cp Cf 的绑定就是函数 find-file，就像 Cx Cf 一样。在任何活动键映射中都找不到键序列 Cp 6。
+</p><div class="lisp">
+<pre class="lisp">
+
+(use-local-map (make-sparse-keymap))
+    ⇒ nil
+
+(local-set-key "\C-p" ctl-x-map)
+    ⇒ nil
+
+(key-binding "\C-p\C-f")
+    ⇒ find-file
+
+
+(key-binding "\C-p6")
+    ⇒ nil
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: define-prefix-command symbol &amp;optional mapvar prompt ¶
+</pre></div>
+<p>此函数准备用作前缀键绑定的符号：它创建一个稀疏键映射并将其存储为符号的函数定义。随后将键序列绑定到符号将使该键序列成为前缀键。返回值是符号。
+</p>
+<p>此函数还将符号设置为变量，键映射为其值。但如果 mapvar 不是 nil，它会将 mapvar 设置为变量。
+</p>
+<p>如果 prompt 不为 nil，则它将成为键盘映射的整体提示字符串。应为菜单键映射提供提示字符串（请参阅定义菜单）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="23.7_活动键盘映射.html">活动键盘映射</a>, Previous: <a href="23.5_继承和键映射.html">继承和键映射</a>, Up: <a href="23_键盘映射.html">键盘映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

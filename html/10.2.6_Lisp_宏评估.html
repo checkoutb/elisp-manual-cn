@@ -1,0 +1,25 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>10.2.6 Lisp 宏评估</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">10.2.6 Lisp 宏评估</h3>
+<div class="nav-panel"><p>Next: <a href="10.2.7_特殊表格.html">特殊表格</a>, Previous: <a href="10.2.5_函数形式的评估.html">函数形式的评估</a>, Up: <a href="10.2_表格种类.html">表格种类.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>如果正在评估的列表的第一个元素是宏对象，则该列表是宏调用。评估宏调用时，最初不会评估列表其余部分的元素。相反，这些元素本身被用作宏的参数。宏定义计算一个替换形式，称为宏的扩展，以代替原始形式进行评估。展开可以是任何形式：自评估常数、符号或列表。如果扩展本身是一个宏调用，则此扩展过程将重复直到某种其他形式的结果。
+</p>
+<p>宏调用的普通评估通过评估扩展来完成。但是，宏扩展不一定会立即评估，或者根本就不会评估，因为其他程序也会扩展宏调用，它们可能会或可能不会评估扩展。
+</p>
+<p>通常，参数表达式不会作为计算宏扩展的一部分进行计算，而是作为扩展的一部分出现，因此在计算扩展时会计算它们。
+</p>
+<p>例如，给定一个宏定义如下：
+</p>
+<div class="lisp">
+<pre class="lisp">(defmacro cadr (x)
+  (list 'car (list 'cdr x)))
+</pre></div>
+<p>(cadr (assq ’handler list)) 这样的表达式是一个宏调用，它的扩展是：
+</p>
+<div class="lisp">
+<pre class="lisp">(car (cdr (assq 'handler list)))
+</pre></div>
+<p>请注意，参数 (assq ’handler list) 出现在扩展中。
+</p>
+<p>有关 Emacs Lisp 宏的完整描述，请参阅宏。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="10.2.7_特殊表格.html">特殊表格</a>, Previous: <a href="10.2.5_函数形式的评估.html">函数形式的评估</a>, Up: <a href="10.2_表格种类.html">表格种类.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>12.8 设置变量值</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">12.8 设置变量值</h2>
+<div class="nav-panel"><p>Next: <a href="12.9_当变量改变时运行函数。.html">当变量改变时运行函数。</a>, Previous: <a href="12.7_访问变量值.html">访问变量值</a>, Up: <a href="12_变量.html">变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>更改变量值的常用方法是使用特殊形式 setq。当您需要在运行时计算变量的选择时，请使用函数集。
+</p>
+<div class="lisp">
+<pre class="lisp">Special Form: setq [symbol form]… ¶
+</pre></div>
+<p>这种特殊形式是更改变量值的最常用方法。每个符号都被赋予一个新值，这是对相应形式求值的结果。符号的当前绑定已更改。
+</p>
+<p>setq 不评估符号；  它设置您编写的符号。我们说这个论点是自动引用的。setq 中的“q”代表“引用”。
+</p>
+<p>setq 形式的值是最后一个形式的值。
+</p><div class="lisp">
+<pre class="lisp">(setq x (1+ 2))
+     ⇒ 3
+
+x                   ; x now has a global value.
+     ⇒ 3
+
+(let ((x 5))
+  (setq x 6)        ; The local binding of x is set.
+  x)
+     ⇒ 6
+
+x                   ; The global value is unchanged.
+     ⇒ 3
+
+</pre></div>
+<p>请注意，先计算第一种形式，然后设置第一个符号，然后计算第二种形式，然后设置第二个符号，依此类推：
+</p><div class="lisp">
+<pre class="lisp">(setq x 10          ; Notice that x is set before
+      y (1+ x))     ;   the value of y is computed.
+     ⇒ 11
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: set symbol value ¶
+</pre></div>
+<p>此函数将值放入符号的值单元格中。因为它是一个函数而不是一个特殊的形式，所以为符号编写的表达式被求值以获得要设置的符号。返回值是值。
+</p>
+<p>当动态变量绑定生效（默认）时，set 与 setq 具有相同的效果，除了 set 计算其符号参数而 setq 不计算这一事实。但是当一个变量被词法绑定时，set 会影响它的动态值，而 setq 会影响它的当前（词法）值。请参阅变量绑定的范围规则。
+</p>
+<div class="lisp">
+<pre class="lisp">(set one 1)
+error→ Symbol's value as variable is void: one
+
+(set 'one 1)
+     ⇒ 1
+
+(set 'two 'one)
+     ⇒ one
+
+(set two 2)         ; two evaluates to symbol one.
+     ⇒ 2
+
+one                 ; So it is one that was set.
+     ⇒ 2
+(let ((one 1))      ; This binding of one is set,
+  (set 'one 3)      ;   not the global value.
+  one)
+     ⇒ 3
+
+one
+     ⇒ 2
+</pre></div>
+<p>如果 symbol 实际上不是一个符号，则会发出错误类型参数错误的信号。
+</p><div class="lisp">
+<pre class="lisp">(set '(x y) 'z)
+error→ Wrong type argument: symbolp, (x y)
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="12.9_当变量改变时运行函数。.html">当变量改变时运行函数。</a>, Previous: <a href="12.7_访问变量值.html">访问变量值</a>, Up: <a href="12_变量.html">变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

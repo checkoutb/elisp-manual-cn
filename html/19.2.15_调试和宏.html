@@ -1,0 +1,261 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>19.2.15 调试和宏</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">19.2.15 调试和宏</h3>
+<div class="nav-panel"><p>Next: <a href="19.2.16_调试选项.html">调试选项</a>, Previous: <a href="19.2.14_外部环境.html">外部环境</a>, Up: <a href="19.2_调试.html">调试.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>为了使 Edebug 正确地检测调用宏的表达式，需要格外小心。本小节解释了细节。
+</p>
+<ol>
+<li>
+19.2.15.1 检测宏调用
+
+
+<p>当 Edebug 检测调用 Lisp 宏的表达式时，它需要有关宏的附加信息才能正确完成工作。这是因为没有先验方法来判断宏调用的哪些子表达式是要评估的形式。（评估可能会在宏体中显式发生，或者在评估结果扩展时，或者稍后的任何时间。）
+</p>
+<p>因此，您必须为 Edebug 将遇到的每个宏定义一个 Edebug 规范，以解释对该宏的调用格式。为此，请将调试声明添加到宏定义中。这是一个简单的示例，显示了示例宏的规范（请参阅重复评估宏参数）。
+</p>
+<div class="lisp">
+<pre class="lisp">(defmacro for (var from init to final do &amp;rest body)
+  "Execute a simple \"for\" loop.
+For example, (for i from 1 to 10 do (print i))."
+  (declare (debug (symbolp "from" form "to" form "do" &amp;rest form)))
+  ...)
+</pre></div>
+<p>Edebug 规范说明了对宏的调用的哪些部分是要评估的表单。对于简单的宏，规范通常看起来与宏定义的形式参数列表非常相似，但规范比宏参数更通用。有关声明形式的更多说明，请参见定义宏。
+</p>
+<p>当您检测代码时，请注意确保 Edebug 知道规范。如果您正在检测使用在另一个文件中定义的宏的函数，您可能首先需要评估包含您的函数的文件中的 require 表单，或者显式加载包含宏的文件。如果宏的定义由 eval-when-compile 包装，您可能需要对其求值。
+</p>
+<p>您还可以使用 def-edebug-spec 将宏定义与宏定义分开定义 edebug 规范。对于 Lisp 中的宏定义，添加调试声明是首选且更方便，但 def-edebug-spec 可以为 C 中实现的特殊形式定义 Edebug 规范。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: def-edebug-spec macro specification ¶
+</pre></div>
+<p>指定调用宏的哪些表达式是要评估的形式。规范应该是 Edebug 规范。两个参数都没有被评估。
+</p>
+<p>宏参数实际上可以是任何符号，而不仅仅是宏名称。
+</p>
+<p>下表列出了规范的可能性以及每种可能性如何指导参数的处理。
+</p>
+<div class="lisp">
+<pre class="lisp">t
+</pre></div>
+<p>所有论点都用于评估。这是（身体）的缩写。
+</p><div class="lisp">
+<pre class="lisp">a symbol
+</pre></div>
+<p>该符号必须有一个 Edebug 规范，以替代使用。重复这种间接方式，直到找到另一种规范。这允许您从另一个宏继承规范。
+</p><div class="lisp">
+<pre class="lisp">a list
+</pre></div>
+<p>列表的元素描述了调用表单的参数类型。规格列表的可能元素将在以下部分中描述。
+</p>
+<p>如果宏没有 Edebug 规范，无论是通过调试声明还是通过 def-edebug-spec 调用，变量 edebug-eval-macro-args 都会发挥作用。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: edebug-eval-macro-args ¶
+</pre></div>
+<p>这控制了 Edebug 处理没有明确 Edebug 规范的宏参数的方式。如果它是 nil（默认值），则不会对任何参数进行评估。否则，所有参数都会被检测。
+</p>
+</li><li>
+19.2.15.2 规格表
+
+
+<p>如果宏调用的某些参数被评估而其他参数不被评估，则 Edebug 规范需要规范列表。规范列表中的一些元素匹配一个或多个参数，但其他元素修改所有后续元素的处理。后者称为规范关键字，是以 <code>&amp;</code> 开头的符号（例如 &amp;optional）。
+</p>
+<p>规范列表可能包含子列表，这些子列表匹配本身就是列表的参数，或者它可能包含用于分组的向量。子列表和组因此将规范列表细分为层次结构。规范关键字仅适用于包含它们的子列表或组的其余部分。
+</p>
+<p>当规范列表涉及替代或重复时，将其与实际的宏调用进行匹配可能需要回溯。有关更多详细信息，请参阅规范中的回溯。
+</p>
+<p>Edebug 规范提供了正则表达式匹配的强大功能，以及一些上下文无关的语法结构：使用平衡括号匹配子列表、表单的递归处理以及通过间接规范进行递归。
+</p>
+<p>以下是规范列表的可能元素及其含义的表格（参见规范示例，参考示例）：
+</p>
+<div class="lisp">
+<pre class="lisp">sexp
+</pre></div>
+<p>单个未计算的 Lisp 对象，未检测。
+</p><div class="lisp">
+<pre class="lisp">form
+</pre></div>
+<p>单个评估的表达式，它被检测。如果您的宏在计算之前用 lambda 包装了表达式，请改用 def-form。请参见下面的 def-form。
+</p><div class="lisp">
+<pre class="lisp">place
+</pre></div>
+<p>广义变量。请参阅广义变量。
+</p><div class="lisp">
+<pre class="lisp">body
+</pre></div>
+<p>&amp;rest 形式的缩写。请参阅下面的 &amp;rest。如果您的宏在评估之前使用 lambda 包装其代码体，请改用 def-body。请参阅下面的 def-body。
+</p><div class="lisp">
+<pre class="lisp">lambda-expr
+</pre></div>
+<p>没有引号的 lambda 表达式。
+</p><div class="lisp">
+<pre class="lisp">&amp;optional
+</pre></div>
+<p>规格列表中​​的所有以下元素都是可选的；  一旦有一个不匹配，Edebug 就会在此级别停止匹配。
+</p>
+<p>要使几个元素成为可选元素，然后是非可选元素，请使用 [&amp;optional specs…]。要指定几个元素必须全部匹配或不匹配，请使用 &amp;optional [specs…]。请参阅 defun 示例。
+</p><div class="lisp">
+<pre class="lisp">&amp;rest
+</pre></div>
+<p>规格列表中​​的所有以下元素重复零次或多次。然而，在最后的重复中，如果表达式在匹配规范列表的所有元素之前用完，这不是问题。
+</p>
+<p>要仅重复几个元素，请使用 [&amp;rest specs…]。要指定在每次重复时必须全部匹配的几个元素，请使用 &amp;rest [specs…]。
+</p><div class="lisp">
+<pre class="lisp">&amp;or
+</pre></div>
+<p>规格列表中​​的以下每个元素都是一个替代项。备选方案之一必须匹配，否则 &amp;or 规范失败。
+</p>
+<p>&amp;or 之后的每个列表元素都是一个替代项。要将两个或多个列表元素组合为一个备选方案，请将它们括在 […] 中。
+</p><div class="lisp">
+<pre class="lisp">&amp;not
+</pre></div>
+<p>下面的每个元素都被匹配为替代项，就像使用 &amp;or 一样，但如果其中任何一个匹配，则说明失败。如果它们都不匹配，则不匹配，但 &amp;not 规范成功。
+</p><div class="lisp">
+<pre class="lisp">&amp;define
+</pre></div>
+<p>表示规范是针对定义形式的。Edebug 对定义表单的定义是包含一个或多个代码表单的表单，这些代码表单在定义表单执行后保存并稍后执行。
+</p>
+<p>定义表单本身没有被检测（也就是说，Edebug 不会在定义表单之前和之后停止），但它内部的表单通常会被检测。&amp;define 关键字应该是列表规范中的第一个元素。
+</p><div class="lisp">
+<pre class="lisp">nil
+</pre></div>
+<p>当当前参数列表级别没有更多参数匹配时，这是成功的；  否则失败。请参阅子列表规范和反引号示例。
+</p><div class="lisp">
+<pre class="lisp">gate ¶
+</pre></div>
+<p>没有匹配的参数，但在匹配此级别的其余规范时禁用通过门的回溯。这主要用于生成更具体的语法错误消息。有关详细信息，请参阅规范中的回溯。另请参见 let 示例。
+</p><div class="lisp">
+<pre class="lisp">&amp;error
+</pre></div>
+<p>&amp;error 后面应该跟一个字符串，一条错误消息，在 edebug-spec 中；  它中止检测，在 minibuffer 中显示消息。
+</p><div class="lisp">
+<pre class="lisp">&amp;interpose
+</pre></div>
+<p>让函数控制剩余代码的解析。它采用 &amp;interpose spec fun args… 的形式，这意味着 Edebug 将首先将 spec 与代码匹配，然后使用匹配 spec 的代码调用 fun，一个解析函数 pf，最后是 args…。解析函数需要一个单个参数，指示用于解析剩余代码的规范列表。它应该只被调用一次并返回 fun 预期返回的检测代码。例如 (&amp;interpose symbolp pcase–match-pat-args) 匹配第一个元素是符号的 sexps，然后让 pcase–match-pat-args 根据 pcase–match-pat- 查找与该头部符号关联的规范args 并将它们传递给它作为参数接收的 pf。
+</p><div class="lisp">
+<pre class="lisp">other-symbol ¶
+</pre></div>
+<p>规范列表中的任何其他符号都可以是谓词或间接规范。
+</p>
+<p>如果符号具有 Edebug 规范，则此间接规范应该是用于代替符号的列表规范，或者是调用以处理参数的函数。规范可以用 def-edebug-elem-spec 定义：
+</p>
+<p>功能：def-edebug-elem-spec 元素规范¶
+</p>
+<p>定义用于代替符号元素的规范。规范必须是一个列表。
+</p>
+<p>否则，符号应该是谓词。谓词与参数一起调用，如果谓词返回 nil，则规范失败并且参数不会被检测。
+</p>
+<p>一些合适的谓词包括 symbolp、integerp、stringp、vectorp 和 atom。
+</p><div class="lisp">
+<pre class="lisp">[elements…] ¶
+</pre></div>
+<p>元素向量将元素分组为单个组规范。它的含义与向量无关。
+</p><div class="lisp">
+<pre class="lisp">"string"
+</pre></div>
+<p>参数应该是一个名为字符串的符号。该规范等效于带引号的符号 ’symbol，其中符号的名称是字符串，但首选字符串形式。
+</p><div class="lisp">
+<pre class="lisp">(vector elements…)
+</pre></div>
+<p>参数应该是一个向量，其元素必须与规范中的元素匹配。请参阅反引号示例。
+</p><div class="lisp">
+<pre class="lisp">(elements…)
+</pre></div>
+<p>任何其他列表都是子列表规范，并且参数必须是其元素与规范元素匹配的列表。
+</p>
+<p>子列表规范可以是一个点列表，然后相应的列表参数可以是一个点列表。或者，点列表规范的最后一个 CDR 可以是另一个子列表规范（通过分组或间接规范，例如 (spec . [(more specs…)])），其元素与非点列表参数匹配。这在递归规范中很有用，例如在反引号示例中。另请参阅上面对 nil 规范的描述以终止此类递归。
+</p>
+<p>请注意，写为 (specs . nil) 的子列表规范等价于 (specs)，并且 (specs . (sublist-elements…)) 等价于 (specs sublist-elements…)。
+</p>
+<p>以下是可能仅在 &amp;define 之后出现的附加规范列表。请参阅 defun 示例。
+</p>
+<div class="lisp">
+<pre class="lisp">&amp;name
+</pre></div>
+<p>从代码中提取当前定义表单的名称。它采用 &amp;name [prestring] spec [poststring] fun args… 的形式，这意味着 Edebug 会将 spec 与代码匹配，然后调用 fun 并连接当前名称、args…、prestring、匹配的代码规范和后字符串。如果 fun 不存在，则默认为连接参数的函数（在前一个名称和新名称之间有一个 @）。
+</p><div class="lisp">
+<pre class="lisp">name
+</pre></div>
+<p>参数是一个符号，是定义形式的名称。[&amp;name symbolp] 的简写。
+</p>
+<p>定义表单不需要具有名称字段；  它可能有多个名称字段。
+</p><div class="lisp">
+<pre class="lisp">arg
+</pre></div>
+<p>参数是一个符号，是定义形式的参数的名称。但是，不允许使用 lambda 列表关键字（以 ’&amp;’ 开头的符号）。
+</p><div class="lisp">
+<pre class="lisp">lambda-list ¶
+</pre></div>
+<p>这匹配一个 lambda 列表——一个 lambda 表达式的参数列表。
+</p><div class="lisp">
+<pre class="lisp">def-body
+</pre></div>
+<p>参数是定义中的代码主体。这就像上面描述的主体，但定义主体必须使用不同的 Edebug 调用来检测与定义关联的信息。使用 def-body 作为定义中最高级别的表单列表。
+</p><div class="lisp">
+<pre class="lisp">def-form
+</pre></div>
+<p>参数是定义中的单一、最高级别的形式。这类似于 def-body，除了它用于匹配单个表单而不是表单列表。作为一种特殊情况，def-form 还意味着在执行表单时不输出跟踪信息。请参阅交互式示例。
+</p>
+</li><li>
+19.2.15.3 规范中的回溯
+
+
+<p>如果规范在某些时候无法匹配，这并不一定意味着会发出语法错误信号；  相反，将进行回溯，直到用尽所有替代方案。最终，参数列表的每个元素都必须与规范中的某个元素匹配，并且规范中的每个必需元素都必须匹配某个参数。
+</p>
+<p>当检测到语法错误时，可能要到很久以后才会报告，在更高级别的替代方案已经用尽之后，并且该点距离真正的错误更远。但是如果发生错误时禁用回溯，则可以立即报告。请注意，在几种情况下，回溯也会自动重新启用；  当 &amp;optional、&amp;rest 或 &amp;or 或在开始处理子列表、组或间接规范时建立新的替代方案时。启用或禁用回溯的效果仅限于当前正在处理的级别的其余部分和较低级别。
+</p>
+<p>匹配任何表单规范（即表单、正文、def-form 和 def-body）时，将禁用回溯。这些规范将匹配任何形式，因此任何错误都必须在形式本身而不是更高级别。
+</p>
+<p>在成功匹配带引号的符号、字符串规范或 &amp;define 关键字后，回溯也被禁用，因为这通常表示已识别的构造。但是，如果您有一组都以相同符号开头的替代构造，您通常可以通过将符号从替代中分解来解决此约束，例如 ["foo" &amp;or [first case] [second case] .. .]。
+</p>
+<p>大多数需求都可以通过这两种自动禁用回溯的方式来满足，但有时通过使用门规范显式禁用回溯很有用。当您知道没有更高的替代方案可以应用时，这很有用。请参阅 let 规范的示例。
+</p>
+</li><li>
+19.2.15.4 规范示例
+
+
+<p>通过研究此处提供的示例，可能更容易理解 Edebug 规范。
+</p>
+<p>考虑一个假设的宏 my-test-generator，它在提供的数据列表上运行测试。尽管 Edebug 的默认行为是不将参数作为代码进行检测，但由 edebug-eval-macro-args 控制（请参阅检测宏调用），但显式记录参数是数据会很有用：
+</p><div class="lisp">
+<pre class="lisp">(def-edebug-spec my-test-generator (&amp;rest sexp))
+</pre></div>
+<p>一个 let 特殊形式有一个绑定序列和一个主体。每个绑定要么是一个符号，要么是一个带有符号和可选表达式的子列表。在下面的规范中，请注意子列表内部的门，以防止在找到子列表后回溯。
+</p>
+<div class="lisp">
+<pre class="lisp">(def-edebug-spec let
+  ((&amp;rest
+    &amp;or symbolp (gate symbolp &amp;optional form))
+   body))
+</pre></div>
+<p>Edebug 对 defun 以及相关的参数列表和交互规范使用以下规范。有必要专门处理交互式表单，因为表达式参数实际上是在函数体之外评估的。（defmacro 的规范与 defun 的规范非常相似，但允许声明语句。）
+</p><div class="lisp">
+<pre class="lisp">
+
+(def-edebug-spec defun
+  (&amp;define name lambda-list
+           [&amp;optional stringp]   ; Match the doc string, if present.
+           [&amp;optional ("interactive" interactive)]
+           def-body))
+
+(def-edebug-elem-spec 'lambda-list
+  '(([&amp;rest arg]
+     [&amp;optional ["&amp;optional" arg &amp;rest arg]]
+     &amp;optional ["&amp;rest" arg]
+     )))
+
+(def-edebug-elem-spec 'interactive
+  '(&amp;optional &amp;or stringp def-form))    ; Notice: def-form
+</pre></div>
+<p>下面的反引号规范说明了如何匹配点列表并使用 nil 来终止递归。它还说明了如何匹配向量的分量。（由 Edebug 定义的实际规范略有不同，并且不支持点列表，因为这样做会导致非常深的递归，可能会失败。）
+</p><div class="lisp">
+<pre class="lisp">(def-edebug-spec \` (backquote-form))   ; Alias just for clarity.
+
+(def-edebug-elem-spec 'backquote-form
+  '(&amp;or ([&amp;or "," ",@"] &amp;or ("quote" backquote-form) form)
+        (backquote-form . [&amp;or nil backquote-form])
+        (vector &amp;rest backquote-form)
+        sexp))
+</pre></div>
+</li></ol>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="19.2.16_调试选项.html">调试选项</a>, Previous: <a href="19.2.14_外部环境.html">外部环境</a>, Up: <a href="19.2_调试.html">调试.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

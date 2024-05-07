@@ -1,0 +1,26 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>34.10.8 终端 I/O 编码</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">34.10.8 终端 I/O 编码</h3>
+<div class="nav-panel"><p>Next: <a href="34.11_输入法.html">输入法</a>, Previous: <a href="34.10.7_显式编码和解码.html">显式编码和解码</a>, Up: <a href="34.10_编码系统.html">编码系统.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 可以使用编码系统来解码键盘输入和编码终端输出。这对于使用特定编码（例如 Latin-1）传输或显示文本的终端很有用。Emacs 在编码或解码终端 I/O 时没有设置 last-coding-system-used。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: keyboard-coding-system &amp;optional terminal ¶
+</pre></div>
+<p>此函数返回用于解码终端键盘输入的编码系统。no-conversion 值表示不进行解码。如果终端省略或为零，则表示所选帧的终端。请参阅多个终端。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: set-keyboard-coding-system coding-system &amp;optional terminal ¶
+</pre></div>
+<p>该命令将 coding-system 指定为用于解码来自终端的键盘输入的编码系统。如果 coding-system 为 nil，则意味着不对键盘输入进行解码。如果终端是一个框架，则表示该框架的终端；  如果为 nil，则表示当前选择的帧的终端。请参阅多个终端。请注意，在现代 MS-Windows 系统上，Emacs 在解码键盘输入时始终使用 Unicode 输入，因此该命令设置的编码对 Windows 没有影响。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: terminal-coding-system &amp;optional terminal ¶
+</pre></div>
+<p>此函数返回用于对终端的终端输出进行编码的编码系统。no-conversion 值表示不进行编码。如果终端是一个框架，则表示该框架的终端；  如果为 nil，则表示当前选择的帧的终端。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: set-terminal-coding-system coding-system &amp;optional terminal ¶
+</pre></div>
+<p>此命令将 coding-system 指定为用于对终端输出进行编码的编码系统。如果 coding-system 为 nil，则意味着不对终端输出进行编码。如果终端是一个框架，则表示该框架的终端；  如果为 nil，则表示当前选择的帧的终端。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="34.11_输入法.html">输入法</a>, Previous: <a href="34.10.7_显式编码和解码.html">显式编码和解码</a>, Up: <a href="34.10_编码系统.html">编码系统.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

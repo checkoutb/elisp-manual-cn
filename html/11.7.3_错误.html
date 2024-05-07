@@ -1,0 +1,284 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>11.7.3 错误</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">11.7.3 错误</h3>
+<div class="nav-panel"><p>Next: <a href="11.7.4_清理非本地出口.html">清理非本地出口</a>, Previous: <a href="11.7.2_示例_catch和_throw.html">示例_catch和_throw</a>, Up: <a href="11.7_非本地出口.html">非本地出口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当 Emacs Lisp 尝试评估由于某种原因无法评估的表单时，它会发出错误信号。
+</p>
+<p>当发出错误信号时，Emacs 的默认反应是打印错误消息并终止当前命令的执行。在大多数情况下，这是正确的做法，例如在缓冲区末尾键入 Cf。
+</p>
+<p>在复杂的程序中，简单的终止可能不是您想要的。例如，程序可能对数据结构进行了临时更改，或者创建了应在程序完成之前删除的临时缓冲区。在这种情况下，您将使用 unwind-protect 建立清理表达式以在出现错误时进行评估。（请参阅从非本地退出中清除。）有时，您可能希望程序继续执行，尽管子例程中有错误。在这些情况下，您将使用条件案例来建立错误处理程序以在发生错误时恢复控制。
+</p>
+<p>抵制使用错误处理将控制从程序的一部分转移到另一部分的诱惑；  使用 catch 和 throw 代替。请参阅显式非本地退出：catch and throw。
+</p>
+<ol>
+<li>
+11.7.3.1 如何发出错误信号
+
+
+<p>发出错误信号意味着开始错误处理。错误处理通常会中止所有或部分正在运行的程序并返回到为处理错误而设置的点（请参阅 Emacs 如何处理错误）。在这里，我们描述了如何发出错误信号。
+</p>
+<p>大多数错误都会在您为其他目的调用的 Lisp 原语中自动发出信号，例如，如果您尝试获取整数的 CAR 或在缓冲区末尾向前移动一个字符。您还可以使用函数 error 和 signal 显式地发出错误信号。
+</p>
+<p>当用户键入 Cg 时发生的退出不被视为错误，但它几乎像错误一样被处理。请参阅退出。
+</p>
+<p>每个错误都以一种或另一种方式指定错误消息。消息应该说明出了什么问题（ <code>文件不存在</code> ），而不是事情应该如何（ <code>文件必须存在</code> ）。Emacs Lisp 中的约定是错误消息应该以大写字母开头，但不应以任何标点符号结尾。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: error format-string &amp;rest args ¶
+</pre></div>
+<p>此函数通过将 format-message（请参阅格式化字符串）应用于 format-string 和 args 构造的错误消息发出错误信号。
+</p>
+<p>这些示例显示了错误的典型用法：
+</p><div class="lisp">
+<pre class="lisp">(error "That is an error -- try something else")
+     error→ That is an error -- try something else
+
+
+(error "Invalid name `%s'" "A%%B")
+     error→ Invalid name ‘A%%B’
+</pre></div>
+<p>error 通过使用两个参数调用信号来工作：错误符号 error 和包含由 format-message 返回的字符串的列表。
+</p>
+<p>通常，格式中的重音和撇号会转换为匹配的弯引号，例如， <code>Missing `%s'</code> 可能会导致 <code>Missing 'foo'</code> 。有关如何影响或禁止此翻译的信息，请参阅文本引用样式。
+</p>
+<p>警告：如果您想将自己的字符串逐字用作错误消息，请不要只写（错误字符串）。如果字符串 string 包含 ’%’、’‘’ 或 ”’ 它可能会被重新格式化，从而产生不希望的结果。而是使用（错误 <code>%s</code> 字符串）。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: signal error-symbol data ¶
+</pre></div>
+<p>此函数表示一个由错误符号命名的错误。参数 data 是与错误情况相关的附加 Lisp 对象的列表。
+</p>
+<p>参数error-symbol 必须是一个错误符号——一个用define-error 定义的符号。这就是 Emacs Lisp 对不同类型错误进行分类的方式。有关错误符号、错误条件和条件名称的说明，请参阅错误符号和条件名称。
+</p>
+<p>如果错误没有被处理，这两个参数用于打印错误信息。通常，此错误消息由 error-symbol 的 error-message 属性提供。如果 data 不为零，则后面是冒号和逗号分隔的未计算数据元素的列表。对于错误，错误消息是数据的 CAR（必须是字符串）。文件错误的子类别经过特殊处理。
+</p>
+<p>数据中对象的数量和重要性取决于错误符号。例如，对于错误类型参数错误，列表中应该有两个对象：一个描述预期类型的​​谓词，以及一个不适合该类型的对象。
+</p>
+<p>处理错误的任何错误处理程序都可以使用错误符号和数据：条件案例将局部变量绑定到表单列表 (error-symbol .data)（请参阅编写代码以处理错误）。
+</p>
+<p>函数信号永远不会返回。
+</p><div class="lisp">
+<pre class="lisp">(signal 'wrong-number-of-arguments '(x y))
+     error→ Wrong number of arguments: x, y
+
+
+(signal 'no-such-error '("My unknown error condition"))
+     error→ peculiar error: "My unknown error condition"
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: user-error format-string &amp;rest args ¶
+</pre></div>
+<p>此函数的行为与 error 完全相同，只是它使用错误符号 user-error 而不是 error。顾名思义，这是为了报告用户的错误，而不是代码本身的错误。例如，如果您尝试使用命令 Info-history-back (l) 移回您的 Info 浏览历史记录的开头，Emacs 会发出用户错误信号。此类错误不会导致进入调试器，即使 debug-on-error 不为零。请参阅出现错误时进入调试器。 
+</p>
+<p>Common Lisp 注意：Emacs Lisp 与 Common Lisp 的可连续错误概念完全不同。
+</p>
+</li><li>
+11.7.3.2 Emacs 如何处理错误
+
+
+<p>当发出错误信号时，信号会搜索错误的活动处理程序。处理程序是一系列 Lisp 表达式，指定在 Lisp 程序的一部分发生错误时执行。如果错误具有适用的处理程序，则执行处理程序，并且控制继续跟随处理程序。处理程序在建立它的条件案例的环境中执行；  在该条件案例中调用的所有函数都已退出，处理程序无法返回它们。
+</p>
+<p>如果没有适用的错误处理程序，它将终止当前命令并将控制权返回给编辑器命令循环。（命令循环对所有类型的错误都有一个隐式处理程序。）命令循环的处理程序使用错误符号和相关数据来打印错误消息。您可以使用变量 command-error-function 来控制如何完成：
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: command-error-function ¶
+</pre></div>
+<p>这个变量，如果非 nil，指定一个函数用来处理返回控制给 Emacs 命令循环的错误。该函数应该接受三个参数：数据，一个与条件案例绑定到其变量的形式相同的列表；  context，一个描述错误发生情况的字符串，或者（更常见的）nil；  和调用者，Lisp 函数调用发出错误信号的原语。 
+</p>
+<p>没有显式处理程序的错误可能会调用 Lisp 调试器。如果变量 debug-on-error（请参阅在出现错误时进入调试器）非零，则启用调试器。与错误处理程序不同，调试器在错误环境中运行，因此您可以准确地检查变量的值，就像它们在错误发生时一样。
+</p>
+</li><li>
+11.7.3.3 编写代码来处理错误
+
+
+<p>发出错误信号的通常效果是终止正在运行的命令并立即返回 Emacs 编辑器命令循环。您可以通过建立一个错误处理程序来安排捕获程序的一部分中发生的错误，使用特殊形式的条件案例。一个简单的示例如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(condition-case nil
+    (delete-file filename)
+  (error nil))
+</pre></div>
+<p>这将删除名为 filename 的文件，捕获任何错误并在发生错误时返回 nil。（对于这样的简单情况，您可以使用宏忽略错误；见下文。）
+</p>
+<p>condition-case 构造通常用于捕获可预测的错误，例如在调用 insert-file-contents 时无法打开文件。它还用于捕获完全不可预测的错误，例如当程序评估从用户读取的表达式时。
+</p>
+<p>条件案例的第二个参数称为受保护形式。（在上面的示例中，受保护的表单是对 delete-file 的调用。）错误处理程序在此表单开始执行时生效，并在此表单返回时停用。它们在所有干预时间内都保持有效。特别是，它们在执行由这种形式调用的函数期间、在它们的子例程中等期间有效。这是一件好事，因为严格来说，错误只能由受保护形式调用的 Lisp 原语（包括信号和错误）发出信号，而不能由受保护形式本身发出。
+</p>
+<p>受保护形式之后的参数是处理程序。每个处理程序列出一个或多个条件名称（它们是符号）以指定它将处理哪些错误。发出错误信号时指定的错误符号还定义了条件名称列表。如果它们有任何共同的条件名称，则处理程序适用于错误。在上面的例子中，有一个handler，它指定了一个条件名error，它涵盖了所有的错误。
+</p>
+<p>搜索适用的处理程序会检查所有已建立的处理程序，从最近建立的处理程序开始。因此，如果两个嵌套的条件案例形式提供处理相同的错误，则两者的内部可以处理它。
+</p>
+<p>如果错误是由某种条件案例形式处理的，这通常会阻止调试器运行，即使 debug-on-error 说这个错误应该调用调试器。
+</p>
+<p>如果您希望能够调试由条件案例捕获的错误，请将变量 debug-on-signal 设置为非零值。您还可以通过在条件中编写 debug 来指定特定的处理程序应该让调试器首先运行，如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(condition-case nil
+    (delete-file filename)
+  ((debug error) nil))
+</pre></div>
+<p>这里的 debug 的作用只是防止 condition-case 抑制对调试器的调用。任何给定的错误只有在 debug-on-error 和其他常用过滤机制认为应该调用时才会调用调试器。请参阅出现错误时进入调试器。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: condition-case-unless-debug var protected-form handlers… ¶
+</pre></div>
+<p>宏 condition-case-unless-debug 提供了另一种处理此类表单调试的方法。它的行为与条件情况完全相同，除非变量 debug-on-error 不为零，在这种情况下，它根本不处理任何错误。 
+</p>
+<p>一旦 Emacs 决定某个处理程序处理错误，它就会将控制权返回给该处理程序。为此，Emacs 取消绑定由正在退出的绑定构造所做的所有变量绑定，并执行对正在退出的所有 unwind-protect 表单的清理。一旦控制到达处理程序，处理程序的主体就会正常执行。
+</p>
+<p>处理程序主体执行后，执行从条件案例形式返回。因为受保护的表单在处理程序执行之前完全退出，所以处理程序不能在错误点恢复执行，也不能检查在受保护的表单中进行的变量绑定。它所能做的就是清理并继续。
+</p>
+<p>错误信号和处理与 throw 和 catch 有一些相似之处（请参阅显式非本地退出：catch 和 throw），但它们是完全独立的工具。错误不能被 catch 捕获，并且 throw 不能由错误处理程序处理（尽管在没有合适的 catch 时使用 throw 表示可以处理的错误）。
+</p>
+<div class="lisp">
+<pre class="lisp">Special Form: condition-case var protected-form handlers… ¶
+</pre></div>
+<p>这种特殊形式围绕受保护形式的执行建立错误处理程序处理程序。如果 protected-form 执行没有错误，它返回的值将成为条件案例形式的值（在没有成功处理程序的情况下；见下文）。在这种情况下，条件案例无效。当在受保护形式期间发生错误时，条件案例形式会有所不同。
+</p>
+<p>每个处理程序都是表单（条件体…）的列表。这里的 conditions 是要处理的错误条件名称，或条件名称列表（可以包括 debug 以允许调试器在处理程序之前运行）。条件名称 t 匹配任何条件。body 是这个处理程序处理错误时要执行的一个或多个 Lisp 表达式。以下是处理程序的示例：
+</p><div class="lisp">
+<pre class="lisp">(error nil)
+
+(arith-error (message "Division by zero"))
+
+((arith-error file-error)
+ (message
+  "Either division by zero or failure to open a file"))
+</pre></div>
+<p>发生的每个错误都有一个错误符号来描述它是什么类型的错误，并且还描述了一个条件名称列表（请参阅错误符号和条件名称）。Emacs 在所有活动的条件案例形式中搜索指定一个或多个条件名称的处理程序；  最里面的匹配条件案例处理错误。在这种情况下，第一个适用的处理程序处理错误。
+</p>
+<p>执行处理程序主体后，条件案例正常返回，使用处理程序主体中最后一个表单的值作为整体值。
+</p>
+<p>参数 var 是一个变量。condition-case 在执行 protected-form 时不绑定此变量，仅在它处理错误时。那时，它将 var 本地绑定到错误描述，这是一个给出错误细节的列表。错误描述的形式为 (error-symbol . data)。处理程序可以参考这个列表来决定做什么。例如，如果错误是因为打开文件失败，则文件名是数据的第二个元素——错误描述的第三个元素。
+</p>
+<p>如果 var 为 nil，则表示没有绑定任何变量。然后错误符号和相关数据对处理程序不可用。
+</p>
+<p>作为一种特殊情况，其中一个处理程序可以是表单 (:success body…) 的列表，其中执行 body 时，当该表达式无错误终止时，绑定到 protected-form 的返回值的 var（如果非 nil） .
+</p>
+<p>有时有必要重新抛出一个被条件案例捕获的信号，以便某些外层处理程序捕获。以下是如何做到这一点：
+</p>
+<div class="lisp">
+<pre class="lisp">(signal (car err) (cdr err))
+</pre></div>
+<p>其中 err 是错误描述变量，是要重新抛出其错误条件的 condition-case 的第一个参数。见信号定义。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: error-message-string error-descriptor ¶
+</pre></div>
+<p>此函数返回给定错误描述符的错误消息字符串。如果您想通过打印该错误的通常错误消息来处理错误，这很有用。见信号定义。 
+</p>
+<p>这是使用条件案例处理除以零导致的错误的示例。处理程序显示错误消息（但没有哔声），然后返回一个非常大的数字。
+</p>
+<div class="lisp">
+<pre class="lisp">(defun safe-divide (dividend divisor)
+  (condition-case err
+      ;; Protected form.
+      (/ dividend divisor)
+
+    ;; The handler.
+    (arith-error                        ; Condition.
+     ;; Display the usual message for this error.
+     (message "%s" (error-message-string err))
+     1000000)))
+⇒ safe-divide
+
+
+(safe-divide 5 0)
+     -| Arithmetic error: (arith-error)
+⇒ 1000000
+</pre></div>
+<p>处理程序指定条件名称 arith-error 以便它只处理除零错误。其他类型的错误将不会被处理（通过这种情况）。因此：
+</p>
+<div class="lisp">
+<pre class="lisp">(safe-divide nil 3)
+     error→ Wrong type argument: number-or-marker-p, nil
+</pre></div>
+<p>这是一个捕获各种错误的条件案例，包括来自错误的错误：
+</p><div class="lisp">
+<pre class="lisp">(setq baz 34)
+     ⇒ 34
+
+
+(condition-case err
+    (if (eq baz 35)
+        t
+      ;; This is a call to the function error.
+      (error "Rats!  The variable %s was %s, not 35" 'baz baz))
+  ;; This is the handler; it is not a form.
+  (error (princ (format "The error was: %s" err))
+         2))
+-| The error was: (error "Rats!  The variable baz was 34, not 35")
+⇒ 2
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Macro: ignore-errors body… ¶
+</pre></div>
+<p>此构造执行主体，忽略执行期间发生的任何错误。如果执行没有错误，则ignore-errors返回body中最后一个表单的值；  否则，它返回 nil。
+</p>
+<p>这是本小节开头使用忽略错误重写的示例：
+</p>
+<div class="lisp">
+<pre class="lisp">(ignore-errors
+ (delete-file filename))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Macro: ignore-error condition body… ¶
+</pre></div>
+<p>此宏类似于忽略错误，但只会忽略指定的特定错误条件。
+</p>
+<div class="lisp">
+<pre class="lisp">(ignore-error end-of-file
+   (read ""))
+</pre></div>
+<p>condition 也可以是错误条件列表。 
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: with-demoted-errors format body… ¶
+</pre></div>
+<p>这个宏就像是忽略错误的温和版本。它不是完全抑制错误，而是将它们转换为消息。它使用字符串格式来格式化消息。格式应包含单个 ’%’ 序列；  例如， <code>错误：%S</code> 。使用 with-demoted-errors 来处理预期不会发出错误信号的代码，但如果确实发生错误，应该是健壮的。请注意，此宏使用 condition-case-unless-debug 而不是 condition-case。
+</p>
+</li><li>
+11.7.3.4 错误符号和条件名称
+
+
+<p>当您发出错误信号时，您指定一个错误符号来指定您想到的错误类型。每个错误都有一个且只有一个错误符号来对其进行分类。这是 Emacs Lisp 语言定义的最好的错误分类。
+</p>
+<p>这些狭窄的分类被分组为更广泛的类的层次结构，称为错误条件，由条件名称标识。最窄的此类属于错误符号本身：每个错误符号也是一个条件名称。还有更广泛的类的条件名称，直到条件名称错误，它接受各种错误（但不退出）。因此，每个错误都有一个或多个条件名称：错误、与错误不同的错误符号，可能还有一些中间分类。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: define-error name message &amp;optional parent ¶
+</pre></div>
+<p>为了使符号成为错误符号，必须使用 define-error 定义它，它采用父条件（默认为错误）。这个父级定义了这种错误所属的条件。父母的传递集总是包括错误符号本身和符号错误。因为退出不被认为是一个错误，所以退出的父集合就是（退出）。 
+</p>
+<p>除了其父项之外，错误符号还有一条消息，该消息是在发出错误信号但未处理时要打印的字符串。如果该消息无效，则使用错误消息 <code>特殊错误</code> 。见信号定义。
+</p>
+<p>在内部，父集合存储在错误符号的错误条件属性中，消息存储在错误符号的错误消息属性中。
+</p>
+<p>下面是我们如何定义一个新的错误符号 new-error：
+</p>
+<div class="lisp">
+<pre class="lisp">(define-error 'new-error "A new error" 'my-own-errors)
+</pre></div>
+<p>这个错误有几个条件名称：new-error，最窄的分类；  我自己的错误，我们认为这是一个更广泛的分类；  以及我自己的错误的所有条件，其中应该包括错误，这是最广泛的。
+</p>
+<p>错误字符串应以大写字母开头，但不应以句点结尾。这是为了与 Emacs 的其余部分保持一致。
+</p>
+<p>自然，Emacs 永远不会自己发出新错误信号。只有在代码中显式调用信号（参见信号定义）才能执行此操作：
+</p>
+<div class="lisp">
+<pre class="lisp">(signal 'new-error '(x y))
+     error→ A new error: x, y
+</pre></div>
+<p>可以通过其任何条件名称来处理此错误。此示例处理 my-own-errors 类中的 new-error 和任何其他错误：
+</p>
+<div class="lisp">
+<pre class="lisp">(condition-case foo
+    (bar nil t)
+  (my-own-errors nil))
+</pre></div>
+<p>错误分类的重要方式是通过它们的条件名称——用于将错误与处理程序匹配的名称。错误符号仅用作指定预期错误消息和条件名称列表的便捷方式。给 signal 提供一个条件名称列表而不是一个错误符号会很麻烦。
+</p>
+<p>相比之下，仅使用没有条件名称的错误符号会严重降低条件案例的能力。当您编写错误处理程序时，条件名称可以在各种通用级别上对错误进行分类。单独使用错误符号将消除除最窄级别之外的所有分类。
+</p>
+<p>有关主要错误符号及其条件的列表，请参阅标准错误。
+</p></li></ol>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="11.7.4_清理非本地出口.html">清理非本地出口</a>, Previous: <a href="11.7.2_示例_catch和_throw.html">示例_catch和_throw</a>, Up: <a href="11.7_非本地出口.html">非本地出口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>32.4 来自标记的信息</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">32.4 来自标记的信息</h2>
+<div class="nav-panel"><p>Next: <a href="32.5_标记插入类型.html">标记插入类型</a>, Previous: <a href="32.3_创建标记的函数.html">创建标记的函数</a>, Up: <a href="32_标记.html">标记.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍用于访问标记对象的组件的函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: marker-position marker ¶
+</pre></div>
+<p>此函数返回标记指向的位置，如果它不指向任何地方，则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: marker-buffer marker ¶
+</pre></div>
+<p>此函数返回标记指向的缓冲区，如果它不指向任何地方，则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">(setq m (make-marker))
+     ⇒ #&lt;marker in no buffer&gt;
+
+(marker-position m)
+     ⇒ nil
+
+(marker-buffer m)
+     ⇒ nil
+
+
+(set-marker m 3770 (current-buffer))
+     ⇒ #&lt;marker at 3770 in markers.texi&gt;
+
+(marker-buffer m)
+     ⇒ #&lt;buffer markers.texi&gt;
+
+(marker-position m)
+     ⇒ 3770
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="32.5_标记插入类型.html">标记插入类型</a>, Previous: <a href="32.3_创建标记的函数.html">创建标记的函数</a>, Up: <a href="32_标记.html">标记.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.12.5 面重映射</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.12.5 面重映射</h3>
+<div class="nav-panel"><p>Next: <a href="40.12.6_处理面的函数.html">处理面的函数</a>, Previous: <a href="40.12.4_显示面.html">显示面</a>, Up: <a href="40.12_面.html">面.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>变量 face-remapping-alist 用于面外观的缓冲区局部或全局变化。例如，它用于实现 text-scale-adjust 命令（参见 GNU Emacs 手册中的文本缩放）。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: face-remapping-alist ¶
+</pre></div>
+<p>此变量的值是一个 alist，其元素具有 (face . remapping) 形式。这会导致 Emacs 显示任何带有重新映射的面的文本，而不是普通的面定义。
+</p>
+<p>重新映射可以是任何适用于面文本属性的面规范：面（即面名称或属性/值对的属性列表）或面列表。具体请参见具有特殊含义的属性中对面文本属性的描述。重新映射作为重新映射面的完整规范——它取代了面的正常定义，而不是修改它。
+</p>
+<p>如果 face-remapping-alist 是缓冲区本地，则其本地值仅在该缓冲区内生效。如果 face-remapping-alist 包含仅适用于某些窗口的面，则通过使用 (:filtered (:window param val) 规范），该面仅在匹配过滤条件的窗口中生效（请参阅具有特殊含义的属性）。要暂时关闭面过滤，请将 face-filters-always-match 绑定到非零值，然后所有面过滤器将匹配任何窗口。
+</p>
+<p>注意：面重映射是非递归的。如果重新映射直接或通过重新映射中某个其他面的 :inherit 属性引用相同的面名称面，则该引用使用面的正常定义。例如，如果使用 face-remapping-alist 中的此条目重新映射模式线面：
+</p>
+<div class="lisp">
+<pre class="lisp">(mode-line italic mode-line)
+</pre></div>
+<p>然后模式线面的新定义继承自斜体面，以及模式线面的正常（未重新映射）定义。
+</p>
+<p>以下函数实现了 face-remapping-alist 的更高级别接口。大多数 Lisp 代码应该使用这些函数而不是直接设置 face-remapping-alist，以避免践踏其他地方应用的重映射。这些函数旨在用于缓冲区局部重映射，因此它们都使 face-remapping-alist 缓冲区局部作为副作用。他们管理表单的 face-remapping-alist 条目
+</p>
+<div class="lisp">
+<pre class="lisp">(face relative-spec-1 relative-spec-2 ... base-spec)
+</pre></div>
+<p>其中，如上所述，relative-spec-N 和 base-spec 中的每一个都是面名或属性/值对的属性列表。每个相对重映射条目，relative-spec-N，由 face-remap-add-relative 和 face-remap-remove-relative 函数管理；  这些旨在用于简单的修改，例如更改文本大小。基础重映射条目 base-spec 具有最低优先级，由 face-remap-set-base 和 face-remap-reset-base 函数管理；  它适用于主要模式在它们控制的缓冲区中重新映射面。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: face-remap-add-relative face &amp;rest specs ¶
+</pre></div>
+<p>此函数将规格添加为当前缓冲区中面的相对重映射。specs 应该是一个列表，其中每个元素要么是面名称，要么是属性/值对的属性列表。
+</p>
+<p>返回值是一个用作 cookie 的 Lisp 对象；  如果您稍后需要删除重新映射，则可以将此对象作为参数传递给 face-remap-remove-relative。
+</p>
+<div class="lisp">
+<pre class="lisp">;; Remap the 'escape-glyph' face into a combination
+;; of the 'highlight' and 'italic' faces:
+(face-remap-add-relative 'escape-glyph 'highlight 'italic)
+
+;; Increase the size of the 'default' face by 50%:
+(face-remap-add-relative 'default :height 1.5)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: face-remap-remove-relative cookie ¶
+</pre></div>
+<p>此函数删除之前由 face-remap-add-relative 添加的相对重映射。cookie 应该是添加重映射时 face-remap-add-relative 返回的 Lisp 对象。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: face-remap-set-base face &amp;rest specs ¶
+</pre></div>
+<p>此函数将当前缓冲区中面的基本重新映射设置为规格。如果 specs 为空，则恢复默认的基础重映射，类似于调用 face-remap-reset-base（见下文）；  请注意，这与包含单个值 nil 的规范不同，后者具有相反的结果（面的全局定义被忽略）。
+</p>
+<p>这会覆盖默认的 base-spec，它继承了全局面定义，因此如果需要，由调用者添加此类继承。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: face-remap-reset-base face ¶
+</pre></div>
+<p>此函数将 face 的基本重新映射设置为其默认值，该值继承自 face 的全局定义。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.12.6_处理面的函数.html">处理面的函数</a>, Previous: <a href="40.12.4_显示面.html">显示面</a>, Up: <a href="40.12_面.html">面.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

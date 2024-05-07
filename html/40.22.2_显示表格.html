@@ -1,0 +1,76 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.22.2 显示表格</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.22.2 显示表格</h3>
+<div class="nav-panel"><p>Next: <a href="40.22.3_活动显示表.html">活动显示表</a>, Previous: <a href="40.22.1_通常的显示约定.html">通常的显示约定</a>, Up: <a href="40.22_字符显示.html">字符显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>显示表是一种特殊用途的字符表（参见 Char-Tables），以 display-table 作为其子类型，用于覆盖通常的字符显示约定。本节介绍如何制作、检查和分配元素到显示表对象。下一部分（参见活动显示表）描述了各种标准显示表及其优先级。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-display-table ¶
+</pre></div>
+<p>这将创建并返回一个显示表。该表最初在所有元素中都为零。
+</p>
+<p>显示表的普通元素以字符代码为索引；  索引 c 处的元素说明了如何显示字符代码 c。该值应为 nil（这意味着根据通常的显示约定显示字符 c；请参阅通常的显示约定），或字形代码的向量（这意味着将字符 c 显示为那些字形；请参阅 Glyphs）。
+</p>
+<p>警告：如果您使用显示表更改换行符的显示，整个缓冲区将显示为一长行。
+</p>
+<p>展示台还有六个额外的插槽，用于特殊用途。这是它们的含义表；  任何插槽中的 nil 表示使用该插槽的默认值，如下所述。
+</p>
+<div class="lisp">
+<pre class="lisp">0
+</pre></div>
+<p>截断屏幕行末尾的字形（默认为 <code>$</code> ）。请参见字形。在图形终端上，Emacs 默认使用边缘中的箭头来表示截断，因此显示表没有效果，除非您禁用边缘（请参阅 GNU Emacs 手册中的窗口边缘）。
+</p><div class="lisp">
+<pre class="lisp">1
+</pre></div>
+<p>续行结尾的字形（默认为 <code>\</code> ）。在图形终端上，Emacs 默认使用边缘中的弯曲箭头来指示继续，因此显示表没有效果，除非您禁用边缘。
+</p><div class="lisp">
+<pre class="lisp">2
+</pre></div>
+<p>用于指示显示为八进制字符代码的字符的字形（默认为 <code>\</code> ）。
+</p><div class="lisp">
+<pre class="lisp">3
+</pre></div>
+<p>用于指示控制字符的字形（默认为 ’^’）。
+</p><div class="lisp">
+<pre class="lisp">4
+</pre></div>
+<p>用于指示存在不可见线条的字形向量（默认为 <code>...</code> ）。请参阅选择性显示。
+</p><div class="lisp">
+<pre class="lisp">5
+</pre></div>
+<p>用于在并排窗口之间绘制边框的字形（默认为 <code>|</code> ）。请参阅拆分窗口。这目前仅对文本终端有效；  在图形终端上，如果支持并使用垂直滚动条，则滚动条将两个窗口分开，如果没有垂直滚动条和分隔符（请参阅窗口分隔符），Emacs 使用细线表示边框。
+</p>
+<p>例如，这里是如何构建一个显示表来模拟将 ctl-arrow 设置为非 nil 值的效果（请参阅 Glyphs，了解函数 make-glyph-code）：
+</p>
+<div class="lisp">
+<pre class="lisp">(setq disptab (make-display-table))
+(dotimes (i 32)
+  (or (= i ?\t)
+      (= i ?\n)
+      (aset disptab i
+            (vector (make-glyph-code ?^ 'escape-glyph)
+                    (make-glyph-code (+ i 64) 'escape-glyph)))))
+(aset disptab 127
+      (vector (make-glyph-code ?^ 'escape-glyph)
+              (make-glyph-code ?? 'escape-glyph)))))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: display-table-slot display-table slot ¶
+</pre></div>
+<p>该函数返回 display-table 的额外 slot slot 的值。参数 slot 可以是从 0 到 5 的数字，也可以是插槽名称（符号）。有效符号为截断、换行、转义、控制、选择性显示和垂直边框。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-display-table-slot display-table slot value ¶
+</pre></div>
+<p>此函数将值存储在 display-table 的额外插槽槽中。参数 slot 可以是从 0 到 5 的数字，也可以是插槽名称（符号）。有效符号为截断、换行、转义、控制、选择性显示和垂直边框。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: describe-display-table display-table ¶
+</pre></div>
+<p>该函数在帮助缓冲区中显示显示表 display-table 的描述。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: describe-current-display-table ¶
+</pre></div>
+<p>此命令在帮助缓冲区中显示当前显示表的描述。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.22.3_活动显示表.html">活动显示表</a>, Previous: <a href="40.22.1_通常的显示约定.html">通常的显示约定</a>, Up: <a href="40.22_字符显示.html">字符显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

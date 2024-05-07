@@ -1,0 +1,583 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>30.4.3 窗框参数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">30.4.3 窗框参数</h3>
+<div class="nav-panel"><p>Next: <a href="30.4.4_几何.html">几何</a>, Previous: <a href="30.4.2_初始帧参数.html">初始帧参数</a>, Up: <a href="30.4_帧参数.html">帧参数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>帧具有哪些参数取决于它使用的显示机制。本节介绍在某些或所有类型的终端上具有特殊含义的参数。其中，名称、标题、高度、宽度、缓冲区列表和缓冲区谓词在终端帧中提供有意义的信息，而 tty-color-mode 仅对文本终端上的帧有意义。
+</p>
+<ol>
+<li>
+30.4.3.1 基本参数
+
+
+<p>这些帧参数给出了关于帧的最基本信息。title 和 name 在所有终端上都有意义。
+</p>
+<div class="lisp">
+<pre class="lisp">display
+</pre></div>
+<p>在其上打开此帧的显示器。它应该是 <code>host:dpy.screen</code> 形式的字符串，就像 DISPLAY 环境变量一样。有关显示名称的更多详细信息，请参阅多个终端。
+</p><div class="lisp">
+<pre class="lisp">display-type
+</pre></div>
+<p>这个参数描述了可以在这个帧中使用的可能颜色的范围。它的值是彩色、灰度或单色。
+</p><div class="lisp">
+<pre class="lisp">title
+</pre></div>
+<p>如果一个帧有一个非零标题，它会出现在帧顶部的窗口系统的标题栏中，如果 mode-line-frame-identification 使用 ’%F’ （请参阅模式行中的 %-Constructs）。当 Emacs 不使用窗口系统并且一次只能显示一帧时，通常会出现这种情况。请参阅帧标题。
+</p><div class="lisp">
+<pre class="lisp">name
+</pre></div>
+<p>帧的名称。如果标题参数未指定或为零，则帧名称用作帧标题的默认值。如果您不指定名称，Emacs 会自动设置帧名称（请参阅帧标题）。
+</p>
+<p>如果您在创建帧时明确指定帧名称，则在查找帧的 X 资源时也会使用该名称（而不是 Emacs 可执行文件的名称）。
+</p><div class="lisp">
+<pre class="lisp">explicit-name
+</pre></div>
+<p>如果在创建帧时明确指定了帧名称，则此参数将是该名称。如果帧没有明确命名，则此参数将为 nil。
+</p>
+</li><li>
+30.4.3.2 位置参数
+
+
+<p>描述帧的 X 和 Y 偏移的参数始终以像素为单位。对于正常的非子帧，它们指定帧相对于其显示原点的外部位置（请参阅帧几何）。对于子帧（请参阅子帧），它们指定帧相对于帧父帧的本地位置的外部位置。（请注意，这些参数在 TTY 帧上都没有意义。）
+</p>
+<div class="lisp">
+<pre class="lisp">left
+</pre></div>
+<p>帧的左外边缘相对于帧的显示或父帧的左边缘的位置（以像素为单位）。可以通过以下方式之一指定。
+</p>
+<div class="lisp">
+<pre class="lisp">an integer
+</pre></div>
+<p>正整数始终将帧的左边缘与其显示或父帧的左边缘相关联。负整数将右帧边缘与显示或父帧的右边缘相关联。
+</p><div class="lisp">
+<pre class="lisp">(+ pos)
+</pre></div>
+<p>这指定了左帧边缘相对于其显示或父帧的左边缘的位置。整数 pos 可以是正数或负数；  负值指定屏幕或父帧之外的位置，或在主显示器以外的显示器上（用于多显示器显示器）。
+</p><div class="lisp">
+<pre class="lisp">(- pos)
+</pre></div>
+<p>这指定了右帧边缘相对于显示或父帧的右边缘的位置。整数 pos 可以是正数或负数；  负值指定屏幕或父帧之外的位置，或在主显示器以外的显示器上（用于多显示器显示器）。
+</p><div class="lisp">
+<pre class="lisp">a floating-point value
+</pre></div>
+<p>0.0 到 1.0 范围内的浮点值通过帧的左位置比率指定左边缘的偏移量 - 其外帧的左边缘与帧工作区（请参阅多个终端）或其父工作区宽度的比率原生帧（参见子帧）减去外帧的宽度。因此，左侧位置比率 0.0 将帧刷新到左侧，比率 0.5 将其居中，比率 1.0 将帧刷新到其显示或父帧的右侧。类似地，帧的顶部位置比率是帧的顶部位置与其工作区或父帧的高度之比减去帧的高度。
+</p>
+<p>如果子帧具有非零保持比率参数（请参阅帧交互参数）并且其父帧被调整大小，Emacs 将尝试保持子帧的位置比率不变。
+</p>
+<p>由于帧的外部尺寸（请参阅帧几何）通常在帧可见之前不可用，因此在创建装饰帧时通常不建议使用浮点值。浮点值更适合确保（未装饰的）子帧很好地定位在其父帧的区域内。
+</p>
+<p>一些窗口管理器会忽略程序指定的位置。如果您想确保您指定的位置不会被忽略，请为 user-position 参数指定一个非零值，如下例所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(modify-frame-parameters
+  nil '((user-position . t) (left . (+ -4))))
+</pre></div>
+<p>通常，相对于其显示的右边缘或下边缘定位帧并不是一个好主意。定位初始帧或新帧要么不准确（因为在帧可见之前外部帧的大小尚不完全清楚），要么会导致额外的闪烁（如果帧在变得可见后必须重新定位）。
+</p>
+<p>另请注意，相对于显示、工作区或父帧的右/下边缘指定的位置以及浮点偏移量在内部存储为相对于显示、工作区或父帧边缘的左/上边缘的整数偏移量.  它们也由帧参数等函数返回，并由桌面保存例程恢复。
+</p><div class="lisp">
+<pre class="lisp">top
+</pre></div>
+<p>顶部（或底部）边缘的屏幕位置，以像素为单位，相对于显示或父帧的顶部（或底部）边缘。它的工作方式与左一样，除了垂直而不是水平。
+</p><div class="lisp">
+<pre class="lisp">icon-left
+</pre></div>
+<p>帧图标左边缘的屏幕位置，以像素为单位，从屏幕左边缘开始计数。如果窗口管理器支持此功能，则在帧图标化时生效。如果您为此参数指定一个值，那么您还必须为 icon-top 指定一个值，反之亦然。
+</p><div class="lisp">
+<pre class="lisp">icon-top
+</pre></div>
+<p>帧图标顶部边缘的屏幕位置，以像素为单位，从屏幕顶部边缘开始计数。如果窗口管理器支持此功能，则在帧图标化时生效。
+</p><div class="lisp">
+<pre class="lisp">user-position
+</pre></div>
+<p>当您创建帧并使用 left 和 top 参数指定其屏幕位置时，使用此参数来说明指定位置是用户指定的（由人类用户以某种方式明确请求）还是仅仅是程序指定的（由程序）。非零值表示该位置是用户指定的。
+</p>
+<p>窗口管理器通常注意用户指定的位置，有些也注意程序指定的位置。但是许多人忽略了程序指定的位置，以默认方式放置窗口或让用户用鼠标放置它。一些窗口管理器，包括 twm，让用户指定是服从程序指定的位置还是忽略它们。
+</p>
+<p>调用 make-frame 时，如果 left 和 top 参数的值代表用户声明的偏好，则应该为此参数指定一个非 nil 值；  否则，使用 nil。
+</p><div class="lisp">
+<pre class="lisp">z-group
+</pre></div>
+<p>此参数指定帧的窗口系统窗口在帧显示的堆叠 (Z-) 顺序中的相对位置。
+</p>
+<p>如果高于此值，则窗口系统将在所有其他未设置上述属性的窗口系统窗口上方显示与帧对应的窗口。如果为 nil，则帧的窗口显示在所有设置了上述属性的窗口下方和所有设置了以下属性的窗口上方。如果在下方，则帧的窗口将显示在所有未设置以下属性的窗口下方。
+</p>
+<p>要将帧定位在特定其他帧的上方或下方，请使用函数 frame-restack（请参阅提升、降低和重新堆叠帧）。
+</p>
+</li><li>
+30.4.3.3 尺寸参数
+
+
+<p>帧参数通常以字符为单位指定帧大小。在图形显示上，默认面决定了这些字符单元的实际像素大小（请参阅面属性）。
+</p>
+<div class="lisp">
+<pre class="lisp">width
+</pre></div>
+<p>此参数指定帧的宽度。可以通过以下方式指定：
+</p>
+<div class="lisp">
+<pre class="lisp">an integer
+</pre></div>
+<p>一个正整数指定帧文本区域的宽度（请参阅帧几何），以字符为单位。
+</p><div class="lisp">
+<pre class="lisp">a cons cell
+</pre></div>
+<p>如果这是一个在其 CAR 中带有符号 text-pixels 的 cons 单元格，则该单元格的 CDR 指定帧文本区域的宽度（以像素为单位）。
+</p><div class="lisp">
+<pre class="lisp">a floating-point value
+</pre></div>
+<p>一个介于 0.0 和 1.0 之间的浮点数可用于通过其宽度比来指定帧的宽度——其外部宽度（请参阅帧几何）与帧工作区（请参阅多个终端）或其父级宽度的比率帧的（参见子帧）本机帧。因此，值为 0.5 使帧占据其工作区或父帧宽度的一半，值为 1.0 则为整个宽度。类似地，帧的高度比是其外部高度与其工作区或其父帧的高度之比。
+</p>
+<p>如果子帧具有非零保持比参数（请参阅帧交互参数）并且其父帧已调整大小，Emacs 将尝试保持子帧的宽度和高度比不变。
+</p>
+<p>由于在使帧可见之前通常无法获得帧的外部大小，因此在创建装饰帧时通常不建议使用浮点值。浮点值更适合确保子帧始终适合其父帧的区域，例如，当通过 display-buffer-in 自定义 display-buffer-alist（请参阅选择用于显示缓冲区的窗口）时-子帧。
+</p>
+<p>无论如何指定此参数，报告此参数值的函数（如 frame-parameters）总是将帧文本区域的宽度（以字符为单位）报告为整数，如有必要，四舍五入为帧默认字符宽度的倍数。桌面保存例程也使用该值。
+</p><div class="lisp">
+<pre class="lisp">height
+</pre></div>
+<p>此参数指定帧的高度。它就像宽度一样工作，除了垂直而不是水平。
+</p><div class="lisp">
+<pre class="lisp">user-size
+</pre></div>
+<p>这对尺寸参数 height 和 width 的作用与用户位置参数（参见用户位置）对位置参数 top 和 left 的作用相同。
+</p><div class="lisp">
+<pre class="lisp">min-width
+</pre></div>
+<p>此参数指定帧的最小原始宽度（请参阅帧几何），以字符为单位。通常，建立帧初始宽度或水平调整帧大小的函数确保可以显示帧的所有窗口、垂直滚动条、边缘、边距和垂直分隔线。这个参数，如果非零允许使帧比那个更窄，结果是任何不适合的组件都将被窗口管理器剪裁。
+</p><div class="lisp">
+<pre class="lisp">min-height
+</pre></div>
+<p>此参数指定帧的最小原始高度（请参阅帧几何），以字符为单位。通常，建立帧的初始大小或调整帧大小的功能确保可以显示所有帧的窗口、水平滚动条和分隔线、模式和标题行、回显区域以及内部菜单和工具栏。这个参数，如果非零允许使帧小于那个，结果是任何不适合的组件都将被窗口管理器剪裁。
+</p><div class="lisp">
+<pre class="lisp">fullscreen
+</pre></div>
+<p>此参数指定是否最大化帧的宽度、高度或两者。它的值可以是 fullwidth、fullheight、fullboth 或最大化。全宽帧尽可能宽，全高帧尽可能高，全宽帧尽可能宽和高。最大化的帧类似于 <code>fullboth</code> 帧，不同之处在于它通常保留其标题栏以及用于调整帧大小和关闭帧的按钮。此外，最大化的帧通常会避免隐藏桌面上显示的任何任务栏或面板。另一方面， <code>fullboth</code> 帧通常会省略标题栏并占据整个可用屏幕空间。
+</p>
+<p>在这方面，全高和全宽帧更类似于最大化的帧。但是，这些通常会显示一个外部边框，最大化的帧可能会缺少该边框。因此，最大化和全高帧的高度以及最大化和全宽帧的宽度通常相差几个像素。
+</p>
+<p>对于某些窗口管理器，您可能必须自定义变量 frame-resize-pixelwise（请参阅 Frame Size），以使帧真正显示为最大化或全屏。此外，一些窗口管理器可能不支持各种全屏或最大化状态之间的平滑过渡。自定义变量 x-frame-normalize-before-maximize 可以帮助克服这个问题。
+</p>
+<p>macOS 上的全屏隐藏工具栏和菜单栏，但是如果将鼠标指针移动到屏幕顶部，两者都会显示。
+</p><div class="lisp">
+<pre class="lisp">fullscreen-restore
+</pre></div>
+<p>此参数指定在 <code>fullboth</code> 状态下调用 toggle-frame-fullscreen 命令（参见 GNU Emacs 手册中的帧命令）后所需的帧全屏状态。通常，当将状态切换为 fullboth 时，该命令会自动安装此参数。但是，如果您以 <code>fullboth</code> 状态启动 Emacs，则必须在初始文件中指定所需的行为，例如
+</p>
+<div class="lisp">
+<pre class="lisp">(setq default-frame-alist
+    '((fullscreen . fullboth)
+      (fullscreen-restore . fullheight)))
+</pre></div>
+<p>这将在第一次输入 F11 后给出一个新的帧全高。
+</p><div class="lisp">
+<pre class="lisp">fit-frame-to-buffer-margins
+</pre></div>
+<p>当使用 fit-frame-to-buffer 将此帧拟合到其根窗口的缓冲区时，此参数允许覆盖选项 fit-frame-to-buffer-margins 的值（请参阅调整窗口大小）。
+</p><div class="lisp">
+<pre class="lisp">fit-frame-to-buffer-sizes
+</pre></div>
+<p>当使用 fit-frame-to-buffer 将此帧拟合到其根窗口的缓冲区时，此参数允许覆盖选项 fit-frame-to-buffer-sizes 的值（请参阅调整窗口大小）。
+</p>
+</li><li>
+30.4.3.4 布局参数
+
+
+<p>这些帧参数启用或禁用帧的各个部分，或控制它们的大小。
+</p>
+<div class="lisp">
+<pre class="lisp">border-width
+</pre></div>
+<p>帧外边框的宽度（以像素为单位）（请参阅帧几何）。
+</p><div class="lisp">
+<pre class="lisp">internal-border-width
+</pre></div>
+<p>帧内部边框的宽度（以像素为单位）（请参阅帧几何）。
+</p><div class="lisp">
+<pre class="lisp">child-frame-border-width
+</pre></div>
+<p>如果给定的帧是子帧（请参阅子帧），则以像素为单位的帧内部边框的宽度（请参阅帧几何）。如果为 nil，则使用由 internal-border-width 参数指定的值。
+</p><div class="lisp">
+<pre class="lisp">vertical-scroll-bars
+</pre></div>
+<p>帧是否有用于垂直滚动的滚动条（请参阅滚动条），以及它们应该位于帧的哪一侧。对于无滚动条，可能的值是 left、right 和 nil。
+</p><div class="lisp">
+<pre class="lisp">horizontal-scroll-bars
+</pre></div>
+<p>帧是否有用于水平滚动的滚动条（t 和底部表示是，nil 表示否）。
+</p><div class="lisp">
+<pre class="lisp">scroll-bar-width
+</pre></div>
+<p>垂直滚动条的宽度，以像素为单位，或 nil 表示使用默认宽度。
+</p><div class="lisp">
+<pre class="lisp">scroll-bar-height
+</pre></div>
+<p>水平滚动条的高度，以像素为单位，或 nil 表示使用默认高度。
+</p><div class="lisp">
+<pre class="lisp">left-fringe
+</pre></div>
+<div class="lisp">
+<pre class="lisp">right-fringe
+</pre></div>
+<p>此帧中窗口左右边缘的默认宽度（请参阅边缘）。如果其中任何一个为零，则有效地去除了相应的边缘。
+</p>
+<p>当您使用 frame-parameter 查询这两个 frame 参数中的任何一个的值时，返回值始终是一个整数。使用 set-frame-parameter 时，传递一个 nil 值会强制使用 8 个像素的实际默认值。
+</p><div class="lisp">
+<pre class="lisp">right-divider-width
+</pre></div>
+<p>为帧上任何窗口的右分隔线（请参阅窗口分隔线）保留的宽度（厚度），以像素为单位。零值表示不绘制右分隔线。
+</p><div class="lisp">
+<pre class="lisp">bottom-divider-width
+</pre></div>
+<p>为帧上任何窗口的底部分隔线（请参阅窗口分隔线）保留的宽度（厚度），以像素为单位。零值表示不绘制底部分隔线。
+</p><div class="lisp">
+<pre class="lisp">menu-bar-lines
+</pre></div>
+<p>在帧顶部为菜单栏分配的行数（请参阅菜单栏）。如果启用了菜单栏模式，则默认值为 1，否则为 0。请参阅 GNU Emacs 手册中的菜单栏。对于外部菜单栏（请参阅帧布局），即使菜单栏换行为两行或多行，此值也保持不变。在这种情况下，由 frame-geometry（参见 Frame Geometry）返回的 menu-bar-size 值允许推导出菜单栏是否实际占用一行或多行。
+</p><div class="lisp">
+<pre class="lisp">tool-bar-lines
+</pre></div>
+<p>用于工具栏的行数（请参阅工具栏）。如果启用了工具栏模式，则默认值为 1，否则为 0。请参阅 GNU Emacs 手册中的工具栏。每当工具栏换行时，此值可能会更改（请参阅帧布局）。
+</p><div class="lisp">
+<pre class="lisp">tool-bar-position
+</pre></div>
+<p>使用 GTK+ 构建 Emacs 时工具栏的位置。它的值可以是上、左下、右之一。默认为顶部。
+</p><div class="lisp">
+<pre class="lisp">tab-bar-lines
+</pre></div>
+<p>用于标签栏的行数（参见 GNU Emacs 手册中的标签栏）。如果启用 Tab Bar 模式，则默认值为 1，否则为 0。每当标签栏换行时，此值可能会更改（请参阅帧布局）。
+</p><div class="lisp">
+<pre class="lisp">line-spacing
+</pre></div>
+<p>在每个文本行下方留下的额外空间，以像素为单位（正整数）。有关详细信息，请参阅行高。
+</p><div class="lisp">
+<pre class="lisp">no-special-glyphs
+</pre></div>
+<p>如果这是非零，它会禁止显示此帧显示的所有缓冲区的任何截断和继续字形（请参阅截断）。当通过 fit-frame-to-buffer 将帧拟合到其缓冲区时，这对于消除此类字形很有用（请参阅调整窗口大小）。
+</p>
+</li><li>
+30.4.3.5 缓冲区参数
+
+
+<p>这些对各种终端都有意义的帧参数处理哪些缓冲区已经或应该显示在帧中。
+</p>
+<div class="lisp">
+<pre class="lisp">minibuffer
+</pre></div>
+<p>此帧是否有自己的 minibuffer。值 t 表示是，nil 表示否，仅表示此帧只是一个 minibuffer。如果该值是一个 minibuffer 窗口（在某个其他帧中），则该帧使用该 minibuffer。
+</p>
+<p>该参数在创建帧时生效。如果指定为 nil，Emacs 将尝试将其设置为 default-minibuffer-frame 的 minibuffer 窗口（参见 Minibuffers and Frames）。对于现有帧，此参数可专门用于指定另一个 minibuffer 窗口。不允许将其从 minibuffer 窗口更改为 t，反之亦然，或从 t 更改为 nil。如果参数已经指定了一个 minibuffer 窗口，则将其设置为 nil 无效。
+</p>
+<p>特殊值 child-frame 意味着创建一个只有 minibuffer 的子帧（参见子帧），其父帧成为创建的帧。如同指定为 nil 一样，Emacs 会将此参数设置为子帧的 minibuffer 窗口，但不会在子帧创建后选择子帧。
+</p><div class="lisp">
+<pre class="lisp">buffer-predicate
+</pre></div>
+<p>此帧的缓冲区谓词函数。如果谓词不为零，则函数 other-buffer 使用此谓词（来自所选帧）来决定应该考虑哪些缓冲区。它使用一个参数调用谓词，一个缓冲区，每个缓冲区一次；  如果谓词返回一个非零值，它会考虑该缓冲区。
+</p><div class="lisp">
+<pre class="lisp">buffer-list
+</pre></div>
+<p>已在此帧中选择的缓冲区列表，按最近选择的顺序排列。
+</p><div class="lisp">
+<pre class="lisp">unsplittable
+</pre></div>
+<p>如果非零，则此帧的窗口永远不会自动拆分。
+</p>
+</li><li>
+30.4.3.6 帧交互参数
+
+
+<p>这些参数提供了不同帧之间的交互形式。
+</p>
+<div class="lisp">
+<pre class="lisp">parent-frame
+</pre></div>
+<p>如果非零，这意味着这个帧是一个子帧（见子帧），这个参数指定它的父帧。如果为零，这意味着这个帧是一个普通的顶级帧。
+</p><div class="lisp">
+<pre class="lisp">delete-before
+</pre></div>
+<p>如果非零，则该参数指定另一个帧，其删除将自动触发该帧的删除。请参阅删除帧。
+</p><div class="lisp">
+<pre class="lisp">mouse-wheel-frame
+</pre></div>
+<p>如果非零，则此参数指定每当鼠标滚轮滚动且鼠标指针悬停在此帧上时，该帧的窗口将滚动，请参阅 GNU Emacs 手册中的鼠标命令。
+</p><div class="lisp">
+<pre class="lisp">no-other-frame
+</pre></div>
+<p>如果这是非零，则此帧不适合作为函数 next-frame、previous-frame（请参阅查找所有帧）和其他帧的候选者，请参阅 GNU Emacs 手册中的帧命令。
+</p><div class="lisp">
+<pre class="lisp">auto-hide-function
+</pre></div>
+<p>当此参数指定一个函数时，当退出帧的唯一窗口（请参阅退出窗口）并且还有其他帧时，将调用该函数而不是变量 frame-auto-hide-function 指定的函数。
+</p><div class="lisp">
+<pre class="lisp">minibuffer-exit
+</pre></div>
+<p>当这个参数不为 nil 时，Emacs 默认会在 minibuffer（见 Minibuffers）退出时使这个帧不可见。或者，它可以指定函数 iconify-frame 和 delete-frame。该参数对于在退出 minibuffer 时使子帧自动消失（类似于 Emacs 处理窗口的方式）很有用。
+</p><div class="lisp">
+<pre class="lisp">keep-ratio
+</pre></div>
+<p>此参数目前仅对子帧（请参阅子帧）有意义。如果它不是 nil，那么 Emacs 将尝试保持帧的大小（宽度和高度）比率（请参阅大小参数）以及其左右位置比率（请参阅位置参数）在其父帧调整大小时保持不变。
+</p>
+<p>如果该参数的值为nil，则在调整父帧的大小时，帧的位置和大小保持不变，因此位置和大小的比例可能会发生变化。如果此参数的值为 t，Emacs 将尝试保留帧的大小和位置比例，因此帧相对于其父帧的大小和位置可能会发生变化。
+</p>
+<p>使用 cons 单元格可以进行更多的单独控制：在这种情况下，如果单元格的 CAR 为 t 或仅宽度，则保留帧的宽度比。如果单元格的 CAR 为 t 或仅高度，则保留高度比。如果单元格的 CDR 为 t 或 left-only，则保留左侧位置比率。如果单元的 CDR 为 t 或 top-only，则保留顶部位置比率。
+</p>
+</li><li>
+30.4.3.7 鼠标拖动参数
+
+
+<p>下面描述的参数支持通过用鼠标拖动帧的内部边框来调整帧的大小。它们还允许通过拖动其最顶部的标题或标签行或最底部窗口的模式行来使用鼠标移动帧。
+</p>
+<p>这些参数对于没有窗口管理器装饰的子帧（参见子帧）非常有用。如有必要，它们也可用于未装饰的顶级帧。
+</p>
+<div class="lisp">
+<pre class="lisp">drag-internal-border
+</pre></div>
+<p>如果非零，则可以通过使用鼠标拖动其内部边框（如果存在）来调整帧的大小。
+</p><div class="lisp">
+<pre class="lisp">drag-with-header-line
+</pre></div>
+<p>如果非零，则可以通过拖动其最顶部窗口的标题行来使用鼠标移动帧。
+</p><div class="lisp">
+<pre class="lisp">drag-with-tab-line
+</pre></div>
+<p>如果非零，则可以通过拖动其最顶部窗口的制表符行来使用鼠标移动帧。
+</p><div class="lisp">
+<pre class="lisp">drag-with-mode-line
+</pre></div>
+<p>如果非零，则可以通过拖动其最底部窗口的模式线来使用鼠标移动帧。请注意，这样的帧不允许有自己的 minibuffer 窗口。
+</p><div class="lisp">
+<pre class="lisp">snap-width
+</pre></div>
+<p>用鼠标移动的帧将 <code>捕捉</code> 在显示器的边框或其父帧上，只要它被拖动到接近此参数指定的像素数的边缘。
+</p><div class="lisp">
+<pre class="lisp">top-visible
+</pre></div>
+<p>如果此参数是一个数字，则帧的上边缘永远不会出现在其显示或父帧的上边缘之上。此外，当帧移动到其显示或父帧的任何剩余边缘时，该数字指定的尽可能多的帧像素将保持可见。设置此参数对于防止将具有非 nil drag-with-header-line 参数的子帧完全拖出其父帧区域很有用。
+</p><div class="lisp">
+<pre class="lisp">bottom-visible
+</pre></div>
+<p>如果此参数是一个数字，则帧的底边永远不会出现在其显示或父帧的底边之下。此外，当帧移动到其显示或父帧的任何剩余边缘时，该数字指定的尽可能多的帧像素将保持可见。设置此参数有助于防止将具有非零拖动模式线参数的子帧完全拖出其父帧的区域。
+</p>
+</li><li>
+30.4.3.8 窗口管理参数
+
+
+<p>以下帧参数控制帧与窗口管理器或窗口系统交互的各个方面。它们对文本终端没有影响。
+</p>
+<div class="lisp">
+<pre class="lisp">visibility
+</pre></div>
+<p>帧的可见性状态。有三种可能：nil 表示不可见，t 表示可见，icon 表示图标化。请参阅帧的可见性。
+</p><div class="lisp">
+<pre class="lisp">auto-raise
+</pre></div>
+<p>如果非 nil，Emacs 会在选择帧时自动提升帧。一些窗口管理器不允许这样做。
+</p><div class="lisp">
+<pre class="lisp">auto-lower
+</pre></div>
+<p>如果非零，Emacs 会在取消选择时自动降低帧。一些窗口管理器不允许这样做。
+</p><div class="lisp">
+<pre class="lisp">icon-type
+</pre></div>
+<p>用于此帧的图标类型。如果值是字符串，则指定包含要使用的位图的文件；  nil 不指定图标（在这种情况下，窗口管理器决定显示什么）；  任何其他非 nil 值指定默认的 Emacs 图标。
+</p><div class="lisp">
+<pre class="lisp">icon-name
+</pre></div>
+<p>在此帧的图标中使用的名称，何时以及是否出现图标。如果为 nil，则使用帧的标题。
+</p><div class="lisp">
+<pre class="lisp">window-id
+</pre></div>
+<p>图形显示用于此帧的 ID 号。Emacs 在创建帧时分配这个参数；  更改参数对实际 ID 号没有影响。
+</p><div class="lisp">
+<pre class="lisp">outer-window-id
+</pre></div>
+<p>帧所在的最外层窗口系统窗口的 ID 号。与 window-id 一样，更改此参数没有实际效果。
+</p><div class="lisp">
+<pre class="lisp">wait-for-wm
+</pre></div>
+<p>如果非零，告诉 Xt 等待窗口管理器确认几何变化。某些窗口管理器，包括 Fvwm2 和 KDE 的版本，无法确认，因此 Xt 挂起。将此设置为 nil 以防止与那些窗口管理器挂起。
+</p><div class="lisp">
+<pre class="lisp">sticky
+</pre></div>
+<p>如果非零，则该帧在具有虚拟桌面的系统上的所有虚拟桌面上可见。
+</p><div class="lisp">
+<pre class="lisp">inhibit-double-buffering
+</pre></div>
+<p>如果非零，则将帧绘制到屏幕上而不进行双重缓冲。Emacs 通常会尝试在可用的情况下使用双缓冲来减少闪烁。如果您遇到显示错误或因那种复古、闪烁的感觉而感到松懈，请设置此属性。
+</p><div class="lisp">
+<pre class="lisp">skip-taskbar
+</pre></div>
+<p>如果非零，这将告诉窗口管理器从与帧的显示关联的任务栏中删除帧的图标，并禁止通过组合 Alt-TAB 切换到帧的窗口。在 MS-Windows 上，图标化这样的帧将在桌面底部 <code>滚动</code> 其窗口系统窗口。某些窗口管理器可能不支持此参数。
+</p><div class="lisp">
+<pre class="lisp">no-focus-on-map
+</pre></div>
+<p>如果非零，这意味着帧在映射时不希望接收输入焦点（请参阅帧的可见性）。某些窗口管理器可能不支持此参数。
+</p><div class="lisp">
+<pre class="lisp">no-accept-focus
+</pre></div>
+<p>如果非零，这意味着帧不希望通过显式鼠标单击或通过焦点跟随鼠标（请参阅输入焦点）或鼠标自动选择窗口（请参阅鼠标窗口）将鼠标移入其中时接收输入焦点自动选择）。这可能会产生不希望的副作用，即用户无法使用鼠标滚动未选择的帧。某些窗口管理器可能不支持此参数。
+</p><div class="lisp">
+<pre class="lisp">undecorated
+</pre></div>
+<p>如果非零，则该帧的窗口系统窗口不带任何装饰，如标题、最小化/最大化框和外部边框。这通常意味着不能用鼠标拖动、调整大小、图标化、最大化或删除窗口。如果为 nil，则通常使用上面列出的所有元素绘制帧的窗口，除非它们的显示已通过窗口管理器设置暂停。
+</p>
+<p>在 X 下，Emacs 使用 Motif 窗口管理器提示来关闭装饰。一些窗口管理器可能不遵守这些提示。
+</p>
+<p>NS 构建将工具栏视为装饰，因此将其隐藏在未装饰的帧上。
+</p><div class="lisp">
+<pre class="lisp">override-redirect ¶
+</pre></div>
+<p>如果非零，这意味着这是一个覆盖重定向帧——在 X 下不被窗口管理器处理的帧。覆盖重定向帧没有窗口管理器装饰，只能通过 Emacs 的定位和调整大小函数来定位和调整大小，并且通常是绘制在所有其他帧之上。设置此参数对 MS-Windows 没有影响。
+</p><div class="lisp">
+<pre class="lisp">ns-appearance
+</pre></div>
+<p>仅在 macOS 上可用，如果设置为深色，则使用 <code>充满活力的深色</code> 主题绘制此帧的窗口系统窗口，如果设置为浅色，则使用 <code>水色</code> 主题，否则使用系统默认值。当使用带有深色背景的 Emacs 主题时， <code>充满活力的深色</code> 主题可用于将工具栏和滚动条设置为深色外观。
+</p><div class="lisp">
+<pre class="lisp">ns-transparent-titlebar
+</pre></div>
+<p>仅在 macOS 上可用，如果非零，则将标题栏和工具栏设置为透明。这有效地设置了两者的背景颜色以匹配 Emacs 背景颜色。
+</p>
+</li><li>
+30.4.3.9 光标参数
+
+
+<p>此帧参数控制光标的外观。
+</p>
+<div class="lisp">
+<pre class="lisp">cursor-type
+</pre></div>
+<p>如何显示光标。合法值是：
+</p>
+<div class="lisp">
+<pre class="lisp">box
+</pre></div>
+<p>显示一个填充框。（这是默认设置。）
+</p><div class="lisp">
+<pre class="lisp">(box . size)
+</pre></div>
+<p>显示一个填充框。但是，如果点在蒙版图像下大于任一维度中的 size 像素，则将其显示为空心框。
+</p><div class="lisp">
+<pre class="lisp">hollow
+</pre></div>
+<p>显示一个空心盒子。
+</p><div class="lisp">
+<pre class="lisp">nil
+</pre></div>
+<p>不显示光标。
+</p><div class="lisp">
+<pre class="lisp">bar
+</pre></div>
+<p>在字符之间显示竖线。
+</p><div class="lisp">
+<pre class="lisp">(bar . width)
+</pre></div>
+<p>在字符之间显示一个垂直条宽度像素宽。
+</p><div class="lisp">
+<pre class="lisp">hbar
+</pre></div>
+<p>显示一个水平条。
+</p><div class="lisp">
+<pre class="lisp">(hbar . height)
+</pre></div>
+<p>显示一个水平条高度像素高。
+</p>
+<p>cursor-type 帧参数可以被变量 cursor-type 和 cursor-in-non-selected-windows 覆盖：
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: cursor-type ¶
+</pre></div>
+<p>此缓冲区局部变量控制光标在显示缓冲区的选定窗口中的外观。如果其值为 t，则表示使用 cursor-type frame 参数指定的光标。否则，该值应该是上面列出的游标类型之一，它会覆盖游标类型帧参数。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: cursor-in-non-selected-windows ¶
+</pre></div>
+<p>此缓冲区局部变量控制光标在未选定窗口中的外观。它支持与光标类型帧参数相同的值；  此外，nil 表示不在未选择的窗口中显示光标，而 t（默认值）表示使用通常光标类型的标准修改（实心框变为空心框，条形变为较窄的条形）。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: x-stretch-cursor ¶
+</pre></div>
+<p>此变量控制显示在超宽字形上的块光标的宽度，例如制表符或一段空白区域。默认情况下，块光标仅与字体的默认字符一样宽，如果字形超宽，则不会覆盖其下字形的所有宽度。此变量的非 nil 值意味着将块光标绘制为与其下方的字形一样宽。默认值为无。
+</p>
+<p>这个变量对文本模式帧没有影响，因为文本模式光标是由终端绘制的，不受 Emacs 的控制。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: blink-cursor-alist ¶
+</pre></div>
+<p>此变量指定如何使光标闪烁。每个元素都有形式（on-state . off-state）。只要光标类型等于 on-state（使用 equal 进行比较），相应的 off-state 就会指定光标闪烁时的样子。开启状态和关闭状态都应该是光标类型帧参数的合适值。
+</p>
+<p>如果在此处未将类型作为开启状态提及，则如何闪烁每种类型的光标有各种默认值。此变量的更改不会立即生效，只有在您指定光标类型帧参数时才会生效。
+</p>
+</li><li>
+30.4.3.10 字体和颜色参数
+
+
+<p>这些帧参数控制字体和颜色的使用。
+</p>
+<div class="lisp">
+<pre class="lisp">font-backend
+</pre></div>
+<p>符号列表，按优先级指定用于在帧上绘制字符的字体后端。在没有在 X 上绘制 Cairo 的 Emacs 中，目前有三种可能可用的字体后端：x（X 核心字体驱动程序）、xft（Xft 字体驱动程序）和 xfthb（具有 HarfBuzz 文本整形的 Xft 字体驱动程序）。如果使用 Cairo 绘图构建，那么 X 上还有三个潜在可用的字体后端：x、ftcr（Cairo 上的 FreeType 字体驱动程序）和 ftcrhb（Cairo 上具有 HarfBuzz 文本整形的 FreeType 字体驱动程序）。使用 HarfBuzz 构建 Emacs 时，默认字体驱动程序是 ftcrhb，虽然使用 ftcr 驱动程序仍然是可能的，但不推荐。在 MS-Windows 上，目前有三种可用的字体后端：gdi（核心 MS-Windows 字体驱动程序）、uniscribe（用于 OTF 和 TTF 字体的字体驱动程序，由 Uniscribe 引擎进行文本整形）和 harfbuzz（用于 OTF 和带有 HarfBuzz 文本整形的 TTF 字体）（参见 GNU Emacs 手册中的 Windows 字体）。同样推荐使用 harfbuzz 驱动程序。在其他系统上，只有一个可用的字体后端，所以修改这个帧参数没有意义。
+</p><div class="lisp">
+<pre class="lisp">background-mode
+</pre></div>
+<p>根据背景颜色是浅色还是深色，此参数是深色还是浅色。
+</p><div class="lisp">
+<pre class="lisp">tty-color-mode ¶
+</pre></div>
+<p>此参数覆盖系统终端功能数据库给出的终端颜色支持，因为此参数的值指定在文本终端上使用的颜色模式。该值可以是符号或数字。一个数字指定要使用的颜色数量（以及间接地指定发出什么命令来产生每种颜色）。例如，(tty-color-mode . 8) 指定 ANSI 转义序列用于 8 种标准文本颜色。值 -1 关闭颜色支持。
+</p>
+<p>如果参数的值为符号，则通过 tty-color-mode-alist 的值指定一个数字，并使用关联的数字代替。
+</p><div class="lisp">
+<pre class="lisp">screen-gamma ¶
+</pre></div>
+<p>如果这是一个数字，Emacs 会执行 gamma 校正来调整所有颜色的亮度。该值应该是显示器的屏幕伽玛。
+</p>
+<p>通常的 PC 显示器的屏幕 gamma 为 2.2，因此 Emacs 和 X 窗口中的颜色值经过校准，可以在具有该 gamma 值的显示器上正确显示。如果您为 screen-gamma 指定 2.2，这意味着不需要校正。其他值需要校正，旨在使校正后的颜色在屏幕上显示为未经校正而在伽马值为 2.2 的普通显示器上出现的方式。
+</p>
+<p>如果您的显示器显示颜色太浅，您应该指定一个小于 2.2 的屏幕伽马值。这要求进行使颜色变深的校正。屏幕伽马值 1.5 可能会为 LCD 彩色显示器提供良好的效果。
+</p><div class="lisp">
+<pre class="lisp">alpha ¶
+</pre></div>
+<p>此参数在支持可变不透明度的图形显示上指定帧的不透明度。它应该是 0 到 100 之间的整数，其中 0 表示完全透明，100 表示完全不透明。它也可以有一个 nil 值，它告诉 Emacs 不要设置帧的不透明度（把它留给窗口管理器）。
+</p>
+<p>为了防止帧从视图中完全消失，变量 frame-alpha-lower-limit 定义了不透明度下限。如果 frame 参数的值小于这个变量的值，Emacs 使用后者。默认情况下，frame-alpha-lower-limit 为 20。
+</p>
+<p>alpha frame参数也可以是cons单元格（active.inactive），其中active为选中时frame的不透明度，inactive为未选中时的不透明度。
+</p>
+<p>某些窗口系统不支持子帧的 alpha 参数（请参阅子帧）。
+</p>
+<p>以下帧参数是半过时的，因为它们自动等效于特定面的特定面属性（请参阅 Emacs 手册中的标准面）：
+</p>
+<div class="lisp">
+<pre class="lisp">font
+</pre></div>
+<p>用于在帧中显示文本的字体名称。这是一个字符串，可以是系统的有效字体名称，也可以是 Emacs 字体集的名称（请参阅字体集）。相当于默认面的字体属性。
+</p><div class="lisp">
+<pre class="lisp">foreground-color
+</pre></div>
+<p>用于字符的颜色。它相当于默认面的 :foreground 属性。
+</p><div class="lisp">
+<pre class="lisp">background-color
+</pre></div>
+<p>用于字符背景的颜色。它相当于默认面的 :background 属性。
+</p><div class="lisp">
+<pre class="lisp">mouse-color
+</pre></div>
+<p>鼠标指针的颜色。相当于鼠标脸的 :background 属性。
+</p><div class="lisp">
+<pre class="lisp">cursor-color
+</pre></div>
+<p>显示点的光标颜色。它相当于光标面的 :background 属性。
+</p><div class="lisp">
+<pre class="lisp">border-color
+</pre></div>
+<p>帧边框的颜色。它相当于边框的 :background 属性。
+</p><div class="lisp">
+<pre class="lisp">scroll-bar-foreground
+</pre></div>
+<p>如果非零，滚动条前景的颜色。它相当于滚动条面的 :foreground 属性。
+</p><div class="lisp">
+<pre class="lisp">scroll-bar-background
+</pre></div>
+<p>如果非零，滚动条背景的颜色。它相当于滚动条面的 :background 属性。
+</p></li></ol>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="30.4.4_几何.html">几何</a>, Previous: <a href="30.4.2_初始帧参数.html">初始帧参数</a>, Up: <a href="30.4_帧参数.html">帧参数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

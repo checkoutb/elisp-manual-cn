@@ -1,0 +1,47 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.17.4 相对于前几行的缩进</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">33.17.4 相对于前几行的缩进</h3>
+<div class="nav-panel"><p>Next: <a href="33.17.5_可调制表位.html">可调制表位</a>, Previous: <a href="33.17.3_缩进整个区域.html">缩进整个区域</a>, Up: <a href="33.17_缩进.html">缩进.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节描述了两个基于前几行内容缩进当前行的命令。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: indent-relative &amp;optional first-only unindented-ok ¶
+</pre></div>
+<p>此命令在点处插入空格，延伸到与前一个非空行的下一个缩进点相同的列。缩进点是空格后面的非空格字符。下一个缩进点是大于当前点列的列处的第一个缩进点。例如，如果点位于一行文本的第一个非空白字符的下方和左侧，它会通过插入空格移动到该列。
+</p>
+<p>如果前一个非空白行没有下一个缩进点（即，在足够大的列位置没有），则 indent-relative 要么什么都不做（如果 unindented-ok 不为零），要么调用 tab-to-tab-stop。因此，如果 point 在短行文本的最后一列的下方和右侧，则此命令通常通过插入空格将 point 移动到下一个制表位。
+</p>
+<p>如果 first-only 不为零，则仅考虑第一个缩进点。
+</p>
+<p>indent-relative 的返回值是不可预测的。
+</p>
+<p>在以下示例中，点位于第二行的开头：
+</p>
+<div class="lisp">
+<pre class="lisp">            This line is indented twelve spaces.
+∗The quick brown fox jumped.
+</pre></div>
+<p>表达式 (indent-relative nil) 的评估产生以下结果：
+</p>
+<div class="lisp">
+<pre class="lisp">This line is indented twelve spaces.
+         ∗The quick brown fox jumped.
+</pre></div>
+<p>在下一个示例中，点位于 ’jumped’ 的 ’m’ 和 ’p’ 之间：
+</p>
+<div class="lisp">
+<pre class="lisp">  This line is indented twelve spaces.
+The quick brown fox jum∗ped.
+</pre></div>
+<p>表达式 (indent-relative nil) 的评估产生以下结果：
+</p><div class="lisp">
+<pre class="lisp">            This line is indented twelve spaces.
+The quick brown fox jum  ∗ped.
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Command: indent-relative-first-indent-point ¶
+</pre></div>
+<p>此命令通过调用 indent-relative 并将 t 作为第一个唯一参数来缩进当前行，就像之前的非空白行一样。返回值是不可预测的。
+</p>
+<p>如果前一个非空行没有超出当前列的缩进点，则此命令不执行任何操作。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.17.5_可调制表位.html">可调制表位</a>, Previous: <a href="33.17.3_缩进整个区域.html">缩进整个区域</a>, Up: <a href="33.17_缩进.html">缩进.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

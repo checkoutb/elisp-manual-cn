@@ -1,0 +1,33 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>10.2.1 自我评估表</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">10.2.1 自我评估表</h3>
+<div class="nav-panel"><p>Next: <a href="10.2.2_符号形式.html">符号形式</a>, Previous: <a href="10.2_表格种类.html">表格种类</a>, Up: <a href="10.2_表格种类.html">表格种类.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>自我评估表格是任何不是列表或符号的表格。自我评估形式对自己进行评估：评估的结果与被评估的对象相同。因此，数字 25 的计算结果为 25，字符串 <code>foo</code> 的计算结果为字符串 <code>foo</code> 。同样，对向量评估不会导致对向量元素的评估——它返回相同的向量，但其内容不变。
+</p>
+<div class="lisp">
+<pre class="lisp">'123               ; A number, shown without evaluation.
+     ⇒ 123
+
+123                ; Evaluated as usual—result is the same.
+     ⇒ 123
+
+(eval '123)        ; Evaluated "by hand"—result is the same.
+     ⇒ 123
+
+(eval (eval '123)) ; Evaluating twice changes nothing.
+     ⇒ 123
+</pre></div>
+<p>自评估表单产生的值会成为程序的一部分，您不应尝试通过 setcar、aset 或类似操作来修改它。Lisp 解释器可能会统一程序的自评估形式产生的常量，以便这些常量可以共享结构。请参阅可变性。
+</p>
+<p>在 Lisp 代码中编写数字、字符、字符串甚至向量是很常见的，利用它们自评估的事实。但是，对于缺少读取语法的类型，这样做是很不寻常的，因为没有办法以文本方式编写它们。可以通过 Lisp 程序构造包含这些类型的 Lisp 表达式。这是一个例子：
+</p>
+<div class="lisp">
+<pre class="lisp">;; Build an expression containing a buffer object.
+(setq print-exp (list 'print (current-buffer)))
+     ⇒ (print #&lt;buffer eval.texi&gt;)
+
+;; Evaluate it.
+(eval print-exp)
+     -| #&lt;buffer eval.texi&gt;
+     ⇒ #&lt;buffer eval.texi&gt;
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="10.2.2_符号形式.html">符号形式</a>, Previous: <a href="10.2_表格种类.html">表格种类</a>, Up: <a href="10.2_表格种类.html">表格种类.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>6.6 字符表</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">6.6 字符表</h2>
+<div class="nav-panel"><p>Next: <a href="06.7_布尔向量.html">布尔向量</a>, Previous: <a href="06.5_向量函数.html">向量函数</a>, Up: <a href="06_序列、数组和向量.html">序列、数组和向量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>一个字符表很像一个向量，除了它是由字符代码索引的。任何没有修饰符的有效字符代码都可以用作字符表中的索引。与任何数组一样，您可以使用 aref 和 aset 访问 char-table 的元素。此外，一个字符表可以有额外的槽来保存与特定字符代码无关的附加数据。与向量一样，char-tables 在求值时是常量，可以保存任何类型的元素。
+</p>
+<p>每个字符表都有一个子类型，一个符号，它有两个用途：
+</p>
+<ul>
+<li>
+子类型提供了一种简单的方法来判断 char-table 的用途。例如，显示表是以display-table为子类型的char-table，语法表是以syntax-table为子类型的char-table。可以使用函数 char-table-subtype 查询子类型，如下所述。
+</li><li>
+子类型控制字符表中额外槽的数量。此数字由子类型的 char-table-extra-slots 符号属性指定（请参阅符号属性），其值应为 0 到 10 之间的整数。如果子类型没有此类符号属性，则 char-table 没有额外的槽.
+</li></ul>
+<p>一个 char-table 可以有一个 parent，它是另一个 char-table。如果是这样，那么每当 char-table 为特定字符 c 指定 nil 时，它都会继承父级中指定的值。换句话说，如果 char-table 本身指定 nil，则 (aref char-table c) 从 char-table 的父级返回值。
+</p>
+<p>一个字符表也可以有一个默认值。如果是这样，那么 (aref char-table c) 会在 char-table 未指定任何其他非 nil 值时返回默认值。
+</p>
+<div class="lisp">
+<pre class="lisp">Function:  make-char-table subtype &amp;optional init ¶
+</pre></div>
+<p>返回一个新创建的字符表，带有子类型 subtype（一个符号）。每个元素都初始化为 init，默认为 nil。创建 char-table 后，您无法更改 char-table 的子类型。
+</p>
+<p>没有参数来指定 char-table 的长度，因为所有 char-tables 都有任何有效字符代码作为索引的空间。
+</p>
+<p>如果 subtype 具有 char-table-extra-slots 符号属性，则指定 char-table 中的额外插槽数。这应该是 0 到 10 之间的整数；  否则，make-char-table 会引发错误。如果 subtype 没有 char-table-extra-slots 符号属性（请参阅属性列表），则 char-table 没有额外的插槽。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: char-table-p object ¶
+</pre></div>
+<p>如果 object 是 char 表，则此函数返回 t，否则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: char-table-subtype char-table ¶
+</pre></div>
+<p>该函数返回 char-table 的子类型符号。
+</p>
+<p>没有特殊的函数可以访问字符表中的默认值。为此，请使用 char-table-range（见下文）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: char-table-parent char-table ¶
+</pre></div>
+<p>此函数返回 char-table 的父级。父级总是 nil 或另一个字符表。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-char-table-parent char-table new-parent ¶
+</pre></div>
+<p>此函数将 char-table 的父级设置为 new-parent。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: char-table-extra-slot char-table n ¶
+</pre></div>
+<p>此函数返回字符表的额外槽 n（从零开始）的内容。字符表中的额外槽数由其子类型决定。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-char-table-extra-slot char-table n value ¶
+</pre></div>
+<p>此函数将值存储在字符表的额外槽 n（从零开始）中。
+</p>
+<p>char-table 可以为单个字符代码指定一个元素值；  它还可以为整个字符集指定一个值。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: char-table-range char-table range ¶
+</pre></div>
+<p>这将返回在 char-table 中为一系列字符范围指定的值。以下是范围的可能性：
+</p>
+<div class="lisp">
+<pre class="lisp">nil
+</pre></div>
+<p>指默认值。
+</p><div class="lisp">
+<pre class="lisp">char
+</pre></div>
+<p>指字符 char 的元素（假设 char 是有效的字符代码）。
+</p><div class="lisp">
+<pre class="lisp">(from . to)
+</pre></div>
+<p>cons 单元格引用包含范围~ [from..to]~ 中的所有字符。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-char-table-range char-table range value ¶
+</pre></div>
+<p>此函数设置字符表中字符范围的值。以下是范围的可能性：
+</p>
+<div class="lisp">
+<pre class="lisp">nil
+</pre></div>
+<p>指默认值。
+</p><div class="lisp">
+<pre class="lisp">t
+</pre></div>
+<p>指整个范围的字符代码。
+</p><div class="lisp">
+<pre class="lisp">char
+</pre></div>
+<p>指字符 char 的元素（假设 char 是有效的字符代码）。
+</p><div class="lisp">
+<pre class="lisp">(from . to)
+</pre></div>
+<p>cons 单元格引用包含范围~ [from..to]~ 中的所有字符。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: map-char-table function char-table ¶
+</pre></div>
+<p>此函数为 char-table 中具有非 nil 值的每个元素调用其参数函数。函数调用有两个参数，一个键和一个值。键是 char-table-range 的可能范围参数——有效字符或 cons 单元格（从 . 到），指定共享相同值的字符范围。该值是 (char-table-range char-table key) 返回的值。
+</p>
+<p>总的来说，传递给函数的键值对描述了存储在 char-table 中的所有值。
+</p>
+<p>返回值始终为零；  为了使调用 map-char-table 有用，函数应该有副作用。例如，这里是如何检查语法表的元素：
+</p><div class="lisp">
+<pre class="lisp">(let (accumulator)
+   (map-char-table
+    (lambda (key value)
+      (setq accumulator
+            (cons (list
+                   (if (consp key)
+                       (list (car key) (cdr key))
+                     key)
+                   value)
+                  accumulator)))
+    (syntax-table))
+   accumulator)
+⇒
+(((2597602 4194303) (2)) ((2597523 2597601) (3))
+ ... (65379 (5 . 65378)) (65378 (4 . 65379)) (65377 (1))
+ ... (12 (0)) (11 (3)) (10 (12)) (9 (0)) ((0 8) (3)))
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="06.7_布尔向量.html">布尔向量</a>, Previous: <a href="06.5_向量函数.html">向量函数</a>, Up: <a href="06_序列、数组和向量.html">序列、数组和向量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

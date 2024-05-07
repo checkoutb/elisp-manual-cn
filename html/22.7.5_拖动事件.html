@@ -1,0 +1,17 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.7.5 拖动事件</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">22.7.5 拖动事件</h3>
+<div class="nav-panel"><p>Next: <a href="22.7.6_按钮按下事件.html">按钮按下事件</a>, Previous: <a href="22.7.4_点击事件.html">点击事件</a>, Up: <a href="22.7_输入事件.html">输入事件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>使用 Emacs，您甚至可以在不换衣服的情况下进行拖动事件。每次用户按下鼠标按钮，然后在释放按钮之前将鼠标移动到不同的字符位置时，都会发生拖动事件。像所有鼠标事件一样，拖动事件在 Lisp 中表示为列表。列表记录了鼠标的起始位置和最终位置，如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(event-type
+ (window1 START-POSITION)
+ (window2 END-POSITION))
+</pre></div>
+<p>对于拖动事件，符号事件类型的名称包含前缀 <code>拖动-</code> 。例如，在按住按钮 2 的情况下拖动鼠标会生成一个 drag-mouse-2 事件。事件的第二个和第三个元素给出了拖动的开始和结束位置，作为鼠标位置列表（请参阅单击事件）。您可以以相同的方式访问任何鼠标事件的第二个元素。但是，拖动事件可能会在最初选择的帧边界之外结束。在这种情况下，第三个元素的位置列表包含该框架而不是窗口。
+</p>
+<p><code>drag-</code> 前缀跟在修饰键前缀之后，例如 <code>C-</code> 和 <code>M-</code> 。
+</p>
+<p>如果 read-key-sequence 接收到一个没有键绑定的拖动事件，并且相应的单击事件确实有一个绑定，它会将拖动事件更改为拖动开始位置的单击事件。这意味着您不必区分单击和拖动事件，除非您愿意。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.7.6_按钮按下事件.html">按钮按下事件</a>, Previous: <a href="22.7.4_点击事件.html">点击事件</a>, Up: <a href="22.7_输入事件.html">输入事件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>16.7 特征</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">16.7 特征</h2>
+<div class="nav-panel"><p>Next: <a href="16.8_哪个文件定义了某个符号.html">哪个文件定义了某个符号</a>, Previous: <a href="16.6_重复加载.html">重复加载</a>, Up: <a href="16_加载.html">加载.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>调用一个特定的函数，但是当另一个程序第一次通过名称请求它时加载一个特性。
+</p>
+<p>功能名称是代表函数、变量等集合的符号。定义它们的文件应提供该功能。另一个使用它们的程序可以确保它们是通过要求该特性来定义的。如果尚未加载定义文件，则会加载它。
+</p>
+<p>要要求存在功能，请使用功能名称作为参数调用 require。require 查看全局变量 features 以查看是否已经提供了所需的功能。如果没有，它会从相应的文件中加载该功能。该文件应在顶层调用提供以将功能添加到功能；  如果它没有这样做， require 会发出错误信号。
+</p>
+<p>例如，在 idlwave.el 中，idlwave-complete-filename 的定义包括以下代码：
+</p>
+<div class="lisp">
+<pre class="lisp">(defun idlwave-complete-filename ()
+  "Use the comint stuff to complete a file name."
+   (require 'comint)
+   (let* ((comint-file-name-chars "~/A-Za-z0-9+@:_.$#%={}\\-")
+          (comint-completion-addsuffix nil)
+          ...)
+       (comint-dynamic-complete-filename)))
+</pre></div>
+<p>如果文件 comint.el 尚未加载，则表达式 (require ’comint) 会加载文件，确保定义了 comint-dynamic-complete-filename。功能通常以提供它们的文件命名，因此不需要为 require 提供文件名。（请注意，要求语句位于 let 的主体之外很重要。在其变量为 let 绑定时加载库可能会产生意想不到的后果，即变量在 let 退出后变得未绑定。）
+</p>
+<p>comint.el 文件包含以下顶级表达式：
+</p>
+<div class="lisp">
+<pre class="lisp">(provide 'comint)
+</pre></div>
+<p>这会将 comint 添加到全局功能列表中，因此 (require ’comint) 将从此知道无需执行任何操作。
+</p>
+<p>当在文件的顶层使用 require 时，它​​会在您对该文件进行字节编译（请参阅字节编译）以及加载它时生效。这是为了防止所需的包包含字节编译器必须知道的宏。它还避免了对使用 require 加载的文件中定义的函数和变量的字节编译器警告。
+</p>
+<p>尽管在字节编译期间会评估对 require 的顶级调用，但不会对提供调用进行评估。因此，您可以确保在对定义文件进行字节编译之前加载定义文件，方法是在提供相同功能的同时包含一个要求，如下例所示。
+</p><div class="lisp">
+<pre class="lisp">(provide 'my-feature)  ; Ignored by byte compiler,
+                       ;   evaluated by load.
+(require 'my-feature)  ; Evaluated by byte compiler.
+</pre></div>
+<p>编译器忽略提供，然后通过加载相关文件来处理需求。加载文件确实会执行 provide 调用，因此在加载文件时后续的 require 调用不会执行任何操作。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: provide feature &amp;optional subfeatures ¶
+</pre></div>
+<p>此函数宣布该功能现在已加载或正在加载到当前 Emacs 会话中。这意味着与功能相关的设施已经或将可用于其他 Lisp 程序。
+</p>
+<p>调用 provide 的直接效果是如果 feature 不在该列表中，则将 feature 添加到 features 的前面，并调用任何等待它的 eval-after-load 代码（请参阅 Hooks for Loading）。参数特征必须是符号。提供退货功能。
+</p>
+<p>如果提供，子功能应该是一个符号列表，指示此版本功能提供的一组特定子功能。您可以使用 featurep 测试子功能的存在。子功能的想法是，当包（这是一个功能）足够复杂时，您可以使用它们，以便为包的各个部分或功能命名有用，这些部分或功能可能会或可能不会被加载，或者可能会或可能不会出现在给定的版本中。例如，请参阅测试网络功能的可用性。
+</p>
+<div class="lisp">
+<pre class="lisp">features
+     ⇒ (bar bish)
+
+(provide 'foo)
+     ⇒ foo
+features
+     ⇒ (foo bar bish)
+</pre></div>
+<p>当一个文件被加载以满足自动加载，并且由于对其内容的评估错误而停止时，加载期间发生的任何函数定义或提供调用都将被撤消。请参阅自动加载。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: require feature &amp;optional filename noerror ¶
+</pre></div>
+<p>该函数检查当前 Emacs 会话中是否存在特性（使用 (featurep feature)；见下文）。参数特征必须是符号。
+</p>
+<p>如果该功能不存在，则 require 使用 load 加载文件名。如果未提供文件名，则将符号特征的名称用作要加载的基本文件名。但是，在这种情况下，require 坚持要查找添加了 ’.el’ 或 ’.elc’ 后缀的功能（可能使用压缩后缀进行扩展）；  不会使用名称只是功能的文件。（变量 load-suffixes 指定了所需的确切 Lisp 后缀。）
+</p>
+<p>如果 noerror 不为零，则抑制文件实际加载的错误。在这种情况下，如果加载文件失败，require 返回 nil。通常，需要返回功能。
+</p>
+<p>如果加载文件成功但未提供功能，则 require 会发出有关缺少功能的错误信号。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: featurep feature &amp;optional subfeature ¶
+</pre></div>
+<p>如果在当前 Emacs 会话中提供了 feature（即，如果 feature 是 features 的成员），则此函数返回 t。如果 subfeature 不是 nil，则仅当也提供了该 subfeature 时，该函数才返回 t（即，如果subfeature 是特征符号的 subfeature 属性的成员。）
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: features ¶
+</pre></div>
+<p>此变量的值是符号列表，这些符号是当前 Emacs 会话中加载的功能。每个符号都被放入此列表中，并调用提供。特征列表中元素的顺序并不重要。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="16.8_哪个文件定义了某个符号.html">哪个文件定义了某个符号</a>, Previous: <a href="16.6_重复加载.html">重复加载</a>, Up: <a href="16_加载.html">加载.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>13.4 定义函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">13.4 定义函数</h2>
+<div class="nav-panel"><p>Next: <a href="13.5_调用函数.html">调用函数</a>, Previous: <a href="13.3_命名函数.html">命名函数</a>, Up: <a href="13_函数.html">函数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>我们通常在首次创建函数时为其命名。这称为定义函数，我们通常使用 defun 宏来完成。本节还介绍了定义函数的其他方法。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: defun name args [doc] [declare] [interactive] body… ¶
+</pre></div>
+<p>defun 是定义新的 Lisp 函数的常用方法。它将符号名称定义为具有参数列表 args 的函数（请参阅参数列表的特征）和 body 给出的主体形式。name 和 args 都不应该被引用。
+</p>
+<p>doc，如果存在，应该是一个字符串，指定函数的文档字符串（请参阅函数文档字符串）。如果存在，则声明应该是指定函数元数据的声明表单（请参阅声明表单）。交互，如果存在，应该是一个交互形式，指定如何交互调用函数（参见交互调用）。
+</p>
+<p>defun 的返回值是未定义的。
+</p>
+<p>这里有些例子：
+</p><div class="lisp">
+<pre class="lisp">(defun foo () 5)
+(foo)
+     ⇒ 5
+
+
+(defun bar (a &amp;optional b &amp;rest c)
+    (list a b c))
+(bar 1 2 3 4 5)
+     ⇒ (1 2 (3 4 5))
+
+(bar 1)
+     ⇒ (1 nil nil)
+
+(bar)
+error→ Wrong number of arguments.
+
+
+(defun capitalize-backwards ()
+  "Upcase the last letter of the word at point."
+  (interactive)
+  (backward-word 1)
+  (forward-word 1)
+  (backward-char 1)
+  (capitalize-word 1))
+
+</pre></div>
+<p>注意不要无意中重新定义现有功能。defun 甚至毫不犹豫地重新定义了汽车等原始功能。Emacs 不会阻止你这样做，因为重新定义一个函数有时是故意的，没有办法区分故意的重新定义和无意的重新定义。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: defalias name definition &amp;optional doc ¶
+</pre></div>
+<p>该函数将符号名称定义为一个函数，带有定义定义（可以是任何有效的 Lisp 函数）。它的返回值是未定义的。
+</p>
+<p>如果 doc 不为 nil，则成为 name 的函数文档。否则，将使用定义提供的任何文档。
+</p>
+<p>在内部，defalias 通常使用 fset 来设置定义。但是，如果 name 具有 defalias-fset-function 属性，则关联的值将用作函数来代替 fset 调用。
+</p>
+<p>使用 defalias 的正确位置是定义特定函数名称的地方——尤其是该名称显式出现在正在加载的源文件中的地方。这是因为 defalias 记录了哪个文件定义了函数，就像 defun 一样（参见卸载）。
+</p>
+<p>相比之下，在为其他目的操作函数定义的程序中，最好使用 fset，它不会保留此类记录。请参阅访问函数单元格内容。
+</p>
+<p>您不能使用 defun 或 defalias 创建新的原始函数，但您可以使用它们来更改任何符号的函数定义，即使是诸如 car 或 x-popup-menu 之类的正常定义为原始符号的符号。然而，这是有风险的：例如，在不完全破坏 Lisp 的情况下重新定义汽车几乎是不可能的。重新定义诸如 x-popup-menu 之类的晦涩功能的危险性较小，但它仍然可能无法按您预期的那样工作。如果从 C 代码调用原语，它们会直接调用原语的 C 定义，因此更改符号的定义不会对它们产生影响。
+</p>
+<p>另见 defsubst，它定义了一个类似于 defun 的函数，并告诉 Lisp 编译器对其执行内联扩展。请参阅内联函数。
+</p>
+<p>要取消定义函数名称，请使用 fmakunbound。请参阅访问函数单元格内容。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="13.5_调用函数.html">调用函数</a>, Previous: <a href="13.3_命名函数.html">命名函数</a>, Up: <a href="13_函数.html">函数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

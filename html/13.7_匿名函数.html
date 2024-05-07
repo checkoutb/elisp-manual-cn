@@ -1,0 +1,60 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>13.7 匿名函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">13.7 匿名函数</h2>
+<div class="nav-panel"><p>Next: <a href="13.8_泛型函数.html">泛型函数</a>, Previous: <a href="13.6_映射函数.html">映射函数</a>, Up: <a href="13_函数.html">函数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>尽管函数通常同时使用 defun 和给定名称定义，但有时使用显式 lambda 表达式（匿名函数）会很方便。匿名函数在函数名所在的地方都是有效的。它们通常被分配为变量值，或作为函数的参数；  例如，您可以将一个作为函数参数传递给 mapcar，该函数将该函数应用于列表的每个元素（请参阅映射函数）。请参阅 describe-symbols 示例，了解一个实际的示例。
+</p>
+<p>在定义用作匿名函数的 lambda 表达式时，原则上可以使用任何方法来构造列表。但通常你应该使用 lambda 宏，或者特殊形式的函数，或者 #’ 读取语法：
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: lambda args [doc] [interactive] body… ¶
+</pre></div>
+<p>此宏返回一个匿名函数，其中包含参数列表 args、文档字符串 doc（如果有）、交互式规范交互（如果有）和 body 给出的正文形式。
+</p>
+<p>在动态绑定下，此宏有效地使 lambda 表单自引用：评估 CAR 为 lambda 的表单会产生表单本身：
+</p>
+<div class="lisp">
+<pre class="lisp">(lambda (x) (* x x))
+     ⇒ (lambda (x) (* x x))
+</pre></div>
+<p>请注意，在词法绑定下进行评估时，结果是一个闭包对象（请参阅闭包）。
+</p>
+<p>lambda 形式还有另一个效果：它通过将函数用作子例程（见下文）告诉 Emacs 求值器和字节编译器它的参数是一个函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Special Form: function function-object ¶
+</pre></div>
+<p>这种特殊形式返回函数对象而不对其进行评估。在这方面，它类似于引用（参见引用）。但与引用不同的是，它还可以作为 Emacs 评估器和字节编译器的注释，说明函数对象旨在用作函数。假设 function-object 是一个有效的 lambda 表达式，这有两个效果：
+</p>
+<p>当代码被字节编译时，函数对象被编译成字节码函数对象（参见字节编译）。
+当启用词法绑定时，函数对象被转换为闭包。请参阅闭包。
+</p>
+<p>当函数对象是一个符号并且代码是字节编译时，如果该函数未定义或在运行时可能不知道，字节编译器将发出警告。
+</p>
+<p>读取语法 #’ 是使用函数的简写。以下形式都是等价的：
+</p><div class="lisp">
+<pre class="lisp">(lambda (x) (* x x))
+(function (lambda (x) (* x x)))
+#'(lambda (x) (* x x))
+</pre></div>
+<p>在下面的示例中，我们定义了一个 change-property 函数，该函数将一个函数作为其第三个参数，然后是一个双属性函数，该函数通过向其传递一个匿名函数来使用 change-property：
+</p>
+<div class="lisp">
+<pre class="lisp">(defun change-property (symbol prop function)
+  (let ((value (get symbol prop)))
+    (put symbol prop (funcall function value))))
+
+
+(defun double-property (symbol prop)
+  (change-property symbol prop (lambda (x) (* 2 x))))
+</pre></div>
+<p>请注意，我们不引用 lambda 形式。
+</p>
+<p>如果编译上面的代码，匿名函数也会被编译。如果您通过将匿名函数引用为列表来构造匿名函数，则不会发生这种情况：
+</p>
+<div class="lisp">
+<pre class="lisp">(defun double-property (symbol prop)
+  (change-property symbol prop '(lambda (x) (* 2 x))))
+</pre></div>
+<p>在这种情况下，匿名函数将作为 lambda 表达式保存在编译的代码中。字节编译器不能假定这个列表是一个函数，即使它看起来像一个，因为它不知道 change-property 打算将它用作一个函数。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="13.8_泛型函数.html">泛型函数</a>, Previous: <a href="13.6_映射函数.html">映射函数</a>, Up: <a href="13_函数.html">函数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

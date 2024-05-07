@@ -1,0 +1,43 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>26.1.2 访问子程序</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">26.1.2 访问子程序</h3>
+<div class="nav-panel"><p>Next: <a href="26.2_保存缓冲区.html">保存缓冲区</a>, Previous: <a href="26.1.1_文件访问函数.html">文件访问函数</a>, Up: <a href="26.1_访问文件.html">访问文件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>find-file-noselect 函数使用两个在用户 Lisp 代码中有时很有用的重要子例程：create-file-buffer 和 after-find-file。本节说明如何使用它们。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: create-file-buffer filename ¶
+</pre></div>
+<p>该函数为访问文件名创建一个适当命名的缓冲区，并将其返回。如果该名称是空闲的，它将使用文件名（无目录）作为名称；  否则，它会附加一个字符串，例如 ’&lt;2&gt;’ 以获取未使用的名称。另请参阅创建缓冲区。请注意，uniquify 库会影响此函数的结果。请参阅 GNU Emacs 手册中的 Uniquify。
+</p>
+<p>请注意：create-file-buffer 不会将新缓冲区与文件关联，也不会选择缓冲区。它也不使用默认的主要模式。
+</p><div class="lisp">
+<pre class="lisp">
+
+(create-file-buffer "foo")
+     ⇒ #&lt;buffer foo&gt;
+
+(create-file-buffer "foo")
+     ⇒ #&lt;buffer foo&lt;2&gt;&gt;
+
+(create-file-buffer "foo")
+     ⇒ #&lt;buffer foo&lt;3&gt;&gt;
+</pre></div>
+<p>此函数由 find-file-noselect 使用。它使用 generate-new-buffer（请参阅创建缓冲区）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: after-find-file &amp;optional error warn noauto after-find-file-from-revert-buffer nomodes ¶
+</pre></div>
+<p>此函数设置缓冲区主模式，并解析局部变量（请参阅 Emacs 如何选择主模式）。它由 find-file-noselect 和默认的 revert 函数调用（请参阅 Reverting）。
+</p>
+<p>如果由于文件不存在而读取文件出错，但它的目录确实存在，则调用者应该传递一个非零值来表示错误。在这种情况下，after-find-file 会发出警告： <code>（新文件）</code> 。对于更严重的错误，调用者通常不应该调用 after-find-file。
+</p>
+<p>如果 warn 不为 nil，则如果自动保存文件存在并且比访问的文件更新，则此函数会发出警告。
+</p>
+<p>如果 noauto 不为零，则表示不启用或禁用自动保存模式。如果之前启用了该模式，则该模式将保持启用状态。
+</p>
+<p>如果 after-find-file-from-revert-buffer 不为 nil，则表示此调用来自 revert-buffer。这没有直接影响，但是一些模式函数和钩子函数会检查这个变量的值。
+</p>
+<p>如果 nomodes 不是 nil，这意味着不改变缓冲区的主模式，不处理文件中的局部变量规范，也不运行 find-file-hook。在某些情况下，revert-buffer 会使用此功能。
+</p>
+<p>after-find-file 所做的最后一件事是调用列表 find-file-hook 中的所有函数。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="26.2_保存缓冲区.html">保存缓冲区</a>, Previous: <a href="26.1.1_文件访问函数.html">文件访问函数</a>, Up: <a href="26.1_访问文件.html">访问文件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

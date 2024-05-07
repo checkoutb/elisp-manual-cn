@@ -1,0 +1,87 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>29.16 退出窗口</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">29.16 退出窗口</h2>
+<div class="nav-panel"><p>Next: <a href="29.17_侧窗.html">侧窗</a>, Previous: <a href="29.15_专用窗口.html">专用窗口</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在命令使用 display-buffer 在屏幕上放置一个缓冲区后，用户可能决定隐藏它并返回到 Emacs 显示的先前配置。我们称之为退出窗口。这样做的方法是在 display-buffer 使用的窗口是选定的窗口时调用 quit-window。
+</p>
+<p>恢复显示器先前配置的正确方法取决于对现在出现缓冲区的窗口所做的操作。删除那个窗口，或者删除它的 <code>帧</code> ( <code>frame</code> )，或者只是在那个窗口中显示另一个缓冲区可能是正确的。一个复杂的问题是，用户可能在显示缓冲区后更改了窗口配置，并且不希望撤消用户明确请求的更改。
+</p>
+<p>为了让 quit-window 做正确的事，display-buffer 在窗口的 quit-restore 参数中保存了关于它所做的事情的信息（请参阅窗口参数）。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: quit-window &amp;optional kill window ¶
+</pre></div>
+<p>此命令退出窗口并掩埋其缓冲区。参数窗口必须是活动窗口，并且默认为选定的窗口。使用前缀参数 kill 非 nil，它会杀死缓冲区而不是掩埋它。
+</p>
+<p>函数 quit-window 首先运行 quit-window-hook。然后它调用函数 quit-restore-window，如下所述，它完成了艰苦的工作。
+</p>
+<p>您可以通过调用 quit-restore-window 来获得更多控制权。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: quit-restore-window &amp;optional window bury-or-kill ¶
+</pre></div>
+<p>此函数在退出后处理窗口及其缓冲区。可选参数窗口必须是活动窗口，并且默认为选定的窗口。该函数考虑了窗口的退出恢复参数。
+</p>
+<p>可选参数 bury-or-kill 指定如何处理窗口的缓冲区。以下值是有意义的：
+</p>
+<div class="lisp">
+<pre class="lisp">nil
+</pre></div>
+<p>这意味着不以任何特定方式处理缓冲区。因此，如果没有删除窗口，调用 switch-to-prev-buffer 通常会再次显示缓冲区。
+</p><div class="lisp">
+<pre class="lisp">append
+</pre></div>
+<p>这意味着如果没有删除窗口，它的缓冲区将移动到窗口先前缓冲区列表的末尾（请参阅窗口历史记录），因此将来对 switch-to-prev-buffer 的调用不太可能切换到它。此外，它将缓冲区移动到帧缓冲区列表的末尾（请参阅缓冲区列表）。
+</p><div class="lisp">
+<pre class="lisp">bury
+</pre></div>
+<p>这意味着如果没有删除窗口，它的缓冲区将从窗口的先前缓冲区列表中删除。此外，它将缓冲区移动到帧缓冲区列表的末尾。这是防止 switch-to-prev-buffer 再次切换到此缓冲区的最可靠方法，而不是杀死缓冲区。
+</p><div class="lisp">
+<pre class="lisp">kill
+</pre></div>
+<p>这意味着杀死窗口的缓冲区。
+</p>
+<p>参数 bury-or-kill 还指定当窗口应该被删除时如何处理窗口的 <code>帧</code> ( <code>frame</code> )，如果它是其 <code>帧</code> ( <code>frame</code> )上的唯一窗口，并且该 <code>帧</code> ( <code>frame</code> )的终端上还有其他 <code>帧</code> ( <code>frame</code> )。如果bury-or-kill等于kill，则表示删除帧。否则， <code>帧</code> ( <code>frame</code> )的命运是通过调用 frame-auto-hide-function（见下文）以该 <code>帧</code> ( <code>frame</code> )作为唯一参数来确定的。
+</p>
+<p>此函数始终将窗口的退出恢复参数设置为 nil，除非它删除了窗口。
+</p>
+<p>窗口窗口的 quit-restore 参数（请参阅窗口参数）应为 nil 或四个元素的列表：
+</p>
+<div class="lisp">
+<pre class="lisp">(method obuffer owindow this-buffer)
+</pre></div>
+<p>第一个元素method 是window、frame、same 和other 四个符号之一。frame 和 window 控制如何删除窗口，同时在其中显示一些其他缓冲区的相同和其他控件。
+</p>
+<p>具体来说，window 表示该窗口是由 display-buffer 专门创建的；  frame 表示已经创建了一个单独的 <code>帧</code> ( <code>frame</code> )；  同样，窗口只显示过这个缓冲区；  其他，该窗口之前显示了另一个缓冲区。
+</p>
+<p>第二个元素，obuffer，要么是符号窗口或 <code>帧</code> ( <code>frame</code> )之一，要么是表单列表
+</p><div class="lisp">
+<pre class="lisp">(prev-buffer prev-window-start prev-window-point height)
+</pre></div>
+<p>它表示之前在窗口中显示了哪个缓冲区，该缓冲区的窗口开始（请参阅窗口开始和结束位置）和窗口点（请参阅窗口和点）当时的位置，以及当时窗口的高度。如果退出窗口时prev-buffer仍然存在，退出窗口可能会重新使用窗口来显示prev-buffer。
+</p>
+<p>第三个元素 owindow 是在显示完成之前选择的窗口。如果退出删除窗口，它会尝试选择 owindow。
+</p>
+<p>第四个元素this-buffer是显示设置了quit-restore参数的缓冲区。仅当它仍然显示该缓冲区时，退出窗口可能会删除该窗口。
+</p>
+<p>退出窗口尝试删除它当且仅当 (1) 方法是窗口或 <code>帧</code> ( <code>frame</code> )，(2) 窗口没有先前显示的缓冲区的历史记录，并且 (3) 此缓冲区等于当前显示在窗口中的缓冲区。如果窗口是原子窗口的一部分（参见原子窗口），退出将尝试删除该原子窗口的根。在任何一种情况下，它都会尝试避免在无法删除窗口时发出错误信号。
+</p>
+<p>如果obuffer 是一个列表，并且prev-buffer 仍然存在，则退出根据obuffer 的其余元素在窗口中显示prev-buffer。如果临时调整大小以显示此缓冲区，这包括将窗口大小调整为高度。
+</p>
+<p>否则，如果 window 以前用于显示其他缓冲区（请参阅 Window History），则将显示该历史记录中的最新缓冲区。
+</p>
+<p>以下选项指定了一个函数，用于在退出该窗口时对包含一个窗口的 <code>帧</code> ( <code>frame</code> )执行正确的操作。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: frame-auto-hide-function ¶
+</pre></div>
+<p>调用此选项指定的函数以自动隐藏 <code>帧</code> ( <code>frame</code> )。这个函数用一个参数调用——一个 <code>帧</code> ( <code>frame</code> )。
+</p>
+<p>此处指定的函数由 bury-buffer 调用（请参阅缓冲区列表），当所选窗口专用并显示要掩埋的缓冲区时。当要退出的窗口的 <code>帧</code> ( <code>frame</code> )是专门为显示该窗口的缓冲区而创建的并且缓冲区没有被杀死时，它也被 quit-restore-window （见上文）调用。
+</p>
+<p>默认是调用 iconify-frame （请参阅 <code>帧</code> ( <code>frame</code> )的可见性）。或者，您可以指定 delete-frame（请参阅删除 <code>帧</code> ( <code>frame</code> )）以从其显示中删除 <code>帧</code> ( <code>frame</code> )，使 <code>帧</code> ( <code>frame</code> )不可见以使 <code>帧</code> ( <code>frame</code> )不可见，忽略以保持 <code>帧</code> ( <code>frame</code> )不变，或任何其他可以将 <code>帧</code> ( <code>frame</code> )作为它的唯一论据。
+</p>
+<p>请注意，仅当指定帧仅包含一个实时窗口并且同一终端上至少有一个其他帧时，才会调用此选项指定的函数。
+</p>
+<p>对于特定帧，此处指定的值可能会被该帧的自动隐藏功能帧参数覆盖（请参阅帧交互参数）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="29.17_侧窗.html">侧窗</a>, Previous: <a href="29.15_专用窗口.html">专用窗口</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

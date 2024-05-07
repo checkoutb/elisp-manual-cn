@@ -1,0 +1,31 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>29.19 窗口和点</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">29.19 窗口和点</h2>
+<div class="nav-panel"><p>Next: <a href="29.20_窗口开始和结束位置.html">窗口开始和结束位置</a>, Previous: <a href="29.18_原子窗口.html">原子窗口</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>每个窗口都有自己的点值（请参阅点），与显示相同缓冲区的其他窗口中的点值无关。这使得让多个窗口显示一个缓冲区很有用。
+</p>
+<p>窗口点是在第一次创建窗口时建立的；  它从缓冲区的点初始化，或者如果存在这样的窗口，则从缓冲区上打开的另一个窗口的窗口点初始化。
+选择一个窗口会根据窗口的点值设置其缓冲区中的点值。相反，取消选择窗口会将窗口的点值设置为缓冲区的值。因此，当您在显示给定缓冲区的窗口之间切换时，所选窗口的点值在缓冲区中有效，而其他窗口的点值存储在这些窗口中。
+只要选中的窗口显示当前缓冲区，窗口的点和缓冲区的点总是一起移动；  他们保持平等。
+</p>
+<p>默认情况下，Emacs 将光标显示为一个矩形块，在每个窗口中该窗口点的位置。当用户切换到窗口中的另一个缓冲区时，Emacs 将该窗口的光标移动到该缓冲区中的点。如果点的确切位置隐藏在某个显示元素之后，例如显示字符串或图像，Emacs 会在该显示元素之前或之后立即显示光标。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-point &amp;optional window ¶
+</pre></div>
+<p>此函数返回窗口中点的当前位置。对于未选择的窗口，如果选择了该窗口，这是（在该窗口的缓冲区中）的值点。窗口的默认值是选定的窗口。
+</p>
+<p>当 window 为选中窗口时，返回的值为该窗口缓冲区中的 point 值。严格来说，在任何保存-游览形式之外返回点的顶级值会更正确。但这个价值很难找到。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-window-point window position ¶
+</pre></div>
+<p>此函数将窗口中的点定位在窗口缓冲区中的位置位置。它返回位置。
+</p>
+<p>如果选择了窗口，这只是在窗口的缓冲区中执行 goto-char 。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: window-point-insertion-type ¶
+</pre></div>
+<p>此变量指定窗口点的标记插入类型（请参阅标记插入类型）。默认值为 nil，因此窗口点将停留在插入的文本后面。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="29.20_窗口开始和结束位置.html">窗口开始和结束位置</a>, Previous: <a href="29.18_原子窗口.html">原子窗口</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

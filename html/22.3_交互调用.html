@@ -1,0 +1,82 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.3 交互调用</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">22.3 交互调用</h2>
+<div class="nav-panel"><p>Next: <a href="22.4_区分交互调用.html">区分交互调用</a>, Previous: <a href="22.2.5_在命令选项中进行选择.html">在命令选项中进行选择</a>, Up: <a href="22_命令循环.html">命令循环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在命令循环将键序列转换为命令后，它使用函数 command-execute 调用该命令。如果命令是一个函数，command-execute 调用 call-interactive，它读取参数并调用命令。您也可以自己调用这些函数。
+</p>
+<p>请注意，在此上下文中，术语 <code>命令</code> 是指可交互调用的函数（或类似函数的对象）或键盘宏。它不是指用于调用命令的键序列（请参阅键映射）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: commandp object &amp;optional for-call-interactively ¶
+</pre></div>
+<p>如果 object 是命令，则此函数返回 t。否则，它返回零。
+</p>
+<p>命令包括字符串和向量（被视为键盘宏）、包含顶级交互形式的 lambda 表达式（请参阅使用交互）、由此类 lambda 表达式生成的字节码函数对象、声明为交互的自动加载对象（非-nil 自动加载的第四个参数），以及一些原始函数。此外，如果符号具有非 nil 交互形式属性，或者其函数定义满足 commandp，则将其视为命令。
+</p>
+<p>如果 for-call-interactively 不为 nil，则 commandp 只为 call-interactively 可以调用的对象返回 t——因此，不为键盘宏返回。
+</p>
+<p>有关使用 commandp 的实际示例，请参阅访问文档字符串中的文档。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: call-interactively command &amp;optional record-flag keys ¶
+</pre></div>
+<p>该函数调用交互式可调用函数命令，根据其交互式调用规范提供参数。它返回任何命令返回。
+</p>
+<p>例如，如果您有一个具有以下签名的函数：
+</p>
+<div class="lisp">
+<pre class="lisp">(defun foo (begin end)
+  (interactive "r")
+  ...)
+</pre></div>
+<p>然后说
+</p><div class="lisp">
+<pre class="lisp">(call-interactively 'foo)
+</pre></div>
+<p>将以区域（点和标记）作为参数调用 foo。
+</p>
+<p>如果 command 不是函数或不能交互调用（即不是命令），则会发出错误信号。请注意，即使它们被视为命令，也不接受键盘宏（字符串和向量），因为它们不是函数。如果 command 是一个符号，则 call-interactively 使用它的函数定义。
+</p>
+<p>如果 record-flag 不是 nil，则此命令及其参数将无条件添加到 list command-history。否则，只有在使用 minibuffer 读取参数时才会添加该命令。请参阅命令历史记录。
+</p>
+<p>如果给定了参数键，则应该是一个向量，它指定在命令查询使用哪些事件来调用它时要提供的事件序列。如果keys被省略或nil，默认是this-command-keys-vector的返回值。请参阅 this-command-keys-vector 的定义。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: funcall-interactively function &amp;rest arguments ¶
+</pre></div>
+<p>此函数的工作方式类似于 funcall（请参阅调用函数），但它使调用看起来像一个交互式调用：在函数内部调用 called-interactively-p 将返回 t。如果函数不是命令，则调用它时不会发出错误信号。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: command-execute command &amp;optional record-flag keys special ¶
+</pre></div>
+<p>该函数执行命令。参数 command 必须满足 commandp 谓词；  即，它必须是可交互调用的函数或键盘宏。
+</p>
+<p>使用 execute-kbd-macro 执行作为命令的字符串或向量。一个函数与记录标志和键参数一起以交互方式传递给调用（见上文）。
+</p>
+<p>如果 command 是一个符号，则使用它的函数定义代替它。如果一个具有自动加载定义的符号被声明为代表一个可交互调用的函数，那么它就被视为一个命令。这样的定义是通过加载指定的库然后重新检查符号的定义来处理的。
+</p>
+<p>如果给出参数 special，则表示忽略前缀参数并且不清除它。这用于执行特殊事件（请参阅特殊事件）。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: execute-extended-command prefix-argument ¶
+</pre></div>
+<p>此函数使用完成读取从迷你缓冲区中读取命令名称（请参阅完成）。然后它使用命令执行来调用指定的命令。该命令返回的任何内容都将成为 execute-extended-command 的值。
+</p>
+<p>如果该命令要求一个前缀参数，它会收到值前缀参数。如果以交互方式调用execute-extended-command，则当前原始前缀参数用于前缀参数，因此传递给运行的任何命令。
+</p>
+<p>execute-extended-command 是 Mx 的正常定义，所以它使用字符串 ’Mx ’ 作为提示符。（最好从用于调用 execute-extended-command 的事件中获取提示，但实现起来很痛苦。）前缀参数值的描述（如果有）也成为提示的一部分。
+</p>
+<div class="lisp">
+<pre class="lisp">(execute-extended-command 3)
+---------- Buffer: Minibuffer ----------
+3 M-x forward-word RET
+---------- Buffer: Minibuffer ----------
+     ⇒ t
+</pre></div>
+<p>此命令注意 read-extended-command-predicate 变量，该变量可以过滤掉不适用于当前主要模式（或启用的次要模式）的命令。默认情况下，该变量的值为 nil，不会过滤掉任何命令。但是，自定义它以调用函数 command-completion-default-include-p 将执行与模式相关的过滤。read-extended-command-predicate 可以是任何谓词函数；  它将使用两个参数调用：命令的符号和当前缓冲区。如果在该缓冲区中完成时要包含命令，则 if 应返回非零。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: execute-extended-command-for-buffer prefix-argument ¶
+</pre></div>
+<p>这类似于执行扩展命令，但将提供完成的命令限制为与当前主要模式（和启用的次要模式）特别相关的那些命令。这包括使用模式标记的命令（请参阅使用交互），以及绑定到本地活动键盘映射的命令。此命令是 MSx 的正常定义（即 <code>meta shift x</code> ）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.4_区分交互调用.html">区分交互调用</a>, Previous: <a href="22.2.5_在命令选项中进行选择.html">在命令选项中进行选择</a>, Up: <a href="22_命令循环.html">命令循环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.7.12 分类事件</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">22.7.12 分类事件</h3>
+<div class="nav-panel"><p>Next: <a href="22.7.13_访问鼠标事件.html">访问鼠标事件</a>, Previous: <a href="22.7.11_事件示例.html">事件示例</a>, Up: <a href="22.7_输入事件.html">输入事件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>每个事件都有一个事件类型，它为键绑定目的对事件进行分类。对于键盘事件，事件类型等于事件值；  因此，字符的事件类型是字符，而功能键符号的事件类型是符号本身。对于列表事件，事件类型是列表的 CAR 中的符号。因此，事件类型始终是符号或字符。
+</p>
+<p>在涉及键绑定的情况下，相同类型的两个事件是等价的；  因此，它们总是运行相同的命令。但是，这并不一定意味着它们会做同样的事情，因为某些命令会查看整个事件来决定要做什么。例如，某些命令使用鼠标事件的位置来决定在缓冲区中的哪个位置进行操作。
+</p>
+<p>有时更广泛的事件分类是有用的。例如，您可能想询问事件是否涉及 META 键，而不管使用了哪个其他键或鼠标按钮。
+</p>
+<p>提供了函数 event-modifiers 和 event-basic-type 来方便地获取这些信息。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: event-modifiers event ¶
+</pre></div>
+<p>此函数返回事件具有的修饰符列表。修饰符是符号；  它们包括 shift、control、meta、alt、hyper 和 super。此外，鼠标事件符号的修饰符列表始终包含单击、拖动和向下之一。对于双重或三重事件，它还包含双重或三重。
+</p>
+<p>参数事件可以是整个事件对象，或者只是一个事件类型。如果 event 是一个从未在当前 Emacs 会话中作为输入读取的事件中使用过的符号，那么 event-modifiers 可以返回 nil，即使 event 实际上有修饰符。
+</p>
+<p>这里有些例子：
+</p><div class="lisp">
+<pre class="lisp">(event-modifiers ?a)
+     ⇒ nil
+(event-modifiers ?A)
+     ⇒ (shift)
+(event-modifiers ?\C-a)
+     ⇒ (control)
+(event-modifiers ?\C-%)
+     ⇒ (control)
+(event-modifiers ?\C-\S-a)
+     ⇒ (control shift)
+(event-modifiers 'f5)
+     ⇒ nil
+(event-modifiers 's-f5)
+     ⇒ (super)
+(event-modifiers 'M-S-f5)
+     ⇒ (meta shift)
+(event-modifiers 'mouse-1)
+     ⇒ (click)
+(event-modifiers 'down-mouse-1)
+     ⇒ (down)
+</pre></div>
+<p>单击事件的修饰符列表明确包含单击，但事件符号名称本身不包含 <code>单击</code> 。类似地，ASCII 控制字符（例如 <code>C-a</code> ）的修饰符列表包含控制，即使通过 read-char 读取此类事件将返回值 1，并且删除了控制修饰符位。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: event-basic-type event ¶
+</pre></div>
+<p>此函数返回事件描述的键或鼠标按钮，并删除所有修饰符。事件参数与事件修饰符中的一样。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">(event-basic-type ?a)
+     ⇒ 97
+(event-basic-type ?A)
+     ⇒ 97
+(event-basic-type ?\C-a)
+     ⇒ 97
+(event-basic-type ?\C-\S-a)
+     ⇒ 97
+(event-basic-type 'f5)
+     ⇒ f5
+(event-basic-type 's-f5)
+     ⇒ f5
+(event-basic-type 'M-S-f5)
+     ⇒ f5
+(event-basic-type 'down-mouse-1)
+     ⇒ mouse-1
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: mouse-movement-p object ¶
+</pre></div>
+<p>如果对象是鼠标移动事件，此函数返回非零。请参阅运动事件。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: event-convert-list list ¶
+</pre></div>
+<p>此函数将修饰符名称列表和基本事件类型转换为指定所有这些的事件类型。基本事件类型必须是列表的最后一个元素。例如，
+</p><div class="lisp">
+<pre class="lisp">(event-convert-list '(control ?a))
+     ⇒ 1
+(event-convert-list '(control meta ?a))
+     ⇒ -134217727
+(event-convert-list '(control super f1))
+     ⇒ C-s-f1
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.7.13_访问鼠标事件.html">访问鼠标事件</a>, Previous: <a href="22.7.11_事件示例.html">事件示例</a>, Up: <a href="22.7_输入事件.html">输入事件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

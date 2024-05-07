@@ -1,0 +1,46 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.28 解析 HTML 和 XML</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">33.28 解析 HTML 和 XML</h2>
+<div class="nav-panel"><p>Next: <a href="33.28.1_文档对象模型.html">文档对象模型</a>, Previous: <a href="33.27.2_GnuTLS_加密函数.html">GnuTLS_加密函数</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 可以使用内置的 libxml2 支持进行编译。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: libxml-available-p ¶
+</pre></div>
+<p>如果此 Emacs 会话中提供了内置的 libxml2 支持，则此函数返回非 nil。
+</p>
+<p>当 libxml2 支持可用时，可以使用以下函数将 HTML 或 XML 文本解析为 Lisp 对象树。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: libxml-parse-html-region start end &amp;optional base-url discard-comments ¶
+</pre></div>
+<p>此函数将开始和结束之间的文本解析为 HTML，并返回一个表示 HTML 解析树的列表。它试图通过稳健地处理语法错误来处理现实世界的 HTML。
+</p>
+<p>可选参数 base-url，如果非零，应该是一个字符串，指定链接中出现的相对 URL 的基本 URL。
+</p>
+<p>如果可选参数 discard-comments 不为零，则丢弃任何顶级注释。（此参数已过时，将在未来的 Emacs 版本中删除。要删除注释，请在调用解析函数之前对数据使用 xml-remove-comments 实用程序函数。）
+</p>
+<p>在解析树中，每个 HTML 节点由一个列表表示，其中第一个元素是表示节点名称的符号，第二个元素是节点属性列表，其余元素是子节点。
+</p>
+<p>下面的示例演示了这一点。鉴于此（格式错误的）HTML 文档：
+</p><div class="lisp">
+<pre class="lisp">&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body width=101&gt;&lt;div class=thing&gt;Foo&lt;div&gt;Yes
+</pre></div>
+<p>对 libxml-parse-html-region 的调用会返回此 DOM（文档对象模型）：
+</p><div class="lisp">
+<pre class="lisp">(html nil
+ (head nil)
+ (body ((width . "101"))
+  (div ((class . "thing"))
+   "Foo"
+   (div nil
+    "Yes"))))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: shr-insert-document dom ¶
+</pre></div>
+<p>该函数将解析后的 dom 中的 HTML 渲染到当前缓冲区中。参数 dom 应该是由 libxml-parse-html-region 生成的列表。例如，EWW 在 The Emacs Web Wowser Manual 中使用了这个函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: libxml-parse-xml-region start end &amp;optional base-url discard-comments ¶
+</pre></div>
+<p>此函数与 libxml-parse-html-region 相同，只是它将文本解析为 XML 而不是 HTML（因此对语法更严格）。
+</p>
+<div class="nav-panel"><p>Next: <a href="33.28.1_文档对象模型.html">文档对象模型</a>, Previous: <a href="33.27.2_GnuTLS_加密函数.html">GnuTLS_加密函数</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

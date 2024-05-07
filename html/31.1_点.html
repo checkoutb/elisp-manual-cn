@@ -1,0 +1,49 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>31.1 点</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">31.1 点</h2>
+<div class="nav-panel"><p>Next: <a href="31.2_运动.html">运动</a>, Previous: <a href="31_位置.html">位置</a>, Up: <a href="31_位置.html">位置.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>点是许多编辑命令使用的特殊缓冲区位置，包括自插入键入的字符和文本插入功能。其他命令在文本中移动点以允许在不同位置进行编辑和插入。
+</p>
+<p>与其他位置一样，点表示两个字符之间的位置（或在第一个字符之前，或在最后一个字符之后），而不是特定字符。通常终端将光标显示在紧跟在点后面的字符上；  点实际上在光标所在的字符之前。
+</p>
+<p>point 的值是一个不小于 1 且不大于缓冲区大小加 1 的数字。如果变窄有效（请参阅 Narrowing），则点被限制在缓冲区的可访问部分内（可能在一端其中）。
+</p>
+<p>每个缓冲区都有自己的点值，与其他缓冲区中的点值无关。每个窗口也有一个point的值，它与同一缓冲区上其他窗口中的point值无关。这就是为什么点在显示相同缓冲区的不同窗口中可以具有不同值的原因。当一个缓冲区只出现在一个窗口中时，缓冲区的点和窗口的点通常具有相同的值，因此区别很少重要。有关更多详细信息，请参阅 Windows 和 Point。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: point ¶
+</pre></div>
+<p>此函数以整数形式返回当前缓冲区中点的值。
+</p>
+<div class="lisp">
+<pre class="lisp">(point)
+     ⇒ 175
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: point-min ¶
+</pre></div>
+<p>此函数返回当前缓冲区中点的最小可访问值。这通常是 1，但如果收窄生效，它是您收窄到的区域的开始位置。（见收窄。）
+</p>
+<div class="lisp">
+<pre class="lisp">Function: point-max ¶
+</pre></div>
+<p>此函数返回当前缓冲区中点的最大可访问值。这是 (1+ (buffer-size))，除非变窄生效，在这种情况下，它是您变窄到的区域末端的位置。（见收窄。）
+</p>
+<div class="lisp">
+<pre class="lisp">Function: buffer-end flag ¶
+</pre></div>
+<p>如果 flag 大于 0，此函数返回 (point-max)，否则返回 (point-min)。参数标志必须是一个数字。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: buffer-size &amp;optional buffer ¶
+</pre></div>
+<p>此函数返回当前缓冲区中的字符总数。在没有任何缩小的情况下（请参阅缩小），point-max 返回一个比这大一的值。
+</p>
+<p>如果你指定一个缓冲区，buffer，那么这个值就是缓冲区的大小。
+</p><div class="lisp">
+<pre class="lisp">(buffer-size)
+     ⇒ 35
+
+(point-max)
+     ⇒ 36
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="31.2_运动.html">运动</a>, Previous: <a href="31_位置.html">位置</a>, Up: <a href="31_位置.html">位置.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

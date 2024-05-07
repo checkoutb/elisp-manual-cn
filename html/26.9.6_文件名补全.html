@@ -1,0 +1,63 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>26.9.6 文件名补全</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">26.9.6 文件名补全</h3>
+<div class="nav-panel"><p>Next: <a href="26.9.7_标准文件名.html">标准文件名</a>, Previous: <a href="26.9.5_生成唯一文件名.html">生成唯一文件名</a>, Up: <a href="26.9_文件名.html">文件名.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍用于完成文件名的低级子例程。有关更高级别的功能，请参阅读取文件名。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-name-all-completions partial-filename directory ¶
+</pre></div>
+<p>此函数返回目录目录中名称以部分文件名开头的文件的所有可能完成的列表。完成的顺序是目录中文件的顺序，它是不可预测的，也没有传达任何有用的信息。
+</p>
+<p>参数 partial-filename 必须是不包含目录部分和斜杠（或在某些系统上为反斜杠）的文件名。如果目录不是绝对的，则当前缓冲区的默认目录将附加到目录。
+</p>
+<p>在以下示例中，假设 <code>rms/lewis 是当前默认目录，并且有五个名称以 'f' 开头的文件：foo、file~、file.c、file.c.~1</code> 和 file.c .~2~.
+</p><div class="lisp">
+<pre class="lisp">
+
+(file-name-all-completions "f" "")
+     ⇒ ("foo" "file~" "file.c.~2~"
+                "file.c.~1~" "file.c")
+
+
+(file-name-all-completions "fo" "")
+     ⇒ ("foo")
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: file-name-completion filename directory &amp;optional predicate ¶
+</pre></div>
+<p>该函数补全目录目录中的文件名filename。它返回目录目录中以文件名开头的所有文件名共有的最长前缀。如果谓词非零，则在使用一个参数（扩展的绝对文件名）调用该函数后，它会忽略不满足谓词的可能完成。
+</p>
+<p>如果只存在一个匹配并且文件名完全匹配，则函数返回 t。如果目录目录不包含以文件名开头的名称，则该函数返回 nil。
+</p>
+<p>在以下示例中，假设当前默认目录有五个名称以 <code>f</code> 开头的文件：foo、file~、file.c、file.c.~1~ 和 file.c.~2~。
+</p><div class="lisp">
+<pre class="lisp">(file-name-completion "fi" "")
+     ⇒ "file"
+
+
+(file-name-completion "file.c.~1" "")
+     ⇒ "file.c.~1~"
+
+
+(file-name-completion "file.c.~1~" "")
+     ⇒ t
+
+
+(file-name-completion "file.c.~3" "")
+     ⇒ nil
+
+</pre></div>
+<div class="lisp">
+<pre class="lisp">User Option: completion-ignored-extensions ¶
+</pre></div>
+<p>file-name-completion 通常会忽略此列表中以任何字符串结尾的文件名。当所有可能的补全都以这些后缀之一结尾时，它不会忽略它们。此变量对文件名全部完成没有影响。
+</p>
+<p>典型值可能如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">completion-ignored-extensions
+     ⇒ (".o" ".elc" "~" ".dvi")
+</pre></div>
+<p>如果完成忽略扩展的元素以斜杠 <code>/</code> 结尾，则它表示目录。不以斜线结尾的元素永远不会匹配目录；  因此，上述值不会过滤掉名为 foo.elc 的目录。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="26.9.7_标准文件名.html">标准文件名</a>, Previous: <a href="26.9.5_生成唯一文件名.html">生成唯一文件名</a>, Up: <a href="26.9_文件名.html">文件名.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>13.11.3 编写建议的方法</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">13.11.3 编写建议的方法</h3>
+<div class="nav-panel"><p>Next: <a href="13.11.4_使用旧的_defadvice_适配代码.html">使用旧的_defadvice_适配代码</a>, Previous: <a href="13.11.2_建议命名函数.html">建议命名函数</a>, Up: <a href="13.11_建议_Emacs_Lisp_函数.html">建议_Emacs_Lisp_函数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>以下是 add-function 和advice-add 的where 参数的不同可能值，指定了advice 函数和原始函数的组合方式。
+</p>
+<div class="lisp">
+<pre class="lisp">:before
+</pre></div>
+<p>在旧函数之前调用函数。两个函数接收相同的参数，组合的返回值是旧函数的返回值。更具体地说，这两个函数的组合行为如下：
+</p>
+<div class="lisp">
+<pre class="lisp">(lambda (&amp;rest r) (apply function r) (apply oldfun r))
+</pre></div>
+<p>(add-function :before funvar function) 与普通钩子的 (add-hook ’hookvar function) 相当。
+</p><div class="lisp">
+<pre class="lisp">:after
+</pre></div>
+<p>在旧函数之后调用函数。两个函数接收相同的参数，组合的返回值是旧函数的返回值。更具体地说，这两个函数的组合行为如下：
+</p>
+<div class="lisp">
+<pre class="lisp">(lambda (&amp;rest r) (prog1 (apply oldfun r) (apply function r)))
+</pre></div>
+<p>(add-function :after funvar function) 对于单功能挂钩与 (add-hook ’hookvar function ’append) 对于普通挂钩相当。
+</p><div class="lisp">
+<pre class="lisp">:override
+</pre></div>
+<p>这完全用新功能替换了旧功能。如果您稍后调用 remove-function，旧功能当然可以恢复。
+</p><div class="lisp">
+<pre class="lisp">:around
+</pre></div>
+<p>调用函数而不是旧函数，但提供旧函数作为函数的额外参数。这是最灵活的组合。例如，它允许您使用不同的参数调用旧函数，或者多次调用，或者在 let-binding 中调用，或者您有时可以将工作委托给旧函数，有时完全覆盖它。更具体地说，这两个函数的组合行为如下：
+</p>
+<div class="lisp">
+<pre class="lisp">(lambda (&amp;rest r) (apply function oldfun r))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">:before-while
+</pre></div>
+<p>在旧函数之前调用函数，如果函数返回 nil，则不要调用旧函数。两个函数接收相同的参数，组合的返回值是旧函数的返回值。更具体地说，这两个函数的组合行为如下：
+</p>
+<div class="lisp">
+<pre class="lisp">(lambda (&amp;rest r) (and (apply function r) (apply oldfun r)))
+</pre></div>
+<p>(add-function :before-while funvar function) 当 hookvar 通过 run-hook-with-args-until-failure 运行时，单函数钩子与 (add-hook ’hookvar function) 相当。
+</p><div class="lisp">
+<pre class="lisp">:before-until
+</pre></div>
+<p>在旧函数之前调用函数，并且仅在函数返回 nil 时才调用旧函数。更具体地说，这两个函数的组合行为如下：
+</p>
+<div class="lisp">
+<pre class="lisp">(lambda (&amp;rest r) (or (apply function r) (apply oldfun r)))
+</pre></div>
+<p>(add-function :before-until funvar function) 当 hookvar 通过 run-hook-with-args-until-success 运行时，单函数钩子与 (add-hook ’hookvar function) 相当。
+</p><div class="lisp">
+<pre class="lisp">:after-while
+</pre></div>
+<p>在旧函数之后调用函数，并且仅当旧函数返回非零时。两个函数接收相同的参数，组合的返回值是函数的返回值。更具体地说，这两个函数的组合行为如下：
+</p>
+<div class="lisp">
+<pre class="lisp">(lambda (&amp;rest r) (and (apply oldfun r) (apply function r)))
+</pre></div>
+<p>(add-function :after-while funvar function) 当 hookvar 通过 run-hook-with-args-until-failure 运行时，单函数钩子与 (add-hook ’hookvar function ’append) 相当。
+</p><div class="lisp">
+<pre class="lisp">:after-until
+</pre></div>
+<p>在旧函数之后调用函数，并且仅当旧函数返回 nil 时。更具体地说，这两个函数的组合行为如下：
+</p>
+<div class="lisp">
+<pre class="lisp">(lambda (&amp;rest r) (or  (apply oldfun r) (apply function r)))
+</pre></div>
+<p>(add-function :after-until funvar function) 当 hookvar 通过 run-hook-with-args-until-success 运行时，单函数钩子与 (add-hook ’hookvar function ’append) 相当。
+</p><div class="lisp">
+<pre class="lisp">:filter-args
+</pre></div>
+<p>首先调用函数并将结果（应该是一个列表）作为新参数传递给旧函数。更具体地说，这两个函数的组合行为如下：
+</p>
+<div class="lisp">
+<pre class="lisp">(lambda (&amp;rest r) (apply oldfun (funcall function r)))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">:filter-return
+</pre></div>
+<p>首先调用旧函数并将结果传递给函数。更具体地说，这两个函数的组合行为如下：
+</p>
+<div class="lisp">
+<pre class="lisp">(lambda (&amp;rest r) (funcall function (apply oldfun r)))
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="13.11.4_使用旧的_defadvice_适配代码.html">使用旧的_defadvice_适配代码</a>, Previous: <a href="13.11.2_建议命名函数.html">建议命名函数</a>, Up: <a href="13.11_建议_Emacs_Lisp_函数.html">建议_Emacs_Lisp_函数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

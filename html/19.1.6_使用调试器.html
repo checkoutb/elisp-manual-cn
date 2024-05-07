@@ -1,0 +1,12 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>19.1.6 使用调试器</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">19.1.6 使用调试器</h3>
+<div class="nav-panel"><p>Next: <a href="19.1.7_回溯.html">回溯</a>, Previous: <a href="19.1.5_显式进入调试器.html">显式进入调试器</a>, Up: <a href="19.1_Lisp_调试器.html">Lisp_调试器.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>进入调试器后，它会在一个窗口中显示先前选择的缓冲区，并在另一个窗口中显示一个名为 <strong>Backtrace</strong> 的缓冲区。回溯缓冲区包含当前正在进行的每一级 Lisp 函数执行的一行。在这个缓冲区的开头是一条消息，描述了调试器被调用的原因（例如错误消息和相关数据，如果它是由于错误而被调用的）。
+</p>
+<p>回溯缓冲区是只读的，并使用一种特殊的主要模式，调试器模式，其中字母被定义为调试器命令。可以使用常用的 Emacs 编辑命令；  因此，您可以切换窗口以检查发生错误时正在编辑的缓冲区、切换缓冲区、访问文件或进行任何其他类型的编辑。但是，调试器是递归编辑级别（请参阅递归编辑），当您完成调试器时，最好返回回溯缓冲区并退出调试器（使用 q 命令）。退出调试器退出递归编辑并掩埋回溯缓冲区。（您可以通过设置变量 debugger-bury-or-kill 来自定义 q 命令对回溯缓冲区的作用。例如，如果您更喜欢杀死缓冲区而不是埋葬它，请将其设置为 kill。有关更多信息，请参阅变量的文档可能性。）
+</p>
+<p>进入调试器后，根据 eval-expression-debug-on-error 临时设置 debug-on-error 变量。如果后一个变量不为 nil，则 debug-on-error 将临时设置为 t。这意味着在进行调试会话时发生的任何进一步错误将（默认情况下）触发另一个回溯。如果这不是您想要的，您可以将 eval-expression-debug-on-error 设置为 nil，或者在 debugger-mode-hook 中将 debug-on-error 设置为 nil。
+</p>
+<p>调试器本身必须运行字节编译，因为它对 Lisp 解释器的状态做出假设。如果调试器正在解释运行，则这些假设是错误的。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="19.1.7_回溯.html">回溯</a>, Previous: <a href="19.1.5_显式进入调试器.html">显式进入调试器</a>, Up: <a href="19.1_Lisp_调试器.html">Lisp_调试器.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

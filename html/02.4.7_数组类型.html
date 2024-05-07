@@ -1,0 +1,16 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>2.4.7 数组类型</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">2.4.7 数组类型</h3>
+<div class="nav-panel"><p>Next: <a href="02.4.8_字符串类型.html">字符串类型</a>, Previous: <a href="02.4.6_缺点单元格和列表类型.html">缺点单元格和列表类型</a>, Up: <a href="02.4_编程类型.html">编程类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>数组由任意数量的槽组成，用于保存或引用其他 Lisp 对象，排列在连续的内存块中。访问数组的任何元素所花费的时间大致相同。相反，访问列表中的元素需要的时间与列表中元素的位置成正比。（访问列表末尾的元素比访问列表开头的元素需要更长的时间。）
+</p>
+<p>Emacs 定义了四种类型的数组：字符串、向量、布尔向量和字符表。
+</p>
+<p>字符串是字符数组，向量是任意对象数组。布尔向量只能包含 t 或 nil。这些类型的数组可以有任何长度，直到最大的固定数，受系统架构限制和可用内存的限制。字符表是由任何有效字符代码索引的稀疏数组；  他们可以持有任意对象。
+</p>
+<p>数组的第一个元素的索引为零，第二个元素的索引为 1，依此类推。这称为零原点索引。例如，一个由四个元素组成的数组的索引为 0、1、2 和 3。可能的最大索引值比数组的长度小 1。一旦创建了一个数组，它的长度就固定了。
+</p>
+<p>所有 Emacs Lisp 数组都是一维的。（大多数其他编程语言都支持多维数组，但它们不是必需的；嵌套一维数组可以获得相同的效果。）每种类型的数组都有自己的读取语法；  有关详细信息，请参阅以下部分。
+</p>
+<p>数组类型是序列类型的子集，包含字符串类型、向量类型、bool-vector类型和char-table类型。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="02.4.8_字符串类型.html">字符串类型</a>, Previous: <a href="02.4.6_缺点单元格和列表类型.html">缺点单元格和列表类型</a>, Up: <a href="02.4_编程类型.html">编程类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

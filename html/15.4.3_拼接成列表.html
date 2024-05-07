@@ -1,0 +1,26 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>15.4.3 拼接成列表</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">15.4.3 拼接成列表</h3>
+<div class="nav-panel"><p>Next: <a href="15.4.4_键入关键字.html">键入关键字</a>, Previous: <a href="15.4.2_复合类型.html">复合类型</a>, Up: <a href="15.4_自定义类型.html">自定义类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>:inline 功能允许您将可变数量的元素拼接到列表或向量自定义类型的中间。您可以通过将 :inline t 添加到包含在列表或向量规范中的类型规范来使用它。
+</p>
+<p>通常，列表或向量类型规范中的每个条目都描述了单个元素类型。但是当一个条目包含 :inline t 时，它匹配的值会直接合并到包含序列中。例如，如果条目与包含三个元素的列表匹配，则这些元素将成为整个序列的三个元素。这类似于反引号结构中的 ’,@’（参见反引号）。
+</p>
+<p>例如，要指定一个列表，其第一个元素必须是 baz 并且其剩余参数应该是 foo 和 bar 的零个或多个，请使用此自定义类型：
+</p>
+<div class="lisp">
+<pre class="lisp">(list (const baz) (set :inline t (const foo) (const bar)))
+</pre></div>
+<p>这匹配诸如 (baz)、(baz foo)、(baz bar) 和 (baz foo bar) 之类的值。
+</p>
+<p>当元素类型是一个选项时，您使用 :inline 不是在选项本身中，而是在（某些）选项的选项中。例如，要匹配必须以文件名开头、后跟符号 t 或两个字符串的列表，请使用以下自定义类型：
+</p>
+<div class="lisp">
+<pre class="lisp">(list file
+      (choice (const t)
+              (list :inline t string string)))
+</pre></div>
+<p>如果用户在选项中选择了第一个选项，那么整个列表有两个元素，第二个元素是 t。如果用户选择第二个选项，那么整个列表包含三个元素，第二个和第三个必须是字符串。
+</p>
+<p>小部件可以指定谓词来说明内联值是否与带有 :match-inline 元素的小部件匹配。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="15.4.4_键入关键字.html">键入关键字</a>, Previous: <a href="15.4.2_复合类型.html">复合类型</a>, Up: <a href="15.4_自定义类型.html">自定义类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

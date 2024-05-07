@@ -1,0 +1,46 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>3.3 数字的类型谓词</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">3.3 数字的类型谓词</h2>
+<div class="nav-panel"><p>Next: <a href="03.4_数字比较.html">数字比较</a>, Previous: <a href="03.2_浮点基础.html">浮点基础</a>, Up: <a href="03_数字.html">数字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节中的函数测试数字或特定类型的数字。函数 integerp 和 floatp 可以将任何类型的 Lisp 对象作为参数（否则它们不会有太大用处），但 zerop 谓词需要一个数字作为参数。另请参阅标记上的谓词中的 integer-or-marker-p 和 number-or-marker-p。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: bignump object
+</pre></div>
+<p>该谓词测试其参数是否为大整数，如果是则返回 t，否则返回 nil。与小整数不同，大整数可以是 = 或 eql，即使它们不是 eq。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: fixnump object
+</pre></div>
+<p>此谓词测试其参数是否为小整数，如果是则返回 t，否则返回 nil。小整数可以与 eq 进行比较。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: floatp object
+</pre></div>
+<p>该谓词测试其参数是否为浮点数，如果是则返回 t，否则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: integerp object
+</pre></div>
+<p>该谓词测试其参数是否为整数，如果是则返回 t，否则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: numberp object
+</pre></div>
+<p>此谓词测试其参数是否为数字（整数或浮点数），如果是则返回 t，否则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: natnump object
+</pre></div>
+<p>该谓词（其名称来自短语~ 自然数~ ）测试其参数是否为非负整数，如果是则返回 t，否则返回 nil。0 被认为是非负数。
+</p>
+<p>Wholenump 是 natnump 的同义词。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: zerop number
+</pre></div>
+<p>该谓词测试其参数是否为零，如果是则返回 t，否则返回 nil。参数必须是一个数字。
+</p>
+<div class="lisp">
+<pre class="lisp">(zerop x) is equivalent to (= x 0)
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="03.4_数字比较.html">数字比较</a>, Previous: <a href="03.2_浮点基础.html">浮点基础</a>, Up: <a href="03_数字.html">数字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

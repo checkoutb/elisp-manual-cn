@@ -1,0 +1,24 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>12.16 有限制值的变量</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">12.16 有限制值的变量</h2>
+<div class="nav-panel"><p>Next: <a href="12.17_广义变量.html">广义变量</a>, Previous: <a href="12.15_变量别名.html">变量别名</a>, Up: <a href="12_变量.html">变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>可以为普通 Lisp 变量分配任何有效的 Lisp 对象的值。但是，某些 Lisp 变量不是在 Lisp 中定义的，而是在 C 中定义的。这些变量中的大多数是在 C 代码中使用 DEFVAR<em>_LISP</em> 定义的。就像在 Lisp 中定义的变量一样，它们可以取任何值。但是，有些变量是使用 DEFVAR<em>_INT</em> 或 DEFVAR<em>_BOOL</em> 定义的。有关 C 实现的简要讨论，请参阅编写 Emacs Primitives，特别是 syms<em>_of</em><em>_filename</em> 类型的函数的描述。
+</p>
+<p>DEFVAR<em>_BOOL</em> 类型的变量只能取值 nil 或 t。尝试为它们分配任何其他值会将它们设置为 t：
+</p>
+<div class="lisp">
+<pre class="lisp">(let ((display-hourglass 5))
+  display-hourglass)
+     ⇒ t
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Variable: byte-boolean-vars ¶
+</pre></div>
+<p>此变量包含所有 DEFVAR<em>_BOOL</em> 类型变量的列表。 
+</p>
+<p>DEFVAR<em>_INT</em> 类型的变量只能采用整数值。尝试为它们分配任何其他值将导致错误：
+</p>
+<div class="lisp">
+<pre class="lisp">(setq undo-limit 1000.0)
+error→ Wrong type argument: integerp, 1000.0
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="12.17_广义变量.html">广义变量</a>, Previous: <a href="12.15_变量别名.html">变量别名</a>, Up: <a href="12_变量.html">变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

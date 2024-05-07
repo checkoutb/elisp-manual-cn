@@ -1,0 +1,137 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>25.7 文档组</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">25.7 文档组</h2>
+<div class="nav-panel"><p>Next: <a href="26_文件.html">文件</a>, Previous: <a href="25.6_帮助功能.html">帮助功能</a>, Up: <a href="25_文档.html">文档.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 可以根据各种分组列出函数。例如，string-trim 和 mapconcat 是 <code>字符串</code> 函数，因此 Mx shortdoc-display-group RET string RET 将概述对字符串进行操作的函数。
+</p>
+<p>文档组是使用 define-short-documentation-group 宏创建的。
+</p>
+<div class="lisp">
+<pre class="lisp">
+Macro: define-short-documentation-group group &amp;rest functions ¶
+</pre></div>
+<p>将 group 定义为一组函数，并提供使用这些函数的简短摘要。可选参数函数是一个列表，其元素具有以下形式：
+</p>
+<div class="lisp">
+<pre class="lisp">(func [keyword val]…)
+</pre></div>
+<p>可识别以下关键字：
+</p>
+<div class="lisp">
+<pre class="lisp">
+:eval
+</pre></div>
+<p>该值应该是在评估时没有副作用的形式。该表单将通过使用 prin1 打印在文档中使用（请参阅输出函数）。但是，如果表单是字符串，它将按原样插入，然后读取字符串以生成表单。在任何情况下，都会对表单进行评估，并使用结果。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">:eval (concat "foo" "bar" "zot")
+:eval "(make-string 5 ?x)"
+</pre></div>
+<p>将导致：
+</p><div class="lisp">
+<pre class="lisp">(concat "foo" "bar" "zot")
+⇒ "foobarzot"
+(make-string 5 ?x)
+⇒ "xxxxx"
+</pre></div>
+<p>（这里允许同时使用 Lisp 表单和字符串的原因是，在少数需要某种形式呈现的情况下，可以控制打印。在示例中， <code>？x</code> 将被打印为 <code>120</code> 如果它没有包含在字符串中。）
+</p><div class="lisp">
+<pre class="lisp">
+:no-eval
+</pre></div>
+<p>这类似于 :eval，只是不会评估表单。在这些情况下，应该包含某种类型的 :result 元素（见下文）。
+</p>
+<div class="lisp">
+<pre class="lisp">:no-eval (file-symlink-p "/tmp/foo")
+:eg-result t
+</pre></div>
+<div class="lisp">
+<pre class="lisp">
+:no-eval*
+</pre></div>
+<p>像 :no-eval 一样，但总是插入 ’[it depends]’ 作为结果。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">:no-eval* (buffer-string)
+</pre></div>
+<p>将导致：
+</p><div class="lisp">
+<pre class="lisp">(buffer-string)
+→ [it depends]
+</pre></div>
+<div class="lisp">
+<pre class="lisp">
+:no-value
+</pre></div>
+<p>与 :no-eval 类似，但在所讨论的函数没有明确定义的返回值时使用，并且仅用于副作用。
+</p><div class="lisp">
+<pre class="lisp">
+:result
+</pre></div>
+<p>用于输出非评估示例表单的结果。
+</p>
+<div class="lisp">
+<pre class="lisp">:no-eval (setcar list 'c)
+:result c
+</pre></div>
+<div class="lisp">
+<pre class="lisp">
+:eg-result
+</pre></div>
+<p>用于从非评估示例表单输出示例结果。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">:no-eval (looking-at "f[0-9]")
+:eg-result t
+</pre></div>
+<p>将导致：
+</p><div class="lisp">
+<pre class="lisp">(looking-at "f[0-9]")
+eg. → t
+</pre></div>
+<div class="lisp">
+<pre class="lisp">:result-string
+:eg-result-string
+</pre></div>
+<p>这两个分别与 :result 和 :eg-result 相同，但按原样插入。当结果不可读或应为特定形式时，这很有用：
+</p><div class="lisp">
+<pre class="lisp">:no-eval (find-file "/tmp/foo")
+:eg-result-string "#&lt;buffer foo&gt;"
+:no-eval (default-file-modes)
+:eg-result-string "#o755"
+</pre></div>
+<div class="lisp">
+<pre class="lisp">:no-manual
+</pre></div>
+<p>表示该功能未在手册中记录。
+</p><div class="lisp">
+<pre class="lisp">:args
+</pre></div>
+<p>默认情况下，会显示函数的实际参数列表。如果 :args 存在，则使用它们。
+</p>
+<div class="lisp">
+<pre class="lisp">:args (regexp string)
+</pre></div>
+<p>这是一个非常简短的示例：
+</p><div class="lisp">
+<pre class="lisp">(define-short-documentation-group string
+  "Creating Strings"
+  (substring
+   :eval (substring "foobar" 0 3)
+   :eval (substring "foobar" 3))
+  (concat
+   :eval (concat "foo" "bar" "zot")))
+</pre></div>
+<p>第一个参数是要定义的组的名称，然后是任意数量的函数描述。
+</p>
+<p>一个函数可以属于任意数量的文档组。
+</p>
+<p>除了功能描述外，列表还可以有字符串元素，用于将文档组划分为多个部分。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: shortdoc-add-function shortdoc-add-function group section elem ¶
+</pre></div>
+<p>Lisp 包可以使用此命令将函数添加到组中。每个元素都应该是一个函数描述，如上所述。group 是功能组，section 是将功能插入到功能组中的哪个部分。
+</p>
+<p>如果组不存在，它将被创建。如果部分不存在，它将被添加到功能组的末尾。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="26_文件.html">文件</a>, Previous: <a href="25.6_帮助功能.html">帮助功能</a>, Up: <a href="25_文档.html">文档.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

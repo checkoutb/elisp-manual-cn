@@ -1,0 +1,37 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.17.10 多帧图像</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.17.10 多帧图像</h3>
+<div class="nav-panel"><p>Next: <a href="40.17.11_图像缓存.html">图像缓存</a>, Previous: <a href="40.17.9_显示图像.html">显示图像</a>, Up: <a href="40.17_图像.html">图像.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>一些图像文件可以包含多个图像。我们说图像中有多个 <code>帧</code> 。目前，Emacs 支持 GIF、TIFF 和某些 ImageMagick 格式（如 DJVM）的多帧。
+</p>
+<p>帧可用于表示多个页面（例如，多帧 TIFF 文件通常是这种情况），或创建动画（通常是多帧 GIF 文件的情况）。
+</p>
+<p>多帧图像有一个属性 :index，它的值是一个整数（从 0 开始计数），它指定正在显示的帧。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: image-multi-frame-p image ¶
+</pre></div>
+<p>如果图像包含多于一帧，此函数返回非零。实际返回值是一个 cons (nimages . delay)，其中 nimages 是帧数，delay 是它们之间的延迟（以秒为单位），如果图像没有指定延迟，则返回 nil。旨在进行动画处理的图像通常指定帧延迟，而旨在被视为多页的图像则没有。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: image-current-frame image ¶
+</pre></div>
+<p>该函数返回图像当前帧号的索引，从 0 开始计数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: image-show-frame image n &amp;optional nocheck ¶
+</pre></div>
+<p>此函数将图像切换到帧号 n。它将有效范围之外的帧号替换为范围末尾的帧号，除非 nocheck 为非零。如果图像不包含具有指定编号的帧，则图像显示为空心框。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: image-animate image &amp;optional index limit ¶
+</pre></div>
+<p>此功能为图像设置动画。可选的整数索引指定开始的帧（默认为 0）。可选参数限制控制动画的长度。如果省略或为零，则图像仅动画一次；  如果 t 它永远循环；  如果数字动画在这么多秒后停止。
+</p>
+<p>动画通过计时器进行操作。请注意，Emacs 施加了 0.01 (image-minimum-frame-delay) 秒的最小帧延迟。如果图像本身没有指定延迟，Emacs 使用 image-default-frame-delay。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: image-animate-timer image ¶
+</pre></div>
+<p>此函数返回负责动画图像的计时器（如果有）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.17.11_图像缓存.html">图像缓存</a>, Previous: <a href="40.17.9_显示图像.html">显示图像</a>, Up: <a href="40.17_图像.html">图像.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

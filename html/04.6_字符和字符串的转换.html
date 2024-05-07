@@ -1,0 +1,80 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>4.6 字符和字符串的转换</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">4.6 字符和字符串的转换</h2>
+<div class="nav-panel"><p>Next: <a href="04.7_格式化字符串.html">格式化字符串</a>, Previous: <a href="04.5_字符与字符串的比较.html">字符与字符串的比较</a>, Up: <a href="04_字符串和字.html">字符串和字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍用于在字符、字符串和整数之间进行转换的函数。format（请参阅格式化字符串）和 prin1-to-string（请参阅输出函数）也可以将 Lisp 对象转换为字符串。read-from-string（参见输入函数）可以将 Lisp 对象的字符串表示形式转换为对象。函数 string-to-multibyte 和 string-to-unibyte 转换字符串的文本表示（请参阅转换文本表示）。
+</p>
+<p>有关生成文本字符的文本描述和一般输入事件（单键描述和文本字符描述）的函数，请参阅文档。这些主要用于制作帮助信息。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: number-to-string number
+</pre></div>
+<p>此函数返回一个字符串，该字符串由打印的以十为基数的数字表示形式组成。如果参数为负，则返回值以减号开头。
+</p>
+<div class="lisp">
+<pre class="lisp">(number-to-string 256)
+     ⇒ "256"
+
+(number-to-string -23)
+     ⇒ "-23"
+
+(number-to-string -23.5)
+     ⇒ "-23.5"
+</pre></div>
+<p>int-to-string 是此函数的半过时别名。
+</p>
+<p>另请参阅格式化字符串中的函数格式。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: string-to-number string &amp;optional base
+</pre></div>
+<p>该函数返回字符串中字符的数值。如果 base 不是 nil，它必须是 2 到 16（含）之间的整数，并且整数在该基数中转换。如果 base 为 nil，则使用 base 10。浮点转换仅适用于十进制；  我们还没有为浮点数实现其他基数，因为那会做更多的工作并且似乎没有用。如果 string 看起来像一个整数，但它的值太大而无法放入 Lisp 整数，则 string-to-number 返回一个浮点结果。
+</p>
+<p>解析会跳过字符串开头的空格和制表符，然后读取尽可能多的字符串，因为它可以解释为给定基数中的数字。（在某些系统上，它会忽略开头的其他空格，而不仅仅是空格和制表符。）如果字符串不能解释为数字，则此函数返回 0。
+</p>
+<div class="lisp">
+<pre class="lisp">(string-to-number "256")
+     ⇒ 256
+(string-to-number "25 is a perfect square.")
+     ⇒ 25
+(string-to-number "X256")
+     ⇒ 0
+(string-to-number "-4.5")
+     ⇒ -4.5
+(string-to-number "1e5")
+     ⇒ 100000.0
+</pre></div>
+<p>string-to-int 是此函数的过时别名。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: char-to-string character
+</pre></div>
+<p>这个函数返回一个包含一个字符的新字符串，character。这个函数是半过时的，因为函数字符串更通用。请参阅创建字符串。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: string-to-char string
+</pre></div>
+<p>此函数返回字符串中的第一个字符。这与 (aref string 0) 基本相同，只是如果字符串为空则返回 0。（当字符串的第一个字符为空字符时，该值也为 0，ASCII 码为 0。）如果它看起来没有足够的用处，可能会被淘汰。保留。
+</p>
+<p>以下是一些可以转换为字符串或从字符串转换的其他函数：
+</p>
+<div class="lisp">
+<pre class="lisp">concat
+</pre></div>
+<p>此函数将向量或列表转换为字符串。请参阅创建字符串。
+</p>
+<div class="lisp">
+<pre class="lisp">vconcat
+</pre></div>
+<p>此函数将字符串转换为向量。请参阅向量函数。
+</p>
+<div class="lisp">
+<pre class="lisp">append
+</pre></div>
+<p>此函数将字符串转换为列表。请参阅构建缺点单元格和列表。
+</p>
+<div class="lisp">
+<pre class="lisp">byte-to-string
+</pre></div>
+<p>该函数将一个字节的字符数据转换为一个单字节字符串。请参阅转换文本表示。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="04.7_格式化字符串.html">格式化字符串</a>, Previous: <a href="04.5_字符与字符串的比较.html">字符与字符串的比较</a>, Up: <a href="04_字符串和字.html">字符串和字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

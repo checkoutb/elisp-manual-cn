@@ -1,0 +1,42 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>30.17 弹出菜单</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">30.17 弹出菜单</h2>
+<div class="nav-panel"><p>Next: <a href="30.18_对话框.html">对话框</a>, Previous: <a href="30.16_鼠标位置.html">鼠标位置</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Lisp 程序可以弹出一个菜单，以便用户可以用鼠标选择一个选项。在文本终端上，如果鼠标不可用，用户可以使用键盘移动键（Cn、Cp 或上下箭头键）选择替代方案。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: x-popup-menu position menu ¶
+</pre></div>
+<p>此函数显示一个弹出菜单并返回用户所做选择的指示。
+</p>
+<p>参数位置指定在屏幕上放置菜单左上角的位置。它可以是鼠标按钮事件（表示将菜单放在用户按下按钮的位置）或以下形式的列表：
+</p>
+<div class="lisp">
+<pre class="lisp">((xoffset yoffset) window)
+</pre></div>
+<p>其中 xoffset 和 yoffset 是坐标，以像素为单位，从窗口的左上角开始计数。window 可以是窗口或帧。
+</p>
+<p>如果 position 为 t，则表示使用当前鼠标位置（如果鼠标在文本终端上不可用，则使用帧的左上角）。如果 position 为 nil，则表示预先计算 menu 中指定的键映射的键绑定等效项，而不实际显示或弹出菜单。
+</p>
+<p>参数 menu 说明要在菜单中显示的内容。它可以是键盘映射或键盘映射列表（请参阅菜单键盘映射）。在这种情况下，返回值是与用户选择相对应的事件列表。如果选择发生在子菜单中，则该列表具有多个元素。（请注意，x-popup-menu 实际上并不执行绑定到该事件序列的命令。）在支持菜单标题的文本终端和工具包上，如果 menu 是键盘映射，则标题取自 menu 的提示字符串，或者取自如果是键映射列表，则菜单中第一个键映射的提示字符串（请参阅定义菜单）。
+</p>
+<p>或者，菜单可以具有以下形式：
+</p>
+<div class="lisp">
+<pre class="lisp">(title pane1 pane2...)
+</pre></div>
+<p>其中每个窗格都是表单列表
+</p>
+<div class="lisp">
+<pre class="lisp">(title item1 item2...)
+</pre></div>
+<p>每个项目都应该是一个 cons 单元格 (line . value)，其中 line 是一个字符串，而 value 是选择该行时要返回的值。与菜单键映射不同，nil 值不会使菜单项不可选择。或者，每个项目都可以是一个字符串而不是一个 cons 单元格；  这使得一个不可选择的菜单项。
+</p>
+<p>如果用户在没有做出有效选择的情况下退出菜单，例如通过在有效选择之外单击鼠标或键入 Cg，则这通常会导致退出并且 x-popup-menu 不会返回。但是如果 position 是一个鼠标按钮事件（表明用户用鼠标调用了菜单），那么不会发生退出并且 x-popup-menu 返回 nil。
+</p>
+<p>使用说明：如果您可以使用由菜单键映射定义的前缀键来完成这项工作，请不要使用 x-popup-menu 来显示菜单。如果您使用菜单键映射来实现菜单，则 Ch c 和 Ch a 可以看到该菜单中的各个项目并为它们提供帮助。相反，如果您通过定义调用 x-popup-menu 的命令来实现菜单，则帮助工具无法知道该命令内部发生了什么，因此它们无法为菜单项提供任何帮助。
+</p>
+<p>允许您通过移动鼠标在子菜单之间切换的菜单栏机制无法在命令的定义中查看它是否调用了 x-popup-menu。因此，如果您尝试使用 x-popup-menu 实现子菜单，则它无法以集成方式与菜单栏一起使用。这就是为什么所有菜单栏子菜单都使用父菜单中的菜单键映射实现，而不是使用 x-popup-menu。请参阅菜单栏。
+</p>
+<p>如果您希望菜单栏子菜单具有不同的内容，您仍然应该使用菜单键映射来实现它。要使内容变化，请在 menu-bar-update-hook 中添加一个钩子函数，以根据需要更新菜单键映射的内容。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="30.18_对话框.html">对话框</a>, Previous: <a href="30.16_鼠标位置.html">鼠标位置</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

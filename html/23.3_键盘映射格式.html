@@ -1,0 +1,92 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>23.3 键盘映射格式</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">23.3 键盘映射格式</h2>
+<div class="nav-panel"><p>Next: <a href="23.4_创建键盘映射.html">创建键盘映射</a>, Previous: <a href="23.2_键盘映射基础.html">键盘映射基础</a>, Up: <a href="23_键盘映射.html">键盘映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>每个键映射是一个列表，其 CAR 是符号键映射。列表的其余元素定义键映射的键绑定。功能定义为键映射的符号也是键映射。使用函数 keymapp（见下文）来测试一个对象是否是一个键盘映射。
+</p>
+<p>几种元素可能会出现在一个键映射中，在开始它的符号键映射之后：
+</p>
+<div class="lisp">
+<pre class="lisp">(type . binding)
+</pre></div>
+<p>这为类型类型的事件指定了一个绑定。每个普通绑定都适用于特定事件类型的事件，该事件类型始终是字符或符号。请参阅分类事件。在这种绑定中，绑定是一个命令。
+</p><div class="lisp">
+<pre class="lisp">(type item-name . binding)
+</pre></div>
+<p>这指定了一个绑定，它也是一个简单的菜单项，在菜单中显示为 item-name。请参阅简单菜单项。
+</p><div class="lisp">
+<pre class="lisp">(type item-name help-string . binding)
+</pre></div>
+<p>这是一个带有帮助字符串 help-string 的简单菜单项。
+</p><div class="lisp">
+<pre class="lisp">(type menu-item . details)
+</pre></div>
+<p>这指定了一个绑定，它也是一个扩展的菜单项。这允许使用其他功能。请参阅扩展菜单项。
+</p><div class="lisp">
+<pre class="lisp">(t . binding) ¶
+</pre></div>
+<p>这指定了一个默认的键绑定；  任何不受键映射其他元素绑定的事件都被赋予绑定作为其绑定。默认绑定允许键映射绑定所有可能的事件类型，而不必枚举所有事件类型。具有默认绑定的键映射完全屏蔽任何较低优先级的键映射，但显式绑定到 nil 的事件除外（见下文）。
+</p><div class="lisp">
+<pre class="lisp">char-table
+</pre></div>
+<p>如果 keymap 的元素是 char-table，则它被视为持有所有没有修饰符位的字符事件的绑定（请参阅修饰符位）：索引为 c 的元素是字符 c 的绑定。这是一种记录大量绑定的紧凑方式。具有这种字符表的键映射称为完整键映射。其他键映射称为稀疏键映射。
+</p><div class="lisp">
+<pre class="lisp">vector
+</pre></div>
+<p>这种元素类似于 char-table：索引为 c 的元素是字符 c 的绑定。由于可以以这种方式绑定的字符范围受向量大小的限制，并且向量创建为从 0 开始的所有字符代码分配空间，因此不应使用这种格式，除非创建菜单键映射（请参阅菜单键映射），其中绑定本身并不重要。
+</p><div class="lisp">
+<pre class="lisp">string ¶
+</pre></div>
+<p>除了为键指定绑定的元素外，键映射还可以将字符串作为元素。这称为整体提示字符串，可以将键盘映射用作菜单。请参阅定义菜单。
+</p><div class="lisp">
+<pre class="lisp">(keymap …)
+</pre></div>
+<p>如果一个键映射的元素本身就是一个键映射，那么它就好像这个内部键映射被内联在外部键映射中一样。这用于多重继承，例如在 make-composed-keymap 中。
+</p>
+<p>当绑定为 nil 时，它不构成定义，但它确实优先于默认绑定或父键映射中的绑定。另一方面， nil 的绑定不会覆盖优先级较低的键映射；  因此，如果本地映射提供 nil 绑定，Emacs 将使用来自全局映射的绑定。
+</p>
+<p>键映射不直接记录元字符的绑定。取而代之的是，元字符在键查找时被视为两个字符的序列，其中第一个字符是 ESC（或任何当前元前缀字符的值）。因此，键 Ma 在内部表示为 ESC a，并且它的全局绑定在 esc-map 中的 a 插槽中找到（请参阅前缀键）。
+</p>
+<p>此转换仅适用于字符，不适用于功能键或其他输入事件；  因此，M端与ESC端无关。
+</p>
+<p>这里以 Lisp 模式的本地键映射为例，一个稀疏键映射。它定义了 DEL、Cc Cz、CMq 和 CMx 的绑定（实际值还包含菜单绑定，为简洁起见，此处省略）。
+</p>
+<div class="lisp">
+<pre class="lisp">lisp-mode-map
+⇒
+
+(keymap
+ (3 keymap
+    ;; C-c C-z
+    (26 . run-lisp))
+
+ (27 keymap
+     ;; C-M-x, treated as ESC C-x
+     (24 . lisp-send-defun))
+
+ ;; This part is inherited from lisp-mode-shared-map.
+ keymap
+ ;; DEL
+ (127 . backward-delete-char-untabify)
+
+ (27 keymap
+     ;; C-M-q, treated as ESC C-q
+     (17 . indent-sexp)))
+
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: keymapp object ¶
+</pre></div>
+<p>如果 object 是 keymap，则此函数返回 t，否则返回 nil。更准确地说，此函数测试其 CAR 为 keymap 的列表，或测试其函数定义满足 keymapp 的符号。
+</p>
+<div class="lisp">
+<pre class="lisp">(keymapp '(keymap))
+    ⇒ t
+
+(fset 'foo '(keymap))
+(keymapp 'foo)
+    ⇒ t
+
+(keymapp (current-global-map))
+    ⇒ t
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="23.4_创建键盘映射.html">创建键盘映射</a>, Previous: <a href="23.2_键盘映射基础.html">键盘映射基础</a>, Up: <a href="23_键盘映射.html">键盘映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

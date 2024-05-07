@@ -1,0 +1,46 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>12.17.1 setf 宏</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">12.17.1 setf 宏</h3>
+<div class="nav-panel"><p>Next: <a href="12.17.2_定义新的_setf_形式.html">定义新的_setf_形式</a>, Previous: <a href="12.17_广义变量.html">广义变量</a>, Up: <a href="12.17_广义变量.html">广义变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>setf 宏是对广义变量进行操作的最基本方法。setf 形式类似于 setq，不同之处在于它接受左侧的任意位置形式而不仅仅是符号。例如，(setf (car a) b) 将 a 的汽车设置为 b，执行与 (setcar ab) 相同的操作，但您不必使用两个单独的函数来设置和访问此类地点。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: setf [place form]… ¶
+</pre></div>
+<p>此宏评估表单并将其存储在适当的位置，它必须是有效的广义变量形式。如果有多个位置和形式对，则分配按顺序完成，就像 setq 一样。setf 返回最后一个表单的值。 
+</p>
+<p>以下 Lisp 形式是 Emacs 中将用作广义变量的形式，因此可能出现在 setf 的 place 参数中：
+</p>
+<p>一个符号。换句话说，(setf xy) 完全等价于 (setq xy)，并且 setq 本身严格来说是冗余的，因为 setf 存在。然而，出于风格和历史原因，大多数程序员将继续更喜欢 setq 来设置简单的变量。宏 (setf xy) 实际上扩展为 (setq xy)，因此在编译代码中使用它不会降低性能。
+</p>
+<p>对以下任何标准 Lisp 函数的调用：
+</p><div class="lisp">
+<pre class="lisp">aref      cddr      symbol-function
+car       elt       symbol-plist
+caar      get       symbol-value
+cadr      gethash
+cdr       nth
+cdar      nthcdr
+</pre></div>
+<p>对以下任何 Emacs 特定函数的调用：
+</p>
+<div class="lisp">
+<pre class="lisp">alist-get                     process-get
+frame-parameter               process-sentinel
+terminal-parameter            window-buffer
+keymap-parent                 window-display-table
+match-data                    window-dedicated-p
+overlay-get                   window-hscroll
+overlay-start                 window-parameter
+overlay-end                   window-point
+process-buffer                window-start
+process-filter                default-value
+</pre></div>
+<p>如果您传递一个它不知道如何处理的地方表单，setf 会发出错误信号。
+</p>
+<p>请注意，对于 nthcdr，函数的列表参数本身必须是有效的位置形式。例如， (setf (nthcdr 0 foo) 7) 会将 foo 本身设置为 7。
+</p>
+<p>宏 push（参见修改列表变量）和 pop（参见访问列表元素）可以操作广义变量，而不仅仅是列表。(pop place) 删除并返回存储在原地的列表的第一个元素。它类似于 (prog1 (car place) (setf place (cdr place)))，只是它只需要对所有子表单进行一次评估。(push x place) 在原地存储的列表的前面插入 x。它类似于 (setf place (cons x place))，除了对子表单的评估。请注意，在 nthcdr 位置上的 push 和 pop 可用于在列表中的任何位置插入或删除。
+</p>
+<p>cl-lib 库为通用变量定义了各种扩展，包括额外的 setf 位置。请参阅 Common Lisp 扩展中的广义变量。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="12.17.2_定义新的_setf_形式.html">定义新的_setf_形式</a>, Previous: <a href="12.17_广义变量.html">广义变量</a>, Up: <a href="12.17_广义变量.html">广义变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

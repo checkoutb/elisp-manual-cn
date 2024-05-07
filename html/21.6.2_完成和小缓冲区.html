@@ -1,0 +1,62 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>21.6.2 完成和小缓冲区</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">21.6.2 完成和小缓冲区</h3>
+<div class="nav-panel"><p>Next: <a href="21.6.3_完成完成的_Minibuffer_命令.html">完成完成的_Minibuffer_命令</a>, Previous: <a href="21.6.1_基本完成函数.html">基本完成函数</a>, Up: <a href="21.6_完成.html">完成.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节描述了从 minibuffer 中读取并完成的基本接口。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: completing-read prompt collection &amp;optional predicate require-match initial history default inherit-input-method ¶
+</pre></div>
+<p>此函数读取 minibuffer 中的字符串，通过提供完成来帮助用户。它使用提示符激活 minibuffer，提示符必须是一个字符串。
+</p>
+<p>实际完成是通过将完成表集合和完成谓词谓词传递给函数 try-completion 来完成的（请参阅基本完成函数）。这发生在用于完成的本地键盘映射中绑定的某些命令中。其中一些命令也称为测试完成。因此，如果谓词非零，它应该与集合和完成忽略情况兼容。请参阅测试完成的定义。
+</p>
+<p>有关收集是函数时的详细要求，请参阅程序化完成。
+</p>
+<p>可选参数 require-match 的值决定了用户如何退出 minibuffer：
+</p>
+<p>如果为 nil，则无论 minibuffer 中的输入如何，通常的 minibuffer exit 命令都会起作用。
+如果 t，通常的 minibuffer 退出命令将不会退出，除非输入完成到集合元素。
+如果确认，用户可以使用任何输入退出，但如果输入不是集合元素，则要求确认。
+如果confirm-after-completion，用户可以使用任何输入退出，但如果前面的命令是完成命令（即minibuffer-confirm-exit-commands中的命令之一）并且结果输入不是，则要求确认收藏的一个元素。请参阅完成完成的 Minibuffer 命令。
+require-match 的任何其他值的行为都类似于 t，除了 exit 命令在执行完成时不会退出。
+</p>
+<p>但是，无论 require-match 的值如何，始终允许空输入；  在这种情况下，如果它是一个列表，则完成读取返回默认的第一个元素；  ""，如果默认为 nil；  或默认。用户也可以通过历史命令使用默认的一个或多个字符串。
+</p>
+<p>如果 require-match 为 nil，则函数 completed-read 使用 minibuffer-local-completion-map 作为键映射，如果 require-match 为非 nil，则使用 minibuffer-local-must-match-map。请参阅完成完成的 Minibuffer 命令。
+</p>
+<p>参数 history 指定用于保存输入和 minibuffer 历史命令的历史列表变量。它默认为 minibuffer-history。如果历史是符号 t，则不记录历史。请参阅小缓冲区历史记录。
+</p>
+<p>参数 initial 大多已被弃用；  我们建议仅在为历史指定 cons 单元格的同时使用非 nil 值。请参阅初始输入。对于默认输入，请改用默认值。
+</p>
+<p>如果参数inherit-input-method 不为nil，那么minibuffer 会继承当前输入法（参见Input Methods）和enable-multibyte-characters 的设置（参见Text Representations）从进入minibuffer 之前的当前缓冲区。
+</p>
+<p>如果变量completion-ignore-case 不为nil，则在将输入与可能的匹配项进行比较时，完成会忽略大小写。请参阅基本完成功能。在这种操作模式下，谓词也必须忽略大小写，否则你会得到令人惊讶的结果。
+</p>
+<p>以下是使用完成读取的示例：
+</p>
+<div class="lisp">
+<pre class="lisp">
+
+(completing-read
+ "Complete a foo: "
+ '(("foobar1" 1) ("barfoo" 2) ("foobaz" 3) ("foobar2" 4))
+ nil t "fo")
+
+
+;; After evaluation of the preceding expression,
+;;   the following appears in the minibuffer:
+
+---------- Buffer: Minibuffer ----------
+Complete a foo: fo∗
+---------- Buffer: Minibuffer ----------
+</pre></div>
+<p>如果用户随后键入 DEL DEL b RET，则完成读取返回 barfoo。
+</p>
+<p>完成读取函数绑定变量以将信息传递给实际完成的命令。它们在下一节中描述。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: completing-read-function ¶
+</pre></div>
+<p>这个变量的值必须是一个函数，通过完成读取调用它来实际完成它的工作。它应该接受与完成读取相同的参数。这可以绑定到不同的函数以完全覆盖完成读取的正常行为。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="21.6.3_完成完成的_Minibuffer_命令.html">完成完成的_Minibuffer_命令</a>, Previous: <a href="21.6.1_基本完成函数.html">基本完成函数</a>, Up: <a href="21.6_完成.html">完成.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

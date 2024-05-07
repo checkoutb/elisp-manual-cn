@@ -1,0 +1,15 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.12 面</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">40.12 面</h2>
+<div class="nav-panel"><p>Next: <a href="40.12.1_面属性.html">面属性</a>, Previous: <a href="40.11_行高.html">行高</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>面是用于显示文本的图形属性的集合：字体、前景色、背景色、可选的下划线等。面控制 Emacs 如何在缓冲区中显示文本，以及框架的其他部分，例如模式行。
+</p>
+<p>表示面的一种方法是作为属性的属性列表，例如 (:foreground "red" :weight bold)。这样的列表称为匿名面。例如，您可以指定一个匿名面作为面文本属性的值，Emacs 将显示具有指定属性的底层文本。请参阅具有特殊含义的属性。
+</p>
+<p>更常见的是，通过面名称来引用面：与一组面属性相关联的 Lisp 符号24。命名面是使用 defface 宏定义的（请参阅定义面）。Emacs 带有几个标准的命名面（请参阅基本面）。
+</p>
+<p>Emacs 的某些部分需要命名面（例如，面属性函数中记录的函数）。除非另有说明，否则我们将使用术语 <code>面</code> 来指代已命名的面。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: facep object ¶
+</pre></div>
+<p>如果对象是一个命名的面，这个函数返回一个非零值：一个 Lisp 符号或字符串，用作面名。否则，它返回零。
+</p>
+<div class="nav-panel"><p>Next: <a href="40.12.1_面属性.html">面属性</a>, Previous: <a href="40.11_行高.html">行高</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

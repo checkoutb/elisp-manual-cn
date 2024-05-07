@@ -1,0 +1,55 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>41.1.2 初始化文件</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">41.1.2 初始化文件</h3>
+<div class="nav-panel"><p>Next: <a href="41.1.3_终端特定初始化.html">终端特定初始化</a>, Previous: <a href="41.1.1_小结：启动时的动作顺序.html">小结：启动时的动作顺序</a>, Up: <a href="41.1_启动_Emacs.html">启动_Emacs.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当您启动 Emacs 时，它通常会尝试加载您的 init 文件。这可以是主目录中名为 .emacs 或 .emacs.el 的文件，或者是主目录中名为 .emacs.d 的子目录中名为 init.el 的文件。
+</p>
+<p>命令行开关 <code>-q</code> 、 <code>-Q</code> 和 <code>-u</code> 控制是否以及在哪里找到初始化文件；  ’-q’（和更强的’-Q’）表示不加载init文件，而’-u user’表示加载用户的init文件而不是你的。请参阅 GNU Emacs 手册中的输入 Emacs。如果两个选项都没有指定，Emacs 使用 LOGNAME 环境变量，或者 USER（大多数系统）或 USERNAME（MS 系统）变量来查找你的主目录，从而找到你的 init 文件；  这样，即使你有 su’d，Emacs 仍然会加载你自己的 init 文件。但是，如果没有这些环境变量，Emacs 会使用您的用户 ID 来查找您的主目录。
+</p>
+<p>Emacs 还尝试加载第二个 init 文件，称为 early init 文件（如果存在）。这是 ~/.emacs.d 目录中名为 early-init.el 的文件。early init 文件和常规 init 文件的区别在于，early init 文件在启动过程中加载得更早，因此您可以使用它来自定义一些在加载常规 init 文件之前初始化的东西。例如，您可以通过设置 package-load-list 或 package-enable-at-startup 等变量来自定义初始化包系统的过程。请参阅 GNU Emacs 手册中的软件包安装。
+</p>
+<p>Emacs 安装可能有一个默认的 init 文件，它是一个名为 default.el 的 Lisp 库。Emacs 通过库的标准搜索路径找到这个文件（参见程序如何加载）。Emacs 发行版不附带此文件；  它用于本地定制。如果默认的 init 文件存在，它会在您启动 Emacs 时加载。但是你自己的个人初始化文件，如果有的话，首先被加载；  如果它将禁止默认初始化设置为非零值，则 Emacs 不会随后加载 default.el 文件。在批处理模式下，或者如果您指定 <code>-q</code> （或 <code>-Q</code> ），Emacs 既不会加载您的个人 init 文件，也不会加载默认的 init 文件。
+</p>
+<p>站点定制的另一个文件是 site-start.el。Emacs 在用户的 init 文件之前加载它。您可以使用选项 <code>--no-site-file</code> 来禁止加载此文件。
+</p>
+<p>用户选项：站点运行文件¶
+</p>
+<p>此变量指定要在用户的 init 文件之前加载的站点自定义文件。它的正常值为 <code>site-start</code> 。您可以真正改变它的唯一方法是在转储 Emacs 之前这样做。
+</p>
+<p>有关如何在 .emacs 文件中进行各种常用自定义的示例，请参阅 GNU Emacs 手册中的初始化文件示例。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: site-run-file ¶
+</pre></div>
+<p>如果这个变量不是 nil，它会阻止 Emacs 加载默认的初始化库文件。默认值为无。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: inhibit-default-init ¶
+</pre></div>
+<p>在加载所有初始化文件（site-start.el、您的初始化文件和 default.el）之前，这个正常的钩子会运行一次。（真正改变它的唯一方法是在转储 Emacs 之前。）
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: before-init-hook ¶
+</pre></div>
+<p>这个正常的钩子运行一次，在加载所有初始化文件（site-start.el、你的初始化文件和 default.el）之后，在加载特定于终端的库（如果在文本终端上启动）和处理命令行操作参数。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: after-init-hook ¶
+</pre></div>
+<p>这个普通的钩子在处理命令行参数之后运行一次。在批处理模式下，Emacs 不会运行这个钩子。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: emacs-startup-hook ¶
+</pre></div>
+<p>这个普通的钩子与 emacs-startup-hook 非常相似。唯一的区别是它在设置帧参数之后运行稍晚一些。请参阅窗口设置挂钩。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: window-setup-hook ¶
+</pre></div>
+<p>此变量保存用户初始化文件的绝对文件名。如果实际加载的 init 文件是编译文件，如 .emacs.elc，则该值是指对应的源文件。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: user-init-file ¶
+</pre></div>
+<p>此变量保存 Emacs 默认目录的名称。如果该目录存在并且 ~/.emacs.d/ 和 ~/.emacs 不存在，则默认为 {XDG<em>_CONFIG</em><em>_HOME</em>-’~/.config’} 代表环境变量 XDG<em>_CONFIG</em><em>_HOME</em> 的值（如果设置了该变量），否则代表 ~/.config。请参阅 GNU Emacs 手册中的 Emacs 如何找到您的初始化文件。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="41.1.3_终端特定初始化.html">终端特定初始化</a>, Previous: <a href="41.1.1_小结：启动时的动作顺序.html">小结：启动时的动作顺序</a>, Up: <a href="41.1_启动_Emacs.html">启动_Emacs.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

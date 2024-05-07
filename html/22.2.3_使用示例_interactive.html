@@ -1,0 +1,44 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.2.3 使用示例 interactive</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">22.2.3 使用示例 interactive</h3>
+<div class="nav-panel"><p>Next: <a href="22.2.4_指定命令模式.html">指定命令模式</a>, Previous: <a href="22.2.2_代码字符_interactive.html">代码字符_interactive</a>, Up: <a href="22.2_定义命令.html">定义命令.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>以下是一些交互式示例：
+</p><div class="lisp">
+<pre class="lisp">(defun foo1 ()              ; foo1 takes no arguments,
+    (interactive)           ;   just moves forward two words.
+    (forward-word 2))
+     ⇒ foo1
+
+
+(defun foo2 (n)             ; foo2 takes one argument,
+    (interactive "^p")      ;   which is the numeric prefix.
+                            ; under shift-select-mode,
+                            ;   will activate or extend region.
+    (forward-word (* 2 n)))
+     ⇒ foo2
+
+
+(defun foo3 (n)             ; foo3 takes one argument,
+    (interactive "nCount:") ;   which is read with the Minibuffer.
+    (forward-word (* 2 n)))
+     ⇒ foo3
+
+
+(defun three-b (b1 b2 b3)
+  "Select three existing buffers.
+Put them into three windows, selecting the last one."
+
+    (interactive "bBuffer1:\nbBuffer2:\nbBuffer3:")
+    (delete-other-windows)
+    (split-window (selected-window) 8)
+    (switch-to-buffer b1)
+    (other-window 1)
+    (split-window (selected-window) 8)
+    (switch-to-buffer b2)
+    (other-window 1)
+    (switch-to-buffer b3))
+     ⇒ three-b
+
+(three-b "*scratch*" "declarations.texi" "*mail*")
+     ⇒ nil
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.2.4_指定命令模式.html">指定命令模式</a>, Previous: <a href="22.2.2_代码字符_interactive.html">代码字符_interactive</a>, Up: <a href="22.2_定义命令.html">定义命令.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

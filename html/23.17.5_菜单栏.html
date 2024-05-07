@@ -1,0 +1,52 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>23.17.5 菜单栏</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">23.17.5 菜单栏</h3>
+<div class="nav-panel"><p>Next: <a href="23.17.6_工具栏.html">工具栏</a>, Previous: <a href="23.17.4_菜单示例.html">菜单示例</a>, Up: <a href="23.17_菜单键映射.html">菜单键映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 通常在每一帧的顶部显示一个菜单栏。请参阅 GNU Emacs 手册中的菜单栏。菜单栏项目是假功能键 MENU-BAR 的子命令，如活动键盘映射中所定义。
+</p>
+<p>要将项目添加到菜单栏，请发明一个您自己的假功能键（我们称之为键），并为键序列 [菜单栏键] 进行绑定。大多数情况下，绑定是菜单键映射，因此按下菜单栏项上的按钮会导致另一个菜单。
+</p>
+<p>当多个活动键盘映射为菜单栏定义相同的功能键时，该项目只出现一次。如果用户单击该菜单栏项，它会弹出一个组合菜单，其中包含该项的所有子命令——全局子命令、本地子命令和次要模式子命令。
+</p>
+<p>在确定菜单栏内容时，变量overriding-local-map 通常会被忽略。也就是说，如果 overriding-local-map 为 nil，则菜单栏是根据将处于活动状态的键映射计算出来的。请参阅活动键盘映射。
+</p>
+<p>这是设置菜单栏项的示例：
+</p><div class="lisp">
+<pre class="lisp">
+
+;; Make a menu keymap (with a prompt string)
+;; and make it the menu bar item’s definition.
+(define-key global-map [menu-bar words]
+  (cons "Words" (make-sparse-keymap "Words")))
+
+
+;; Define specific subcommands in this menu.
+(define-key global-map
+  [menu-bar words forward]
+  '("Forward word" . forward-word))
+
+(define-key global-map
+  [menu-bar words backward]
+  '("Backward word" . backward-word))
+</pre></div>
+<p>本地键映射可以取消由全局键映射创建的菜单栏项，方法是重新绑定具有 undefined 作为绑定的相同假功能键。例如，这是 Dired 抑制 <code>编辑</code> 菜单栏项的方式：
+</p>
+<div class="lisp">
+<pre class="lisp">(define-key dired-mode-map [menu-bar edit] 'undefined)
+</pre></div>
+<p>在这里，edit 是由假功能键产生的符号，它被全局映射用于 <code>编辑</code> 菜单栏项。抑制全局菜单栏项的主要原因是为特定于模式的项重新获得空间。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: menu-bar-final-items ¶
+</pre></div>
+<p>通常，菜单栏会显示全局项目，然后是本地地图定义的项目。
+</p>
+<p>这个变量保存了一个伪功能键列表，用于显示在菜单栏末尾而不是按正常顺序显示的项目。默认值为（帮助菜单）；  因此， <code>帮助</code> 菜单项通常出现在菜单栏的末尾，位于本地菜单项之后。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: menu-bar-update-hook ¶
+</pre></div>
+<p>在重新显示菜单栏之前，此正常挂钩由重新显示运行以更新菜单栏内容。您可以使用它来更新内容应该不同的菜单。由于这个钩子经常运行，我们建议您确保它调用的函数在通常情况下不会花费太多时间。
+</p>
+<p>在每个菜单栏项旁边，Emacs 会显示一个运行相同命令的键绑定（如果存在这样的键绑定）。这为不知道键绑定的用户提供了方便的提示。如果一个命令有多个绑定，Emacs 通常会显示它找到的第一个。您可以通过将 :advertised-binding 符号属性分配给命令来指定一个特定的键绑定。请参阅替换文档中的键绑定。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="23.17.6_工具栏.html">工具栏</a>, Previous: <a href="23.17.4_菜单示例.html">菜单示例</a>, Up: <a href="23.17_菜单键映射.html">菜单键映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,435 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>附录 H 标准钩子</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h1 class="chapter">附录 H 标准钩子</h1>
+<div class="nav-panel"><p>Next: <a href="00_content.htm">conten</a>, Previous: <a href="附录_G_标准键盘映射.html">G_标准键盘映射</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>以下是一些钩子变量的列表，这些变量让您可以在适当的情况下提供从 Emacs 中调用的函数。
+</p>
+<p>大多数这些变量的名称都以 <code>-hook</code> 结尾。它们是普通的钩子，通过 run-hooks 运行。这种钩子的值是一个函数列表；  这些函数在没有参数的情况下被调用，并且它们的值被完全忽略。在这种钩子上放置新函数的推荐方法是调用 add-hook。有关使用钩子的更多信息，请参阅钩子。
+</p>
+<p>名称以 <code>-functions</code> 结尾的变量通常是异常钩子（一些旧代码也可能使用已弃用的 <code>-hooks</code> 后缀）。它们的值是函数列表，但这些函数以特殊方式调用：它们要么是传递的参数，要么以某种方式使用它们的返回值。名称以 <code>-function</code> 结尾的变量具有单个函数作为它们的值。
+</p>
+<p>这不是一个详尽的列表，它只涵盖了更一般的钩子。例如，每个主要模式都定义了一个名为 <code>modename-mode-hook</code> 的钩子。主模式命令使用 run-mode-hooks 作为它执行的最后一件事来运行这个普通的钩子。请参阅模式钩子。大多数次要模式也有模式钩子。
+</p>
+<p>一项特殊功能允许您指定表达式以评估是否以及何时加载文件（请参阅加载钩子）。该功能不完全是一个钩子，但做了类似的工作。
+</p>
+<div class="lisp">
+<pre class="lisp">activate-mark-hook
+</pre></div>
+<div class="lisp">
+<pre class="lisp">deactivate-mark-hook
+</pre></div>
+<p>见标记。
+</p><div class="lisp">
+<pre class="lisp">after-change-functions
+</pre></div>
+<div class="lisp">
+<pre class="lisp">before-change-functions
+</pre></div>
+<div class="lisp">
+<pre class="lisp">first-change-hook
+</pre></div>
+<p>请参阅更改钩子。
+</p><div class="lisp">
+<pre class="lisp">after-change-major-mode-hook
+</pre></div>
+<div class="lisp">
+<pre class="lisp">change-major-mode-after-body-hook
+</pre></div>
+<p>请参阅模式钩子。
+</p><div class="lisp">
+<pre class="lisp">after-init-hook
+</pre></div>
+<div class="lisp">
+<pre class="lisp">before-init-hook
+</pre></div>
+<div class="lisp">
+<pre class="lisp">emacs-startup-hook
+</pre></div>
+<div class="lisp">
+<pre class="lisp">window-setup-hook
+</pre></div>
+<p>请参阅初始化文件。
+</p><div class="lisp">
+<pre class="lisp">after-insert-file-functions
+</pre></div>
+<div class="lisp">
+<pre class="lisp">write-region-annotate-functions
+</pre></div>
+<div class="lisp">
+<pre class="lisp">write-region-post-annotation-function
+</pre></div>
+<p>请参阅文件格式转换。
+</p><div class="lisp">
+<pre class="lisp">after-make-frame-functions
+</pre></div>
+<div class="lisp">
+<pre class="lisp">before-make-frame-hook
+</pre></div>
+<div class="lisp">
+<pre class="lisp">server-after-make-frame-hook
+</pre></div>
+<p>请参阅创建框架。
+</p><div class="lisp">
+<pre class="lisp">after-save-hook
+</pre></div>
+<div class="lisp">
+<pre class="lisp">before-save-hook
+</pre></div>
+<div class="lisp">
+<pre class="lisp">write-contents-functions
+</pre></div>
+<div class="lisp">
+<pre class="lisp">write-file-functions
+</pre></div>
+<p>请参阅保存缓冲区。
+</p><div class="lisp">
+<pre class="lisp">after-setting-font-hook ¶
+</pre></div>
+<p>框架字体更改后的钩子运行。
+</p><div class="lisp">
+<pre class="lisp">auto-save-hook
+</pre></div>
+<p>请参阅自动保存。
+</p><div class="lisp">
+<pre class="lisp">before-hack-local-variables-hook
+</pre></div>
+<div class="lisp">
+<pre class="lisp">hack-local-variables-hook
+</pre></div>
+<p>请参阅文件局部变量。
+</p><div class="lisp">
+<pre class="lisp">buffer-access-fontify-functions
+</pre></div>
+<p>请参阅文本属性的延迟计算。
+</p><div class="lisp">
+<pre class="lisp">buffer-list-update-hook ¶
+</pre></div>
+<p>当缓冲区列表更改时钩子运行（请参阅缓冲区列表）。
+</p><div class="lisp">
+<pre class="lisp">buffer-quit-function ¶
+</pre></div>
+<p>调用以退出当前缓冲区的函数。
+</p><div class="lisp">
+<pre class="lisp">change-major-mode-hook
+</pre></div>
+<p>请参阅创建和删除缓冲区本地绑定。
+</p><div class="lisp">
+<pre class="lisp">comint-password-function
+</pre></div>
+<p>这个异常钩子允许派生模式在不提示用户的情况下为底层命令解释器提供密码。
+</p><div class="lisp">
+<pre class="lisp">command-line-functions
+</pre></div>
+<p>请参阅命令行参数。
+</p><div class="lisp">
+<pre class="lisp">delayed-warnings-hook ¶
+</pre></div>
+<p>命令循环在 post-command-hook (qv) 后不久运行。
+</p><div class="lisp">
+<pre class="lisp">focus-in-hook ¶
+</pre></div>
+<div class="lisp">
+<pre class="lisp">focus-out-hook
+</pre></div>
+<p>请参阅输入焦点。
+</p><div class="lisp">
+<pre class="lisp">delete-frame-functions
+</pre></div>
+<div class="lisp">
+<pre class="lisp">after-delete-frame-functions
+</pre></div>
+<p>请参阅删除框架。
+</p><div class="lisp">
+<pre class="lisp">delete-terminal-functions
+</pre></div>
+<p>请参阅多个终端。
+</p><div class="lisp">
+<pre class="lisp">pop-up-frame-function
+</pre></div>
+<div class="lisp">
+<pre class="lisp">split-window-preferred-function
+</pre></div>
+<p>请参阅显示缓冲区的其他选项。
+</p><div class="lisp">
+<pre class="lisp">echo-area-clear-hook
+</pre></div>
+<p>请参阅回声区域自定义。
+</p><div class="lisp">
+<pre class="lisp">find-file-hook
+</pre></div>
+<div class="lisp">
+<pre class="lisp">find-file-not-found-functions
+</pre></div>
+<p>请参阅访问文件的函数。
+</p><div class="lisp">
+<pre class="lisp">font-lock-extend-after-change-region-function
+</pre></div>
+<p>请参阅缓冲区更改后要字体化的区域。
+</p><div class="lisp">
+<pre class="lisp">font-lock-extend-region-functions
+</pre></div>
+<p>请参阅多行字体锁定结构。
+</p><div class="lisp">
+<pre class="lisp">font-lock-fontify-buffer-function
+</pre></div>
+<div class="lisp">
+<pre class="lisp">font-lock-fontify-region-function
+</pre></div>
+<div class="lisp">
+<pre class="lisp">font-lock-mark-block-function
+</pre></div>
+<div class="lisp">
+<pre class="lisp">font-lock-unfontify-buffer-function
+</pre></div>
+<div class="lisp">
+<pre class="lisp">font-lock-unfontify-region-function
+</pre></div>
+<p>请参阅其他字体锁定变量。
+</p><div class="lisp">
+<pre class="lisp">fontification-functions
+</pre></div>
+<p>请参阅自动面分配。
+</p><div class="lisp">
+<pre class="lisp">frame-auto-hide-function
+</pre></div>
+<p>请参阅退出 Windows。
+</p><div class="lisp">
+<pre class="lisp">quit-window-hook
+</pre></div>
+<p>请参阅退出 Windows。
+</p><div class="lisp">
+<pre class="lisp">kill-buffer-hook
+</pre></div>
+<div class="lisp">
+<pre class="lisp">kill-buffer-query-functions
+</pre></div>
+<p>请参阅杀死缓冲区。
+</p><div class="lisp">
+<pre class="lisp">kill-emacs-hook
+</pre></div>
+<div class="lisp">
+<pre class="lisp">kill-emacs-query-functions
+</pre></div>
+<p>请参阅杀死 Emacs。
+</p><div class="lisp">
+<pre class="lisp">menu-bar-update-hook
+</pre></div>
+<p>请参阅菜单栏。
+</p><div class="lisp">
+<pre class="lisp">minibuffer-setup-hook
+</pre></div>
+<div class="lisp">
+<pre class="lisp">minibuffer-exit-hook
+</pre></div>
+<p>请参阅 Minibuffer Miscellany。
+</p><div class="lisp">
+<pre class="lisp">mouse-leave-buffer-hook ¶
+</pre></div>
+<p>当用户在窗口中单击鼠标时钩子运行。
+</p><div class="lisp">
+<pre class="lisp">mouse-position-function
+</pre></div>
+<p>请参阅鼠标位置。
+</p><div class="lisp">
+<pre class="lisp">prefix-command-echo-keystrokes-functions ¶
+</pre></div>
+<p>由前缀命令（例如 Cu）运行的异常钩子，它应该返回描述当前前缀状态的字符串。例如，Cu 产生 <code>Cu-</code> 和 <code>Cu 1 2 3-</code> 。每个钩子函数都在没有参数的情况下被调用，并且应该返回一个描述当前前缀状态的字符串，如果没有前缀状态，则返回 nil。请参阅前缀命令参数。
+</p><div class="lisp">
+<pre class="lisp">prefix-command-preserve-state-hook ¶
+</pre></div>
+<p>当前缀命令需要通过将当前前缀命令状态传递给下一个命令来保留前缀时，钩子运行。例如，当用户键入 Cu 时，Cu 需要将状态传递给下一个命令 - 或者在 Cu 后面跟一个数字。
+</p><div class="lisp">
+<pre class="lisp">pre-redisplay-functions
+</pre></div>
+<p>在重新显示之前在每个窗口中运行钩子。请参阅强制重新显示。
+</p><div class="lisp">
+<pre class="lisp">post-command-hook
+</pre></div>
+<div class="lisp">
+<pre class="lisp">pre-command-hook
+</pre></div>
+<p>请参阅命令循环概述。
+</p><div class="lisp">
+<pre class="lisp">post-gc-hook
+</pre></div>
+<p>请参阅垃圾收集。
+</p><div class="lisp">
+<pre class="lisp">post-self-insert-hook
+</pre></div>
+<p>请参阅键盘映射和次要模式。
+</p><div class="lisp">
+<pre class="lisp">suspend-hook
+</pre></div>
+<div class="lisp">
+<pre class="lisp">suspend-resume-hook
+</pre></div>
+<div class="lisp">
+<pre class="lisp">suspend-tty-functions
+</pre></div>
+<div class="lisp">
+<pre class="lisp">resume-tty-functions
+</pre></div>
+<p>请参阅暂停 Emacs。
+</p><div class="lisp">
+<pre class="lisp">syntax-begin-function
+</pre></div>
+<div class="lisp">
+<pre class="lisp">syntax-propertize-extend-region-functions
+</pre></div>
+<div class="lisp">
+<pre class="lisp">syntax-propertize-function
+</pre></div>
+<div class="lisp">
+<pre class="lisp">font-lock-syntactic-face-function
+</pre></div>
+<p>请参阅语法字体锁定。请参阅语法属性。
+</p><div class="lisp">
+<pre class="lisp">temp-buffer-setup-hook
+</pre></div>
+<div class="lisp">
+<pre class="lisp">temp-buffer-show-function
+</pre></div>
+<div class="lisp">
+<pre class="lisp">temp-buffer-show-hook
+</pre></div>
+<p>请参阅临时展示。
+</p><div class="lisp">
+<pre class="lisp">tty-setup-hook
+</pre></div>
+<p>请参阅特定于终端的初始化。
+</p><div class="lisp">
+<pre class="lisp">window-configuration-change-hook
+</pre></div>
+<div class="lisp">
+<pre class="lisp">window-scroll-functions
+</pre></div>
+<div class="lisp">
+<pre class="lisp">window-size-change-functions
+</pre></div>
+<p>请参阅用于窗口滚动和更改的钩子。
+</p>
+<hr size="6"/>
+<a name="SEC_Contents"></a>
+<table border="0" cellpadding="1" cellspacing="1" class="header">
+<tr><td align="left" valign="middle">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
+<td align="left" valign="middle">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td align="left" valign="middle">[Index]</td>
+<td align="left" valign="middle">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h1>Table of Contents</h1>
+<div class="contents">
+<ul class="no-bullet">
+<li><a href="#g_t_9644_5f55-H-_6807_51c6_94a9_5b50" name="toc-Fu-Lu--H-Biao-Zhun-Gou-Zi-">1 附录 H 标准钩子</a></li>
+</ul>
+</div>
+<hr/>
+<a name="SEC_About"></a>
+<table border="0" cellpadding="1" cellspacing="1" class="header">
+<tr><td align="left" valign="middle">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
+<td align="left" valign="middle">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td align="left" valign="middle">[Index]</td>
+<td align="left" valign="middle">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h1>About This Document</h1>
+<p>
+  This document was generated on <i>May 7, 2024</i> using <a href="http://www.nongnu.org/texi2html/"><i>texi2html 5.0</i></a>.
+</p>
+<p>
+  The buttons in the navigation panels have the following meaning:
+</p>
+<table border="1">
+<tr>
+<th> Button </th>
+<th> Name </th>
+<th> Go to </th>
+<th> From 1.2.3 go to</th>
+</tr>
+<tr>
+<td align="center"> [ &lt;&lt; ] </td>
+<td align="center">FastBack</td>
+<td>Beginning of this chapter or previous chapter</td>
+<td>1</td>
+</tr>
+<tr>
+<td align="center"> [ &lt; ] </td>
+<td align="center">Back</td>
+<td>Previous section in reading order</td>
+<td>1.2.2</td>
+</tr>
+<tr>
+<td align="center"> [ Up ] </td>
+<td align="center">Up</td>
+<td>Up section</td>
+<td>1.2</td>
+</tr>
+<tr>
+<td align="center"> [ &gt; ] </td>
+<td align="center">Forward</td>
+<td>Next section in reading order</td>
+<td>1.2.4</td>
+</tr>
+<tr>
+<td align="center"> [ &gt;&gt; ] </td>
+<td align="center">FastForward</td>
+<td>Next chapter</td>
+<td>2</td>
+</tr>
+<tr>
+<td align="center"> [Top] </td>
+<td align="center">Top</td>
+<td>Cover (top) of document</td>
+<td>   </td>
+</tr>
+<tr>
+<td align="center"> [Contents] </td>
+<td align="center">Contents</td>
+<td>Table of contents</td>
+<td>   </td>
+</tr>
+<tr>
+<td align="center"> [Index] </td>
+<td align="center">Index</td>
+<td>Index</td>
+<td>   </td>
+</tr>
+<tr>
+<td align="center"> [ ? ] </td>
+<td align="center">About</td>
+<td>About (help)</td>
+<td>   </td>
+</tr>
+</table>
+<p>
+  where the <strong> Example </strong> assumes that the current position is at <strong> Subsubsection One-Two-Three </strong> of a document of the following structure:
+</p>
+<ul>
+<li> 1. Section One
+    <ul>
+<li>1.1 Subsection One-One
+        <ul>
+<li>...</li>
+</ul>
+</li>
+<li>1.2 Subsection One-Two
+        <ul>
+<li>1.2.1 Subsubsection One-Two-One</li>
+<li>1.2.2 Subsubsection One-Two-Two</li>
+<li>1.2.3 Subsubsection One-Two-Three    
+            <strong>&lt;== Current Position </strong></li>
+<li>1.2.4 Subsubsection One-Two-Four</li>
+</ul>
+</li>
+<li>1.3 Subsection One-Three
+        <ul>
+<li>...</li>
+</ul>
+</li>
+<li>1.4 Subsection One-Four</li>
+</ul>
+</li>
+</ul>
+<hr/>
+<p>
+<font size="-1">
+  This document was generated on <i>May 7, 2024</i> using <a href="http://www.nongnu.org/texi2html/"><i>texi2html 5.0</i></a>.
+ </font>
+<br/>
+</p>
+<div class="nav-panel"><p>Next: <a href="00_content.htm">conten</a>, Previous: <a href="附录_G_标准键盘映射.html">G_标准键盘映射</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>16.3 库搜索</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">16.3 库搜索</h2>
+<div class="nav-panel"><p>Next: <a href="16.4_加载非_ASCII_字符.html">加载非_ASCII_字符</a>, Previous: <a href="16.2_加载后缀.html">加载后缀</a>, Up: <a href="16_加载.html">加载.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当 Emacs 加载 Lisp 库时，它会在由变量 load-path 指定的目录列表中搜索该库。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: load-path ¶
+</pre></div>
+<p>此变量的值是加载文件时要搜索的目录列表。每个元素都是一个字符串（必须是目录）或 nil（代表当前工作目录）。
+</p>
+<p>当 Emacs 启动时，它会分几步设置 load-path 的值。首先，它使用编译 Emacs 时设置的默认位置初始化加载路径。通常，这是一个类似的目录
+</p>
+<div class="lisp">
+<pre class="lisp">"/usr/local/share/emacs/version/lisp"
+</pre></div>
+<p>（在本示例和以下示例中，将 /usr/local 替换为适合您的 Emacs 的安装前缀。）这些目录包含 Emacs 附带的标准 Lisp 文件。如果 Emacs 找不到它们，它将无法正确启动。
+</p>
+<p>如果您从构建 Emacs 的目录（即尚未正式安装的可执行文件）运行 Emacs，则 Emacs 会使用包含构建源的目录中的 lisp 目录来初始化 load-path。如果您在与源代码不同的目录中构建 Emacs，它还会从构建目录中添加 lisp 目录。（在所有情况下，元素都表示为绝对文件名。）
+</p>
+<p>除非您使用 –no-site-lisp 选项启动 Emacs，否则它会在 load-path 的前面添加另外两个 site-lisp 目录。这些适用于本地安装的 Lisp 文件，通常采用以下形式：
+</p>
+<div class="lisp">
+<pre class="lisp">"/usr/local/share/emacs/version/site-lisp"
+</pre></div>
+<p>和
+</p><div class="lisp">
+<pre class="lisp">"/usr/local/share/emacs/site-lisp"
+</pre></div>
+<p>第一个是针对特定 Emacs 版本的本地安装文件；  第二个是本地安装的文件，用于所有已安装的 Emacs 版本。（如果 Emacs 正在卸载运行，它还会从源目录和构建目录中添加 site-lisp 目录，如果它们存在的话。通常这些目录不包含 site-lisp 目录。）
+</p>
+<p>如果设置了环境变量 EMACSLOADPATH，它会修改上述初始化过程。Emacs 根据环境变量的值初始化 load-path。
+</p>
+<p>EMACSLOADPATH 的语法与用于 PATH 的语法相同；  目录由’:’（或’;’，在某些操作系统上）分隔。以下是如何设置 EMACSLOADPATH 变量的示例（来自 sh 样式的 shell）：
+</p>
+<div class="lisp">
+<pre class="lisp">export EMACSLOADPATH=/home/foo/.emacs.d/lisp:
+</pre></div>
+<p>环境变量值中的空元素，无论是尾随（如上例）、前导还是嵌入，都将替换为由标准初始化过程确定的 load-path 的默认值。如果没有这样的空元素，则 EMACSLOADPATH 指定整个加载路径。您必须包含一个空元素，或者包含标准 Lisp 文件的目录的显式路径，否则 Emacs 将无法运行。（修改加载路径的另一种方法是在启动 Emacs 时使用 -L 命令行选项；见下文。）
+</p>
+<p>对于 load-path 中的每个目录，Emacs 然后检查它是否包含文件 subdirs.el，如果是，则加载它。subdirs.el 文件是在构建/安装 Emacs 时创建的，其中包含使 Emacs 将这些目录的任何子目录添加到加载路径的代码。添加了直接子目录和向下多层的子目录。但它不包括名称不以字母或数字开头的子目录、名为 RCS 或 CVS 的子目录，以及包含名为 .nosearch 的文件的子目录。
+</p>
+<p>接下来，Emacs 添加您使用 -L 命令行选项指定的任何额外加载目录（请参阅 The GNU Emacs Manual 中的 Action Arguments）。它还会添加安装可选包的目录（如果有）（请参阅打包基础知识）。
+</p>
+<p>通常将代码添加到一个初始化文件（请参阅初始化文件）以将一个或多个目录添加到加载路径。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">(push "~/.emacs.d/lisp" load-path)
+</pre></div>
+<p>转储 Emacs 使用 load-path 的特殊值。如果您使用 site-load.el 或 site-init.el 文件来自定义转储的 Emacs（请参阅构建 Emacs），这些文件对加载路径所做的任何更改都将在转储后丢失。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: locate-library library &amp;optional nosuffix path interactive-call ¶
+</pre></div>
+<p>此命令查找库库的精确文件名。它以与 load 相同的方式搜索库，并且参数 nosuffix 与 load 中的含义相同：不要将后缀 <code>.elc</code> 或 <code>.el</code> 添加到指定的名称库中。
+</p>
+<p>如果路径不为零，则使用该目录列表而不是加载路径。
+</p>
+<p>当从程序调用 locate-library 时，它将文件名作为字符串返回。当用户以交互方式运行 locate-library 时，参数 interactive-call 为 t，这告诉 locate-library 在回显区域显示文件名。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: list-load-path-shadows &amp;optional stringp ¶
+</pre></div>
+<p>这个命令显示了一个隐藏的 Emacs Lisp 文件的列表。阴影文件是一个通常不会被加载的文件，尽管它位于加载路径上的目录中，因为在加载路径上较早的目录中存在另一个类似名称的文件。
+</p>
+<p>例如，假设 load-path 设置为
+</p>
+<div class="lisp">
+<pre class="lisp">("/opt/emacs/site-lisp" "/usr/share/emacs/23.3/lisp")
+</pre></div>
+<p>并且这两个目录都包含一个名为 foo.el 的文件。然后 (require ’foo) 永远不会将文件加载到第二个目录中。这种情况可能表明 Emacs 的安装方式存在问题。
+</p>
+<p>当从 Lisp 调用时，该函数会打印一条消息，列出被遮蔽的文件，而不是在缓冲区中显示它们。如果可选参数 stringp 不为 nil，则它将阴影文件作为字符串返回。
+</p>
+<p>如果 Emacs 是在支持原生编译的情况下编译的（参见 Lisp 到原生代码的编译），那么当通过搜索 load-path 找到 <code>.elc</code> 字节编译文件时，Emacs 将尝试寻找相应的 <code>.eln</code> 保存相应的本机编译代码的文件。在 native-comp-eln-load-path 列出的目录中查找本机编译的文件。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: native-comp-eln-load-path ¶
+</pre></div>
+<p>这个变量包含一个目录列表，Emacs 在其中查找本地编译的 ’.eln’ 文件。列表中非绝对的文件名被解释为相对于调用目录（请参阅操作系统环境）。列表中的最后一个目录是系统目录，即 Emacs 构建和安装过程安装的带有 <code>.eln</code> 文件的目录。在列表中的每个目录中，Emacs 在子目录中查找 <code>.eln</code> 文件，其名称由 Emacs 版本和取决于当前本地编译 ABI 的 8 字符散列构成；  此子目录的名称存储在变量 comp-native-version-dir 中。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="16.4_加载非_ASCII_字符.html">加载非_ASCII_字符</a>, Previous: <a href="16.2_加载后缀.html">加载后缀</a>, Up: <a href="16_加载.html">加载.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

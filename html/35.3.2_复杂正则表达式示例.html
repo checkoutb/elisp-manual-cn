@@ -1,0 +1,46 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>35.3.2 复杂正则表达式示例</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">35.3.2 复杂正则表达式示例</h3>
+<div class="nav-panel"><p>Next: <a href="35.3.3_该_rx结构化正则表达式表示法.html">该_rx结构化正则表达式表示法</a>, Previous: <a href="35.3.1_正则表达式的语法.html">正则表达式的语法</a>, Up: <a href="35.3_正则表达式.html">正则表达式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这是一个复杂的正则表达式，以前 Emacs 使用它来识别句子的结尾以及后面的任何空格。（现在 Emacs 使用类似但更复杂的默认正则表达式，由函数 sentence-end 构造。请参阅编辑中使用的标准正则表达式。）
+</p>
+<p>下面，我们首先将正则表达式显示为 Lisp 语法中的字符串（以区分空格和制表符），然后显示计算结果。字符串常量以双引号开始和结束。’\"’ 表示双引号作为字符串的一部分，’\\’ 表示反斜杠作为字符串的一部分，” 表示制表符，” 表示换行符。
+</p><div class="lisp">
+<pre class="lisp">"[.?!][]\"')}]*\\($\\| $\\|\t\\|  \\)[ \t\n]*"
+     ⇒ "[.?!][]\"')}]*\\($\\| $\\|  \\|  \\)[
+]*"
+</pre></div>
+<p>在输出中，制表符和换行符显示为它们本身。
+</p>
+<p>这个正则表达式依次包含四个部分，可以破译如下：
+</p>
+<div class="lisp">
+<pre class="lisp">[.?!]
+</pre></div>
+<p>模式的第一部分是与以下三个字符中的任何一个匹配的替代字符：句点、问号和感叹号。匹配必须以这三个字符之一开始。（这是 Emacs 使用的新的默认正则表达式与旧的不同的一点。新值还允许一些非 ASCII 字符结束一个句子而没有任何后续空格。）
+</p><div class="lisp">
+<pre class="lisp">[]\"')}]*
+</pre></div>
+<p>模式的第二部分匹配任何右大括号和引号，其中零个或多个，可能跟在句号、问号或感叹号之后。\" 是字符串中双引号的 Lisp 语法。末尾的 ’*’ 表示紧接在前面的正则表达式（在这种情况下是字符替代）可以重复零次或多次。
+</p><div class="lisp">
+<pre class="lisp">\\($\\| $\\|\t\\|  \\)
+</pre></div>
+<p>模式的第三部分匹配句子结尾之后的空格：行尾（可选带空格）、制表符或两个空格。双反斜杠将括号和竖线标记为正则表达式语法；  括号分隔组，竖线分隔备选方案。美元符号用于匹配行尾。
+</p><div class="lisp">
+<pre class="lisp">[ \t\n]*
+</pre></div>
+<p>最后，模式的最后一部分匹配超出结束句子所需的最小空格的任何额外空格。
+</p>
+<p>在 rx 表示法中（参见 The rx Structured Regexp Notation），正则表达式可以写成
+</p>
+<div class="lisp">
+<pre class="lisp">(rx (any ".?!")                    ; Punctuation ending sentence.
+    (zero-or-more (any "\"')]}"))  ; Closing quotes or brackets.
+    (or line-end
+        (seq " " line-end)
+        "\t"
+        "  ")                      ; Two spaces.
+    (zero-or-more (any "\t\n ")))  ; Optional extra whitespace.
+</pre></div>
+<p>由于 rx 正则表达式只是 S 表达式，因此可以对其进行格式化和注释。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="35.3.3_该_rx结构化正则表达式表示法.html">该_rx结构化正则表达式表示法</a>, Previous: <a href="35.3.1_正则表达式的语法.html">正则表达式的语法</a>, Up: <a href="35.3_正则表达式.html">正则表达式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

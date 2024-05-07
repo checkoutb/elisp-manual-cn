@@ -1,0 +1,37 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.7.11 事件示例</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">22.7.11 事件示例</h3>
+<div class="nav-panel"><p>Next: <a href="22.7.12_分类事件.html">分类事件</a>, Previous: <a href="22.7.10_其他系统事件.html">其他系统事件</a>, Up: <a href="22.7_输入事件.html">输入事件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>如果用户在同一位置按下并释放鼠标左键，则会生成如下事件序列：
+</p>
+<div class="lisp">
+<pre class="lisp">(down-mouse-1 (#&lt;window 18 on NEWS&gt; 2613 (0 . 38) -864320))
+(mouse-1      (#&lt;window 18 on NEWS&gt; 2613 (0 . 38) -864180))
+</pre></div>
+<p>在按住控制键的同时，用户可能会按住第二个鼠标按钮，并将鼠标从一行拖到下一行。这会产生两个事件，如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(C-down-mouse-2 (#&lt;window 18 on NEWS&gt; 3440 (0 . 27) -731219))
+(C-drag-mouse-2 (#&lt;window 18 on NEWS&gt; 3440 (0 . 27) -731219)
+                (#&lt;window 18 on NEWS&gt; 3510 (0 . 28) -729648))
+</pre></div>
+<p>在按住 meta 和 shift 键的同时，用户可能会按下窗口模式行上的第二个鼠标按钮，然后将鼠标拖到另一个窗口中。这会产生如下一对事件：
+</p>
+<div class="lisp">
+<pre class="lisp">(M-S-down-mouse-2 (#&lt;window 18 on NEWS&gt; mode-line (33 . 31) -457844))
+(M-S-drag-mouse-2 (#&lt;window 18 on NEWS&gt; mode-line (33 . 31) -457844)
+                  (#&lt;window 20 on carlton-sanskrit.tex&gt; 161 (33 . 3)
+                   -453816))
+</pre></div>
+<p>具有输入焦点的框架可能不会占据整个屏幕，用户可能会将鼠标移到框架范围之外。在 track-mouse 特殊形式中，会产生如下事件：
+</p>
+<div class="lisp">
+<pre class="lisp">(mouse-movement (#&lt;frame *ielm* 0x102849a30&gt; nil (563 . 205) 532301936))
+</pre></div>
+<p>要处理 SIGUSR1 信号，请定义一个交互函数，并将其绑定到信号 usr1 事件序列：
+</p><div class="lisp">
+<pre class="lisp">(defun usr1-handler ()
+  (interactive)
+  (message "Got USR1 signal"))
+(global-set-key [signal usr1] 'usr1-handler)
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.7.12_分类事件.html">分类事件</a>, Previous: <a href="22.7.10_其他系统事件.html">其他系统事件</a>, Up: <a href="22.7_输入事件.html">输入事件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

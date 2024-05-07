@@ -1,0 +1,112 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>15.1 常用项关键字</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">15.1 常用项关键字</h2>
+<div class="nav-panel"><p>Next: <a href="15.2_定义自定义组.html">定义自定义组</a>, Previous: <a href="15_自定义设置.html">自定义设置</a>, Up: <a href="15_自定义设置.html">自定义设置.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>我们将在接下来的几节中描述的自定义声明——defcustom、defgroup 等——都接受关键字参数（请参阅从不更改的变量）来指定各种信息。本节介绍适用于所有类型的自定义声明的关键字。
+</p>
+<p>除了 :tag 之外，所有这些关键字都可以在给定项目中多次使用。关键字的每次使用都有独立的效果。关键字 :tag 是一个例外，因为任何给定的项目只能显示一个名称。
+</p>
+<div class="lisp">
+<pre class="lisp">:tag label ¶
+</pre></div>
+<p>使用字符串标签而不是项目名称来标记自定义菜单和缓冲区中的项目。请勿使用与商品真实姓名有本质区别的标签；  这会引起混乱。
+</p><div class="lisp">
+<pre class="lisp">:group group
+</pre></div>
+<p>将此自定义项放在组组中。如果自定义项中缺少此关键字，它将被放置在上次定义的同一组中（在当前文件中）。
+</p>
+<p>当您在 defgroup 中使用 :group 时，它会使新组成为组的子组。
+</p>
+<p>如果您多次使用此关键字，则可以将单个项目放入多个组中。显示这些组中的任何一个都将显示此项目。请不要过度这样做，因为结果会很烦人。
+</p><div class="lisp">
+<pre class="lisp">:link link-data ¶
+</pre></div>
+<p>在此项目的文档字符串后包含一个外部链接。这是一个包含引用其他文档的按钮的句子。
+</p>
+<p>有几种替代方案可以用于链接数据：
+</p>
+<div class="lisp">
+<pre class="lisp">(custom-manual info-node)
+</pre></div>
+<p>链接到信息节点；  info-node 是一个字符串，它指定节点名称，如 <code>(emacs)Top</code> 。该链接在自定义缓冲区中显示为 <code>[Manual]</code> ，并进入 info-node 上的内置信息阅读器。
+</p><div class="lisp">
+<pre class="lisp">(info-link info-node)
+</pre></div>
+<p>与 custom-manual 类似，只是链接出现在自定义缓冲区中并带有 Info 节点名称。
+</p><div class="lisp">
+<pre class="lisp">(url-link url)
+</pre></div>
+<p>链接到网页；  url 是指定 URL 的字符串。该链接作为 url 出现在自定义缓冲区中，并调用由 browse-url-browser-function 指定的 WWW 浏览器。
+</p><div class="lisp">
+<pre class="lisp">(emacs-commentary-link library)
+</pre></div>
+<p>链接到图书馆的评论部分；  library 是一个指定库名称的字符串。请参阅 Emacs 库的常规标头。
+</p><div class="lisp">
+<pre class="lisp">(emacs-library-link library)
+</pre></div>
+<p>链接到 Emacs Lisp 库文件；  library 是一个指定库名称的字符串。
+</p><div class="lisp">
+<pre class="lisp">(file-link file)
+</pre></div>
+<p>链接到文件；  file 是一个字符串，它指定当用户调用此链接时要使用 find-file 访问的文件的名称。
+</p><div class="lisp">
+<pre class="lisp">(function-link function)
+</pre></div>
+<p>链接到函数的文档；  function 是一个字符串，它指定当用户调用此链接时要使用 describe-function 描述的函数名称。
+</p><div class="lisp">
+<pre class="lisp">(variable-link variable)
+</pre></div>
+<p>链接到变量的文档；  variable 是一个字符串，它指定当用户调用此链接时要使用 describe-variable 进行描述的变量名称。
+</p><div class="lisp">
+<pre class="lisp">(face-link face)
+</pre></div>
+<p>链接到面的文档；  face 是一个字符串，它指定当用户调用此链接时要使用 describe-face 描述的面名称。
+</p><div class="lisp">
+<pre class="lisp">(custom-group-link group)
+</pre></div>
+<p>链接到另一个自定义组。调用它会为组创建一个新的自定义缓冲区。
+</p>
+<p>您可以通过在链接数据的第一个元素后添加 :tag name 来指定要在自定义缓冲区中使用的文本；  例如， (info-link :tag "foo" "(emacs)Top") 创建一个指向 Emacs 手册的链接，该手册在缓冲区中显示为 ’foo’。
+</p>
+<p>您可以多次使用此关键字来添加多个链接。
+</p><div class="lisp">
+<pre class="lisp">:load file ¶
+</pre></div>
+<p>在显示此自定义项之前加载文件文件（字符串）（请参阅加载）。加载是通过加载完成的，并且仅当文件尚未加载时。
+</p><div class="lisp">
+<pre class="lisp">:require feature ¶
+</pre></div>
+<p>当您保存的自定义设置此项目的值时执行（需要’功能）。特征应该是一个符号。
+</p>
+<p>使用 :require 的最常见原因是当变量启用诸如次要模式之类的功能时，除非加载了实现该模式的代码，否则仅设置变量不会产生任何影响。
+</p><div class="lisp">
+<pre class="lisp">:version version ¶
+</pre></div>
+<p>此关键字指定该项目是在 Emacs 版本中首次引入的，或者在该版本中更改了它的默认值。值版本必须是字符串。
+</p><div class="lisp">
+<pre class="lisp">:package-version '(package . version) ¶
+</pre></div>
+<p>此关键字指定该项目是在包版本版本中首次引入的，或者它的含义或默认值在该版本中已更改。此关键字优先于 :version。
+</p>
+<p>package 应该是包的正式名称，作为一个符号（例如，MH-E）。版本应该是一个字符串。如果 package 包作为 Emacs 的一部分发布，package 和 version 应该出现在 customize-package-emacs-version-alist 的值中。
+</p>
+<p>作为 Emacs 的一部分分发的使用 :package-version 关键字的包也必须更新 customize-package-emacs-version-alist 变量。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: customize-package-emacs-version-alist ¶
+</pre></div>
+<p>这个列表提供了与 :package-version 关键字中列出的包的版本相关联的 Emacs 版本的映射。它的元素是：
+</p>
+<div class="lisp">
+<pre class="lisp">(package (pversion . eversion)…)
+</pre></div>
+<p>对于每个包，这是一个符号，有一个或多个元素包含一个包版本 pversion 和一个关联的 Emacs 版本版本。这些版本是字符串。例如，MH-E 程序包使用以下内容更新此列表：
+</p>
+<div class="lisp">
+<pre class="lisp">(add-to-list 'customize-package-emacs-version-alist
+             '(MH-E ("6.0" . "22.1") ("6.1" . "22.1") ("7.0" . "22.1")
+                    ("7.1" . "22.1") ("7.2" . "22.1") ("7.3" . "22.1")
+                    ("7.4" . "22.1") ("8.0" . "22.1")))
+</pre></div>
+<p>package 的值必须是唯一的，并且需要匹配 :package-version 关键字中出现的包值。由于用户可能会在错误消息中看到该值，因此最好选择包的正式名称，例如 MH-E 或 Gnus。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="15.2_定义自定义组.html">定义自定义组</a>, Previous: <a href="15_自定义设置.html">自定义设置</a>, Up: <a href="15_自定义设置.html">自定义设置.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

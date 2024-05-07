@@ -1,0 +1,30 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>35.5 POSIX正则表达式搜索</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">35.5 POSIX正则表达式搜索</h2>
+<div class="nav-panel"><p>Next: <a href="35.6_匹配数据.html">匹配数据</a>, Previous: <a href="35.4_正则表达式搜索.html">正则表达式搜索</a>, Up: <a href="35_搜索和匹配.html">搜索和匹配.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>通常的正则表达式函数在需要处理’\|’时进行回溯 和重复结构，但他们只会继续这样做，直到找到一些匹配。然后他们成功并报告找到的第一个匹配项。
+</p>
+<p>本节介绍替代搜索函数，这些函数执行 POSIX 标准为正则表达式匹配指定的完整回溯。他们继续回溯，直到他们尝试了所有可能性并找到了所有匹配项，因此他们可以按照 POSIX 的要求报告最长的匹配项。这要慢得多，因此仅在您确实需要最长匹配时才使用这些函数。
+</p>
+<p>POSIX 搜索和匹配函数不能正确支持非贪婪重复运算符（请参阅非贪婪）。这是因为 POSIX 回溯与非贪婪重复的语义冲突。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: posix-search-forward regexp &amp;optional limit noerror count ¶
+</pre></div>
+<p>这类似于 re-search-forward，只是它执行 POSIX 标准为正则表达式匹配指定的完整回溯。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: posix-search-backward regexp &amp;optional limit noerror count ¶
+</pre></div>
+<p>这类似于 re-search-backward，只是它执行 POSIX 标准为正则表达式匹配指定的完整回溯。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: posix-looking-at regexp ¶
+</pre></div>
+<p>这就像查看一样，只是它执行 POSIX 标准为正则表达式匹配指定的完整回溯。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: posix-string-match regexp string &amp;optional start ¶
+</pre></div>
+<p>这类似于字符串匹配，只是它执行 POSIX 标准为正则表达式匹配指定的完整回溯。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="35.6_匹配数据.html">匹配数据</a>, Previous: <a href="35.4_正则表达式搜索.html">正则表达式搜索</a>, Up: <a href="35_搜索和匹配.html">搜索和匹配.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,17 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>39.9 接收进程的输出</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">39.9 接收进程的输出</h2>
+<div class="nav-panel"><p>Next: <a href="39.9.1_进程缓冲区.html">进程缓冲区</a>, Previous: <a href="39.8_向进程发送信号.html">向进程发送信号</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>异步子进程写入其标准输出流的输出被传递给称为过滤器函数的函数。默认的过滤器函数只是简单地将输出插入一个缓冲区，该缓冲区称为进程的关联缓冲区（请参阅进程缓冲区）。如果进程没有缓冲区，则默认过滤器会丢弃输出。
+</p>
+<p>如果子进程写入其标准错误流，默认情况下，错误输出也会传递给进程过滤器函数。如果 Emacs 使用伪 TTY (pty) 与子进程通信，那么就不可能将子进程的标准输出流和标准错误流分开，因为伪 TTY 只有一个输出通道。在这种情况下，如果您想将这些流的输出分开，您应该将其中一个重定向到一个文件，例如，通过 start-process-shell-command 或类似函数使用适当的 shell 命令。
+</p>
+<p>或者，您可以在调用 make-process（参见 make-process）时使用带有非 nil 值的 :stderr 参数，以使错误输出的目标与标准输出分开；  在这种情况下，Emacs 将使用管道与子进程进行通信。
+</p>
+<p>当一个子进程终止时，Emacs 读取任何挂起的输出，然后停止从该子进程读取输出。因此，如果子进程的子进程仍然存在并且仍在产生输出，那么 Emacs 将不会收到该输出。
+</p>
+<p>子进程的输出只能在 Emacs 等待时到达：在读取终端输入时（参见函数 waiting-for-user-input-p），在sit-for 和 sleep-for 中（参见等待经过的时间或输入），在accept-process-output（请参阅接受进程的输出），以及向进程发送数据的函数（请参阅向进程发送输入）。这最大限度地减少了通常困扰并行编程的时序错误问题。例如，您可以安全地创建一个进程，然后才指定它的缓冲区或过滤器功能；  如果中间的代码没有调用任何等待的原语，则在完成之前没有输出可以到达。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: process-adaptive-read-buffering ¶
+</pre></div>
+<p>在某些系统上，当 Emacs 从子进程读取输出时，输出数据以非常小的块读取，可能会导致性能非常差。通过将变量 process-adaptive-read-buffering 设置为非 nil 值（默认值）可以在一定程度上纠正这种行为，因为它会自动延迟从此类进程中读取，从而允许它们在 Emacs 尝试之前产生更多输出阅读它。
+</p>
+<div class="nav-panel"><p>Next: <a href="39.9.1_进程缓冲区.html">进程缓冲区</a>, Previous: <a href="39.8_向进程发送信号.html">向进程发送信号</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>35.3.5 正则表达式的问题</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">35.3.5 正则表达式的问题</h3>
+<div class="nav-panel"><p>Next: <a href="35.4_正则表达式搜索.html">正则表达式搜索</a>, Previous: <a href="35.3.4_正则表达式函数.html">正则表达式函数</a>, Up: <a href="35.3_正则表达式.html">正则表达式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 正则表达式实现，和许多同类实现一样，通常是健壮的，但偶尔会以两种方式中的任何一种造成麻烦：匹配可能会耗尽内部堆栈空间并发出错误信号，并且可能需要很长时间才能完成。以下建议将降低这些症状的可能性，并有助于缓解确实出现的问题。
+</p>
+<p>使用零宽度断言（’^’ 和 \‘）将正则表达式锚定在行、字符串或缓冲区的开头。这利用了实现中的快速路径，并且可以避免徒劳的匹配尝试。其他零宽度断言也可能通过导致匹配提前失败来带来好处。
+避免使用或模式来支持字符替代：写 ’[ab]’ 而不是 ’a\|b’。回想一下，’-’ 和 ” 分别等同于 <code>[[:space:]</code> 和 <code>[[:word:]</code> 。
+由于 or 模式的最后一个分支不会在堆栈上添加回溯点，因此请考虑将最可能匹配的模式放在最后。例如，如果尝试匹配很长的 ’a’ 字符串，’^*c’ 将耗尽堆栈，但等效的 ’^*c’ 不会。
+</p>
+<p>（这是一个折衷：成功匹配的 or 模式运行得更快，首先匹配最频繁的模式。）
+尽量确保文本的任何部分只能以单一方式匹配。例如，’a*a*’ 将匹配与 ’a*’ 相同的字符串集，但前者可以通过多种方式进行匹配，因此如果稍后匹配失败，将导致回溯缓慢。如果可能，使 or-pattern 分支互斥，以便匹配在失败之前不会进入多个分支。
+</p>
+<p>对嵌套重复要特别小心：在存在歧义的情况下，它们很容易导致非常慢的匹配。例如，’+c’ 将花费很长时间来尝试匹配中等长度的 ’a’ 字符串，然后才会失败。等效的 ’*c’ 更快，而 ’[ab]*c’ 更好。
+除非确实需要，否则不要使用捕获组；  也就是说，使用 ” 而不是 ” 进行括号括起来。
+考虑使用 rx（请参阅 The rx Structured Regexp Notation）；  它可以自动优化一些或模式，除非明确要求，否则永远不会引入捕获组。
+</p>
+<p>如果尽管遵循了上述建议，但仍遇到正则表达式堆栈溢出，请不要害怕在多个函数调用中执行匹配，每个函数调用都使用更简单的正则表达式，可以更轻松地包含回溯。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="35.4_正则表达式搜索.html">正则表达式搜索</a>, Previous: <a href="35.3.4_正则表达式函数.html">正则表达式函数</a>, Up: <a href="35.3_正则表达式.html">正则表达式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.8.2 读取一个事件</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">22.8.2 读取一个事件</h3>
+<div class="nav-panel"><p>Next: <a href="22.8.3_修改和翻译输入事件.html">修改和翻译输入事件</a>, Previous: <a href="22.8.1_按键序列输入.html">按键序列输入</a>, Up: <a href="22.8_读数输入.html">读数输入.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>命令输入的最低级别函数是 read-event、read-char 和 read-char-exclusive。
+</p>
+<p>如果您需要使用 minibuffer 读取字符的函数，请使用 read-char-from-minibuffer（请参阅询问多项选择题）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: read-event &amp;optional prompt inherit-input-method seconds ¶
+</pre></div>
+<p>该函数读取并返回命令输入的下一个事件，必要时等待事件可用。
+</p>
+<p>返回的事件可能直接来自用户，也可能来自键盘宏。它不被键盘的输入编码系统解码（参见终端 I/O 编码）。
+</p>
+<p>如果可选参数 prompt 不是 nil，它应该是一个字符串，作为提示显示在回显区域中。如果 prompt 为 nil 或字符串 ’""’，则 read-event 不显示任何消息表明它正在等待输入；  相反，它通过回显来提示：它显示导致当前命令或被当前命令读取的事件的描述。见回声区。
+</p>
+<p>如果inherit-input-method 不为nil，则使用当前输入法（如果有）来输入非ASCII 字符。否则，将禁用输入法处理以读取此事件。
+</p>
+<p>如果 cursor-in-echo-area 不为 nil，则 read-event 将光标临时移动到 echo 区域，到那里显示的任何消息的末尾。否则 read-event 不会移动光标。
+</p>
+<p>如果 seconds 不为零，它应该是一个数字，指定等待输入的最长时间，以秒为单位。如果在那段时间内没有输入到达，read-event 停止等待并返回 nil。浮点秒意味着等待小数秒。有些系统只支持整数秒；  在这些系统上，秒是向下舍入的。如果 seconds 为 nil，则 read-event 等待输入到达所需的时间。
+</p>
+<p>如果 seconds 为 nil，则 Emacs 在等待用户输入到达时被认为是空闲的。空闲定时器——那些使用 run-with-idle-timer 创建的定时器（见空闲定时器）——可以在这段时间内运行。但是，如果 seconds 不为零，则空闲状态保持不变。如果调用 read-event 时 Emacs 是 non-idle，则在 read-event 的整个操作过程中保持 non-idle；  如果 Emacs 处于空闲状态（如果调用发生在空闲计时器内，则可能发生这种情况），它保持空闲状态。
+</p>
+<p>如果 read-event 得到一个定义为帮助字符的事件，那么在某些情况下 read-event 直接处理该事件而不返回。请参阅帮助功能。某些称为特殊事件的其他事件也直接在读取事件中处理（请参阅特殊事件）。
+</p>
+<p>如果您调用 read-event 然后按右箭头功能键，会发生以下情况：
+</p>
+<div class="lisp">
+<pre class="lisp">(read-event)
+     ⇒ right
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: read-char &amp;optional prompt inherit-input-method seconds ¶
+</pre></div>
+<p>该函数读取并返回一个字符输入事件。如果用户生成一个非字符事件（即鼠标点击或功能键事件），read-char 会发出错误信号。参数的工作方式与读取事件中的一样。
+</p>
+<p>如果事件有修饰符，Emacs 会尝试解析它们并返回相应字符的代码。例如，如果用户键入 Ca，则函数返回 1，即 <code>C-a</code> 字符的 ASCII 码。如果某些修饰符无法反映在字符代码中，read-char 将在返回的事件中保留未解析的修饰符位设置。例如，如果用户键入 CMa，该函数将返回 134217729，十六进制的 8000001，即设置了 Meta 修饰符位的 <code>C-a</code> 。此值不是有效的字符代码：它未通过 characterp 测试（请参阅字符代码）。使用 event-basic-type（参见 Classifying Events）恢复删除修饰符位的字符代码；  使用 event-modifiers 来测试 read-char 返回的字符事件中的修饰符。
+</p>
+<p>在下面的第一个示例中，用户键入字符 1（ASCII 代码 49）。第二个示例显示了一个键盘宏定义，它使用 eval-expression 从 minibuffer 调用 read-char。read-char 读取键盘宏的下一个字符，即 1。然后 eval-expression 在回显区域显示其返回值。
+</p>
+<div class="lisp">
+<pre class="lisp">(read-char)
+     ⇒ 49
+
+
+;; We assume here you use M-: to evaluate this.
+(symbol-function 'foo)
+     ⇒ "^[:(read-char)^M1"
+
+(execute-kbd-macro 'foo)
+     -| 49
+     ⇒ nil
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: read-char-exclusive &amp;optional prompt inherit-input-method seconds ¶
+</pre></div>
+<p>该函数读取并返回一个字符输入事件。如果用户生成的事件不是字符事件，read-char-exclusive 将忽略它并读取另一个事件，直到它得到一个字符。参数的工作方式与读取事件中的一样。返回值可能包括修饰符位，与 read-char 一样。
+</p>
+<p>上述功能均不抑制退出。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: num-nonmacro-input-events ¶
+</pre></div>
+<p>这个变量保存了到目前为止从终端接收到的输入事件的总数——不包括由键盘宏生成的那些。
+</p>
+<p>我们强调，与 read-key-sequence 不同，函数 read-event、read-char 和 read-char-exclusive 不执行 Keymaps for Translating Sequences of Events 中描述的翻译。如果您希望读取考虑这些翻译的单个键（例如，读取终端中的功能键或 xterm-mouse-mode 中的鼠标事件），请使用函数 read-key：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: read-key &amp;optional prompt disable-fallbacks ¶
+</pre></div>
+<p>此函数读取单个密钥。它介于 read-key-sequence 和 read-event 之间。与前者不同，它读取单个键，而不是键序列。与后者不同的是，它不返回原始事件，而是根据 input-decode-map、local-function-key-map 和 key-translation-map 对用户输入进行解码和翻译（参见 Keymaps for Translating Sequences of Events） .
+</p>
+<p>参数提示要么是在回显区域中作为提示显示的字符串，要么是 nil，表示不显示提示。
+</p>
+<p>如果参数 disable-fallbacks 不为零，则不应用 read-key-sequence 中未绑定键的常用回退逻辑。这意味着不会丢弃鼠标按下和多击事件，并且不会应用 local-function-key-map 和 key-translation-map。如果 nil 或未指定，则唯一禁用的回退是最后一个事件的小写。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: read-char-choice prompt chars &amp;optional inhibit-quit ¶
+</pre></div>
+<p>此函数使用 read-key 读取并返回单个字符。它忽略任何不是 chars 成员的输入，即接受的字符列表。可选地，它在等待有效输入时也会忽略键盘退出事件。如果在调用 read-char-choice 时将 help-form（参见帮助函数）绑定到非 nil 值，则按 help-char 会导致它评估 help-form 并显示结果。然后它继续等待有效的输入字符，或键盘退出。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: read-multiple-choice prompt choices &amp;optional help-string ¶
+</pre></div>
+<p>向用户询问多项选择题。prompt 应该是一个将作为提示显示的字符串。
+</p>
+<p>选择是一个列表，其中每个条目中的第一个元素是要输入的字符，第二个元素是提示时要显示的条目的短名称（如果有空间，它可能会缩短），第三个是可选条目是一个较长的解释，如果用户请求更多帮助，它将显示在帮助缓冲区中。
+</p>
+<p>如果可选参数 help-string 不是 nil，它应该是一个对所有选项有更详细描述的字符串。当用户键入 ? 时，它将显示在帮助缓冲区中，而不是默认的自动生成的描述中。
+</p>
+<p>返回值是来自选择的匹配值。
+</p><div class="lisp">
+<pre class="lisp">(read-multiple-choice
+ "Continue connecting?"
+ '((?a "always" "Accept certificate for this and future sessions.")
+   (?s "session only" "Accept certificate this session only.")
+   (?n "no" "Refuse to use certificate, close connection.")))
+</pre></div>
+<p>read-multiple-choice-face 用于在图形终端上突出显示名称字符串中的匹配字符。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.8.3_修改和翻译输入事件.html">修改和翻译输入事件</a>, Previous: <a href="22.8.1_按键序列输入.html">按键序列输入</a>, Up: <a href="22.8_读数输入.html">读数输入.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>39.17.1 make-network-process</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">39.17.1 make-network-process</h3>
+<div class="nav-panel"><p>Next: <a href="39.17.2_网络选项.html">网络选项</a>, Previous: <a href="39.17_低级网络访问.html">低级网络访问</a>, Up: <a href="39.17_低级网络访问.html">低级网络访问.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>创建网络连接和网络服务器的基本功能是make-network-process。它可以完成其中任何一项工作，具体取决于您提供的参数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-network-process &amp;rest args ¶
+</pre></div>
+<p>该函数创建一个网络连接或服务器，并返回代表它的进程对象。参数 args 是关键字/参数对的列表。除了 :coding、:filter-multibyte 和 :reuseaddr 之外，省略关键字总是等同于指定它的值为 nil。以下是有意义的关键字（与网络选项相对应的关键字在下一节中列出）：
+</p>
+<div class="lisp">
+<pre class="lisp">:name name
+</pre></div>
+<p>使用字符串名称作为进程名称。必要时对其进行修改以使其唯一。
+</p><div class="lisp">
+<pre class="lisp">:type type
+</pre></div>
+<p>指定通信类型。nil 值指定流连接（默认）；  datagram 指定一个数据报连接；  seqpacket 指定一个有序的数据包流连接。连接和服务器都可以是这些类型。
+</p><div class="lisp">
+<pre class="lisp">:server server-flag
+</pre></div>
+<p>如果 server-flag 不为零，则创建一个服务器。否则，创建一个连接。对于流式服务器，server-flag 可以是一个整数，然后指定到服务器的未决连接队列的长度。默认队列长度为 5。
+</p><div class="lisp">
+<pre class="lisp">:host host
+</pre></div>
+<p>指定要连接的主机。host 应该是主机名或 Internet 地址，作为字符串，或符号 local 来指定本地主机。如果您为服务器指定主机，它必须为本地主机指定一个有效地址，并且只接受连接到该地址的客户端。使用本地时，默认情况下将使用 IPv4，指定一个 ipv6 系列来覆盖它。要侦听所有接口，请为 IPv4 指定地址 <code>0.0.0.0</code> 或为 IPv6 指定地址 <code>::</code> 。请注意，在某些操作系统上，监听 ’"::"’ 也会监听 IPv4，因此尝试在 IPv4 上单独监听会导致 EADDRINUSE 错误（’"Address already in use"’）。
+</p><div class="lisp">
+<pre class="lisp">:service service
+</pre></div>
+<p>service 指定要连接的端口号；  或者，对于服务器，要监听的端口号。它应该是一个服务名称，如 <code>https</code> ，转换为端口号，或者一个整数，如 <code>443</code> ，或一个整数字符串，如 <code>443</code> ，直接指定端口号。对于服务器，也可以是t，意思是让系统选择一个未使用的端口号。
+</p><div class="lisp">
+<pre class="lisp">:family family
+</pre></div>
+<p>family 指定用于通信的地址（和协议）族。nil 表示为给定的主机和服务自动确定正确的地址族。local 指定一个 Unix 套接字，在这种情况下 host 被忽略。ipv4 和 ipv6 分别指定使用 IPv4 和 IPv6。
+</p><div class="lisp">
+<pre class="lisp">:use-external-socket use-external-socket
+</pre></div>
+<p>如果 use-external-socket 不为零，则使用在调用时传递给 Emacs 的任何套接字，而不是分配一个。Emacs 服务器代码使用它来允许按需激活套接字。如果 Emacs 没有传递一个套接字，这个选项会被忽略。
+</p><div class="lisp">
+<pre class="lisp">:local local-address
+</pre></div>
+<p>对于服务器进程，local-address 是要监听的地址。它会覆盖家庭、主机和服务，因此您最好不要指定它们。
+</p><div class="lisp">
+<pre class="lisp">:remote remote-address
+</pre></div>
+<p>对于连接，remote-address 是要连接的地址。它会覆盖家庭、主机和服务，因此您最好不要指定它们。
+</p>
+<p>对于数据报服务器，remote-address 指定远程数据报地址的初始设置。
+</p>
+<p>本地地址或远程地址的格式取决于地址族：
+</p>
+<ul>
+<li>
+IPv4 地址表示为一个由四个 8 位整数和一个 16 位整数 [abcdp] 组成的五元素向量，对应于数字 IPv4 地址 abcd 和端口号 p。
+</li><li>
+IPv6 地址表示为 16 位整数 [abcdefghp] 的九元素向量，对应于数字 IPv6 地址 a:b:c:d:e:f:g:h 和端口号 p。
+</li><li>
+本地地址表示为一个字符串，它指定本地地址空间中的地址。
+</li><li>
+不支持的系列地址由 cons (f . av) 表示，其中 f 是系列号，av 是一个向量，它使用每个地址数据字节一个元素来指定套接字地址。不要在可移植代码中依赖这种格式，因为它可能依赖于实现定义的常量、数据大小和数据结构对齐。
+</li></ul>
+<div class="lisp">
+<pre class="lisp">:nowait bool
+</pre></div>
+<p>如果流连接的 bool 不为零，则返回而不等待连接完成。当连接成功或失败时，Emacs 将调用 sentinel 函数，第二个参数匹配 <code>open</code> （如果成功）或 <code>failed</code> 。默认是阻塞的，因此 make-network-process 在连接成功或失败之前不会返回。
+</p>
+<p>如果您要设置异步 TLS 连接，则还必须提供 :tls-parameters 参数（见下文）。
+</p>
+<p>根据 Emacs 的功能，异步 :nowait 的方式可能会有所不同。可能（或不可能）异步完成的三个元素是域名解析、套接字设置和（对于 TLS 连接）TLS 协商。
+</p>
+<p>许多与进程对象交互的函数（例如，进程数据报地址）依赖于它们至少有一个套接字才能返回有用的值。这些函数将阻塞，直到套接字达到所需的状态。与异步套接字交互的推荐方式是在进程上放置一个哨兵，在它将状态更改为 <code>运行</code> 之前不要尝试与它交互。这样，这些功能都不会阻塞。
+</p><div class="lisp">
+<pre class="lisp">:tls-parameters
+</pre></div>
+<p>打开 TLS 连接时，第一个元素应该是 TLS 类型（应该是 gnutls-x509pki 或 gnutls-anon，其余元素应该形成 gnutls-boot 可接受的关键字列表。（这个关键字列表可以从 gnutls-boot-parameters 函数中获取。）完成与主机的连接后，将协商 TLS 连接。
+</p><div class="lisp">
+<pre class="lisp">:stop stopped
+</pre></div>
+<p>如果stopped 不为零，则在stopped 状态下启动网络连接或服务器。
+</p><div class="lisp">
+<pre class="lisp">:buffer buffer
+</pre></div>
+<p>使用缓冲区作为进程缓冲区。
+</p><div class="lisp">
+<pre class="lisp">:coding coding
+</pre></div>
+<p>使用编码作为此过程的编码系统。要指定不同的编码系统来解码来自连接的数据和编码发送给它的数据，请指定 (decoding . encoding) 进行编码。
+</p>
+<p>如果您根本不指定此关键字，则默认是根据数据确定编码系统。
+</p><div class="lisp">
+<pre class="lisp">:noquery query-flag
+</pre></div>
+<p>将进程查询标志初始化为query-flag。请参阅退出前查询。
+</p><div class="lisp">
+<pre class="lisp">:filter filter
+</pre></div>
+<p>初始化流程过滤器进行过滤。
+</p><div class="lisp">
+<pre class="lisp">:filter-multibyte multibyte
+</pre></div>
+<p>如果 multibyte 不是 nil，则给进程过滤器的字符串是多字节的，否则它们是单字节的。默认值为 t。
+</p><div class="lisp">
+<pre class="lisp">:sentinel sentinel
+</pre></div>
+<p>初始化进程哨兵到哨兵。
+</p><div class="lisp">
+<pre class="lisp">:log log
+</pre></div>
+<p>初始化一个服务器进程的日志函数来记录。每次服务器接受来自客户端的网络连接时，都会调用 log 函数。传递给日志函数的参数是服务器、连接和消息；  其中 server 是服务器进程，connection 是连接的新进程，message 是描述发生了什么的字符串。
+</p><div class="lisp">
+<pre class="lisp">:plist plist
+</pre></div>
+<p>将进程 plist 初始化为 plist。
+</p>
+<p>使用实际连接信息修改的原始参数列表可通过过程联系功能获得。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="39.17.2_网络选项.html">网络选项</a>, Previous: <a href="39.17_低级网络访问.html">低级网络访问</a>, Up: <a href="39.17_低级网络访问.html">低级网络访问.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

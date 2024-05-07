@@ -1,0 +1,129 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>23.12 更改键绑定</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">23.12 更改键绑定</h2>
+<div class="nav-panel"><p>Next: <a href="23.13_重映射命令.html">重映射命令</a>, Previous: <a href="23.11_键查找函数.html">键查找函数</a>, Up: <a href="23_键盘映射.html">键盘映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>重新绑定键的方法是更改​​其在键映射中的条目。如果您更改全局键映射中的绑定，则更改在所有缓冲区中都有效（尽管它在将全局绑定与本地绑定遮蔽的缓冲区中没有直接影响）。如果更改当前缓冲区的本地映射，通常会影响使用相同主要模式的所有缓冲区。global-set-key 和 local-set-key 函数是这些操作的方便接口（请参阅绑定键的命令）。你也可以使用define-key，一个更通用的功能；  那么您必须明确指定要更改的地图。
+</p>
+<p>在为 Lisp 程序选择键序列以重新绑定时，请遵循 Emacs 约定以使用各种键（请参阅键绑定约定）。
+</p>
+<p>在编写要重新绑定的键序列时，最好对控制字符和元字符使用特殊的转义序列（请参阅字符串类型）。语法 <code>\C-</code> 表示后面的字符是控制字符， <code>\M-</code> 表示后面的字符是元字符。因此，字符串 <code>\Mx</code> 被读取为包含单个 Mx， <code>\Cf</code> 被读取为包含单个 Cf，并且 <code>\M-\Cx</code> 和 <code>\C-\Mx</code> 都被读取为包含一个单个 CMx。您还可以在向量中使用这种转义语法，以及在字符串中不允许使用的其他语法；  一个例子是’[?-home]’。请参阅字符类型。
+</p>
+<p>键定义和查找函数接受作为向量的键序列中事件类型的替代语法：您可以使用包含修饰符名称和一个基本事件（字符或功能键名称）的列表。例如，(control ?a) 等价于 ?，(hyper control left) 等价于 CH-left。此类列表的一个优点是修饰符位的精确数字代码不会出现在编译文件中。
+</p>
+<p>如果 keymap 不是 keymap，或者 key 不是表示键序列的字符串或向量，则下面的函数会发出错误信号。您可以使用事件类型（符号）作为列表事件的简写。kbd 函数（请参阅键序列）是指定键序列的便捷方式。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: define-key keymap key binding ¶
+</pre></div>
+<p>此函数设置键映射中键的绑定。（如果 key 的长度超过一个事件，则更改实际上是在从 keymap 到达的另一个 keymap 中进行的。）参数绑定可以是任何 Lisp 对象，但只有某些类型是有意义的。（有关有意义类型的列表，请参阅键查找。）define-key 返回的值是绑定的。
+</p>
+<p>如果 key 是 [t]，这将在 keymap 中设置默认绑定。当一个事件没有它自己的绑定时，Emacs 命令循环使用键盘映射的默认绑定，如果有的话。
+</p>
+<p>key 的每个前缀必须是前缀键（即绑定到 keymap）或未定义；  否则会发出错误信号。如果 key 的某些前缀未定义，则 define-key 将其定义为前缀 key，以便 key 的其余部分可以按指定定义。
+</p>
+<p>如果 keymap 中之前没有 key 的绑定，则在 keymap 的开头添加新的绑定。键映射中的绑定顺序对键盘输入没有影响，但对菜单键映射很重要（请参阅菜单键映射）。
+</p>
+<p>此示例创建一个稀疏键映射并在其中进行许多绑定：
+</p><div class="lisp">
+<pre class="lisp">
+
+(setq map (make-sparse-keymap))
+    ⇒ (keymap)
+
+(define-key map "\C-f" 'forward-char)
+    ⇒ forward-char
+
+map
+    ⇒ (keymap (6 . forward-char))
+
+
+;; Build sparse submap for C-x and bind f in that.
+(define-key map (kbd "C-x f") 'forward-word)
+    ⇒ forward-word
+
+map
+⇒ (keymap
+    (24 keymap                ; C-x
+        (102 . forward-word)) ;      f
+    (6 . forward-char))       ; C-f
+
+
+;; Bind C-p to the ctl-x-map.
+(define-key map (kbd "C-p") ctl-x-map)
+;; ctl-x-map
+⇒ [nil … find-file … backward-kill-sentence]
+
+
+;; Bind C-f to foo in the ctl-x-map.
+(define-key map (kbd "C-p C-f") 'foo)
+⇒ 'foo
+
+map
+⇒ (keymap     ; Note foo in ctl-x-map.
+    (16 keymap [nil … foo … backward-kill-sentence])
+    (24 keymap
+        (102 . forward-word))
+    (6 . forward-char))
+</pre></div>
+<p>请注意，为 Cp Cf 存储新绑定实际上是通过更改 ctl-x-map 中的条目来工作的，这具有更改默认全局映射中 Cp Cf 和 Cx Cf 的绑定的效果。
+</p>
+<p>函数替代键定义扫描键映射以查找具有特定绑定的键，并使用不同的绑定重新绑定它们。另一个更简洁且通常可以产生相同结果的功能是将一个命令重新映射到另一个命令（请参阅重新映射命令）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: substitute-key-definition olddef newdef keymap &amp;optional oldmap ¶
+</pre></div>
+<p>对于绑定到 olddef 的键映射中的任何键，此函数将 olddef 替换为 newdef。换句话说，无论它出现在哪里，olddef 都会被替换为 newdef。该函数返回零。
+</p>
+<p>例如，如果您在具有标准绑定的 Emacs 中执行此操作，则会重新定义 Cx Cf：
+</p>
+<div class="lisp">
+<pre class="lisp">(substitute-key-definition
+ 'find-file 'find-file-read-only (current-global-map))
+</pre></div>
+<p>如果 oldmap 不是 nil，那会改变替换键定义的行为：oldmap 中的绑定确定要重新绑定哪些键。重新绑定仍然发生在 keymap 中，而不是 oldmap 中。因此，您可以在另一张地图的绑定控制下更改一张地图。例如，
+</p>
+<div class="lisp">
+<pre class="lisp">(substitute-key-definition
+  'delete-backward-char 'my-funny-delete
+  my-map global-map)
+</pre></div>
+<p>对于全局绑定到标准删除命令的任何键，将特殊删除命令放在 my-map 中。
+</p>
+<p>这是一个显示替换前后的键映射的示例：
+</p>
+<div class="lisp">
+<pre class="lisp">(setq map (list 'keymap
+                (cons ?1 olddef-1)
+                (cons ?2 olddef-2)
+                (cons ?3 olddef-1)))
+⇒ (keymap (49 . olddef-1) (50 . olddef-2) (51 . olddef-1))
+
+
+(substitute-key-definition 'olddef-1 'newdef map)
+⇒ nil
+
+map
+⇒ (keymap (49 . newdef) (50 . olddef-2) (51 . newdef))
+
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: suppress-keymap keymap &amp;optional nodigits ¶
+</pre></div>
+<p>此函数通过将 self-insert-command 重新映射到未定义的命令来更改完整键盘映射 keymap 的内容（请参阅重新映射命令）。这具有取消定义所有打印字符的效果，因此无法正常插入文本。抑制键映射返回 nil。
+</p>
+<p>如果 nodigits 为 nil，则 suppress-keymap 定义数字以运行数字参数，并定义 - 以运行否定参数。否则，它会使它们像其他打印字符一样未定义。
+</p>
+<p>抑制键映射功能不会使修改缓冲区成为不可能，因为它不会抑制诸如 yank 和quoted-insert 之类的命令。要防止对缓冲区进行任何修改，请将其设为只读（请参阅只读缓冲区）。
+</p>
+<p>由于此函数会修改键盘映射，因此您通常会在新创建的键盘映射上使用它。对用于其他目的的现有键盘映射进行操作可能会造成麻烦；  例如，抑制 global-map 将使大多数 Emacs 无法使用。
+</p>
+<p>此函数可用于初始化不需要插入文本的主要模式的本地键盘映射。但通常这种模式应该从特殊模式派生（参见基本主要模式）；  那么它的键映射将自动从已经被抑制的特殊模式映射继承。以下是特殊模式映射的定义方式：
+</p>
+<div class="lisp">
+<pre class="lisp">(defvar special-mode-map
+  (let ((map (make-sparse-keymap)))
+    (suppress-keymap map)
+    (define-key map "q" 'quit-window)
+    …
+    map))
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="23.13_重映射命令.html">重映射命令</a>, Previous: <a href="23.11_键查找函数.html">键查找函数</a>, Up: <a href="23_键盘映射.html">键盘映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

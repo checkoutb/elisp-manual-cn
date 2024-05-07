@@ -1,0 +1,33 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>31.2.3 移动到缓冲区末端</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">31.2.3 移动到缓冲区末端</h3>
+<div class="nav-panel"><p>Next: <a href="31.2.4_文本行的运动.html">文本行的运动</a>, Previous: <a href="31.2.2_词动.html">词动</a>, Up: <a href="31.2_运动.html">运动.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>要将点移动到缓冲区的开头，请编写：
+</p>
+<div class="lisp">
+<pre class="lisp">(goto-char (point-min))
+</pre></div>
+<p>同样，要移动到缓冲区的末尾，请使用：
+</p><div class="lisp">
+<pre class="lisp">(goto-char (point-max))
+</pre></div>
+<p>以下是用户用来执行这些操作的两个命令。此处记录它们是为了警告您不要在 Lisp 程序中使用它们，因为它们会在回显区域设置标记并显示消息。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: beginning-of-buffer &amp;optional n ¶
+</pre></div>
+<p>此函数将点移动到缓冲区的开头（或可访问部分的限制，当窄化生效时），将标记设置在前一个位置（除了在瞬态标记模式下，如果标记已经激活，则不会设置标记。）
+</p>
+<p>如果 n 不为零，则它将点放在距缓冲区可访问部分开头的十分之一处。在交互式调用中，n 是数字前缀参数（如果提供）；  否则 n 默认为 nil。
+</p>
+<p>警告：不要在 Lisp 程序中使用这个函数！
+</p>
+<div class="lisp">
+<pre class="lisp">Command: end-of-buffer &amp;optional n ¶
+</pre></div>
+<p>此功能将点移动到缓冲区的末尾（或可访问部分的限制，当缩小生效时），将标记设置在前一个位置（除了在标记已经激活的瞬态标记模式下）。如果 n 不为零，则它将点放在距缓冲区可访问部分末尾十分之一处。
+</p>
+<p>在交互式调用中，n 是数字前缀参数（如果提供）；  否则 n 默认为 nil。
+</p>
+<p>警告：不要在 Lisp 程序中使用这个函数！
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="31.2.4_文本行的运动.html">文本行的运动</a>, Previous: <a href="31.2.2_词动.html">词动</a>, Up: <a href="31.2_运动.html">运动.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

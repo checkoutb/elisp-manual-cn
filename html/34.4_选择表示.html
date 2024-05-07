@@ -1,0 +1,29 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>34.4 选择表示</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">34.4 选择表示</h2>
+<div class="nav-panel"><p>Next: <a href="34.5_字符代码.html">字符代码</a>, Previous: <a href="34.3_转换文本表示.html">转换文本表示</a>, Up: <a href="34_非ASCII字符.html">非ASCII字符.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>有时，将现有缓冲区或字符串检查为多字节（当它是单字节时）很有用，反之亦然。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-buffer-multibyte multibyte ¶
+</pre></div>
+<p>设置当前缓冲区的表示类型。如果多字节为非零，则缓冲区变为多字节。如果多字节为 nil，则缓冲区变为单字节。
+</p>
+<p>当被视为字节序列时，此函数使缓冲区内容保持不变。因此，它可以改变被视为字符的内容；  例如，在多字节表示中被视为一个字符的三个字节序列在单字节表示中将计为三个字符。表示原始字节的八位字符是一个例外。它们由单字节缓冲区中的一个字节表示，但是当缓冲区设置为多字节时，它们将转换为两字节序列，反之亦然。
+</p>
+<p>此函数设置 enable-multibyte-characters 以记录正在使用的表示形式。它还调整缓冲区中的各种数据（包括覆盖、文本属性和标记），以便它们覆盖与以前相同的文本。
+</p>
+<p>如果缓冲区变窄，此函数会发出错误信号，因为变窄可能发生在多字节字符序列的中间。
+</p>
+<p>如果缓冲区是间接缓冲区，此函数也会发出错误信号。间接缓冲区始终继承其基本缓冲区的表示。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: string-as-unibyte string ¶
+</pre></div>
+<p>如果 string 已经是单字节字符串，则此函数返回 string 本身。否则，它返回一个与字符串具有相同字节的新字符串，但将每个字节视为一个单独的字符（这样该值可能包含比字符串更多的字符）；  作为一个例外，代表原始字节的每个八位字符都被转换为单个字节。新创建的字符串不包含文本属性。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: string-as-multibyte string ¶
+</pre></div>
+<p>如果 string 是多字节字符串，则此函数返回 string 本身。否则，它返回一个与字符串具有相同字节的新字符串，但将每个多字节序列视为一个字符。这意味着该值的字符数可能少于字符串的字符数。如果字符串中的字节序列作为单个字符的多字节表示无效，则序列中的每个字节都被视为原始 8 位字节。新创建的字符串不包含文本属性。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="34.5_字符代码.html">字符代码</a>, Previous: <a href="34.3_转换文本表示.html">转换文本表示</a>, Up: <a href="34_非ASCII字符.html">非ASCII字符.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

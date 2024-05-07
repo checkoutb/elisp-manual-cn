@@ -1,0 +1,56 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>34.5 字符代码</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">34.5 字符代码</h2>
+<div class="nav-panel"><p>Next: <a href="34.6_字符属性.html">字符属性</a>, Previous: <a href="34.4_选择表示.html">选择表示</a>, Up: <a href="34_非ASCII字符.html">非ASCII字符.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>单字节和多字节文本表示使用不同的字符代码。单字节表示的有效字符代码范围从 0 到 #xFF (255) — 可以容纳在一个字节中的值。多字节表示的有效字符代码范围从 0 到 #x3FFFFF。在此代码空间中，值 0 到 #x7F (127) 用于 ASCII 字符，值 #x80 (128) 到 #x3FFF7F (4194175) 用于非 ASCII 字符。
+</p>
+<p>Emacs 字符代码是 Unicode 标准的超集。值 0 到 #x10FFFF (1114111) 对应于同一代码点的 Unicode 字符；  值 #x110000 (1114112) 到 #x3FFF7F (4194175) 表示未与 Unicode 统一的字符；  并且值 #x3FFF80 (4194176) 到 #x3FFFFF (4194303) 表示 8 位原始字节。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: characterp charcode ¶
+</pre></div>
+<p>如果 charcode 是有效字符，则返回 t，否则返回 nil。
+</p><div class="lisp">
+<pre class="lisp">
+
+(characterp 65)
+     ⇒ t
+
+(characterp 4194303)
+     ⇒ t
+
+(characterp 4194304)
+     ⇒ nil
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: max-char ¶
+</pre></div>
+<p>此函数返回有效字符代码点可以具有的最大值。
+</p>
+<div class="lisp">
+<pre class="lisp">
+
+(characterp (max-char))
+     ⇒ t
+
+(characterp (1+ (max-char)))
+     ⇒ nil
+
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: char-from-name string &amp;optional ignore-case ¶
+</pre></div>
+<p>该函数返回 Unicode 名称为字符串的字符。如果 ignore-case 不为零，则字符串中的大小写将被忽略。如果字符串没有命名字符，则此函数返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">;; U+03A3
+(= (char-from-name "GREEK CAPITAL LETTER SIGMA") #x03A3)
+     ⇒ t
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: get-byte &amp;optional pos string ¶
+</pre></div>
+<p>此函数返回当前缓冲区中字符位置 pos 处的字节。如果当前缓冲区是单字节的，那么这就是该位置的字节。如果缓冲区是多字节的，则 ASCII 字符的字节值与字符代码点相同，而 8 位原始字节将转换为它们的 8 位代码。如果 pos 处的字符不是 ASCII，则该函数会发出错误信号。
+</p>
+<p>可选参数字符串意味着从该字符串而不是当前缓冲区中获取一个字节值。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="34.6_字符属性.html">字符属性</a>, Previous: <a href="34.4_选择表示.html">选择表示</a>, Up: <a href="34_非ASCII字符.html">非ASCII字符.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

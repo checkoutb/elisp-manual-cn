@@ -1,0 +1,83 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.27.2 GnuTLS 加密函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">33.27.2 GnuTLS 加密函数</h3>
+<div class="nav-panel"><p>Next: <a href="33.28_解析_HTML_和_XML.html">解析_HTML_和_XML</a>, Previous: <a href="33.27.1_GnuTLS_加密输入的格式.html">GnuTLS_加密输入的格式</a>, Up: <a href="33.27_GnuTLS_密码学.html">GnuTLS_密码学.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><div class="lisp">
+<pre class="lisp">Function: gnutls-digests ¶
+</pre></div>
+<p>此函数返回 GnuTLS 摘要算法的列表。
+</p>
+<p>每个条目都有一个表示算法的键，后跟一个包含算法内部详细信息的 plist。plist 将具有 :type gnutls-digest-algorithm 并且还将具有密钥 :digest-algorithm-length 64 以指示结果摘要的大小（以字节为单位）。
+</p>
+<p>GnuTLS MAC 和摘要算法之间有一个平行的名称，但它们在内部是独立的，不应混用。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: gnutls-hash-digest digest-method input ¶
+</pre></div>
+<p>摘要方法可以是来自 gnutls-digests 的整个 plist，或者只是符号键，或者是具有该符号名称的字符串。
+</p>
+<p>输入可以指定为缓冲区或字符串或以其他方式（请参阅 GnuTLS 加密输入的格式）。
+</p>
+<p>此函数在错误时返回 nil，如果摘要方法或输入无效，则发出 Lisp 错误信号。成功时，它返回一个二进制字符串列表（输出）和使用的 IV。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: gnutls-macs ¶
+</pre></div>
+<p>此函数返回 GnuTLS MAC 算法的列表。
+</p>
+<p>每个条目都有一个表示算法的键，后跟一个包含算法内部详细信息的 plist。plist 将具有 :type gnutls-mac-algorithm 并且还将具有密钥 :mac-algorithm-length :mac-algorithm-keysize :mac-algorithm-noncesize 以指示生成的哈希的大小（以字节为单位），密钥, 和 nonce 分别。
+</p>
+<p>nonce 目前未使用，只有一些 MAC 支持它。
+</p>
+<p>GnuTLS MAC 和摘要算法之间有一个平行的名称，但它们在内部是独立的，不应混用。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: gnutls-hash-mac hash-method key input ¶
+</pre></div>
+<p>hash-method 可以是来自 gnutls-macs 的整个 plist，或者只是符号键，或者是具有该符号名称的字符串。
+</p>
+<p>可以将密钥指定为缓冲区或字符串或以其他方式（请参阅 GnuTLS 加密输入的格式）。如果它是字符串，则密钥将在使用后被擦除。
+</p>
+<p>输入可以指定为缓冲区或字符串或以其他方式（请参阅 GnuTLS 加密输入的格式）。
+</p>
+<p>此函数在错误时返回 nil，如果散列方法或键或输入无效，则发出 Lisp 错误信号。
+</p>
+<p>成功时，它返回一个二进制字符串列表（输出）和使用的 IV。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: gnutls-ciphers ¶
+</pre></div>
+<p>此函数返回 GnuTLS 密码的列表。
+</p>
+<p>每个条目都有一个代表密码的密钥，后跟一个包含算法内部详细信息的 plist。plist 将具有 :type gnutls-symmetric-cipher 并且还将密钥 :cipher-aead-capable 设置为 nil 或 t 以指示 AEAD 功能；  和 :cipher-tagsize :cipher-blocksize :cipher-keysize :cipher-ivsize 分别表示标签的大小、结果数据的块大小、密钥和 IV。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: gnutls-symmetric-encrypt cipher key iv input &amp;optional aead_auth ¶
+</pre></div>
+<p>密码可以是 gnutls-ciphers 中的整个 plist，或者只是符号密钥，或者是具有该符号名称的字符串。
+</p>
+<p>可以将密钥指定为缓冲区或字符串或以其他方式（请参阅 GnuTLS 加密输入的格式）。如果它是字符串，则密钥将在使用后被擦除。
+</p>
+<p>iv 和 input 以及可选的 aead<em>_auth</em> 可以指定为缓冲区或字符串或以其他方式（请参阅 GnuTLS 加密输入的格式）。
+</p>
+<p>aead<em>_auth</em> 仅使用 AEAD 密码检查，即 plist 具有 :cipher-aead-capable t 的密码。否则会被忽略。
+</p>
+<p>此函数在出错时返回 nil，如果密码或密钥、iv 或输入无效，或者如果使用 AEAD 密码指定 aead<em>_auth</em> 并且无效，则发出 Lisp 错误信号。
+</p>
+<p>成功时，它返回一个二进制字符串列表（输出）和使用的 IV。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: gnutls-symmetric-decrypt cipher key iv input &amp;optional aead_auth ¶
+</pre></div>
+<p>密码可以是 gnutls-ciphers 中的整个 plist，或者只是符号密钥，或者是具有该符号名称的字符串。
+</p>
+<p>可以将密钥指定为缓冲区或字符串或以其他方式（请参阅 GnuTLS 加密输入的格式）。如果它是字符串，则密钥将在使用后被擦除。
+</p>
+<p>iv 和 input 以及可选的 aead<em>_auth</em> 可以指定为缓冲区或字符串或以其他方式（请参阅 GnuTLS 加密输入的格式）。
+</p>
+<p>aead<em>_auth</em> 仅使用 AEAD 密码检查，即 plist 具有 :cipher-aead-capable t 的密码。否则会被忽略。
+</p>
+<p>此函数在解密错误时返回 nil，如果密码或密钥、iv 或输入无效，或者如果使用 AEAD 密码指定 aead<em>_auth</em> 并且无效，则发出 Lisp 错误信号。
+</p>
+<p>成功时，它返回一个二进制字符串列表（输出）和使用的 IV。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.28_解析_HTML_和_XML.html">解析_HTML_和_XML</a>, Previous: <a href="33.27.1_GnuTLS_加密输入的格式.html">GnuTLS_加密输入的格式</a>, Up: <a href="33.27_GnuTLS_密码学.html">GnuTLS_密码学.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

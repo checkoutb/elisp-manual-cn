@@ -1,0 +1,14 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>38 线程</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h1 class="chapter">38 线程</h1>
+<div class="nav-panel"><p>Next: <a href="38.1_基本线程函数.html">基本线程函数</a>, Previous: <a href="37.7_缩写表属性.html">缩写表属性</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs Lisp 提供了一种有限形式的并发，称为线程。给定 Emacs 实例中的所有线程共享相同的内存。Emacs Lisp 中的并发是 <code>主要是协作的</code> ，这意味着 Emacs 只会在明确定义的时间在线程之间切换执行。然而，Emacs 线程支持被设计成以后允许更细粒度的并发，正确的程序不应该依赖协作线程。
+</p>
+<p>目前，线程切换将在通过 thread-yield 进行显式请求时发生，在等待键盘输入或异步进程的进程输出时（例如，在接受进程输出期间），或者在与线程相关的阻塞操作期间，例如互斥锁或线程连接。
+</p>
+<p>Emacs Lisp 提供了创建和控制线程，以及创建和控制互斥锁和条件变量的原语，这对于线程同步很有用。
+</p>
+<p>虽然全局变量在所有 Emacs Lisp 线程之间共享，但局部变量不是——动态的 let 绑定是本地的。每个线程也有自己的当前缓冲区（请参阅当前缓冲区）和自己的匹配数据（请参阅匹配数据）。
+</p>
+<p>请注意，Emacs Lisp 实现对 let 绑定进行了特殊处理。除了使用 let 之外，没有其他方法可以复制这种展开和倒带行为。例如，使用 unwind-protect 编写的 let 的手动实现不能将变量值安排为线程特定的。
+</p>
+<p>在词法绑定的情况下（请参阅变量绑定的范围规则），闭包是与 Emacs Lisp 中的任何其他对象一样的对象，并且闭包中的绑定由调用闭包的任何线程共享。
+</p>
+<div class="nav-panel"><p>Next: <a href="38.1_基本线程函数.html">基本线程函数</a>, Previous: <a href="37.7_缩写表属性.html">缩写表属性</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>35.3.4 正则表达式函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">35.3.4 正则表达式函数</h3>
+<div class="nav-panel"><p>Next: <a href="35.3.5_正则表达式的问题.html">正则表达式的问题</a>, Previous: <a href="35.3.3_该_rx结构化正则表达式表示法.html">该_rx结构化正则表达式表示法</a>, Up: <a href="35.3_正则表达式.html">正则表达式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这些函数对正则表达式进行操作。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: regexp-quote string ¶
+</pre></div>
+<p>此函数返回一个正则表达式，其唯一完全匹配的是字符串。仅当缓冲区中的下一个字符是字符串时，在查看中使用此正则表达式才会成功；  如果正在搜索的文本包含字符串，则在搜索函数中使用它会成功。请参阅正则表达式搜索。
+</p>
+<p>这允许您在调用需要正则表达式的函数时请求精确的字符串匹配或搜索。
+</p>
+<div class="lisp">
+<pre class="lisp">(regexp-quote "^The cat$")
+     ⇒ "\\^The cat\\$"
+</pre></div>
+<p>regexp-quote 的一种用途是将精确的字符串匹配与描述为正则表达式的上下文结合起来。例如，这将搜索作为 string 值的字符串，由空格包围：
+</p>
+<div class="lisp">
+<pre class="lisp">(re-search-forward
+ (concat "\\s-" (regexp-quote string) "\\s-"))
+</pre></div>
+<p>如果返回的字符串不包含任何特殊字符，则它可能是字符串本身。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: regexp-opt strings &amp;optional paren ¶
+</pre></div>
+<p>此函数返回一个有效的正则表达式，它将匹配列表字符串中的任何字符串。当您需要尽可能快地进行匹配或搜索时，这很有用 - 例如，对于字体锁定模式 22。
+</p>
+<p>如果字符串是空列表，则返回值是一个从不匹配任何内容的正则表达式。
+</p>
+<p>可选参数 paren 可以是以下任何一种：
+</p>
+<div class="lisp">
+<pre class="lisp">a string
+</pre></div>
+<p>生成的正则表达式前面是paren，后面是’\)’，例如，使用’"\\(?1:"’ 来生成一个明确编号的组。
+</p><div class="lisp">
+<pre class="lisp">words
+</pre></div>
+<p>生成的正则表达式被 ’\&lt;\&gt;’ 包围。
+</p><div class="lisp">
+<pre class="lisp">symbols
+</pre></div>
+<p>生成的正则表达式被 ’\_&lt;\_&gt;’ 包围（这在匹配编程语言关键字等时通常是合适的）。
+</p><div class="lisp">
+<pre class="lisp">non-nil
+</pre></div>
+<p>生成的正则表达式被 ” 包围。
+</p><div class="lisp">
+<pre class="lisp">nil
+</pre></div>
+<p>如果有必要确保附加到它的后缀运算符将应用于整个表达式，则生成的正则表达式被 ” 包围。
+</p>
+<p>返回的正则表达式的排序方式使其始终匹配可能的最长字符串。
+</p>
+<p>在重新排序之前，regexp-opt 的结果正则表达式等效于但通常比简化版本更有效：
+</p>
+<div class="lisp">
+<pre class="lisp">(defun simplified-regexp-opt (strings &amp;optional paren)
+ (let ((parens
+        (cond
+         ((stringp paren)       (cons paren "\\)"))
+         ((eq paren 'words)    '("\\&lt;\\(" . "\\)\\&gt;"))
+         ((eq paren 'symbols) '("\\_&lt;\\(" . "\\)\\_&gt;"))
+         ((null paren)          '("\\(?:" . "\\)"))
+         (t                       '("\\(" . "\\)")))))
+   (concat (car parens)
+           (mapconcat 'regexp-quote strings "\\|")
+           (cdr parens))))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: regexp-opt-depth regexp ¶
+</pre></div>
+<p>此函数返回正则表达式中的分组结构（带括号的表达式）的总数。这不包括害羞组（请参阅正则表达式中的反斜杠构造）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: regexp-opt-charset chars ¶
+</pre></div>
+<p>此函数返回与字符列表中的字符匹配的正则表达式。
+</p>
+<div class="lisp">
+<pre class="lisp">(regexp-opt-charset '(?a ?b ?c ?d ?e))
+     ⇒ "[a-e]"
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Variable: regexp-unmatchable ¶
+</pre></div>
+<p>该变量包含一个保证不匹配任何字符串的正则表达式。它作为变量的默认值特别有用，这些变量可以设置为实际匹配的模式。
+</p>
+<p>脚注
+(22)
+</p>
+<p>请注意，regexp-opt 不保证其结果绝对是最有效的形式。手动调整的正则表达式有时会稍微高效一些，但几乎不值得付出努力。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="35.3.5_正则表达式的问题.html">正则表达式的问题</a>, Previous: <a href="35.3.3_该_rx结构化正则表达式表示法.html">该_rx结构化正则表达式表示法</a>, Up: <a href="35.3_正则表达式.html">正则表达式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

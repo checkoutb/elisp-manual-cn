@@ -1,0 +1,44 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.13 自适应填充模式</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">33.13 自适应填充模式</h2>
+<div class="nav-panel"><p>Next: <a href="33.14_自动填充.html">自动填充</a>, Previous: <a href="33.12_填充边距.html">填充边距</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当启用自适应填充模式时，Emacs 会根据每个段落中的文本自动确定填充前缀，而不是使用预先确定的值。在填充期间，此填充前缀将插入到段落的第二行和后续行的开头，如填充和自动填充中所述。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: adaptive-fill-mode ¶
+</pre></div>
+<p>当此变量为非零时，启用自适应填充模式。默认为 t。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: fill-context-prefix from to ¶
+</pre></div>
+<p>该函数实现了自适应填充模式的核心；  它根据 from 和 to 之间的文本选择填充前缀，通常是段落的开头和结尾。它通过查看段落的前两行来做到这一点，基于下面描述的变量。
+</p>
+<p>通常，这个函数返回填充前缀，一个字符串。但是，在执行此操作之前，该函数会进行最终检查（以下未特别提及）以该前缀开头的行看起来不像段落的开头。如果发生这种情况，该函数会通过返回 nil 来发出异常信号。
+</p>
+<p>详细地说，fill-context-prefix 这样做：
+</p>
+<p>它从第一行获取一个候选填充前缀——它首先尝试adaptive-fill-function（如果有的话）中的函数，然后是正则表达式adaptive-fill-regexp（见下文）。这些的第一个非零结果，或者如果它们都是零，则为空字符串，成为第一行的候选。
+如果该段落还只有一行，则该函数测试刚刚找到的候选前缀的有效性。如果候选者有效，则该函数返回该候选者，否则返回一串空格。（请参阅下面的自适应填充第一行正则表达式的描述）。
+当段落已经有两行时，函数 next 在第二行查找候选前缀，其方式与第一行相同。如果没有找到，则返回 nil。
+该函数现在启发式地比较两个候选前缀：如果第 2 行候选中的非空白字符在第 1 行候选中以相同的顺序出现，则该函数返回第 2 行候选。否则，它返回两个候选者共有的最大初始子字符串（可能是空字符串）。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: adaptive-fill-regexp ¶
+</pre></div>
+<p>自适应填充模式将此正则表达式与一行上左边距空白（如果有）之后开始的文本进行匹配；  它匹配的字符是该行的填充前缀候选。
+</p>
+<p>默认值与混合了某些标点符号的空格匹配。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: adaptive-fill-first-line-regexp ¶
+</pre></div>
+<p>仅在单行段落中使用，此正则表达式充当对一个可用候选填充前缀有效性的附加检查：候选必须匹配此正则表达式，或匹配 comment-start-skip。如果不是，则 fill-context-prefix 将候选者替换为与它相同宽度的空格字符串。
+</p>
+<p>这个变量的默认值是 <code>\\`[ \t]*\\'</code> ，它只匹配一个空格字符串。此默认值的效果是强制在单行段落中找到的填充前缀始终为纯空格。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: adaptive-fill-function ¶
+</pre></div>
+<p>通过将此变量设置为函数，您可以指定更复杂的方式来自动选择填充前缀。该函数在一行的左边距（如果有）之后用点调用，并且它必须保留点。它应该返回该行的填充前缀或 nil，这意味着它无法确定前缀。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.14_自动填充.html">自动填充</a>, Previous: <a href="33.12_填充边距.html">填充边距</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

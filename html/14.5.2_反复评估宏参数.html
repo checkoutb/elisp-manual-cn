@@ -1,0 +1,70 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>14.5.2 反复评估宏参数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">14.5.2 反复评估宏参数</h3>
+<div class="nav-panel"><p>Next: <a href="14.5.3_宏展开中的局部变量.html">宏展开中的局部变量</a>, Previous: <a href="14.5.1_错误时间.html">错误时间</a>, Up: <a href="14.5_使用宏的常见问题.html">使用宏的常见问题.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>定义宏时，您必须注意执行扩展时将评估参数的次数。下面的宏（用于促进迭代）说明了这个问题。这个宏允许我们编写一个 for 循环结构。
+</p>
+<div class="lisp">
+<pre class="lisp">(defmacro for (var from init to final do &amp;rest body)
+  "Execute a simple \"for\" loop.
+For example, (for i from 1 to 10 do (print i))."
+  (list 'let (list (list var init))
+        (cons 'while
+              (cons (list '&lt;= var final)
+                    (append body (list (list 'inc var)))))))
+
+
+(for i from 1 to 3 do
+   (setq square (* i i))
+   (princ (format "\n%d %d" i square)))
+→
+
+(let ((i 1))
+  (while (&lt;= i 3)
+    (setq square (* i i))
+    (princ (format "\n%d %d" i square))
+    (inc i)))
+
+
+     -|1       1
+     -|2       4
+     -|3       9
+⇒ nil
+</pre></div>
+<p>这个宏中的参数 from、to 和 do 是语法糖；  他们完全被忽略了。这个想法是您将在宏调用中的这些位置写入干扰词（例如 from、to 和 do）。
+</p>
+<p>这是通过使用反引号简化的等效定义：
+</p>
+<div class="lisp">
+<pre class="lisp">(defmacro for (var from init to final do &amp;rest body)
+  "Execute a simple \"for\" loop.
+For example, (for i from 1 to 10 do (print i))."
+  `(let ((,var ,init))
+     (while (&lt;= ,var ,final)
+       ,@body
+       (inc ,var))))
+</pre></div>
+<p>此定义的两种形式（带反引号和不带反引号）都存在每次迭代都会评估 final 的缺陷。如果 final 是一个常数，这不是问题。如果它是更复杂的形式，例如（long-complex-calculation x），这会显着减慢执行速度。如果 final 有副作用，多次执行它可能是不正确的。
+</p>
+<p>一个设计良好的宏定义会采取措施来避免这个问题，方法是生成一个只对参数表达式求值一次的扩展，除非重复求值是宏的预期目的的一部分。这是 for 宏的正确扩展：
+</p>
+<div class="lisp">
+<pre class="lisp">(let ((i 1)
+      (max 3))
+  (while (&lt;= i max)
+    (setq square (* i i))
+    (princ (format "%d      %d" i square))
+    (inc i)))
+</pre></div>
+<p>这是创建此扩展的宏定义：
+</p><div class="lisp">
+<pre class="lisp">(defmacro for (var from init to final do &amp;rest body)
+  "Execute a simple for loop: (for i from 1 to 10 do (print i))."
+  `(let ((,var ,init)
+         (max ,final))
+     (while (&lt;= ,var max)
+       ,@body
+       (inc ,var))))
+</pre></div>
+<p>不幸的是，此修复引入了另一个问题，将在下一节中描述。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="14.5.3_宏展开中的局部变量.html">宏展开中的局部变量</a>, Previous: <a href="14.5.1_错误时间.html">错误时间</a>, Up: <a href="14.5_使用宏的常见问题.html">使用宏的常见问题.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

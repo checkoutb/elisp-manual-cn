@@ -1,0 +1,58 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>21.7 是或否查询</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">21.7 是或否查询</h2>
+<div class="nav-panel"><p>Next: <a href="21.8_提出多项选择题.html">提出多项选择题</a>, Previous: <a href="21.6.8_在普通缓冲区中完成.html">在普通缓冲区中完成</a>, Up: <a href="21_小缓冲区.html">小缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍用于向用户询问是或否问题的功能。函数 y-or-np 可以用单个字符来回答；  对于无意的错误答案不会造成严重后果的问题，它很有用。yes-or-no-p 适用于更重要的问题，因为它需要三个或四个字符来回答。
+</p>
+<p>如果在使用鼠标调用的命令中调用了这些函数中的任何一个——更准确地说，如果 last-nonmenu-event（请参阅命令循环中的信息）为 nil 或列表——则它使用对话框或 pop-向上菜单询问问题。否则，它使用键盘输入。您可以通过将 last-nonmenu-event 绑定到调用周围的合适值来强制使用鼠标或键盘输入。
+</p>
+<p>yes-or-no-p 和 y-or-np 都使用 minibuffer。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: y-or-n-p prompt ¶
+</pre></div>
+<p>该函数向用户询问一个问题，期望在 minibuffer 中输入。如果用户输入 y，则返回 t，如果用户输入 n，则返回 nil。此函数还接受 SPC 表示是，DEL 表示否。它接受 C-] 和 Cg 退出，因为问题使用了 minibuffer，因此用户可能会尝试使用 C-] 退出。答案是单个字符，不需要 RET 来终止它。大写和小写是等价的。
+</p>
+<p><code>提出问题</code> 是指在 minibuffer 中打印提示，后跟字符串 ’(y or n) ’。如果输入不是预期答案之一（y、n、SPC、DEL 或退出的内容），则函数响应 <code>请回答 y 或 n。</code> ，并重复请求。
+</p>
+<p>此函数实际上使用了 minibuffer，但不允许编辑答案。在提出问题时，光标会移动到迷你缓冲区。
+</p>
+<p>答案及其含义，甚至是 <code>y</code> 和 <code>n</code> ，都不是硬连线的，而是由键映射查询替换映射指定的（请参阅搜索和替换）。特别是，如果用户输入特殊响应recenter、scroll-up、scroll-down、scroll-other-window或scroll-other-window-down（分别绑定到查询中的Cl、Cv、Mv、CMv和CMSv- replace-map)，此函数执行指定的窗口居中或滚动操作，并再次提出问题。
+</p>
+<p>如果在调用 y-or-np 时将 help-form（请参阅帮助函数）绑定到非 nil 值，则按 help-char 会导致它评估 help-form 并显示结果。help-char 会自动添加到提示中。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: y-or-n-p-with-timeout prompt seconds default ¶
+</pre></div>
+<p>和 y-or-np 一样，除了如果用户在几秒内没有回答，这个函数停止等待并返回默认值。它通过设置计时器来工作；  请参阅延迟执行的计时器。参数 seconds 应该是一个数字。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: yes-or-no-p prompt ¶
+</pre></div>
+<p>该函数向用户询问一个问题，期望在 minibuffer 中输入。如果用户输入 <code>是</code> ，则返回 t，如果用户输入 <code>否</code> ，则返回 nil。用户必须键入 RET 才能完成响应。大写和小写是等价的。
+</p>
+<p>yes-or-no-p 首先在 minibuffer 中显示提示，然后是 ’(yes or no) ’。用户必须键入预期的响应之一；  否则，该函数会响应 <code>请回答是或否。</code> ，等待大约两秒钟并重复请求。
+</p>
+<p>yes-or-no-p 比 y-or-np 需要用户更多的工作，并且适用于更关键的决策。
+</p>
+<p>这是一个例子：
+</p><div class="lisp">
+<pre class="lisp">(yes-or-no-p "Do you really want to remove everything?")
+
+;; After evaluation of the preceding expression,
+;;   the following prompt appears,
+;;   with an empty minibuffer:
+
+
+---------- Buffer: minibuffer ----------
+Do you really want to remove everything? (yes or no)
+---------- Buffer: minibuffer ----------
+</pre></div>
+<p>如果用户首先键入 y RET，这是无效的，因为此函数需要整个单词 ’yes’，它会通过显示这些提示来响应，在它们之间有一个短暂的停顿：
+</p>
+<div class="lisp">
+<pre class="lisp">---------- Buffer: minibuffer ----------
+Please answer yes or no.
+Do you really want to remove everything? (yes or no)
+---------- Buffer: minibuffer ----------
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="21.8_提出多项选择题.html">提出多项选择题</a>, Previous: <a href="21.6.8_在普通缓冲区中完成.html">在普通缓冲区中完成</a>, Up: <a href="21_小缓冲区.html">小缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

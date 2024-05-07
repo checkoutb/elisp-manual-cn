@@ -1,0 +1,201 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>39.3 创建同步进程</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">39.3 创建同步进程</h2>
+<div class="nav-panel"><p>Next: <a href="39.4_创建一个异步进程.html">创建一个异步进程</a>, Previous: <a href="39.2_Shell_参数.html">Shell_参数</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>创建同步进程后，Emacs 会等待进程终止后再继续。在 GNU 或 Unix23 上启动 Dired 就是一个例子：它在同步进程中运行 ls，然后稍微修改输出。因为这个过程是同步的，整个目录列表在 Emacs 尝试对它做任何事情之前到达缓冲区。
+</p>
+<p>在 Emacs 等待同步子进程终止时，用户可以通过键入  <code>C-g</code>  退出。第一个  <code>C-g</code>  尝试使用 SIGINT 信号终止子进程；  但它会等到子进程实际终止后再退出。如果在此期间用户键入另一个  <code>C-g</code> ，则立即使用 SIGKILL 终止子进程并立即退出（MS-DOS 除外，在此情况下终止其他进程不起作用）。请参阅退出。
+</p>
+<p>同步子进程函数返回进程如何终止的指示。
+</p>
+<p>同步子进程的输出通常使用编码系统进行解码，就像从文件中读取的文本一样。通过 call-process-region 发送到子进程的输入使用编码系统进行编码，就像写入文件的文本一样。请参阅编码系统。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: call-process program &amp;optional infile destination display &amp;rest args ¶
+</pre></div>
+<p>该函数调用程序并等待它完成。
+</p>
+<p>如果子进程的当前工作目录是本地的（由 unhandled-file-name-directory 确定），则将其设置为当前缓冲区的 default-directory 值，否则设置为 <code>~</code> 。如果要在远程目录中运行进程，请使用 process-file。
+</p>
+<p>如果 infile 不为零，则新进程的标准输入来自文件 infile，否则来自 null 设备。参数destination 说明将流程输出放在哪里。以下是可能性：
+</p>
+<div class="lisp">
+<pre class="lisp">a buffer
+</pre></div>
+<p>将输出插入该缓冲区中的点之前。这包括进程的标准输出流和标准错误流。
+</p><div class="lisp">
+<pre class="lisp">a buffer name (a string)
+</pre></div>
+<p>在点之前将输出插入到具有该名称的缓冲区中。
+</p><div class="lisp">
+<pre class="lisp">t
+</pre></div>
+<p>将输出插入当前缓冲区中的点之前。
+</p><div class="lisp">
+<pre class="lisp">nil
+</pre></div>
+<p>丢弃输出。
+</p><div class="lisp">
+<pre class="lisp">0
+</pre></div>
+<p>丢弃输出，并立即返回 nil 而无需等待子进程完成。
+</p>
+<p>在这种情况下，进程并不是真正同步的，因为它可以与 Emacs 并行运行；  但是你可以认为它是同步的，因为只要这个函数返回，Emacs 就基本上完成了子进程。
+</p>
+<p>MS-DOS 不支持异步子进程，所以这个选项在那里不起作用。
+</p><div class="lisp">
+<pre class="lisp">(:file file-name)
+</pre></div>
+<p>将输出发送到指定的文件名，如果它已经存在则覆盖它。
+</p><div class="lisp">
+<pre class="lisp">(real-destination error-destination
+</pre></div>
+<p>将标准输出流与标准错误流分开；  按照real-destination指定的处理普通输出，按照error-destination处理错误输出。如果error-destination为nil，则表示丢弃错误输出，t表示将其与普通输出混合，字符串指定将错误输出重定向到的文件名。
+</p>
+<p>您不能直接指定一个缓冲区来放置错误输出；  这太难实施了。但是您可以通过将错误输出发送到临时文件，然后在子进程完成时将文件插入缓冲区来实现此结果。
+</p>
+<p>如果 display 不为零，则调用进程在插入输出时重新显示缓冲区。（但是，如果解码输出选择的编码系统未确定，即从实际数据中推断出编码，那么一旦遇到非 ASCII 字符，重新显示有时就无法继续。这是难以解决的根本原因；请参阅接收进程的输出。）
+</p>
+<p>否则，函数调用过程不会重新显示，并且只有当 Emacs 在正常事件过程中重新显示该缓冲区时，结果才会在屏幕上可见。
+</p>
+<p>其余参数 args 是为程序指定命令行参数的字符串。每个字符串作为单独的参数传递给程序。
+</p>
+<p>call-process 返回的值（除非您告诉它不要等待）指示进程终止的原因。一个数字给出了子进程的退出状态；  0 表示成功，任何其他值表示失败。如果进程以信号终止，则 call-process 返回一个描述该信号的字符串。如果你告诉调用进程不要等待，它会返回 nil。
+</p>
+<p>在下面的示例中，缓冲区 <code>foo</code> 是当前的。
+</p><div class="lisp">
+<pre class="lisp">(call-process "pwd" nil t)
+     ⇒ 0
+
+---------- Buffer: foo ----------
+/home/lewis/manual
+---------- Buffer: foo ----------
+
+
+(call-process "grep" nil "bar" nil "lewis" "/etc/passwd")
+     ⇒ 0
+
+---------- Buffer: bar ----------
+lewis:x:1001:1001:Bil Lewis,,,,:/home/lewis:/bin/bash
+
+---------- Buffer: bar ----------
+</pre></div>
+<p>下面是一个使用调用过程的例子，它可以在插入目录函数的定义中找到：
+</p>
+<div class="lisp">
+<pre class="lisp">(call-process insert-directory-program nil t nil switches
+              (if full-directory-p
+                  (concat (file-name-as-directory file) ".")
+                file))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: process-file program &amp;optional infile buffer display &amp;rest args ¶
+</pre></div>
+<p>此函数在单独的进程中同步处理文件。它类似于 call-process，但可以根据变量 default-directory 的值调用文件名处理程序，该变量指定子进程的当前工作目录。
+</p>
+<p>参数的处理方式几乎与 call-process 相同，但有以下区别：
+</p>
+<p>某些文件名处理程序可能不支持参数 infile、buffer 和 display 的所有组合和形式。例如，某些文件名处理程序可能表现得好像 display 为 nil，而不管实际传递的值如何。作为另一个示例，某些文件名处理程序可能不支持通过缓冲区参数分隔标准输出和错误输出。
+</p>
+<p>如果调用文件名处理程序，它会根据第一个参数 program 确定要运行的程序。例如，假设调用了远程文件的处理程序。那么用于搜索程序的路径可能与 exec-path 不同。
+</p>
+<p>第二个参数 infile 可以调用文件名处理程序。文件名处理程序可能与为进程文件函数本身选择的处理程序不同。（例如，default-directory 可以在一个远程主机上，而 infile 在不同的远程主机上。或者 default-directory 可以是非特殊的，而 infile 在远程主机上。）
+</p>
+<p>如果 buffer 是 (real-destination error-destination) 形式的列表，并且 error-destination 命名一个文件，则适用与 infile 相同的注释。
+</p>
+<p>剩余的参数 (args) 将逐字传递给进程。Emacs 不参与处理 args 中存在的文件名。为避免混淆，最好避免在 args 中使用绝对文件名，而是将所有文件名指定为相对于默认目录。函数 file-relative-name 对于构造这样的相对文件名很有用。或者，您可以使用 file-local-name（请参阅使某些文件名 <code>变魔术</code> ）来获取从远程主机的角度来看的绝对文件名。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: process-file-side-effects ¶
+</pre></div>
+<p>此变量指示 process-file 的调用是否更改远程文件。
+</p>
+<p>默认情况下，此变量始终设置为 t，这意味着调用 process-file 可能会更改远程主机上的任何文件。当设置为 nil 时，文件名处理程序可以针对远程文件属性缓存优化其行为。
+</p>
+<p>您应该只使用 let-binding 更改此变量；  从不使用 setq。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: process-file-return-signal-string ¶
+</pre></div>
+<p>此用户选项指示 process-file 的调用是否返回描述中断远程进程的信号的字符串。
+</p>
+<p>当一个进程返回一个大于 128 的退出代码时，它被解释为一个信号。process-file 需要返回一个描述这个信号的字符串。
+</p>
+<p>由于存在违反此规则的进程，返回大于 128 且未绑定到信号的退出代码，因此 process-file 始终将退出代码作为远程进程的自然数返回。将此用户选项设置为 non-nil 会强制 process-file 将此类退出代码解释为信号，并返回相应的字符串。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: call-process-region start end program &amp;optional delete destination display &amp;rest args ¶
+</pre></div>
+<p>此函数将文本从头到尾作为标准输入发送到正在运行的程序的进程。如果 delete 不为零，则删除发送的文本；  当目标为 t 时，这很有用，可将输出插入当前缓冲区以代替输入。
+</p>
+<p>参数 destination 和 display 控制如何处理来自子进程的输出，以及是否在显示进入时更新它。有关详细信息，请参阅上面的 call-process 描述。如果destination 是整数0，call-process-region 丢弃输出并立即返回nil，而不等待子进程完成（这仅在支持异步子进程时有效；即，在MS-DOS 上不可用）。
+</p>
+<p>其余参数 args 是为程序指定命令行参数的字符串。
+</p>
+<p>call-process-region 的返回值和 call-process 一样：如果你告诉它不等待就返回，则返回 nil；  否则，一个数字或字符串，指示子进程如何终止。
+</p>
+<p>在下面的示例中，我们使用 call-process-region 来运行 cat 实用程序，标准输入是缓冲区 <code>foo</code> （单词 <code>input</code> ）中的前五个字符。cat 将其标准输入复制到其标准输出中。由于参数目标是 t，因此该输出被插入到当前缓冲区中。
+</p><div class="lisp">
+<pre class="lisp">
+
+---------- Buffer: foo ----------
+input∗
+---------- Buffer: foo ----------
+
+
+(call-process-region 1 6 "cat" nil t)
+     ⇒ 0
+
+---------- Buffer: foo ----------
+inputinput∗
+---------- Buffer: foo ----------
+
+</pre></div>
+<p>例如，shell-command-on-region 命令以类似于以下方式使用 call-shell-region：
+</p>
+<div class="lisp">
+<pre class="lisp">(call-shell-region
+ start end
+ command              ; shell command
+ nil                  ; do not delete region
+ buffer)              ; send output to buffer
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: call-process-shell-command command &amp;optional infile destination display ¶
+</pre></div>
+<p>该函数同步执行shell命令命令。其他参数在调用过程中处理。旧的调用约定允许在显示后传递任意数量的附加参数，这些参数连接到命令；  这仍然受到支持，但强烈反对。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: process-file-shell-command command &amp;optional infile destination display ¶
+</pre></div>
+<p>此函数类似于 call-process-shell-command，但在内部使用 process-file。根据默认目录，命令也可以在远程主机上执行。旧的调用约定允许在显示后传递任意数量的附加参数，这些参数连接到命令；  这仍然受到支持，但强烈反对。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: call-shell-region start end command &amp;optional delete destination ¶
+</pre></div>
+<p>此函数将文本从头到尾作为标准输入发送到下级 shell 运行命令。这个函数类似于 call-process-region，进程是一个 shell。参数 delete、destination 和返回值类似于 call-process-region。请注意，此函数不接受其他参数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: shell-command-to-string command ¶
+</pre></div>
+<p>此函数将命令（字符串）作为 shell 命令执行，然后将命令的输出作为字符串返回。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: process-lines program &amp;rest args ¶
+</pre></div>
+<p>该函数运行程序，等待它完成，并将其输出作为字符串列表返回。列表中的每个字符串都包含程序输出的一行文本；  从每一行中删除行尾字符。程序之外的参数 args 是指定用于运行程序的命令行参数的字符串。
+</p>
+<p>如果程序以非零退出状态退出，则此函数会发出错误信号。
+</p>
+<p>此函数通过调用 call-process 工作，因此程序输出的解码方式与 call-process 相同。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: process-lines-ignore-status program &amp;rest args ¶
+</pre></div>
+<p>这个函数就像进程行，但如果程序以非零退出状态退出，则不会发出错误信号。
+</p>
+<p>脚注
+(23)
+</p>
+<p>在其他系统上，Emacs 使用 ls 的 Lisp 模拟；  请参阅目录的内容。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="39.4_创建一个异步进程.html">创建一个异步进程</a>, Previous: <a href="39.2_Shell_参数.html">Shell_参数</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

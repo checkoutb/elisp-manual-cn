@@ -1,0 +1,97 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>26.1.1 文件访问函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">26.1.1 文件访问函数</h3>
+<div class="nav-panel"><p>Next: <a href="26.1.2_访问子程序.html">访问子程序</a>, Previous: <a href="26.1_访问文件.html">访问文件</a>, Up: <a href="26.1_访问文件.html">访问文件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍通常用于访问文件的函数。由于历史原因，这些函数的名称以 <code>find-</code> 而不是 <code>visit-</code> 开头。有关访问缓冲区的已访问文件名或通过其已访问文件名查找现有缓冲区的函数和变量，请参阅缓冲区文件名。
+</p>
+<p>在 Lisp 程序中，如果您想查看文件的内容但不改变它，最快的方法是在临时缓冲区中使用 insert-file-contents。访问该文件不是必需的，并且需要更长的时间。请参阅从文件中读取。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: find-file filename &amp;optional wildcards ¶
+</pre></div>
+<p>此命令选择一个访问文件文件名的缓冲区，如果存在则使用现​​有缓冲区，否则创建一个新缓冲区并将文件读入其中。它还返回该缓冲区。
+</p>
+<p>除了一些技术细节之外，find-file 函数的主体基本上等同于：
+</p><div class="lisp">
+<pre class="lisp">(switch-to-buffer (find-file-noselect filename nil nil wildcards))
+</pre></div>
+<p>（请参阅在窗口中切换到缓冲区中的切换到缓冲区。）
+</p>
+<p>如果通配符不为零（在交互式调用中总是如此），则 find-file 扩展文件名中的通配符并访问所有匹配的文件。
+</p>
+<p>当 find-file 以交互方式调用时，它会提示输入 minibuffer 中的文件名。
+</p>
+<div class="lisp">
+<pre class="lisp">
+Command: find-file-literally filename ¶
+</pre></div>
+<p>此命令访问文件名，就像 find-file 一样，但它不执行任何格式转换（请参阅文件格式转换）、字符代码转换（请参阅编码系统）或行尾转换（请参阅行尾转换）。访问文件的缓冲区是单字节的，它的主要模式是基本模式，与文件名无关。文件中的文件局部变量规范（参见文件局部变量）被忽略，并且由于 require-final-newline（参见 require-final-newline）而导致的自动解压和在文件末尾添加换行符也被禁用。
+</p>
+<p>请注意，如果 Emacs 已经有一个缓冲区以非字面方式访问同一个文件，它不会从字面上访问同一个文件，而只是切换到现有的缓冲区。如果您想确保从字面上访问文件的内容，您应该创建一个临时缓冲区，然后使用 insert-file-contents-literally 将文件内容读入其中（请参阅从文件中读取）。
+</p>
+<div class="lisp">
+<pre class="lisp">
+Function: find-file-noselect filename &amp;optional nowarn rawfile wildcards ¶
+</pre></div>
+<p>这个函数是所有文件访问函数的核心。它返回一个访问文件文件名的缓冲区。如果您愿意，您可以将缓冲区设置为当前缓冲区或将其显示在窗口中，但此功能不会这样做。
+</p>
+<p>如果存在缓冲区，则该函数返回一个现有缓冲区；  否则它会创建一个新缓冲区并将文件读入其中。当 find-file-noselect 使用现有缓冲区时，它首先验证文件自上次访问或保存在该缓冲区中以来没有更改。如果文件已更改，此函数会询问用户是否重新读取已更改的文件。如果用户说 <code>是</code> ，则先前在缓冲区中所做的任何编辑都将丢失。
+</p>
+<p>读取文件涉及解码文件的内容（请参阅编码系统），包括行尾转换和格式转换（请参阅文件格式转换）。如果通配符不为零，则 find-file-noselect 扩展文件名中的通配符并访问所有匹配的文件。
+</p>
+<p>此函数在各种特殊情况下显示警告或建议消息，除非可选参数 nowarn 为非零。例如，如果它需要创建一个缓冲区，并且没有名为 filename 的文件，它会在回显区域显示消息 <code>（新文件）</code> ，并将缓冲区留空。
+</p>
+<p>find-file-noselect 函数通常在读取文件后调用 after-find-file（参见访问子程序）。该函数设置缓冲区主模式，解析局部变量，如果存在比刚刚访问的文件更新的自动保存文件，则警告用户，并通过运行 find-file-hook 中的函数来完成。
+</p>
+<p>如果可选参数 rawfile 不为 nil，则不调用 after-find-file，并且在失败的情况下不运行 find-file-not-found-functions。更重要的是，一个非零原始文件值会抑制编码系统转换和格式转换。
+</p>
+<p>find-file-noselect 函数通常返回正在访问文件文件名的缓冲区。但是，如果实际使用并扩展了通配符，它​​会返回访问各种文件的缓冲区列表。
+</p>
+<div class="lisp">
+<pre class="lisp">(find-file-noselect "/etc/fstab")
+     ⇒ #&lt;buffer fstab&gt;
+</pre></div>
+<div class="lisp">
+<pre class="lisp">
+Command: find-file-other-window filename &amp;optional wildcards ¶
+</pre></div>
+<p>此命令选择访问文件文件名的缓冲区，但在选定窗口以外的窗口中执行此操作。它可以使用另一个现有的窗口或拆分一个窗口；  请参阅在窗口中切换到缓冲区。
+</p>
+<p>当以交互方式调用此命令时，它会提示输入文件名。
+</p>
+<div class="lisp">
+<pre class="lisp">
+Command: find-file-read-only filename &amp;optional wildcards ¶
+</pre></div>
+<p>此命令选择访问文件文件名的缓冲区，如 find-file，但它将缓冲区标记为只读。有关相关函数和变量，请参阅只读缓冲区。
+</p>
+<p>当以交互方式调用此命令时，它会提示输入文件名。
+</p>
+<div class="lisp">
+<pre class="lisp">
+User Option: find-file-wildcards ¶
+</pre></div>
+<p>如果此变量不为 nil，则各种查找文件命令会检查通配符并访问与它们匹配的所有文件（当以交互方式调用或当它们的通配符参数为非 nil 时）。如果这个选项是 nil，那么 find-file 命令会忽略它们的通配符参数并且从不特别对待通配符。
+</p>
+<div class="lisp">
+<pre class="lisp">
+User Option: find-file-hook ¶
+</pre></div>
+<p>此变量的值是访问文件后要调用的函数列表。文件的局部变量规范（如果有）将在钩子运行之前处理。运行钩子函数时，访问文件的缓冲区是当前的。
+</p>
+<p>这个变量是一个普通的钩子。请参阅挂钩。
+</p>
+<div class="lisp">
+<pre class="lisp">
+Variable: find-file-not-found-functions ¶
+</pre></div>
+<p>此变量的值是当 find-file 或 find-file-noselect 传递一个不存在的文件名时要调用的函数列表。find-file-noselect 一旦检测到不存在的文件就会调用这些函数。它按列表的顺序调用它们，直到其中一个返回非零。缓冲区文件名已设置。
+</p>
+<p>这不是一个普通的钩子，因为使用了函数的值，并且在许多情况下只调用了一些函数。
+</p>
+<div class="lisp">
+<pre class="lisp">
+Variable: find-file-literally ¶
+</pre></div>
+<p>这个缓冲区局部变量，如果设置为非零值，则使保存缓冲区的行为就像缓冲区按字面意思访问其文件一样，即，没有任何类型的转换。命令 find-file-literally 设置此变量的本地值，但其他等效函数和命令也可以这样做，例如，避免在文件末尾自动添加换行符。该变量是永久局部变量，因此不受主模式变化的影响。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="26.1.2_访问子程序.html">访问子程序</a>, Previous: <a href="26.1_访问文件.html">访问文件</a>, Up: <a href="26.1_访问文件.html">访问文件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

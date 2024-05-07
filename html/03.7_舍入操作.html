@@ -1,0 +1,26 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>3.7 舍入操作</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">3.7 舍入操作</h2>
+<div class="nav-panel"><p>Next: <a href="03.8_整数的按位运算.html">整数的按位运算</a>, Previous: <a href="03.6_算术运算.html">算术运算</a>, Up: <a href="03_数字.html">数字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>函数 ffloor、fceiling、fround 和 ftruncate 采用浮点参数并返回其值为附近整数的浮点结果。ffloor 返回下面最接近的整数；  fceiling，上面最接近的整数；  ftruncate，向零方向最接近的整数；  fround，最接近的整数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ffloor float
+</pre></div>
+<p>此函数将浮点数舍入到下一个较低的整数值，并将该值作为浮点数返回。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: fceiling float
+</pre></div>
+<p>此函数将浮点数舍入到下一个更高的整数值，并将该值作为浮点数返回。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ftruncate float
+</pre></div>
+<p>此函数将浮点数向零舍入为整数值，并将该值作为浮点数返回。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: fround float
+</pre></div>
+<p>此函数将浮点数舍入为最接近的整数值，并将该值作为浮点数返回。舍入两个整数之间等距的值会返回偶数。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="03.8_整数的按位运算.html">整数的按位运算</a>, Previous: <a href="03.6_算术运算.html">算术运算</a>, Up: <a href="03_数字.html">数字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

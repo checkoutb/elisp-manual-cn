@@ -1,0 +1,91 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>28.2 当前缓冲区</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">28.2 当前缓冲区</h2>
+<div class="nav-panel"><p>Next: <a href="28.3_缓冲区名称.html">缓冲区名称</a>, Previous: <a href="28.1_缓冲区基础.html">缓冲区基础</a>, Up: <a href="28_缓冲区.html">缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>通常，Emacs 会话中有许多缓冲区。在任何时候，它们中的一个都被指定为当前缓冲区——大多数编辑发生的缓冲区。大多数用于检查或更改文本的原语都隐式地在当前缓冲区上运行（请参阅文本）。
+</p>
+<p>通常，所选窗口中显示的缓冲区（请参阅选择窗口）是当前缓冲区，但并非总是如此：Lisp 程序可以临时将任何缓冲区指定为当前缓冲区，以便对其内容进行操作，而不会更改显示的内容屏幕。指定当前缓冲区的最基本功能是设置缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: current-buffer ¶
+</pre></div>
+<p>此函数返回当前缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">(current-buffer)
+     ⇒ #&lt;buffer buffers.texi&gt;
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: set-buffer buffer-or-name ¶
+</pre></div>
+<p>此函数使 buffer-or-name 成为当前缓冲区。buffer-or-name 必须是现有缓冲区或现有缓冲区的名称。返回值是当前缓冲区。
+</p>
+<p>该函数不会在任何窗口中显示缓冲区，因此用户不一定能看到缓冲区。但是 Lisp 程序现在将在其上运行。
+</p>
+<p>当编辑命令返回到编辑器命令循环时，Emacs 会自动在所选窗口中显示的缓冲区上调用 set-buffer（请参阅选择窗口）。这是为了防止混淆：它确保当 Emacs 读取命令时光标所在的缓冲区是该命令应用到的缓冲区（请参阅命令循环）。因此，您不应该使用 set-buffer 明显地切换到不同的缓冲区；  为此，请使用在窗口中切换到缓冲区中描述的函数。
+</p>
+<p>在编写 Lisp 函数时，不要依赖命令循环的这种行为来在操作后恢复当前缓冲区。编辑命令也可以被其他程序调用为 Lisp 函数，而不仅仅是来自命令循环；  如果子程序不改变当前的缓冲区，调用者会很方便（当然，除非这是子程序的目的）。
+</p>
+<p>要在另一个缓冲区上临时操作，请将 set-buffer 放在 save-current-buffer 表单中。例如，这里是命令追加到缓冲区的简化版本：
+</p>
+<div class="lisp">
+<pre class="lisp">(defun append-to-buffer (buffer start end)
+  "Append the text of the region to BUFFER."
+  (interactive "BAppend to buffer: \nr")
+  (let ((oldbuf (current-buffer)))
+    (save-current-buffer
+      (set-buffer (get-buffer-create buffer))
+      (insert-buffer-substring oldbuf start end))))
+</pre></div>
+<p>在这里，我们绑定一个局部变量来记录当前缓冲区，然后 save-current-buffer 安排稍后再次使其成为当前缓冲区。接下来，set-buffer 使指定的缓冲区成为当前缓冲区，并且 insert-buffer-substring 将字符串从原始缓冲区复制到指定的（现在是当前的）缓冲区。
+</p>
+<p>或者，我们可以使用 with-current-buffer 宏：
+</p>
+<div class="lisp">
+<pre class="lisp">(defun append-to-buffer (buffer start end)
+  "Append the text of the region to BUFFER."
+  (interactive "BAppend to buffer: \nr")
+  (let ((oldbuf (current-buffer)))
+    (with-current-buffer (get-buffer-create buffer)
+      (insert-buffer-substring oldbuf start end))))
+</pre></div>
+<p>在任何一种情况下，如果附加到的缓冲区恰好显示在某个窗口中，则下一次重新显示将显示其文本如何更改。如果它没有显示在任何窗口中，您将不会立即在屏幕上看到更改。该命令使缓冲区临时变为当前缓冲区，但不会显示它。
+</p>
+<p>如果您为可能也具有缓冲区本地绑定的变量进行本地绑定（使用 let 或函数参数），请确保相同的缓冲区在本地绑定范围的开头和结尾都是当前的。否则，您可能会在一个缓冲区中绑定它并在另一个缓冲区中解除绑定！
+</p>
+<p>不要依赖使用 set-buffer 将当前缓冲区改回来，因为如果在错误的缓冲区是当前缓冲区时发生退出，那将无法完成这项工作。例如，在前面的示例中，这样做是错误的：
+</p><div class="lisp">
+<pre class="lisp">(let ((oldbuf (current-buffer)))
+  (set-buffer (get-buffer-create buffer))
+  (insert-buffer-substring oldbuf start end)
+  (set-buffer oldbuf))
+</pre></div>
+<p>正如我们所做的那样，使用 save-current-buffer 或 with-current-buffer 可以正确处理退出、错误和抛出以及普通评估。
+</p>
+<div class="lisp">
+<pre class="lisp">Special Form: save-current-buffer body… ¶
+</pre></div>
+<p>save-current-buffer 特殊形式保存当前缓冲区的标识，评估正文形式，最后将该缓冲区恢复为当前缓冲区。返回值是正文中最后一个表单的值。即使在通过 throw 或 error 异常退出的情况下也会恢复当前缓冲区（请参阅非本地退出）。
+</p>
+<p>如果从 save-current-buffer 退出时曾经是当前的缓冲区已被杀死，那么它当然不会再次成为当前缓冲区。相反，无论哪个缓冲区在退出之前是当前的，都会保持当前状态。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: with-current-buffer buffer-or-name body… ¶
+</pre></div>
+<p>with-current-buffer 宏保存当前缓冲区的标识，使缓冲区或名称成为当前缓冲区，评估主体形式，最后恢复当前缓冲区。buffer-or-name 必须指定现有缓冲区或现有缓冲区的名称。
+</p>
+<p>返回值是正文中最后一个表单的值。即使在通过 throw 或 error 异常退出的情况下也会恢复当前缓冲区（请参阅非本地退出）。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: with-temp-buffer body… ¶
+</pre></div>
+<p>with-temp-buffer 宏使用临时缓冲区作为当前缓冲区来评估正文表单。它保存当前缓冲区的标识，创建一个临时缓冲区并使其成为当前缓冲区，评估主体形式，最后在杀死临时缓冲区的同时恢复先前的当前缓冲区。
+</p>
+<p>默认情况下，撤消信息（请参阅撤消）不会记录在此宏创建的缓冲区中（但如果需要，主体可以启用它）。临时缓冲区也不会运行钩子 kill-buffer-hook、kill-buffer-query-functions（请参阅 Killing Buffers）和 buffer-list-update-hook（请参阅缓冲区列表）。
+</p>
+<p>返回值是正文中最后一个表单的值。您可以使用 (buffer-string) 作为最后一种形式返回临时缓冲区的内容。
+</p>
+<p>即使在通过 throw 或 error 异常退出的情况下也会恢复当前缓冲区（请参阅非本地退出）。
+</p>
+<p>另请参阅写入文件中的 with-temp-file。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="28.3_缓冲区名称.html">缓冲区名称</a>, Previous: <a href="28.1_缓冲区基础.html">缓冲区基础</a>, Up: <a href="28_缓冲区.html">缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

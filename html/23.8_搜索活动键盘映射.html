@@ -1,0 +1,27 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>23.8 搜索活动键盘映射</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">23.8 搜索活动键盘映射</h2>
+<div class="nav-panel"><p>Next: <a href="23.9_控制激活的键盘映射.html">控制激活的键盘映射</a>, Previous: <a href="23.7_活动键盘映射.html">活动键盘映射</a>, Up: <a href="23_键盘映射.html">键盘映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这是 Emacs 如何搜索活动键盘映射的伪 Lisp 总结：
+</p><div class="lisp">
+<pre class="lisp">(or (if overriding-terminal-local-map
+        (find-in overriding-terminal-local-map))
+    (if overriding-local-map
+        (find-in overriding-local-map)
+      (or (find-in (get-char-property (point) 'keymap))
+          (find-in-any emulation-mode-map-alists)
+          (find-in-any minor-mode-overriding-map-alist)
+          (find-in-any minor-mode-map-alist)
+          (if (get-text-property (point) 'local-map)
+              (find-in (get-char-property (point) 'local-map))
+            (find-in (current-local-map)))))
+    (find-in (current-global-map)))
+</pre></div>
+<p>在这里，find-in 和 find-in-any 是伪函数，它们分别在一个键映射和键映射列表中进行搜索。请注意，set-transient-map 函数通过设置覆盖终端本地映射来工作（请参阅控制活动键盘映射）。
+</p>
+<p>在上面的伪代码中，如果按键序列以鼠标事件（请参阅鼠标事件）开始，则使用该事件的位置而不是点，并且使用事件的缓冲区而不是当前缓冲区。特别是，这会影响键映射和本地映射属性的查找方式。如果鼠标事件发生在嵌入了 display、before-string 或 after-string 属性的字符串上（请参阅具有特殊含义的属性），并且该字符串具有非 nil 键映射或本地映射属性，它会覆盖相应的属性在底层缓冲区文本中（即，底层文本指定的属性被忽略）。
+</p>
+<p>当在其中一个活动键映射中找到键绑定，并且该绑定是命令时，搜索结束——命令被执行。但是，如果绑定是带有值或字符串的符号，Emacs 会用变量的值或字符串替换输入的键序列，并重新开始搜索活动的键映射。请参阅密钥查找。
+</p>
+<p>最后找到的命令也可能被重新映射。请参阅重新映射命令。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="23.9_控制激活的键盘映射.html">控制激活的键盘映射</a>, Previous: <a href="23.7_活动键盘映射.html">活动键盘映射</a>, Up: <a href="23_键盘映射.html">键盘映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

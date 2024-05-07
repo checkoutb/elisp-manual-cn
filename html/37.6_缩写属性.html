@@ -1,0 +1,35 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>37.6 缩写属性</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">37.6 缩写属性</h2>
+<div class="nav-panel"><p>Next: <a href="37.7_缩写表属性.html">缩写表属性</a>, Previous: <a href="37.5_标准缩写表.html">标准缩写表</a>, Up: <a href="37_缩写和缩写扩展.html">缩写和缩写扩展.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>缩写具有属性，其中一些会影响它们的工作方式。您可以将它们作为参数提供给 define-abbrev，并使用以下函数操作它们：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: abbrev-put abbrev prop val ¶
+</pre></div>
+<p>将 abbrev 的属性 prop 设置为值 val。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: abbrev-get abbrev prop ¶
+</pre></div>
+<p>返回 abbrev 的属性 prop，如果 abbrev 没有这样的属性，则返回 nil。
+</p>
+<p>以下属性具有特殊含义：
+</p>
+<div class="lisp">
+<pre class="lisp">:count
+</pre></div>
+<p>此属性计算缩写扩展的次数。如果未显式设置，则由 define-abbrev 将其初始化为 0。
+</p><div class="lisp">
+<pre class="lisp">:system
+</pre></div>
+<p>如果非零，则此属性将缩写标记为系统缩写。不会保存此类缩写（请参阅将缩写保存在文件中）。
+</p><div class="lisp">
+<pre class="lisp">:enable-function
+</pre></div>
+<p>如果非 nil，则此属性应该是一个无参数的函数，如果不应该使用缩写，则返回 nil，否则返回 t。
+</p><div class="lisp">
+<pre class="lisp">:case-fixed
+</pre></div>
+<p>如果非零，则此属性表示缩写名称的大小写是重要的，并且应该只匹配具有相同大写模式的文本。它还禁用修改扩展大小写的代码。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="37.7_缩写表属性.html">缩写表属性</a>, Previous: <a href="37.5_标准缩写表.html">标准缩写表</a>, Up: <a href="37_缩写和缩写扩展.html">缩写和缩写扩展.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.19.5 按钮缓冲区命令</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.19.5 按钮缓冲区命令</h3>
+<div class="nav-panel"><p>Next: <a href="40.20_抽象显示.html">抽象显示</a>, Previous: <a href="40.19.4_操作按钮.html">操作按钮</a>, Up: <a href="40.19_按钮.html">按钮.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这些是用于在 Emacs 缓冲区中定位和操作按钮的命令和函数。
+</p>
+<p>push-button 是用户用于实际按下按钮的命令，默认情况下，在按钮本身中使用按钮覆盖或文本属性中的本地键映射将按钮绑定到 RET 和 mouse-2。在按钮本身之外有用的命令，例如前进按钮和后退按钮，在存储在按钮缓冲区映射中的键盘映射中也可用；  使用按钮的模式可能希望使用按钮缓冲区映射作为其键映射的父键映射。或者，可以打开按钮模式以获得几乎相同的效果：这是一种次要模式，除了将按钮缓冲区映射安装为次要模式键盘映射之外什么都不做。
+</p>
+<p>如果按钮具有非零跟随链接属性，并且设置了 mouse-1-click-follows-link，则快速单击鼠标 1 也会激活按钮命令。请参阅定义可点击文本。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: push-button &amp;optional pos use-mouse-action ¶
+</pre></div>
+<p>执行位置 pos 处的按钮指定的操作。pos 可以是缓冲区位置或鼠标事件。如果 use-mouse-action 不是 nil，或者 pos 是鼠标事件（请参阅鼠标事件），请尝试调用按钮的 mouse-action 属性而不是 action；  如果按钮没有鼠标动作属性，则正常使用动作。pos 默认为 point，除非作为鼠标事件的结果以交互方式调用按钮时，在这种情况下，使用鼠标事件的位置。如果 pos 处没有按钮，则不执行任何操作并返回 nil，否则返回 t。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: forward-button n &amp;optional wrap display-message no-error ¶
+</pre></div>
+<p>如果 n 为负数，则移至第 n 个下一个按钮，或第 n 个上一个按钮。如果 n 为零，则移动到任意按钮的开头点。如果 wrap 不为零，则从缓冲区的任一端移动过去从另一端继续。如果 display-message 不为零，则显示按钮的帮助回显字符串。任何具有非 nil 跳过属性的按钮都会被跳过。返回找到的按钮，如果找不到按钮，则发出错误信号。如果 no-error 不是 nil，则返回 nil 而不是发出错误信号。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: backward-button n &amp;optional wrap display-message no-error ¶
+</pre></div>
+<p>如果 n 为负数，则移至第 n 个上一个按钮，或第 n 个下一个按钮。如果 n 为零，则移动到任意按钮的开头点。如果 wrap 不为零，则从缓冲区的任一端移动过去从另一端继续。如果 display-message 不为零，则显示按钮的帮助回显字符串。任何具有非 nil 跳过属性的按钮都会被跳过。返回找到的按钮，如果找不到按钮，则发出错误信号。如果 no-error 不是 nil，则返回 nil 而不是发出错误信号。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: next-button pos &amp;optional count-current ¶
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: previous-button pos &amp;optional count-current ¶
+</pre></div>
+<p>在当前缓冲区中的位置 pos 之后（对于下一个按钮）或之前（对于上一个按钮）返回下一个按钮。如果 count-current 不为零，则在搜索中计算 pos 处的任何按钮，而不是从下一个按钮开始。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.20_抽象显示.html">抽象显示</a>, Previous: <a href="40.19.4_操作按钮.html">操作按钮</a>, Up: <a href="40.19_按钮.html">按钮.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>E.8.5 模块中的非本地出口</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">E.8.5 模块中的非本地出口</h3>
+<div class="nav-panel"><p>Next: <a href="0E.9_对象内部.html">对象内部</a>, Previous: <a href="0E.8.4_模块的其他便利功能.html">模块的其他便利功能</a>, Up: <a href="0E.8_编写动态加载的模块.html">编写动态加载的模块.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs Lisp 支持非本地退出，由此程序控制从程序中的一个点转移到另一个远程点。请参阅非本地出口。因此，您的模块调用的 Lisp 函数可能会通过调用 signal 或 throw 非本地退出，并且您的模块函数必须正确处理此类非本地退出。需要这样的处理是因为 C 程序在这些情况下不会自动释放资源并执行其他清理；  您的模块代码必须自己完成。模块 API 为此提供了便利，如本小节所述。它们从 Emacs 25 开始普遍可用；  它们中的那些在以后的版本中可用明确地调用了第一个 Emacs 版本，它们成为 API 的一部分。
+</p>
+<p>当模块函数调用的某些 Lisp 代码发出错误信号或抛出异常时，非本地出口被捕获，待处理的出口及其相关数据被存储在环境中。每当一个非本地出口在环境中挂起时，使用指向该环境的指针调用的任何模块 API 函数将立即返回而不进行任何处理（函数 non_local_exit_check、non_local_exit_get 和 non_local_exit_clear 是此规则的例外）。如果你的模块函数然后什么都不做并返回 Emacs，一个挂起的非本地退出将导致 Emacs 对其采取行动：发出错误信号或抛出相应的 catch。
+</p>
+<p>因此，对模块函数中的非本地退出最简单的 <code>处理</code> 就是不做任何特别的事情，让其余的代码像什么都没发生一样运行。但是，这可能会导致两类问题：
+</p>
+<ul>
+<li>
+您的模块函数可能使用未初始化或未定义的值，因为 API 函数会立即返回而不会产生预期结果。
+</li><li>
+您的模块可能会泄漏资源，因为它可能没有机会释放它们。
+</li></ul>
+<p>因此，我们建议您的模块函数使用下面描述的函数检查非本地退出条件并从中恢复。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: enum emacs_funcall_exit non_local_exit_check (emacs_env *env) ¶
+</pre></div>
+<p>此函数返回存储在 env 中的非本地退出条件。可能的值是：
+</p>
+<div class="lisp">
+<pre class="lisp">emacs_funcall_exit_return ¶
+</pre></div>
+<p>最后一个 API 函数正常退出。
+</p><div class="lisp">
+<pre class="lisp">emacs_funcall_exit_signal ¶
+</pre></div>
+<p>最后一个 API 函数发出错误信号。
+</p><div class="lisp">
+<pre class="lisp">emacs_funcall_exit_throw ¶
+</pre></div>
+<p>最后一个 API 函数通过 throw 退出。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: enum emacs_funcall_exit non_local_exit_get (emacs_env *env, emacs_value *symbol, emacs_value *data) ¶
+</pre></div>
+<p>此函数返回存储在 env 中的非本地退出条件类型，就像 non_local_exit_check 一样，但它也返回有关非本地退出的完整信息（如果有）。如果返回值为 emacs_funcall_exit_signal，则该函数将错误符号存储在 *symbol 中，并将错误数据存储在 *data 中（请参阅如何发出错误信号）。如果返回值为 emacs_funcall_exit_throw，则函数将 catch 标记符号存储在 *symbol 中，将 throw 值存储在 *data 中。当返回值为 emacs_funcall_exit_return 时，该函数不会在这些参数指向的内存中存储任何内容。
+</p>
+<p>您应该检查重要的非本地退出条件：在分配某些资源之前或在分配可能需要释放的资源之后，或者失败意味着进一步处理是不可能或不可行的。
+</p>
+<p>一旦你的模块函数检测到一个非本地出口处于挂起状态，它可以返回到 Emacs（在执行必要的本地清理之后），或者它可以尝试从非本地出口恢复。以下 API 函数将帮助完成这些任务。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: void non_local_exit_clear (emacs_env *env) ¶
+</pre></div>
+<p>此函数从 env 中清除挂起的非本地退出条件和数据。调用后，模块API函数将正常工作。如果您的模块函数可以从它调用的 Lisp 函数的非本地退出中恢复并继续，并且在调用以下任何两个函数（或任何其他 API 函数，如果您希望它们在非本地时执行其预期处理）之前，请使用此函数退出待定）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: void non_local_exit_throw (emacs_env *env, emacs_value tag, emacs_value value) ¶
+</pre></div>
+<p>这个函数抛出到由 tag 表示的 Lisp catch 符号，将它的值作为要返回的值传递。您的模块函数通常应该在调用此函数后很快返回。此函数的一种用途是当您想要从调用的 API 或 Lisp 函数之一重新抛出非本地退出时。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: void non_local_exit_signal (emacs_env *env, emacs_value symbol, emacs_value data) ¶
+</pre></div>
+<p>这个函数用指定的错误数据数据来表示错误符号符号所代表的错误。调用此函数后，模块函数应立即返回。这个函数可能很有用，例如，用于从模块函数向 Emacs 发送错误信号。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="0E.9_对象内部.html">对象内部</a>, Previous: <a href="0E.8.4_模块的其他便利功能.html">模块的其他便利功能</a>, Up: <a href="0E.8_编写动态加载的模块.html">编写动态加载的模块.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

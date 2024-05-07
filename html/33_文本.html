@@ -1,0 +1,8 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33 文本</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h1 class="chapter">33 文本</h1>
+<div class="nav-panel"><p>Next: <a href="33.1_检查文本近点.html">检查文本近点</a>, Previous: <a href="32.8_区域.html">区域</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本章描述了处理缓冲区中文本的函数。大多数检查、插入或删除当前缓冲区中的文本，通常在点或与点相邻的文本上操作。许多是交互式的。所有更改文本的功能都提供撤消更改（请参阅撤消）。
+</p>
+<p>许多与文本相关的函数对由传入参数 start 和 end 的两个缓冲区位置定义的文本区域进行操作。这些参数应该是标记（请参阅标记）或数字字符位置（请参阅位置）。这些论点的顺序无关紧要；  start 是区域的结束，结束开始是可以的。例如，(delete-region 1 10) 和 (delete-region 10 1) 是等价的。如果 start 或 end 超出缓冲区的可访问部分，则会发出 args-out-of-range 错误信号。在交互式调用中，点和标记用于这些参数。
+</p>
+<p>在本章中， <code>文本</code> 指的是缓冲区中的字符，以及它们的属性（如果相关）。请记住，点始终位于两个字符之间，并且光标出现在点之后的字符上。
+</p>
+<div class="nav-panel"><p>Next: <a href="33.1_检查文本近点.html">检查文本近点</a>, Previous: <a href="32.8_区域.html">区域</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

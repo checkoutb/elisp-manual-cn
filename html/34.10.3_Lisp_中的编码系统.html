@@ -1,0 +1,106 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>34.10.3 Lisp 中的编码系统</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">34.10.3 Lisp 中的编码系统</h3>
+<div class="nav-panel"><p>Next: <a href="34.10.4_用户选择的编码系统.html">用户选择的编码系统</a>, Previous: <a href="34.10.2_编码和_IO.html">编码和_IO</a>, Up: <a href="34.10_编码系统.html">编码系统.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>以下是使用编码系统的 Lisp 工具：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: coding-system-list &amp;optional base-only ¶
+</pre></div>
+<p>此函数返回所有编码系统名称（符号）的列表。如果 base-only 不为零，则该值仅包括基本编码系统。否则，它还包括别名和变体编码系统。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: coding-system-p object ¶
+</pre></div>
+<p>如果 object 是编码系统名称或 nil，则此函数返回 t。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: check-coding-system coding-system ¶
+</pre></div>
+<p>此功能检查编码系统的有效性。如果有效，则返回编码系统。如果 coding-system 为 nil，则函数返回 nil。对于任何其他值，它表示一个错误，其错误符号是编码系统错误（见信号）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: coding-system-eol-type coding-system ¶
+</pre></div>
+<p>此函数返回编码系统使用的行尾（又名 eol）转换类型。如果coding-system指定了某种eol转换，则返回值为整数0、1、2，分别代表unix、dos、mac。如果 coding-system 没有明确指定 eol 转换，则返回值是编码系统的向量，每个编码系统都有一种可能的 eol 转换类型，如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(coding-system-eol-type 'latin-1)
+     ⇒ [latin-1-unix latin-1-dos latin-1-mac]
+</pre></div>
+<p>如果这个函数返回一个向量，作为文本编码或解码过程的一部分，Ema​​cs 将决定使用什么 eol 转换。对于解码，自动检测文本的行尾格式，并设置 eol 转换以匹配它（例如，DOS 样式的 CRLF 格式将暗示 dos eol 转换）。对于编码，eol 转换取自适当的默认编码系统（例如，缓冲区文件编码系统的缓冲区文件编码系统的默认值），或来自适用于底层平台的默认 eol 转换。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: coding-system-change-eol-conversion coding-system eol-type ¶
+</pre></div>
+<p>该函数返回一个编码系统，除了它的 eol 转换由 eol-type 指定外，它类似于coding-system。eol-type 应该是 unix、dos、mac 或 nil。如果为 nil，则返回的编码系统确定数据的行尾转换。
+</p>
+<p>eol-type 也可以是 0、1 或 2，分别代表 unix、dos 和 mac。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: coding-system-change-text-conversion eol-coding text-coding ¶
+</pre></div>
+<p>该函数返回使用eol-coding 的行尾转换和text-coding 的文本转换的编码系统。如果 text-coding 为 nil，则根据 eol-coding 返回未决定的或其变体之一。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: find-coding-systems-region from to ¶
+</pre></div>
+<p>此函数返回一个编码系统列表，可用于对 from 和 to 之间的文本进行编码。列表中的所有编码系统都可以安全地编码该部分文本中的任何多字节字符。
+</p>
+<p>如果文本不包含多字节字符，则函数返回列表（未确定）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: find-coding-systems-string string ¶
+</pre></div>
+<p>此函数返回可用于对字符串文本进行编码的编码系统列表。列表中的所有编码系统都可以安全地编码字符串中的任何多字节字符。如果文本不包含多字节字符，则返回列表（未确定）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: find-coding-systems-for-charsets charsets ¶
+</pre></div>
+<p>此函数返回可用于对列表字符集中的所有字符集进行编码的编码系统列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: check-coding-systems-region start end coding-system-list ¶
+</pre></div>
+<p>该函数检查列表 coding-system-list 中的编码系统是否可以对 start 和 end 之间区域中的所有字符进行编码。如果列表中的所有编码系统都可以对指定文本进行编码，则该函数返回 nil。如果某些编码系统无法对某些字符进行编码，则该值为 alist，其中每个元素的形式为 (coding-system1 pos1 pos2 …)，这意味着 coding-system1 无法对缓冲区位置 pos1、pos2、..的字符进行编码。 ..
+</p>
+<p>start 可能是一个字符串，在这种情况下 end 被忽略并且返回值引用字符串索引而不是缓冲区位置。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: detect-coding-region start end &amp;optional highest ¶
+</pre></div>
+<p>此函数选择一个合理的编码系统来从头到尾对文本进行解码。该文本应该是一个字节序列，即只有 ASCII 和八位字符的单字节文本或多字节文本（参见显式编码和解码）。
+</p>
+<p>通常，此函数返回可以处理对扫描文本进行解码的编码系统列表。它们按优先级降序排列。但是如果最高是非零，则返回值只是一种编码系统，即优先级最高的一种。
+</p>
+<p>如果该区域仅包含 ASCII 字符，除了诸如 ESC 等 ISO-2022 控制字符 ISO-2022 之外，该值是未确定的或（未确定的），或者指定行尾转换的变体，如果可以从文本中推断出的话。
+</p>
+<p>如果该区域包含空字节，则该值为无转换，即使该区域包含在某些编码系统中编码的文本。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: detect-coding-string string &amp;optional highest ¶
+</pre></div>
+<p>此函数类似于检测编码区域，只是它对字符串的内容而不是缓冲区中的字节进行操作。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: inhibit-null-byte-detection ¶
+</pre></div>
+<p>如果此变量具有非零值，则在检测区域或字符串的编码时会忽略空字节。这允许正确检测包含空字节的文本编码，例如具有索引节点的信息文件。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: inhibit-iso-escape-detection ¶
+</pre></div>
+<p>如果此变量具有非零值，则在检测区域或字符串的编码时会忽略 ISO-2022 转义序列。结果是从未检测到任何文本以某种 ISO-2022 编码进行编码，并且所有转义序列在缓冲区中变得可见。警告：使用此变量时要格外小心，因为 Emacs 发行版中的许多文件都使用 ISO-2022 编码。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: coding-system-charset-list coding-system ¶
+</pre></div>
+<p>此函数返回编码系统支持的字符集列表（请参阅字符集）。一些支持太多字符集以列出它们的编码系统都会产生特殊值：
+</p>
+<p>如果 coding-system 支持所有 Emacs 字符，则值为 (emacs)。
+如果coding-system 支持所有Unicode 字符，则值为(unicode)。
+如果 coding-system 支持所有 ISO-2022 字符集，则值为 iso-2022。
+如果 coding-system 支持 Emacs 版本 21 使用的内部编码系统中的所有字符（在实现内部 Unicode 支持之前），则值为 emacs-mule。
+</p>
+<p>请参阅进程信息，特别是对函数 process-coding-system 和 set-process-coding-system 的描述，了解如何检查或设置用于子进程 I/O 的编码系统。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="34.10.4_用户选择的编码系统.html">用户选择的编码系统</a>, Previous: <a href="34.10.2_编码和_IO.html">编码和_IO</a>, Up: <a href="34.10_编码系统.html">编码系统.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

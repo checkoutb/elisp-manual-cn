@@ -1,0 +1,109 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>16.5 自动加载</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">16.5 自动加载</h2>
+<div class="nav-panel"><p>Next: <a href="16.5.1_按前缀自动加载.html">按前缀自动加载</a>, Previous: <a href="16.4_加载非_ASCII_字符.html">加载非_ASCII_字符</a>, Up: <a href="16_加载.html">加载.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>自动加载工具允许您注册函数或宏的存在，但推迟加载定义它的文件。对函数的第一次调用会自动加载适当的库，以便安装真实定义和其他相关代码，然后运行真实定义，就像它一直被加载一样。自动加载也可以通过查找函数或宏的文档（参见文档基础）以及变量和函数名称的完成来触发（参见下面的按前缀自动加载）。
+</p>
+<p>有两种方法可以设置自动加载函数：调用 autoload，以及在真正定义之前在源代码中编写 <code>魔术</code> 注释。autoload 是自动加载的低级原语；  任何 Lisp 程序都可以随时调用 autoload。对于与 Emacs 一起安装的包，魔术注释是使函数自动加载的最方便的方法。这些注释本身没有任何作用，但它们充当命令 update-file-autoloads 的指南，该命令构造对 autoload 的调用并安排在构建 Emacs 时执行它们。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: autoload function filename &amp;optional docstring interactive type ¶
+</pre></div>
+<p>该函数定义函数（或宏）命名函数，以便从文件名自动加载。字符串文件名指定要加载的文件以获取函数的真实定义。
+</p>
+<p>如果文件名不包含目录名或后缀 .el 或 .elc，则此函数坚持添加这些后缀之一，并且它不会从名称仅为文件名而没有添加后缀的文件加载。（变量 load-suffixes 指定了所需的确切后缀。）
+</p>
+<p>参数 docstring 是函数的文档字符串。在对 autoload 的调用中指定文档字符串可以在不加载函数的真实定义的情况下查看文档。通常，这应该与函数定义本身中的文档字符串相同。如果不是，则函数定义的文档字符串在加载时生效。
+</p>
+<p>如果 interactive 不为零，则表示可以交互调用函数。这让 Mx 中的完成工作无需加载函数的真实定义。这里没有给出完整的交互规范；  除非用户实际调用函数，否则不需要它，当这种情况发生时，是时候加载真正的定义了。
+</p>
+<p>如果 interactive 是一个列表，则将其解释为该命令适用的模式列表。
+</p>
+<p>您可以自动加载宏和键盘映射以及普通函数。如果函数确实是宏，则将类型指定为宏。如果函数确实是键映射，则将类型指定为键映射。Emacs 的各个部分都需要知道这些信息，而无需加载真正的定义。
+</p>
+<p>当前缀键的绑定是符号函数时，自动加载的键映射会在键查找期间自动加载。对键盘映射的其他类型的访问不会发生自动加载。特别是，当 Lisp 程序从变量的值中获取键映射并调用 define-key 时，不会发生这种情况。即使变量名是相同的符号函数也不行。
+</p>
+<p>如果 function 已经有一个非自动加载对象的非 void 函数定义，则此函数不执行任何操作并返回 nil。否则，它会构造一个自动加载对象（请参阅自动加载类型），并将其存储为函数的函数定义。自动加载对象具有以下形式：
+</p>
+<div class="lisp">
+<pre class="lisp">(autoload filename docstring interactive type)
+</pre></div>
+<p>例如，
+</p>
+<div class="lisp">
+<pre class="lisp">(symbol-function 'run-prolog)
+     ⇒ (autoload "prolog" 169681 t nil)
+</pre></div>
+<p>在这种情况下， <code>prolog</code> 是要加载的文件的名称，169681 是指 emacs/etc/DOC 文件中的文档字符串（参见文档基础），t 表示函数是交互式的，nil 表示它不是宏或键盘映射。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: autoloadp object ¶
+</pre></div>
+<p>如果 object 是自动加载对象，则此函数返回非 nil。例如，要检查 run-prolog 是否定义为自动加载函数，请评估
+</p>
+<div class="lisp">
+<pre class="lisp">(autoloadp (symbol-function 'run-prolog))
+</pre></div>
+<p>自动加载的文件通常包含其他定义，并且可能需要或提供一项或多项功能。如果文件未完全加载（由于对其内容的评估错误），则在加载期间发生的任何函数定义或提供调用都将撤消。这是为了确保下次尝试从该文件调用任何自动加载函数时将再次尝试加载该文件。如果不是这样，那么文件中的某些函数可能由中止的加载定义，但由于缺少某些未成功加载的子例程而无法正常工作，因为它们在文件中稍后出现。
+</p>
+<p>如果自动加载的文件未能定义所需的 Lisp 函数或宏，则会用数据 <code>自动加载未能定义函数函数名</code> 发出错误信号。
+</p>
+<p>神奇的自动加载注释（通常称为自动加载 cookie）由单独一行的 ’;;;###autoload’ 组成，就在其可自动加载源文件中函数的真正定义之前。命令 Mx update-file-autoloads 将相应的自动加载调用写入 loaddefs.el。（用作自动加载 cookie 的字符串和由 update-file-autoloads 生成的文件的名称可以从上述默认值更改，见下文。）构建 Emacs 加载 loaddefs.el 并因此调用 autoload。mx make-directory-autoloads 更加强大；  它更新当前目录中所有文件的自动加载。
+</p>
+<p>相同的魔术注释可以将任何类型的表单复制到 loaddefs.el 中。魔术注释后面的形式被逐字复制，除非它是自动加载工具特别处理的形式之一（例如，通过转换为自动加载调用）。未逐字复制的形式如下：
+</p>
+<p>函数或类函数对象的定义：
+</p>
+<p>    defun 和 defmacro；  还有 cl-defun 和 cl-defmacro（参见 Common Lisp Extensions 中的参数列表）和 define-overloadable-function（参见 mode-local.el 中的注释）。
+主要或次要模式的定义：
+</p>
+<p>    定义次要模式，定义全球化次要模式，定义通用模式，定义派生模式，easy-mmode-define-minor-mode，easy-mmode-define-global-mode，定义编译-模式和定义全局次要模式。
+其他定义类型：
+</p>
+<p>defcustom、defgroup、defclass（参见 EIEIO 中的 EIEIO）和 define-skeleton（参见 Autotyping 中的 Autotyping）。
+</p>
+<p>您还可以使用魔术注释在构建时执行表单，而无需在加载文件本身时执行它。为此，请将表单与魔术注释写在同一行。由于它在注释中，因此在加载源文件时它什么也不做；  但是 Mx update-file-autoloads 将它复制到 loaddefs.el，它在构建 Emacs 时执行。
+</p>
+<p>下面的例子展示了医生是如何准备用一个神奇的注释自动加载的：
+</p>
+<div class="lisp">
+<pre class="lisp">;;;###autoload
+(defun doctor ()
+  "Switch to *doctor* buffer and start giving psychotherapy."
+  (interactive)
+  (switch-to-buffer "*doctor*")
+  (doctor-mode))
+</pre></div>
+<p>这是在 loaddefs.el 中产生的内容：
+</p><div class="lisp">
+<pre class="lisp">(autoload 'doctor "doctor" "\
+Switch to *doctor* buffer and start giving psychotherapy.
+
+\(fn)" t nil)
+</pre></div>
+<p>双引号后的反斜杠和换行符是一种约定，仅在预加载的未编译的 Lisp 文件中使用，例如 loaddefs.el；  他们告诉 make-docfile 将文档字符串放在 etc/DOC 文件中。请参阅构建 Emacs。另请参阅 lib-src/make-docfile.c 中的注释。当各种帮助函数（参见帮助函数）显示它时，文档字符串的使用部分中的 <code>（fn）</code> 被替换为函数的名称。
+</p>
+<p>如果您使用非已知和公认的函数定义方法之一的异常宏编写函数定义，则使用普通的魔术自动加载注释会将整个定义复制到 loaddefs.el。这是不可取的。您可以通过编写以下代码将所需的自动加载调用放入 loaddefs.el 中：
+</p>
+<div class="lisp">
+<pre class="lisp">;;;###autoload (autoload 'foo "myfile")
+(mydefunmacro foo
+  ...)
+</pre></div>
+<p>您可以使用非默认字符串作为自动加载 cookie，并将相应的自动加载调用写入名称与默认 loaddefs.el 不同的文件中。Emacs 提供了两个变量来控制它：
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: generate-autoload-cookie ¶
+</pre></div>
+<p>这个变量的值应该是一个字符串，它的语法是一个 Lisp 注释。Mx update-file-autoloads 将跟随 cookie 的 Lisp 表单复制到它生成的自动加载文件中。此变量的默认值为 <code>;;;###autoload</code> 。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: generated-autoload-file ¶
+</pre></div>
+<p>这个变量的值命名了一个 Emacs Lisp 文件，自动加载调用应该去的地方。默认值为 loaddefs.el，但您可以覆盖它，例如，在 .el 文件的局部变量部分（请参阅文件局部变量）。假定自动加载文件包含以换页符开头的预告片。
+</p>
+<p>以下函数可用于显式加载由自动加载对象指定的库：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: autoload-do-load autoload &amp;optional name macro-only ¶
+</pre></div>
+<p>该函数执行 autoload 指定的加载，应该是一个 autoload 对象。可选参数名称，如果非零，应该是一个函数值为自动加载的符号；  在这种情况下，此函数的返回值是符号的新函数值。如果可选参数 macro-only 的值为宏，则此函数避免加载函数，仅加载宏。
+</p>
+<div class="nav-panel"><p>Next: <a href="16.5.1_按前缀自动加载.html">按前缀自动加载</a>, Previous: <a href="16.4_加载非_ASCII_字符.html">加载非_ASCII_字符</a>, Up: <a href="16_加载.html">加载.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

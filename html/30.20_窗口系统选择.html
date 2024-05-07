@@ -1,0 +1,33 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>30.20 窗口系统选择</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">30.20 窗口系统选择</h2>
+<div class="nav-panel"><p>Next: <a href="30.21_拖放.html">拖放</a>, Previous: <a href="30.19_指针形状.html">指针形状</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在诸如 X 之类的窗口系统中，可以通过选择在不同应用程序之间传输数据。X 定义了任意数量的选择类型，每个选择类型都可以存储自己的数据；  但是，只有三个常用：剪贴板、主要选择和次要选择。其他窗口系统仅支持剪贴板。有关使用这些选择的 Emacs 命令，请参阅 GNU Emacs 手册中的剪切和粘贴。本节记录了用于读取和设置窗口系统选择的低级函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: gui-set-selection type data ¶
+</pre></div>
+<p>此函数设置窗口系统选择。它有两个参数：一个选择类型类型，以及分配给它的值，数据。
+</p>
+<p>类型应该是一个符号；  它通常是主要、次要或剪贴板之一。这些是具有大写名称的符号，符合 X Window 系统约定。如果 type 为 nil，则代表 PRIMARY。
+</p>
+<p>如果 data 为 nil，则表示清除选择。否则，数据可能是字符串、符号、整数（或两个整数的 cons 或两个整数的列表）、覆盖或指向同一缓冲区的两个标记的 cons。一个叠加层或一对标记代表叠加层中或标记之间的文本。自变量数据也可以是有效的非向量选择值的向量。
+</p>
+<p>该函数返回数据。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: gui-get-selection &amp;optional type data-type ¶
+</pre></div>
+<p>此功能访问由 Emacs 或其他程序设置的选择。它有两个可选参数，类型和数据类型。类型（选择类型）的默认值是 PRIMARY。
+</p>
+<p>data-type 参数指定要使用的数据转换形式，将从另一个程序获得的原始数据转换为 Lisp 数据。有意义的值包括 TEXT、STRING、UTF8<em>_STRING</em>、TARGETS、LENGTH、DELETE、FILE<em>_NAME</em>、CHARACTER<em>_POSITION</em>、NAME、LINE<em>_NUMBER</em>、COLUMN<em>_NUMBER</em>、OWNER<em>_OS</em>、HOST<em>_NAME</em>、USER、CLASS、ATOM 和 INTEGER。（这些是与 X 约定一致的大写名称的符号。）数据类型的默认值是 STRING。除了 STRING 之外，X 以外的窗口系统通常只支持这些类型的一小部分。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: selection-coding-system ¶
+</pre></div>
+<p>此变量指定在读取和写入选择或剪贴板时要使用的编码系统。请参阅编码系统。默认值为复合文本与扩展，它转换为 X11 通常使用的文本表示。
+</p>
+<p>当 Emacs 在 MS-Windows 上运行时，它通常不实现 X 选择，但它确实支持剪贴板。MS-Windows 上的 gui-get-selection 和 gui-set-selection 仅支持文本数据类型；  如果剪贴板包含其他类型的数据，Emacs 会将剪贴板视为空的。支持的数据类型是 STRING。
+</p>
+<p>为了向后兼容，有过时的别名 x-get-selection 和 x-set-selection，它们是 Emacs 25.1 之前的 gui-get-selection 和 gui-set-selection 的名称。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="30.21_拖放.html">拖放</a>, Previous: <a href="30.19_指针形状.html">指针形状</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

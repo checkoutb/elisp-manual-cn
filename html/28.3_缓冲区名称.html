@@ -1,0 +1,76 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>28.3 缓冲区名称</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">28.3 缓冲区名称</h2>
+<div class="nav-panel"><p>Next: <a href="28.4_缓冲区文件名.html">缓冲区文件名</a>, Previous: <a href="28.2_当前缓冲区.html">当前缓冲区</a>, Up: <a href="28_缓冲区.html">缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>每个缓冲区都有一个唯一的名称，它是一个字符串。许多作用于缓冲区的函数接受缓冲区或缓冲区名称作为参数。任何称为缓冲区或名称的参数都属于这种类型，如果它既不是字符串也不是缓冲区，则会发出错误信号。任何称为 buffer 的参数都必须是实际的缓冲区对象，而不是名称。
+</p>
+<p>短暂且用户通常不感兴趣的缓冲区的名称以空格开头，因此 list-buffers 和 buffer-menu 命令不会提及它们（但如果这样的缓冲区访问文件，则会提及）。以空格开头的名称最初也会禁用记录撤消信息；  请参阅撤消。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: buffer-name &amp;optional buffer ¶
+</pre></div>
+<p>此函数将缓冲区的名称作为字符串返回。buffer 默认为当前缓冲区。
+</p>
+<p>如果 buffer-name 返回 nil，则表示缓冲区已被杀死。请参阅杀死缓冲区。
+</p><div class="lisp">
+<pre class="lisp">
+
+(buffer-name)
+     ⇒ "buffers.texi"
+
+
+(setq foo (get-buffer "temp"))
+     ⇒ #&lt;buffer temp&gt;
+
+(kill-buffer foo)
+     ⇒ nil
+
+(buffer-name foo)
+     ⇒ nil
+
+foo
+     ⇒ #&lt;killed buffer&gt;
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Command: rename-buffer newname &amp;optional unique ¶
+</pre></div>
+<p>此函数将当前缓冲区重命名为 newname。如果 newname 不是字符串，则会发出错误信号。
+</p>
+<p>通常，如果 newname 已在使用中，rename-buffer 会发出错误信号。但是，如果 unique 不为零，它会修改 newname 以生成一个未使用的名称。交互式地，您可以使用数字前缀参数创建唯一的非零。（这就是命令 rename-uniquely 的实现方式。）
+</p>
+<p>此函数返回实际赋予缓冲区的名称。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: get-buffer buffer-or-name ¶
+</pre></div>
+<p>此函数返回由 buffer-or-name 指定的缓冲区。如果 buffer-or-name 是一个字符串并且没有具有该名称的缓冲区，则值为 nil。如果 buffer-or-name 是一个缓冲区，则按给定返回；  这不是很有用，所以参数通常是一个名称。例如：
+</p><div class="lisp">
+<pre class="lisp">
+
+(setq b (get-buffer "lewis"))
+     ⇒ #&lt;buffer lewis&gt;
+
+(get-buffer b)
+     ⇒ #&lt;buffer lewis&gt;
+
+(get-buffer "Frazzle-nots")
+     ⇒ nil
+</pre></div>
+<p>另请参阅创建缓冲区中的函数 get-buffer-create。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: generate-new-buffer-name starting-name &amp;optional ignore ¶
+</pre></div>
+<p>此函数返回一个新缓冲区的唯一名称，但不会创建缓冲区。它以起始名称开头，并通过在 <code>&lt;...&gt;</code> 中附加一个数字来生成一个当前未用于任何缓冲区的名称。它从 2 开始并不断增加数字，直到它不是现有缓冲区的名称。
+</p>
+<p>如果可选的第二个参数 ignore 不是 nil，它应该是一个字符串，一个潜在的缓冲区名称。这意味着认为潜在的缓冲区是可接受的，如果它被尝试，即使它是现有缓冲区的名称（通常会被拒绝）。因此，如果存在名为 ’foo’、’foo&lt;2&gt;’、’foo&lt;3&gt;’ 和 ’foo&lt;4&gt;’ 的缓冲区，
+</p><div class="lisp">
+<pre class="lisp">(generate-new-buffer-name "foo")
+     ⇒ "foo&lt;5&gt;"
+(generate-new-buffer-name "foo" "foo&lt;3&gt;")
+     ⇒ "foo&lt;3&gt;"
+(generate-new-buffer-name "foo" "foo&lt;6&gt;")
+     ⇒ "foo&lt;5&gt;"
+</pre></div>
+<p>请参阅创建缓冲区中的相关函数 generate-new-buffer。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="28.4_缓冲区文件名.html">缓冲区文件名</a>, Previous: <a href="28.2_当前缓冲区.html">当前缓冲区</a>, Up: <a href="28_缓冲区.html">缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

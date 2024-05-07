@@ -1,0 +1,25 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.30.1 概述</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">33.30.1 概述</h3>
+<div class="nav-panel"><p>Next: <a href="33.30.2_基于进程的_JSONRPC_连接.html">基于进程的_JSONRPC_连接</a>, Previous: <a href="33.30_JSONRPC_通信.html">JSONRPC_通信</a>, Up: <a href="33.30_JSONRPC_通信.html">JSONRPC_通信.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>从规范中引用，JSONRPC <code>与传输无关，因为这些概念可以在同一进程中、通过套接字、通过 http 或在许多不同的消息传递环境中使用</code> 。
+</p>
+<p>为了模拟这种不可知论，jsonrpc 库使用 jsonrpc-connection 类的对象，它表示到远程 JSON 端点的连接（有关 Emacs 对象系统的详细信息，请参阅 EIEIO 中的 EIEIO）。在现代面向对象的说法中，这个类是 <code>抽象的</code> ，即有用的连接对象的实际类总是jsonrpc-connection 的子类。尽管如此，我们可以围绕 jsonrpc-connection 类定义两个不同的 API：
+</p>
+<p>用于构建 JSONRPC 应用程序的用户界面
+</p>
+<p>在这种情况下，JSONRPC 应用程序选择 jsonrpc-connection 的具体子类，并继续使用 make-instance 创建该子类的对象。为了发起与远程端点的联系，JSONRPC 应用程序将此对象传递给函数 jsonrpc-notify、jsonrpc-request 和/或 jsonrpc-async-request。对于处理远程发起的联系，通常是异步的，实例化应该包括 :request-dispatcher 和 :notification-dispatcher initargs，它们都是 3 个参数的函数：连接对象；  命名远程调用的 JSONRPC 方法的符号；  和一个 JSONRPC 参数对象。
+</p>
+<p>作为 :request-dispatcher 传递的函数负责处理远程端点的请求，这些请求期望来自本地端点的回复（在这种情况下，是您正在构建的程序）。在该函数内部，您可以在本地（正常返回）或非本地（错误返回）返回。本地返回值必须是可以序列化为 JSON 的 Lisp 对象（请参阅解析和生成 JSON 值）。这确定了一个成功响应，并且该对象作为 JSONRPC 结果对象转发到服务器。通过调用函数 jsonrpc-error 实现的非本地返回会导致向服务器发送错误响应。随附的 JSONRPC 错误的详细信息由传递给 jsonrpc-error 的任何内容填写。由任何其他类型的意外错误触发的非本地返回也会导致发送错误响应（除非您设置了 debug-on-error，在这种情况下这会调用 Lisp 调试器，请参阅在出现错误时输入调试器） .
+用于构建 JSONRPC 传输实现的继承接口
+</p>
+<p>在这种情况下，jsonrpc-connection 被子类化以实现不同的底层传输策略（有关如何子类化的详细信息，请参阅 (eieio)Inheritance.）。然后，应用程序构建接口的用户可以实例化这个具体类的对象（使用 make-instance 函数）并使用该策略连接到 JSONRPC 端点。
+</p>
+<p>此 API 具有强制性和可选部分。
+</p>
+<p>为了允许其用户发起 JSONRPC 联系（通知或请求）或回复端点请求，子类必须具有 jsonrpc-connection-send 方法的实现。
+</p>
+<p>同样，为了处理三种类型的远程联系（请求、通知和对本地请求的响应），传输实现必须安排函数 jsonrpc-connection-receive 在注意到线路上的新 JSONRPC 消息后调用（无论是什么 <code>电线</code> 可能是）。
+</p>
+<p>最后，如果这些概念适用于传输，则 jsonrpc-connection 子类应该实现 jsonrpc-shutdown 和 jsonrpc-running-p 方法。如果他们这样做了，那么任何用于在线路上侦听消息的系统资源（例如进程、计时器等）都应该在 jsonrpc-shutdown 中释放，即它们应该只在 jsonrpc-running-p 为非零时才需要。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.30.2_基于进程的_JSONRPC_连接.html">基于进程的_JSONRPC_连接</a>, Previous: <a href="33.30_JSONRPC_通信.html">JSONRPC_通信</a>, Up: <a href="33.30_JSONRPC_通信.html">JSONRPC_通信.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

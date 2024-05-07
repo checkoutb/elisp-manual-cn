@@ -1,0 +1,64 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>11.1 测序</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">11.1 测序</h2>
+<div class="nav-panel"><p>Next: <a href="11.2_条件.html">条件</a>, Previous: <a href="11_控制结构.html">控制结构</a>, Up: <a href="11_控制结构.html">控制结构.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>按表单出现的顺序评估表单是控制从一种表单传递到另一种表单的最常见方式。在某些情况下，例如在函数体中，这会自动发生。在其他地方，您必须使用控制结构结构来执行此操作：progn，Lisp 最简单的控制结构。
+</p>
+<p>progn 特殊形式如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(progn a b c …)
+</pre></div>
+<p>它说按顺序执行表格 a、b、c 等等。这些形式称为 progn 形式的主体。正文中最后一个形式的值成为整个 progn 的值。(progn) 返回零。
+</p>
+<p>在 Lisp 的早期，progn 是连续执行两个或多个表单并使用最后一个的值的唯一方法。但是程序员发现他们经常需要在函数体中使用 progn，而（当时）只允许一种形式。因此，函数的主体被制作成隐式的 progn：允许使用多种形式，就像在实际 progn 的主体中一样。许多其他控制结构同样包含一个隐含的 progn。因此，progn 的使用量不如多年前。现在最常在 unwind-protect 中使用它，并且，或，或 if 的 then 部分。
+</p>
+<div class="lisp">
+<pre class="lisp">Special Form: progn forms… ¶
+</pre></div>
+<div class="lisp">
+<pre class="lisp">(progn (print "The first form")
+       (print "The second form")
+       (print "The third form"))
+     -| "The first form"
+     -| "The second form"
+     -| "The third form"
+⇒ "The third form"
+</pre></div>
+<p>这种特殊形式以文本顺序评估所有形式，返回最终形式的结果。
+</p>
+<p>另外两个构造同样评估一系列形式，但返回不同的值：
+</p>
+<div class="lisp">
+<pre class="lisp">Special Form: prog1 form1 forms… ¶
+</pre></div>
+<p>这种特殊的形式以文本顺序计算 form1 和所有的形式，返回 form1 的结果。
+</p>
+<div class="lisp">
+<pre class="lisp">(prog1 (print "The first form")
+       (print "The second form")
+       (print "The third form"))
+     -| "The first form"
+     -| "The second form"
+     -| "The third form"
+⇒ "The first form"
+</pre></div>
+<p>这是一种从变量 x 的列表中删除第一个元素，然后返回前一个元素的值的方法：
+</p>
+<div class="lisp">
+<pre class="lisp">(prog1 (car x) (setq x (cdr x)))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Special Form: prog2 form1 form2 forms… ¶
+</pre></div>
+<p>这种特殊形式按文本顺序计算 form1、form2 和以下所有形式，并返回 form2 的结果。
+</p>
+<div class="lisp">
+<pre class="lisp">(prog2 (print "The first form")
+       (print "The second form")
+       (print "The third form"))
+     -| "The first form"
+     -| "The second form"
+     -| "The third form"
+⇒ "The second form"
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="11.2_条件.html">条件</a>, Previous: <a href="11_控制结构.html">控制结构</a>, Up: <a href="11_控制结构.html">控制结构.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

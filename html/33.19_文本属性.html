@@ -1,0 +1,10 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.19 文本属性</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">33.19 文本属性</h2>
+<div class="nav-panel"><p>Next: <a href="33.19.1_检查文本属性.html">检查文本属性</a>, Previous: <a href="33.18_案例变更.html">案例变更</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>缓冲区或字符串中的每个字符位置都可以有一个文本属性列表，很像符号的属性列表（请参阅属性列表）。属性属于特定位置的特定字符，例如，此句开头的字母 <code>T</code> 或 <code>foo</code> 中的第一个 <code>o</code> ——如果相同的字符出现在两个不同的位置，则两次出现一般有不同的属性。
+</p>
+<p>每个属性都有一个名称和一个值。这两者都可以是任何 Lisp 对象，但名称通常是一个符号。通常，每个属性名称符号都用于特定目的；  例如，文本属性 face 指定显示字符的面（请参阅具有特殊含义的属性）。访问属性列表的常用方法是指定一个名称并询问与其对应的值。
+</p>
+<p>如果一个角色有一个类别属性，我们称它为角色的属性类别。它应该是一个符号。符号的属性用作字符属性的默认值。
+</p>
+<p>在字符串和缓冲区之间复制文本会保留属性以及字符；  这包括诸如 substring、insert 和 buffer-substring 等多种函数。
+</p>
+<div class="nav-panel"><p>Next: <a href="33.19.1_检查文本属性.html">检查文本属性</a>, Previous: <a href="33.18_案例变更.html">案例变更</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

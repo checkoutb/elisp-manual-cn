@@ -1,0 +1,106 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>29.13.6 缓冲区显示之禅</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">29.13.6 缓冲区显示之禅</h3>
+<div class="nav-panel"><p>Next: <a href="29.14_窗口历史.html">窗口历史</a>, Previous: <a href="29.13.5_动作函数的优先级.html">动作函数的优先级</a>, Up: <a href="29.13_在合适的窗口中显示缓冲区.html">在合适的窗口中显示缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在其最简单的形式中，一个 <code>帧</code> ( <code>frame</code> )始终容纳一个可用于显示缓冲区的单个窗口。因此，总是最后一次调用 display-buffer 会成功地把它的缓冲区放在那里。
+</p>
+<p>由于使用这样的 <code>帧</code> ( <code>frame</code> )不是很实用，默认情况下，Emacs 允许更复杂的 <code>帧</code> ( <code>frame</code> )布局，由 <code>帧</code> ( <code>frame</code> )大小的默认值以及 split-height-threshold 和 split-width-threshold 选项控制。显示尚未在帧上显示的缓冲区，然后拆分该帧上的单个窗口或（重新）使用其两个窗口之一。
+</p>
+<p>一旦用户自定义这些阈值之一或手动更改 <code>帧</code> ( <code>frame</code> )的布局，就会放弃默认行为。当使用非 nil 操作参数调用 display-buffer 或用户自定义前面小节中提到的选项之一时，默认行为也会被放弃。由于过多的适用显示动作和由此产生的帧布局，很快掌握显示缓冲区可能会变得令人沮丧。
+</p>
+<p>但是，避免使用缓冲区显示功能并退回到拆分和删除窗口的比喻也不是一个好主意。缓冲区显示功能为 Lisp 程序和用户提供了一个 <code>帧</code> ( <code>frame</code> )来协调他们的不同需求；  不存在用于拆分和删除窗口的类似 <code>帧</code> ( <code>frame</code> )。缓冲区显示功能还允许在以后从 <code>帧</code> ( <code>frame</code> )中删除缓冲区时至少部分恢复 <code>帧</code> ( <code>frame</code> )的布局（请参阅退出 Windows）。
+</p>
+<p>下面我们将给出一些指导来弥补上面提到的挫败感，从而避免在帧的窗口之间丢失缓冲区。
+</p>
+<p>轻松编写显示动作
+</p>
+<p>编写显示动作可能会很痛苦，因为必须将动作函数和动作列表放在一个巨大的列表中。（历史原因使我们无法让显示缓冲区支持单独的参数。）这可能有助于记住一些基本形式，如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">'(nil (inhibit-same-window . t))
+</pre></div>
+<p>仅指定动作列表条目，不指定动作函数。其唯一目的是禁止在其他地方指定的 display-buffer-same-window 函数在同一窗口中显示缓冲区，另请参见上一小节的最后一个示例。
+</p>
+<div class="lisp">
+<pre class="lisp">'(display-buffer-below-selected)
+</pre></div>
+<p>另一方面，指定一个动作函数和一个空动作列表。要结合上述两种规范的效果，可以编写以下形式
+</p>
+<div class="lisp">
+<pre class="lisp">'(display-buffer-below-selected (inhibit-same-window . t))
+</pre></div>
+<p>添加另一个动作功能，人们会写
+</p>
+<div class="lisp">
+<pre class="lisp">'((display-buffer-below-selected display-buffer-at-bottom)
+  (inhibit-same-window . t))
+</pre></div>
+<p>并添加另一个 alist 条目，人们会写
+</p>
+<div class="lisp">
+<pre class="lisp">'((display-buffer-below-selected display-buffer-at-bottom)
+  (inhibit-same-window . t)
+  (window-height . fit-window-to-buffer))
+</pre></div>
+<p>最后一种形式可以通过以下方式用作显示缓冲区的操作参数：
+</p><div class="lisp">
+<pre class="lisp">(display-buffer
+ (get-buffer-create "*foo*")
+ '((display-buffer-below-selected display-buffer-at-bottom)
+   (inhibit-same-window . t)
+   (window-height . fit-window-to-buffer)))
+</pre></div>
+<p>在 display-buffer-alist 的定制中，它将按如下方式使用：
+</p><div class="lisp">
+<pre class="lisp">(customize-set-variable
+ 'display-buffer-alist
+ '(("\\*foo\\*"
+    (display-buffer-below-selected display-buffer-at-bottom)
+    (inhibit-same-window . t)
+    (window-height . fit-window-to-buffer))))
+</pre></div>
+<p>要为第二个缓冲区添加自定义项，可以编写：
+</p><div class="lisp">
+<pre class="lisp">(customize-set-variable
+ 'display-buffer-alist
+ '(("\\*foo\\*"
+    (display-buffer-below-selected display-buffer-at-bottom)
+    (inhibit-same-window . t)
+    (window-height . fit-window-to-buffer))
+   ("\\*bar\\*"
+    (display-buffer-reuse-window display-buffer-pop-up-frame)
+    (reusable-frames . visible))))
+</pre></div>
+<p>互相尊重
+</p>
+<p>display-buffer-alist 和 display-buffer-base-action 是用户选项——Lisp 程序绝不能设置或重新绑定它们。另一方面，display-buffer-overriding-action 是为应用程序保留的——他们很少使用该选项，如果他们使用它，那么要格外小心。
+</p>
+<p>显示缓冲区的旧实现经常导致用户和应用程序争夺用户选项的设置，例如弹出框和弹出窗口（请参阅显示缓冲区的附加选项）。这是重新设计显示缓冲区的一个主要原因——提供一个明确的 <code>帧</code> ( <code>frame</code> )来指定用户和应用程序应该被允许做什么。
+</p>
+<p>Lisp 程序必须做好准备，以防用户自定义可能导致缓冲区以意想不到的方式显示。他们不应该在随后的行为中假设缓冲区已按照他们在 display-buffer 的 action 参数中要求的方式精确显示。
+</p>
+<p>用户不应该对任意缓冲区的显示方式施加太多太严格的限制。否则，他们将面临失去为特定目的显示缓冲区的特性的风险。假设编写了一个 Lisp 程序来并排比较两个窗口中不同版本的缓冲区。如果 display-buffer-alist 的自定义规定任何此类缓冲区应始终显示在所选窗口中或下方，则程序将很难通过 display-buffer 设置所需的窗口配置。
+</p>
+<p>    要指定显示任意缓冲区的首选项，用户应自定义 display-buffer-base-action。上一小节中给出了喜欢使用多个 <code>帧</code> ( <code>frame</code> )的用户如何执行此操作的示例。display-buffer-alist 应保留用于以特定方式显示特定缓冲区。
+考虑重用已经显示缓冲区的窗口
+</p>
+<p>一般来说，对于用户和 Lisp 程序员来说，为窗口已经显示有问题的缓冲区的情况做好准备并重用该窗口总是一个好主意。在前面的小节中，我们已经表明，如果没有正确执行此操作，可能会导致 display-buffer 不断弹出一个新帧，尽管显示该缓冲区的帧已经存在。仅在少数情况下，可能不希望重用窗口，例如，当缓冲区的不同部分应显示在该窗口中时。
+</p>
+<p>    因此，display-buffer-reuse-window 是一个应该尽可能频繁地使用的动作函数，无论是在动作参数还是自定义中。action 参数中的禁止相同窗口条目通常处理最常见的情况，即应避免重用显示缓冲区的窗口 - 所讨论的窗口是选定的窗口。
+将焦点吸引到所选窗口
+</p>
+<p>这对于使用多个帧的人来说是一件很容易的事——显示缓冲区的帧将自动提升并获得焦点，除非禁止切换帧条目禁止它。对于单帧用户，这项任务可能要困难得多。特别是，display-buffer-pop-up-window 和 display-buffer-use-some-window 在这方面可能会变得突兀。他们拆分或使用看似任意的（通常是最大的或最近最少使用的）窗口，分散用户的注意力。
+</p>
+<p>    因此，一些 Lisp 程序会尝试在 <code>帧</code> ( <code>frame</code> )底部选择一个窗口，例如，为了在 minibuffer 窗口附近显示缓冲区，用户应该在该窗口中回答与新窗口相关的问题。对于与输入无关的操作，display-buffer-below-selected 可能更可取，因为所选窗口通常已经引起了用户的注意。
+处理显示缓冲区的后续调用
+</p>
+<p>display-buffer 不太适合按顺序显示多个缓冲区并确保所有这些缓冲区在生成的窗口配置中有序显示。同样，标准操作函数 display-buffer-pop-up-window 和 display-buffer-use-some-window 不太适合此目的，因为它们在更复杂的配置中有些混乱。
+</p>
+<p>为了在同一个显示周期中生成显示多个缓冲区（或同一个缓冲区的不同视图）的窗口配置，Lisp 程序员不可避免地必须编写自己的动作函数。下面列出的一些技巧可能会在这方面有所帮助。
+</p>
+<p>使窗口原子化（请参阅原子窗口）可避免在弹出新窗口时破坏现有窗口组合。新窗口将改为在合成之外弹出。
+临时将窗口专用于其缓冲区（请参阅专用窗口）可避免使用窗口来显示不同的缓冲区。将改为使用非专用窗口。
+调用 window-preserve-size（请参阅保留窗口大小）将尝试在弹出新窗口时保持参数窗口的大小不变。但是，您必须确保可以缩小相同组合中的另一个窗口。
+侧窗（请参阅侧窗）可用于始终在窗口中的同一帧位置显示特定缓冲区。这允许对不竞争在帧上同时显示的缓冲区进行分组，并在同一窗口中显示任何此类缓冲区，而不会中断其他缓冲区的显示。
+子帧（请参阅子帧）可用于在选定帧的屏幕范围内显示缓冲区，而不会破坏该帧的窗口配置，也不会产生与 display-buffer-pop-up-frame 造成的完整帧相关的开销.
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="29.14_窗口历史.html">窗口历史</a>, Previous: <a href="29.13.5_动作函数的优先级.html">动作函数的优先级</a>, Up: <a href="29.13_在合适的窗口中显示缓冲区.html">在合适的窗口中显示缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

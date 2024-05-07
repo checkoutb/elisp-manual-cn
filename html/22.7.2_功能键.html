@@ -1,0 +1,79 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.7.2 功能键</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">22.7.2 功能键</h3>
+<div class="nav-panel"><p>Next: <a href="22.7.3_鼠标事件.html">鼠标事件</a>, Previous: <a href="22.7.1_键盘事件.html">键盘事件</a>, Up: <a href="22.7_输入事件.html">输入事件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>大多数键盘还具有功能键——具有非字符名称或符号的键。功能键在 Emacs Lisp 中表示为符号；  符号的名称是功能键的标签，小写。例如，按下标记为 F1 的键会生成由符号 f1 表示的输入事件。
+</p>
+<p>功能键事件的事件类型是事件符号本身。请参阅分类事件。
+</p>
+<p>以下是功能键符号命名约定中的一些特殊情况：
+</p>
+<div class="lisp">
+<pre class="lisp">backspace, tab, newline, return, delete
+</pre></div>
+<p>这些键对应于在大多数键盘上具有特殊键的常见 ASCII 控制字符。
+</p>
+<p>在 ASCII 中，Ci 和 TAB 是同一个字符。如果终端可以区分它们，Emacs 会将区别传达给 Lisp 程序，将前者表示为整数 9，将后者表示为符号制表符。
+</p>
+<p>大多数情况下，区分这两者是没有用的。所以通常local-function-key-map（见Keymaps for Translating Sequences of Events）设置为将tab映射到9。因此，字符代码9（字符Ci）的键绑定也适用于tab。对于该组中的其他符号也是如此。函数 read-char 同样将这些事件转换为字符。
+</p>
+<p>在 ASCII 中，BS 实际上是 Ch。但是退格会转换为字符代码 127 (DEL)，而不是代码 8 (BS)。这是大多数用户喜欢的。
+</p><div class="lisp">
+<pre class="lisp">left, up, right, down
+</pre></div>
+<p>光标方向键
+</p><div class="lisp">
+<pre class="lisp">kp-add, kp-decimal, kp-divide, …
+</pre></div>
+<p>小键盘键（在常规键盘的右侧）。
+</p><div class="lisp">
+<pre class="lisp">kp-0, kp-1, …
+</pre></div>
+<p>带数字的键盘键。
+</p><div class="lisp">
+<pre class="lisp">kp-f1, kp-f2, kp-f3, kp-f4
+</pre></div>
+<p>键盘 PF 键。
+</p><div class="lisp">
+<pre class="lisp">kp-home, kp-left, kp-up, kp-right, kp-down
+</pre></div>
+<p>键盘方向键。Emacs 通常会将这些转换为相应的非键盘键 home、left、…
+</p><div class="lisp">
+<pre class="lisp">kp-prior, kp-next, kp-end, kp-begin, kp-insert, kp-delete
+</pre></div>
+<p>通常在其他地方找到的键的附加键盘副本。Emacs 通常将这些转换为类似名称的非键盘键。
+</p>
+<p>您可以将修饰键 ALT、CTRL、HYPER、META、SHIFT 和 SUPER 与功能键一起使用。表示它们的方法是在符号名称中使用前缀：
+</p>
+<div class="lisp">
+<pre class="lisp">‘A-’
+</pre></div>
+<p>alt 修饰符。
+</p>
+<div class="lisp">
+<pre class="lisp">‘C-’
+</pre></div>
+<p>控制修饰符。
+</p>
+<div class="lisp">
+<pre class="lisp">‘H-’
+</pre></div>
+<p>超级修饰符。
+</p>
+<div class="lisp">
+<pre class="lisp">‘M-’
+</pre></div>
+<p>元修饰符。
+</p>
+<div class="lisp">
+<pre class="lisp">‘S-’
+</pre></div>
+<p>移位修饰符。
+</p>
+<div class="lisp">
+<pre class="lisp">‘s-’
+</pre></div>
+<p>超级修饰符。
+</p>
+<p>因此，按下 META 的键 F3 的符号是 M-f3。当您使用多个前缀时，我们建议您按字母顺序书写；  但在键绑定查找和修改函数的参数中，顺序无关紧要。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.7.3_鼠标事件.html">鼠标事件</a>, Previous: <a href="22.7.1_键盘事件.html">键盘事件</a>, Up: <a href="22.7_输入事件.html">输入事件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

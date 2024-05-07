@@ -1,0 +1,93 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>9.4.2 标准符号属性</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">9.4.2 标准符号属性</h3>
+<div class="nav-panel"><p>Next: <a href="09.5_速记.html">速记</a>, Previous: <a href="09.4.1_访问符号属性.html">访问符号属性</a>, Up: <a href="09.4_符号属性.html">符号属性.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在这里，我们列出了在 Emacs 中用于特殊用途的符号属性。在下表中，每当我们说~ 命名函数~ 时，就是指名称为相关符号的函数；  对于~ 命名变量~ 等类似。
+</p>
+<div class="lisp">
+<pre class="lisp">:advertised-binding
+</pre></div>
+<p>在显示文档时，此属性值指定命名函数的首选键绑定。请参阅替换文档中的键绑定。
+</p><div class="lisp">
+<pre class="lisp">char-table-extra-slots
+</pre></div>
+<p>该值（如果非零）指定命名字符表类型中的额外槽数。请参阅字符表。
+</p><div class="lisp">
+<pre class="lisp">customized-face
+face-defface-spec
+saved-face
+theme-face
+</pre></div>
+<p>这些属性用于记录人脸的标准、已保存、自定义和主题人脸规格。不要直接设置它们；  它们由 defface 和相关函数管理。请参见定义面。
+</p><div class="lisp">
+<pre class="lisp">customized-value
+saved-value
+standard-value
+theme-value
+</pre></div>
+<p>这些属性用于记录可自定义变量的标准值、已保存值、已自定义但未保存的值和主题值。不要直接设置它们；  它们由 defcustom 和相关函数管理。请参阅定义自定义变量。
+</p><div class="lisp">
+<pre class="lisp">disabled
+</pre></div>
+<p>如果该值为非零，则命名函数作为命令被禁用。请参阅禁用命令。
+</p><div class="lisp">
+<pre class="lisp">face-documentation
+</pre></div>
+<p>该值存储命名人脸的文档字符串。这是由 defface 自动设置的。请参见定义面。
+</p><div class="lisp">
+<pre class="lisp">history-length
+</pre></div>
+<p>该值，如果非零，指定命名历史列表变量的最大迷你缓冲区历史长度。请参阅小缓冲区历史记录。
+</p><div class="lisp">
+<pre class="lisp">interactive-form
+</pre></div>
+<p>该值是命名函数的交互形式。通常，您不应该直接设置它；  请改用交互式特殊形式。请参阅交互式呼叫。
+</p><div class="lisp">
+<pre class="lisp">menu-enable
+</pre></div>
+<p>该值是一个表达式，用于确定是否应在菜单中启用命名菜单项。请参阅简单菜单项。
+</p><div class="lisp">
+<pre class="lisp">mode-class
+</pre></div>
+<p>如果该值是特殊的，则命名的主要模式是特殊的。请参阅主要模式约定。
+</p><div class="lisp">
+<pre class="lisp">permanent-local
+</pre></div>
+<p>如果值为非零，则命名变量是缓冲区局部变量，其值不应在更改主要模式时重置。请参阅创建和删除缓冲区本地绑定。
+</p><div class="lisp">
+<pre class="lisp">permanent-local-hook
+</pre></div>
+<p>如果该值为非 nil，则在更改主要模式时不应从挂钩变量的本地值中删除命名函数。请参阅设置挂钩。
+</p><div class="lisp">
+<pre class="lisp">pure
+</pre></div>
+<p>如果该值不是 nil，则命名函数被认为是纯函数（请参阅什么是函数？）。可以在编译时评估带有常量参数的调用。这可能会将运行时错误转移到编译时。不要与纯存储混淆（请参阅纯存储）。
+</p><div class="lisp">
+<pre class="lisp">risky-local-variable
+</pre></div>
+<p>如果该值为非 nil，则命名变量被视为文件局部变量有风险。请参阅文件局部变量。
+</p><div class="lisp">
+<pre class="lisp">safe-function
+</pre></div>
+<p>如果该值为非零，则命名函数通常被认为是安全的评估。请参阅确定函数是否可以安全调用。
+</p><div class="lisp">
+<pre class="lisp">safe-local-eval-function
+</pre></div>
+<p>如果该值为非零，则命名函数可以安全地在文件本地评估表单中调用。请参阅文件局部变量。
+</p><div class="lisp">
+<pre class="lisp">safe-local-variable
+</pre></div>
+<p>该值指定用于确定命名变量的安全文件本地值的函数。请参阅文件局部变量。
+</p><div class="lisp">
+<pre class="lisp">side-effect-free
+</pre></div>
+<p>非 nil 值表示命名函数没有副作用（请参阅什么是函数？），因此字节编译器可能会忽略其值未使用的调用。如果属性的值没有错误，字节编译器甚至可以删除这些未使用的调用。除了字节编译器优化之外，此属性还用于确定函数安全性（请参阅确定函数是否可以安全调用）。
+</p><div class="lisp">
+<pre class="lisp">undo-inhibit-region
+</pre></div>
+<p>如果非零，则命名函数阻止撤消操作被限制在活动区域​​，如果撤消是在函数之后立即调用的。请参阅撤消。
+</p><div class="lisp">
+<pre class="lisp">variable-documentation
+</pre></div>
+<p>如果非零，则指定命名变量的文档字符串。这是由 defvar 和相关函数自动设置的。请参见定义面。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="09.5_速记.html">速记</a>, Previous: <a href="09.4.1_访问符号属性.html">访问符号属性</a>, Up: <a href="09.4_符号属性.html">符号属性.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

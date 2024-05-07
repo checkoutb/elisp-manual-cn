@@ -1,0 +1,21 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>32.2 关于标记的谓词</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">32.2 关于标记的谓词</h2>
+<div class="nav-panel"><p>Next: <a href="32.3_创建标记的函数.html">创建标记的函数</a>, Previous: <a href="32.1_标记概述.html">标记概述</a>, Up: <a href="32_标记.html">标记.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>您可以测试一个对象以查看它是否是标记，或者它是整数还是标记。后一个测试对于同时使用标记和整数的算术函数很有用。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: markerp object ¶
+</pre></div>
+<p>如果 object 是标记，此函数返回 t，否则返回 nil。请注意，整数不是标记，即使许多函数将接受标记或整数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: integer-or-marker-p object ¶
+</pre></div>
+<p>如果 object 是整数或标记，此函数返回 t，否则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: number-or-marker-p object ¶
+</pre></div>
+<p>如果 object 是数字（整数或浮点数）或标记，则此函数返回 t，否则返回 nil。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="32.3_创建标记的函数.html">创建标记的函数</a>, Previous: <a href="32.1_标记概述.html">标记概述</a>, Up: <a href="32_标记.html">标记.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

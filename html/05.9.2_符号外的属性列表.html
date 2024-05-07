@@ -1,0 +1,48 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>5.9.2 符号外的属性列表</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">5.9.2 符号外的属性列表</h3>
+<div class="nav-panel"><p>Next: <a href="06_序列、数组和向量.html">序列、数组和向量</a>, Previous: <a href="05.9.1_属性列表和关联列表.html">属性列表和关联列表</a>, Up: <a href="05.9_属性列表.html">属性列表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>以下函数可用于操作属性列表。他们都使用 eq 比较属性名称。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: plist-get plist property ¶
+</pre></div>
+<p>这将返回存储在属性列表 plist 中的属性值。它接受格式错误的 plist 参数。如果在 plist 中找不到属性，则返回 nil。例如，
+</p><div class="lisp">
+<pre class="lisp">(plist-get '(foo 4) 'foo)
+     ⇒ 4
+(plist-get '(foo 4 bad) 'foo)
+     ⇒ 4
+(plist-get '(foo 4 bad) 'bad)
+     ⇒ nil
+(plist-get '(foo 4 bad) 'bar)
+     ⇒ nil
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: plist-put plist property value ¶
+</pre></div>
+<p>这会将值作为属性属性的值存储在属性列表 plist 中。它可能会破坏性地修改 plist，或者它可能会构造一个新的列表结构而不改变旧的。该函数返回修改后的属性列表，因此您可以将其存储回您获得 plist 的位置。例如，
+</p>
+<div class="lisp">
+<pre class="lisp">(setq my-plist (list 'bar t 'foo 4))
+     ⇒ (bar t foo 4)
+(setq my-plist (plist-put my-plist 'foo 69))
+     ⇒ (bar t foo 69)
+(setq my-plist (plist-put my-plist 'quux '(a)))
+     ⇒ (bar t foo 69 quux (a))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: lax-plist-get plist property ¶
+</pre></div>
+<p>与 plist-get 类似，只是它使用 equal 而不是 eq 比较属性。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: lax-plist-put plist property value ¶
+</pre></div>
+<p>与 plist-put 类似，只是它使用 equal 而不是 eq 比较属性。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: plist-member plist property ¶
+</pre></div>
+<p>如果 plist 包含给定属性，则返回非零。与 plist-get 不同，这允许您区分缺失的属性和值为 nil 的属性。该值实际上是 plist 的尾部，其汽车是财产。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="06_序列、数组和向量.html">序列、数组和向量</a>, Previous: <a href="05.9.1_属性列表和关联列表.html">属性列表和关联列表</a>, Up: <a href="05.9_属性列表.html">属性列表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

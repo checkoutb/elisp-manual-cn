@@ -1,0 +1,14 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>19.3.1 多余的开括号</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">19.3.1 多余的开括号</h3>
+<div class="nav-panel"><p>Next: <a href="19.3.2_多余的右括号.html">多余的右括号</a>, Previous: <a href="19.3_调试无效的_Lisp_语法.html">调试无效的_Lisp_语法</a>, Up: <a href="19.3_调试无效的_Lisp_语法.html">调试无效的_Lisp_语法.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>第一步是找到不平衡的defun。如果有多余的左括号，方法是转到文件末尾并键入 Cu CMu（向后列表，请参阅 The GNU Emacs Manual 中的通过 Parens 移动）。这会将您移动到第一个不平衡的 defun 的开头。
+</p>
+<p>下一步是准确确定问题所在。除了研究程序之外，没有办法确定这一点，但现有的缩进通常是括号应该在哪里的线索。使用此线索的最简单方法是使用 CMq 重新缩进（indent-pp-sexp，请参阅 GNU Emacs 手册中的多行缩进）并查看移动的内容。但不要这样做！  继续阅读，首先。
+</p>
+<p>在你这样做之前，确保 defun 有足够的右括号。否则，CMq 将出现错误，或者将重新缩进文件的所有其余部分，直到结束。所以移动到 defun 的末尾并在那里插入一个右括号。不要使用 CMe (end-of-defun) 移动到那里，因为在 defun 平衡之前这也将无法工作。
+</p>
+<p>现在您可以转到 defun 的开头并键入 CMq。通常从某个点到函数结束的所有行都会向右移动。在该点附近可能缺少右括号或多余的左括号。（但是，不要假设这是真的；研究代码以确保。）一旦发现差异，使用 C-_ 撤消 CMq（撤消），因为旧缩进可能适合预期的括号。
+</p>
+<p>在你认为你已经解决了问题之后，再次使用 CMq。如果旧缩进实际上适合括号的预期嵌套，并且您已放回这些括号，则 CMq 不应更改任何内容。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="19.3.2_多余的右括号.html">多余的右括号</a>, Previous: <a href="19.3_调试无效的_Lisp_语法.html">调试无效的_Lisp_语法</a>, Up: <a href="19.3_调试无效的_Lisp_语法.html">调试无效的_Lisp_语法.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.2 强制重新显示</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">40.2 强制重新显示</h2>
+<div class="nav-panel"><p>Next: <a href="40.3_截断.html">截断</a>, Previous: <a href="40.1_刷新屏幕.html">刷新屏幕</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 通常会在等待输入时尝试重新显示屏幕。使用以下函数，您可以在 Lisp 代码中间请求立即尝试重新显示，而无需实际等待输入。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: redisplay &amp;optional force ¶
+</pre></div>
+<p>此函数会立即尝试重新显示。可选参数 force，如果非零，则强制执行重新显示，而不是在输入未决时被抢占。
+</p>
+<p>如果函数实际尝试重新显示，则返回 t，否则返回 nil。t 值并不意味着重新显示已完成；  它可能已被新到达的输入抢占。
+</p>
+<p>尽管 redisplay 会立即尝试重新显示，但它不会改变 Emacs 决定重新显示其帧的哪些部分的方式。相比之下，以下函数将某些窗口添加到挂起的重新显示工作（好像它们的内容已经完全改变），但不会立即尝试执行重新显示。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: force-window-update &amp;optional object ¶
+</pre></div>
+<p>此函数强制在 Emacs 下一次重新显示时更新部分或所有窗口。如果对象是一个窗口，则该窗口将被更新。如果 object 是缓冲区或缓冲区名称，则显示该缓冲区的所有窗口都将被更新。如果 object 为 nil（或省略），则所有窗口都将被更新。
+</p>
+<p>此功能不会立即重新显示；  Emacs 在等待输入或调用函数 redisplay 时会这样做。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: pre-redisplay-function ¶
+</pre></div>
+<p>一个函数在重新显示之前运行。它使用一个参数调用，即要重新显示的一组窗口。该集合可以为 nil，表示仅选定的窗口，或 t，表示所有窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: pre-redisplay-functions ¶
+</pre></div>
+<p>这个钩子在重新显示之前运行。它在即将重新显示的每个窗口中调用一次，当前缓冲区设置为该窗口中显示的缓冲区。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.3_截断.html">截断</a>, Previous: <a href="40.1_刷新屏幕.html">刷新屏幕</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

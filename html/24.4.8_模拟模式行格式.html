@@ -1,0 +1,19 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.4.8 模拟模式行格式</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">24.4.8 模拟模式行格式</h3>
+<div class="nav-panel"><p>Next: <a href="24.5_名称.html">名称</a>, Previous: <a href="24.4.7_窗口标题行.html">窗口标题行</a>, Up: <a href="24.4_模式线格式.html">模式线格式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>您可以使用函数 format-mode-line 来计算将出现在基于特定模式行结构的模式行或标题行中的文本。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: format-mode-line format &amp;optional face window buffer ¶
+</pre></div>
+<p>此函数根据格式格式化一行文本，就好像它正在为窗口生成模式行一样，但它也将文本作为字符串返回。参数窗口默认为选定的窗口。如果 buffer 为非 nil，则使用的所有信息都取自 buffer；  默认情况下，它来自窗口的缓冲区。
+</p>
+<p>值字符串通常具有与模式行将具有的面、键映射等相对应的文本属性。任何没有按格式指定面属性的字符都将获得一个由面确定的默认值。如果 face 是 t，如果选择了窗口，则表示任一模式行，否则表示模式行不活动。如果 face 为 nil 或省略，则表示默认面。如果 face 是整数，则此函数返回的值将没有文本属性。
+</p>
+<p>您还可以指定其他有效的面作为面的值。如果指定，则该面为其面未由格式指定的字符提供面属性。
+</p>
+<p>请注意，使用 mode-line、mode-line-inactive 或 header-line 作为面实际上将分别使用相应面的当前定义重新显示模式行或标题行，此外还返回格式化字符串。（其他面不会导致重新显示。）
+</p>
+<p>例如，(format-mode-line header-line-format) 返回将出现在所选窗口的标题行中的文本（如果没有标题行，则返回""）。(format-mode-line header-line-format ’header-line) 返回相同的文本，每个字符都带有标题行本身将具有的面孔，并且还重绘标题行。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="24.5_名称.html">名称</a>, Previous: <a href="24.4.7_窗口标题行.html">窗口标题行</a>, Up: <a href="24.4_模式线格式.html">模式线格式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>39.13 事务队列</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">39.13 事务队列</h2>
+<div class="nav-panel"><p>Next: <a href="39.14_网络连接.html">网络连接</a>, Previous: <a href="39.12_访问其他进程.html">访问其他进程</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>您可以使用事务队列与使用事务的子进程进行通信。首先使用 tq-create 创建一个与指定进程通信的事务队列。然后你可以调用 tq-enqueue 发送一个事务。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: tq-create process ¶
+</pre></div>
+<p>该函数创建并返回一个与进程通信的事务队列。参数进程应该是一个能够发送和接收字节流的子进程。它可能是子进程，也可能是与服务器的 TCP 连接，可能在另一台机器上。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: tq-enqueue queue question regexp closure fn &amp;optional delay-question ¶
+</pre></div>
+<p>此函数将事务发送到队列队列。指定队列具有指定要与之交谈的子进程的效果。
+</p>
+<p>参数 question 是启动事务的传出消息。参数 fn 是返回相应答案时调用的函数；  它用两个参数调用：闭包和收到的答案。
+</p>
+<p>参数 regexp 是一个正则表达式，应该匹配整个答案末尾的文本，但之前没有；  这就是 tq-enqueue 确定答案在哪里结束的方式。
+</p>
+<p>如果参数 delay-question 不为零，则延迟发送此问题，直到该过程完成对任何先前问题的答复。这会在某些过程中产生更可靠的结果。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: tq-close queue ¶
+</pre></div>
+<p>关闭事务队列队列，等待所有未决事务完成，然后终止连接或子进程。
+</p>
+<p>事务队列是通过过滤功能实现的。请参阅处理过滤器函数。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="39.14_网络连接.html">网络连接</a>, Previous: <a href="39.12_访问其他进程.html">访问其他进程</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

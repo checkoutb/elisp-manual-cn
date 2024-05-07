@@ -1,0 +1,11 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>16.5.2 何时使用自动加载</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">16.5.2 何时使用自动加载</h3>
+<div class="nav-panel"><p>Next: <a href="16.6_重复加载.html">重复加载</a>, Previous: <a href="16.5.1_按前缀自动加载.html">按前缀自动加载</a>, Up: <a href="16.5_自动加载.html">自动加载.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>除非确实有必要，否则不要添加自动加载注释。自动加载代码意味着它始终是全局可见的。一旦一个项目被自动加载，就没有兼容的方式来转换回它不被自动加载（在人们习惯于能够在没有显式加载的情况下使用它之后）。
+</p>
+<p>最常见的自动加载项是库的交互式入口点。例如，如果python.el是一个定义了用于编辑Python代码的major-mode的库，则自动加载python-mode函数的定义，这样人们就可以简单地使用Mx python-mode来加载该库。
+变量通常不需要自动加载。一个例外是，如果变量本身通常很有用，而无需加载整个定义库。（这方面的一个例子可能是 find-exec-terminator。）
+不要自动加载用户选项，以便用户可以设置它。
+永远不要添加自动加载注释以使另一个文件中的编译器警告静音。在产生警告的文件中，使用 (defvar foo) 使未定义的变量警告静音，并使用 declare-function（请参阅告诉编译器已定义函数）使未定义的函数警告静音；  或要求相关图书馆；  或使用显式自动加载语句。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="16.6_重复加载.html">重复加载</a>, Previous: <a href="16.5.1_按前缀自动加载.html">按前缀自动加载</a>, Up: <a href="16.5_自动加载.html">自动加载.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

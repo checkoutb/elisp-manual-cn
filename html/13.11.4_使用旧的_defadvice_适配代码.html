@@ -1,0 +1,59 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>13.11.4 使用旧的 defadvice 适配代码</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">13.11.4 使用旧的 defadvice 适配代码</h3>
+<div class="nav-panel"><p>Next: <a href="13.12_声明过时的函数.html">声明过时的函数</a>, Previous: <a href="13.11.3_编写建议的方法.html">编写建议的方法</a>, Up: <a href="13.11_建议_Emacs_Lisp_函数.html">建议_Emacs_Lisp_函数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>很多代码使用旧的 defadvice 机制，新的advice-add 在很大程度上使这种机制过时了，它的实现和语义要简单得多。
+</p>
+<p>一条古老的建议，例如：
+</p><div class="lisp">
+<pre class="lisp">(defadvice previous-line (before next-line-at-end
+                                 (&amp;optional arg try-vscroll))
+  "Insert an empty line when moving up from the top line."
+  (if (and next-line-add-newlines (= arg 1)
+           (save-excursion (beginning-of-line) (bobp)))
+      (progn
+        (beginning-of-line)
+        (newline))))
+</pre></div>
+<p>可以在新的建议机制中翻译成一个简单的函数：
+</p>
+<div class="lisp">
+<pre class="lisp">(defun previous-line--next-line-at-end (&amp;optional arg try-vscroll)
+  "Insert an empty line when moving up from the top line."
+  (if (and next-line-add-newlines (= arg 1)
+           (save-excursion (beginning-of-line) (bobp)))
+      (progn
+        (beginning-of-line)
+        (newline))))
+</pre></div>
+<p>显然，这实际上并没有修改上一行。为此，需要旧的建议：
+</p>
+<div class="lisp">
+<pre class="lisp">(ad-activate 'previous-line)
+</pre></div>
+<p>而新的建议机制需要：
+</p><div class="lisp">
+<pre class="lisp">(advice-add 'previous-line :before #'previous-line--next-line-at-end)
+</pre></div>
+<p>请注意 ad-activate 具有全局效果：它激活了为该指定功能启用的所有建议。如果您只想激活或停用特定部分，则需要使用 ad-enable-advice 和 ad-disable-advice 启用或禁用它。新机制消除了这种区别。
+</p>
+<p>周围的建议，例如：
+</p><div class="lisp">
+<pre class="lisp">(defadvice foo (around foo-around)
+  "Ignore case in `foo'."
+  (let ((case-fold-search t))
+    ad-do-it))
+(ad-activate 'foo)
+</pre></div>
+<p>可以翻译成：
+</p><div class="lisp">
+<pre class="lisp">(defun foo--foo-around (orig-fun &amp;rest args)
+  "Ignore case in `foo'."
+  (let ((case-fold-search t))
+    (apply orig-fun args)))
+(advice-add 'foo :around #'foo--foo-around)
+</pre></div>
+<p>关于通知的类，请注意新的 :before 并不完全等同于旧的 before，因为在旧的通知中您可以修改函数的参数（例如，使用 ad-set-arg），这会影响看到的参数值通过原始函数，而在新的 :before 中，通过通知中的 setq 修改参数对原始函数看到的参数没有影响。在移植依赖于这种行为的通知之前，您需要将其转换为新的 :around 或 :filter-args 通知。
+</p>
+<p>类似地，旧的 after 通知可以通过更改 ad-return-value 来修改返回值，而新的 :after 通知不能，因此在移植这种旧的 after 通知时，您需要将其转换为新的 :around 或 :filter-return 通知.
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="13.12_声明过时的函数.html">声明过时的函数</a>, Previous: <a href="13.11.3_编写建议的方法.html">编写建议的方法</a>, Up: <a href="13.11_建议_Emacs_Lisp_函数.html">建议_Emacs_Lisp_函数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

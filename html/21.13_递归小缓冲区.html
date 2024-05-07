@@ -1,0 +1,19 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>21.13 递归小缓冲区</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">21.13 递归小缓冲区</h2>
+<div class="nav-panel"><p>Next: <a href="21.14_抑制交互.html">抑制交互</a>, Previous: <a href="21.12_小缓冲区内容.html">小缓冲区内容</a>, Up: <a href="21_小缓冲区.html">小缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这些函数和变量处理递归小缓冲区（请参阅递归编辑）：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: minibuffer-depth ¶
+</pre></div>
+<p>此函数返回 minibuffer 的当前激活深度，一个非负整数。如果没有活动的小缓冲区，则返回零。
+</p><div class="lisp">
+<pre class="lisp">User Option: enable-recursive-minibuffers ¶
+</pre></div>
+<p>如果此变量不为 nil，即使在 minibuffer 处于活动状态时，您也可以调用使用 minibuffers 的命令（例如 find-file）。这样的调用为新的 minibuffer 产生了一个递归的编辑级别。默认情况下，当您编辑内层 minibuffer 时，外层 minibuffer 是不可见的。如果将 minibuffer-follows-selected-frame 设置为 nil，则可以同时在多个帧上显示 minibuffer。请参阅 (emacs)基本迷你缓冲区。
+</p>
+<p>如果此变量为 nil，则当 minibuffer 处于活动状态时，您无法调用 minibuffer 命令，即使您切换到另一个窗口来执行此操作也是如此。
+</p>
+<p>如果命令名称具有非 nil 的属性 enable-recursive-minibuffers，则该命令可以使用 minibuffer 来读取参数，即使它是从 minibuffer 调用的。命令也可以通过在交互式声明中将 enable-recursive-minibuffers 绑定到 t 来实现这一点（请参阅使用交互式）。minibuffer 命令 next-matching-history-element（通常是 minibuffer 中的 Ms）执行后者。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="21.14_抑制交互.html">抑制交互</a>, Previous: <a href="21.12_小缓冲区内容.html">小缓冲区内容</a>, Up: <a href="21_小缓冲区.html">小缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

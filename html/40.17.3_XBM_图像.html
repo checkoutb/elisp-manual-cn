@@ -1,0 +1,43 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.17.3 XBM 图像</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.17.3 XBM 图像</h3>
+<div class="nav-panel"><p>Next: <a href="40.17.4_XPM_图像.html">XPM_图像</a>, Previous: <a href="40.17.2_图像描述符.html">图像描述符</a>, Up: <a href="40.17_图像.html">图像.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>要使用 XBM 格式，请将 xbm 指定为图像类型。这种图像格式不需要外部库，因此始终支持这种类型的图像。
+</p>
+<p>xbm 图像类型支持的其他图像属性包括：
+</p>
+<div class="lisp">
+<pre class="lisp">:foreground foreground
+</pre></div>
+<p>值 foreground 应该是指定图像前景色的字符串，或者默认颜色为 nil。此颜色用于 XBM 中为 1 的每个像素。默认为框架的前景色。
+</p><div class="lisp">
+<pre class="lisp">:background background
+</pre></div>
+<p>值 background 应该是指定图像背景颜色的字符串，或者默认颜色为 nil。此颜色用于 XBM 中为 0 的每个像素。默认为框架的背景颜色。
+</p>
+<p>如果您使用 Emacs 中的数据而不是外部文件指定 XBM 映像，请使用以下三个属性：
+</p>
+<div class="lisp">
+<pre class="lisp">:data data
+</pre></div>
+<p>值 data 指定图像的内容。您可以为数据使用三种格式：
+</p>
+<p>字符串向量或布尔向量，每个指定图像的一行。请指定 :height 和 :width。
+包含与 XBM 文件相同的字节序列的字符串。在这种情况下，您不能指定 :height 和 :width ，因为省略它们表示数据具有 XBM 文件的格式。文件内容指定图像的高度和宽度。
+包含图像位的字符串或布尔向量（可能在末尾加上一些不会使用的额外位）。它应该至少包含 stride * height 位，其中 stride 是大于或等于图像宽度的 8 的最小倍数。在这种情况下，您应该指定 :height、:width 和 :stride 来指示字符串仅包含位而不是整个 XBM 文件，并指定图像的大小。
+</p>
+<div class="lisp">
+<pre class="lisp">:width width
+</pre></div>
+<p>值 width 指定图像的宽度，以像素为单位。
+</p><div class="lisp">
+<pre class="lisp">:height height
+</pre></div>
+<p>值 height 指定图像的高度，以像素为单位。
+</p>
+<p>请注意，只有在传入未指定宽度和高度的数据（例如，包含图像位的字符串或向量）时才能使用 :width 和 :height 。XBM 文件通常会自行指定，在这些文件上使用这两个属性是错误的。另请注意，大多数其他图像格式使用 :width 和 :height 来指定显示的图像应该是什么，这通常意味着执行某种缩放。XBM 图像不支持此功能。
+</p><div class="lisp">
+<pre class="lisp">:stride stride
+</pre></div>
+<p>每行存储的布尔向量条目数；  大于或等于宽度的 8 的最小倍数。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.17.4_XPM_图像.html">XPM_图像</a>, Previous: <a href="40.17.2_图像描述符.html">图像描述符</a>, Up: <a href="40.17_图像.html">图像.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

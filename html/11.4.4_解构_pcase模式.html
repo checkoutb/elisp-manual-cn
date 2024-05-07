@@ -1,0 +1,54 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>11.4.4 解构 pcase模式</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">11.4.4 解构 pcase模式</h3>
+<div class="nav-panel"><p>Next: <a href="11.5_迭代.html">迭代</a>, Previous: <a href="11.4.3_反引号样式模式.html">反引号样式模式</a>, Up: <a href="11.4_模式匹配条件.html">模式匹配条件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Pcase 模式不仅表达了它们可以匹配的对象形式的条件，而且它们还可以提取这些对象的子字段。例如，我们可以使用以下代码从变量 my-list 的值的列表中提取 2 个元素：
+</p>
+<div class="lisp">
+<pre class="lisp">(pcase my-list
+  (`(add ,x ,y)  (message "Contains %S and %S" x y)))
+</pre></div>
+<p>这不仅会提取 x 和 y，还会额外测试 my-list 是否是一个恰好包含 3 个元素且其第一个元素是符号 add 的列表。如果这些测试中的任何一个失败，pcase 将立即返回 nil 而不会调用 message。
+</p>
+<p>提取存储在对象中的多个值称为解构。使用 pcase 模式允许执行解构绑定，这类似于局部绑定（请参阅局部变量），但通过从兼容结构的对象中提取这些值来为变量的多个元素提供值。
+</p>
+<p>本节中描述的宏使用 pcase 模式来执行解构绑定。对象具有兼容结构的条件意味着对象必须匹配模式，因为只有这样才能提取对象的子字段。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">(pcase-let ((`(add ,x ,y) my-list))
+  (message "Contains %S and %S" x y))
+</pre></div>
+<p>与前面的示例相同，只是它直接尝试从 my-list 中提取 x 和 y，而无需首先验证 my-list 是否是具有正确数量的元素并且将 add 作为其第一个元素的列表。当对象实际上与模式不匹配时的精确行为是未定义的，尽管主体不会被静默地跳过：要么发出错误信号，要么运行主体，其中一些变量可能绑定到任意值，如 nil。
+</p>
+<p>对解构绑定有用的 pcase 模式通常是反引号样式模式中描述的那些模式，因为它们表达了将匹配的对象结构的规范。
+</p>
+<p>有关解构绑定的替代工具，请参阅 seq-let。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: pcase-let bindings body… ¶
+</pre></div>
+<p>根据绑定对变量进行解构绑定，然后对body求值。
+</p>
+<p>bindings 是 (pattern exp) 形式的绑定列表，其中 exp 是要计算的表达式，而 pattern 是 pcase 模式。
+</p>
+<p>首先评估所有 exp，然后将它们与各自的模式匹配，引入新的变量绑定，然后可以在 body 中使用。变量绑定是通过解构 pattern 元素与计算的 exp 的相应元素的值的绑定来产生的。 
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: pcase-let* bindings body… ¶
+</pre></div>
+<p>根据绑定对变量进行解构绑定，然后对body求值。
+</p>
+<p>bindings 是 (pattern exp) 形式的绑定列表，其中 exp 是要计算的表达式，而 pattern 是 pcase 模式。变量绑定是通过解构 pattern 元素与计算的 exp 的相应元素的值的绑定来产生的。
+</p>
+<p>与 pcase-let 不同，但与 let* 类似，每个 exp 在处理绑定的下一个元素之前与其对应的模式匹配，因此在每个绑定中引入的变量绑定在它后面的绑定的 exp 中可用，除了身体可用。 
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: pcase-dolist (pattern list) body… ¶
+</pre></div>
+<p>对 list 的每个元素执行一次 body ，在每次迭代时，将 pattern 中的变量解构绑定到 list 元素的相应子字段的值。绑定就像通过 pcase-let 一样执行。当 pattern 是一个简单变量时，这最终等同于 dolist（请参阅迭代）。 
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: pcase-setq pattern value… ¶
+</pre></div>
+<p>以 setq 形式为变量赋值，根据其各自的模式解构每个值。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="11.5_迭代.html">迭代</a>, Previous: <a href="11.4.3_反引号样式模式.html">反引号样式模式</a>, Up: <a href="11.4_模式匹配条件.html">模式匹配条件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>23.15 绑定键的命令</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">23.15 绑定键的命令</h2>
+<div class="nav-panel"><p>Next: <a href="23.16_扫描键盘映射.html">扫描键盘映射</a>, Previous: <a href="23.14.1_与普通键盘映射的交互.html">与普通键盘映射的交互</a>, Up: <a href="23_键盘映射.html">键盘映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍一些用于更改键绑定的便捷交互界面。他们通过调用define-key来工作。
+</p>
+<p>人们经常在他们的 init 文件（参见 The Init File）中使用 global-set-key 来进行简单的定制。例如，
+</p><div class="lisp">
+<pre class="lisp">(global-set-key (kbd "C-x C-\\") 'next-line)
+</pre></div>
+<p>或者
+</p><div class="lisp">
+<pre class="lisp">(global-set-key [?\C-x ?\C-\\] 'next-line)
+</pre></div>
+<p>或者
+</p>
+<div class="lisp">
+<pre class="lisp">(global-set-key [(control ?x) (control ?\\)] 'next-line)
+</pre></div>
+<p>重新定义 Cx C-\ 以向下移动一行。
+</p>
+<div class="lisp">
+<pre class="lisp">(global-set-key [M-mouse-1] 'mouse-set-point)
+</pre></div>
+<p>将使用 Meta 键输入的第一个（最左侧）鼠标按钮重新定义为您单击的设置点。
+</p>
+<p>在要绑定的键的 Lisp 规范中使用非 ASCII 文本字符时要小心。如果这些被读取为多字节文本，因为它们通常位于 Lisp 文件中（请参阅加载非 ASCII 字符），则您也必须将键键入为多字节。例如，如果你使用这个：
+</p>
+<div class="lisp">
+<pre class="lisp">(global-set-key "ö" 'my-function) ; bind o-umlaut
+</pre></div>
+<p>或者
+</p><div class="lisp">
+<pre class="lisp">(global-set-key ?ö 'my-function) ; bind o-umlaut
+</pre></div>
+<p>并且您的语言环境是多字节 Latin-1，这些命令实际上将多字节字符与代码 246 绑定，而不是由 Latin-1 终端发送的字节代码 246 (Mv)。为了使用这个绑定，您需要教 Emacs 如何使用适当的输入法来解码键盘（参见 GNU Emacs 手册中的输入法）。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: global-set-key key binding ¶
+</pre></div>
+<p>该函数将当前全局映射中key的绑定设置为绑定。
+</p>
+<div class="lisp">
+<pre class="lisp">(global-set-key key binding)
+≡
+(define-key (current-global-map) key binding)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Command: global-unset-key key ¶
+</pre></div>
+<p>此函数从当前全局映射中删除键的绑定。
+</p>
+<p>此函数的一个用途是准备定义一个使用 key 作为前缀的更长的键——如果 key 具有非前缀绑定，则不允许这样做。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">(global-unset-key "\C-l")
+    ⇒ nil
+
+(global-set-key "\C-l\C-l" 'redraw-display)
+    ⇒ nil
+</pre></div>
+<p>这个函数相当于使用define-key，如下：
+</p><div class="lisp">
+<pre class="lisp">(global-unset-key key)
+≡
+(define-key (current-global-map) key nil)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Command: local-set-key key binding ¶
+</pre></div>
+<p>该函数将当前本地keymap中key的绑定设置为绑定。
+</p>
+<div class="lisp">
+<pre class="lisp">(local-set-key key binding)
+≡
+(define-key (current-local-map) key binding)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Command: local-unset-key key ¶
+</pre></div>
+<p>此函数从当前本地地图中删除键的绑定。
+</p>
+<div class="lisp">
+<pre class="lisp">(local-unset-key key)
+≡
+(define-key (current-local-map) key nil)
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="23.16_扫描键盘映射.html">扫描键盘映射</a>, Previous: <a href="23.14.1_与普通键盘映射的交互.html">与普通键盘映射的交互</a>, Up: <a href="23_键盘映射.html">键盘映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

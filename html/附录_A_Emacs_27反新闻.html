@@ -1,0 +1,197 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>附录 A Emacs 27反新闻</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h1 class="chapter">附录 A Emacs 27反新闻</h1>
+<div class="nav-panel"><p>Next: <a href="附录_B_GNU自由文档许可证.html">B_GNU自由文档许可证</a>, Previous: <a href="条款和条件的结束.html">条款和条件的结束</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>对于那些时间倒流的用户，这里是关于降级到 Emacs 版本 27.2 的信息。我们希望您会喜欢由于缺少许多 Emacs 28.1 功能而带来的更大的简单性。
+</p>
+<ul>
+<li>
+烦人的词法绑定局部变量现在注意 enable-local-variables 的值：如果它为 nil，则忽略词法绑定 cookie。我们正在努力消除过去 Emacs 版本中的词法绑定支持，而这一小步让我们回到了这一变化。
+</li><li>
+load-dangerous-libraries 变量并没有过时，因为它必须用于允许加载由 XEmacs 编译的 Lisp，随着时间的推移，这将变得越来越重要。
+</li><li>
+不支持交互的可选模式参数，并且每个命令都被认为适用于任何主要模式。我们相信这让 Lisp 程序员的生活变得更加简单，因为现在不需要用它们有意义的模式来标记命令。
+</li><li>
+Lisp 符号的简写已被删除，这使得加载 Lisp 文件和处理 Lisp 符号更加简单和高效。当您及时返回时，这对于在较慢的 CPU 上获得良好的性能很重要。
+</li><li>
+为了减少 Emacs 中与不重要特性相关的代码量，我们删除了变量 global-minor-modes 和 local-minor-modes。如果您的 Lisp 程序需要确定某个次要模式是否有效，则必须对每种模式进行显式测试。我们不希望任何人错过那些花哨的变量。
+</li><li>
+为以高速率产生输出的子流程提供服务的默认首选项以及相关的变量 process-prioritize-lower-fds 已被删除。时光倒流意味着越来越少的程序可以产生如此高的输出，因此这些功能只是无用的垃圾。
+</li><li>
+EBCDIC 变体的编码已被删除。这包括 ibm256、ibm273 和其他——为某些日本和欧洲语言环境量身定制的 EBCDIC 编码变体。你将不需要那些你要去的地方。
+</li><li>
+<code>Bindat 类型表达式</code> 描述语言已被删除，因为现有的数据布局规范非常适合这项工作。
+</li><li>
+为了简化代码并降低复杂性，我们删除了通过 :success 关键字在条件案例中指定成功处理程序的功能。如果你真的需要这个特性（你为什么要？），你总是可以写一些具有相同效果的简单 Lisp。
+</li><li>
+Emacs 模块不能再提供交互功能，或者安装终结器，也不能打开现有管道子进程的通道。所有这些都是额外的镇流器，特别是因为我们计划在过去的 Emacs 版本中删除模块。出于同样的原因，make_unibyte_string 模块 API 已被删除。
+</li><li>
+为了保持 Emacs 的简洁和优雅，我们删除了 print-integers-as-characters 选项。通过十进制代码识别字符是 Emacs Lisp 程序员的基本要求，并且随着 Unicode 字符使用的预期减少，这将很快仅限于 ASCII：当然你们都可以掌握！
+</li><li>
+目录文件函数的可选计数参数已被删除。从完整列表中提取前 n 个成员是微不足道的，因此对于微不足道的成本来说，这是一个显着的简化。
+</li><li>
+创建子进程和网络连接的函数不再接受 :coding 参数；  改用 set-process-coding-system 或 bind coding-system-for-read/write：同样，以很少或没有成本显着降低 Emacs 复杂性。
+</li><li>
+我们从宏 define-derived-mode 和 define-minor-mode 中删除了允许使用 :interactive 参数的代码。将模式标记为非交互的可能性很小，
+</li><li>
+在文档字符串中包含指向手册页的链接的可能性已被删除。如果您需要此类参考，请改用纯文本。
+</li><li>
+临时缓冲区不再免除运行任何与缓冲区相关的挂钩。不希望在某个缓冲区中出现此类钩子的程序总是可以在本地禁用它，而使这变得更简单会使 Emacs 无缘无故地复杂化。
+</li><li>
+一些使字节编译器复杂化的特性已被删除：
+<ul>
+<li>
+检查缺少动态变量的声明。随着我们摆脱词法绑定支持，这将继续变得越来越没有意义。
+</li><li>
+编译符号链接的 *.el 文件的能力，这真的很恶心：改为复制文件。
+</li><li>
+关于文档字符串太宽的警告——这只是一个麻烦，因为程序员应该被信任知道他们在做什么。
+</li></ul>
+</li><li>
+根据我们从 Emacs 中删除 pcase 的总体计划，我们删除了 pcase 宏的几个特性：
+<ul>
+<li>
+cl 型模式。
+</li><li>
+pcase-setq 宏。
+</li><li>
+pcase-compile-patterns 函数。
+</li></ul>
+</li><li>
+Edebug 规范列表中使用的一些关键字被认为用处不大，因此被删除：&amp;interpose、&amp;error 和 &amp;name。Emacs 的长期计划是完全放弃 Edebug，只留下受信任的 Lisp 调试器，我们将继续按照该计划工作。
+</li><li>
+函数 object-intervals 被删除，因为 Lisp 程序可以通过一个一个地遍历它们来轻松地收集缓冲区或字符串的间隔。
+</li><li>
+我们认为 require-theme 功能是不必要的复杂功能，因此我们将其删除。Lisp 程序可以轻松地沿着 custom-theme-load-path 搜索。
+</li><li>
+便利函数 length&lt;、length&gt; 和 length= 已被删除，因为使用长度和比较应该对每个人都足够好，尤其是考虑到随着时间的推移，列表的典型长度会不断下降。
+</li><li>
+变量 current-minibuffer-command 不再可用，因为我们找不到保留它的理由。
+</li><li>
+作为对简单性的持续追求的一部分，许多其他功能和变量已被消除。自 Emacs 23 以来被声明为过时的其他函数和变量已被添加回来，为在遥远的过去发布 Emacs 23 做准备。
+</li></ul>
+<hr size="6"/>
+<a name="SEC_Contents"></a>
+<table border="0" cellpadding="1" cellspacing="1" class="header">
+<tr><td align="left" valign="middle">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
+<td align="left" valign="middle">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td align="left" valign="middle">[Index]</td>
+<td align="left" valign="middle">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h1>Table of Contents</h1>
+<div class="contents">
+<ul class="no-bullet">
+<li><a href="#g_t_9644_5f55-A-Emacs-27_53cd_65b0_95fb" name="toc-Fu-Lu--A-Emacs-27Fan-Xin-Wen-">1 附录 A Emacs 27反新闻</a></li>
+</ul>
+</div>
+<hr/>
+<a name="SEC_About"></a>
+<table border="0" cellpadding="1" cellspacing="1" class="header">
+<tr><td align="left" valign="middle">[<a href="#Top" title="Cover (top) of document">Top</a>]</td>
+<td align="left" valign="middle">[<a href="#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td align="left" valign="middle">[Index]</td>
+<td align="left" valign="middle">[<a href="#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h1>About This Document</h1>
+<p>
+  This document was generated on <i>May 7, 2024</i> using <a href="http://www.nongnu.org/texi2html/"><i>texi2html 5.0</i></a>.
+</p>
+<p>
+  The buttons in the navigation panels have the following meaning:
+</p>
+<table border="1">
+<tr>
+<th> Button </th>
+<th> Name </th>
+<th> Go to </th>
+<th> From 1.2.3 go to</th>
+</tr>
+<tr>
+<td align="center"> [ &lt;&lt; ] </td>
+<td align="center">FastBack</td>
+<td>Beginning of this chapter or previous chapter</td>
+<td>1</td>
+</tr>
+<tr>
+<td align="center"> [ &lt; ] </td>
+<td align="center">Back</td>
+<td>Previous section in reading order</td>
+<td>1.2.2</td>
+</tr>
+<tr>
+<td align="center"> [ Up ] </td>
+<td align="center">Up</td>
+<td>Up section</td>
+<td>1.2</td>
+</tr>
+<tr>
+<td align="center"> [ &gt; ] </td>
+<td align="center">Forward</td>
+<td>Next section in reading order</td>
+<td>1.2.4</td>
+</tr>
+<tr>
+<td align="center"> [ &gt;&gt; ] </td>
+<td align="center">FastForward</td>
+<td>Next chapter</td>
+<td>2</td>
+</tr>
+<tr>
+<td align="center"> [Top] </td>
+<td align="center">Top</td>
+<td>Cover (top) of document</td>
+<td>   </td>
+</tr>
+<tr>
+<td align="center"> [Contents] </td>
+<td align="center">Contents</td>
+<td>Table of contents</td>
+<td>   </td>
+</tr>
+<tr>
+<td align="center"> [Index] </td>
+<td align="center">Index</td>
+<td>Index</td>
+<td>   </td>
+</tr>
+<tr>
+<td align="center"> [ ? ] </td>
+<td align="center">About</td>
+<td>About (help)</td>
+<td>   </td>
+</tr>
+</table>
+<p>
+  where the <strong> Example </strong> assumes that the current position is at <strong> Subsubsection One-Two-Three </strong> of a document of the following structure:
+</p>
+<ul>
+<li> 1. Section One
+    <ul>
+<li>1.1 Subsection One-One
+        <ul>
+<li>...</li>
+</ul>
+</li>
+<li>1.2 Subsection One-Two
+        <ul>
+<li>1.2.1 Subsubsection One-Two-One</li>
+<li>1.2.2 Subsubsection One-Two-Two</li>
+<li>1.2.3 Subsubsection One-Two-Three    
+            <strong>&lt;== Current Position </strong></li>
+<li>1.2.4 Subsubsection One-Two-Four</li>
+</ul>
+</li>
+<li>1.3 Subsection One-Three
+        <ul>
+<li>...</li>
+</ul>
+</li>
+<li>1.4 Subsection One-Four</li>
+</ul>
+</li>
+</ul>
+<hr/>
+<p>
+<font size="-1">
+  This document was generated on <i>May 7, 2024</i> using <a href="http://www.nongnu.org/texi2html/"><i>texi2html 5.0</i></a>.
+ </font>
+<br/>
+</p>
+<div class="nav-panel"><p>Next: <a href="附录_B_GNU自由文档许可证.html">B_GNU自由文档许可证</a>, Previous: <a href="条款和条件的结束.html">条款和条件的结束</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

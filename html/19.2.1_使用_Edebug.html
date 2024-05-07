@@ -1,0 +1,40 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>19.2.1 使用 Edebug</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">19.2.1 使用 Edebug</h3>
+<div class="nav-panel"><p>Next: <a href="19.2.2_为_Edebug_检测.html">为_Edebug_检测</a>, Previous: <a href="19.2_调试.html">调试</a>, Up: <a href="19.2_调试.html">调试.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>要使用 Edebug 调试 Lisp 程序，您必须首先检测要调试的 Lisp 代码。一个简单的方法是首先将点移动到函数或宏的定义中，然后执行 Cu CMx（带有前缀参数的 eval-defun）。请参阅 Instrumenting for Edebug，了解检测代码的替代方法。
+</p>
+<p>一旦检测到函数，对该函数的任何调用都会激活 Edebug。根据您选择的 Edebug 执行模式，激活 Edebug 可能会停止执行并让您逐步执行该功能，或者它可能会更新显示并在检查调试命令时继续执行。默认执行模式是 step，它会停止执行。请参阅 Edebug 执行模式。
+</p>
+<p>在 Edebug 中，您通常会查看一个 Emacs 缓冲区，其中显示了您正在调试的 Lisp 代码的源代码。这称为源代码缓冲区，它是临时只读的。
+</p>
+<p>左边缘的箭头表示函数正在执行的行。Point 最初显示函数在行内执行的位置，但如果您自己移动 point，这将不再适用。
+</p>
+<p>如果您检测 fac 的定义（如下所示）然后执行（fac 3），这就是您通常会看到的内容。点位于 if 之前的左括号处。
+</p>
+<div class="lisp">
+<pre class="lisp">(defun fac (n)
+=&gt;∗(if (&lt; 0 n)
+      (* n (fac (1- n)))
+    1))
+</pre></div>
+<p>函数中 Edebug 可以停止执行的位置称为停止点。这些出现在每个作为列表的子表达式之前和之后，也出现在每个变量引用之后。这里我们使用句点来显示函数 fac 中的停止点：
+</p>
+<div class="lisp">
+<pre class="lisp">(defun fac (n)
+  .(if .(&lt; 0 n.).
+      .(* n. .(fac .(1- n.).).).
+    1).)
+</pre></div>
+<p>除了 Emacs Lisp 模式的命令外，源代码缓冲区中还有 Edebug 的特殊命令。例如，您可以键入 Edebug 命令 SPC 执行直到下一个停止点。如果您在进入 fac 后键入 SPC 一次，您将看到以下显示：
+</p>
+<div class="lisp">
+<pre class="lisp">(defun fac (n)
+=&gt;(if ∗(&lt; 0 n)
+      (* n (fac (1- n)))
+    1))
+</pre></div>
+<p>当 Edebug 在表达式后停止执行时，它会在回显区域显示表达式的值。
+</p>
+<p>其他常用的命令是 b 在停止点设置断点， g 执行直到到达断点， q 退出 Edebug 并返回到顶层命令循环。类型 ？  显示所有 Edebug 命令的列表。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="19.2.2_为_Edebug_检测.html">为_Edebug_检测</a>, Previous: <a href="19.2_调试.html">调试</a>, Up: <a href="19.2_调试.html">调试.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

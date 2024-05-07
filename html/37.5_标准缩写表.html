@@ -1,0 +1,36 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>37.5 标准缩写表</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">37.5 标准缩写表</h2>
+<div class="nav-panel"><p>Next: <a href="37.6_缩写属性.html">缩写属性</a>, Previous: <a href="37.4_查找和扩展缩略语.html">查找和扩展缩略语</a>, Up: <a href="37_缩写和缩写扩展.html">缩写和缩写扩展.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在这里，我们列出了保存 Emacs 预加载主要模式的缩写表的变量。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: global-abbrev-table ¶
+</pre></div>
+<p>这是与模式无关的缩写的缩写表。其中定义的缩写适用于所有缓冲区。每个缓冲区也可能有一个本地缩写表，其缩写定义优先于全局表中的定义。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: local-abbrev-table ¶
+</pre></div>
+<p>此缓冲区局部变量的值是当前缓冲区的（特定于模式的）缩写表。它也可以是此类表的列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: abbrev-minor-mode-table-alist ¶
+</pre></div>
+<p>此变量的值是 (mode . abbrev-table) 形式的元素列表，其中 mode 是变量的名称：如果变量绑定到非 nil 值，则 abbrev-table 处于活动状态，否则它被忽略了。abbrev-table 也可以是缩写表的列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: fundamental-mode-abbrev-table ¶
+</pre></div>
+<p>这是基本模式中使用的本地缩写表；  换句话说，它是基本模式下所有缓冲区中的本地缩写表。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: text-mode-abbrev-table ¶
+</pre></div>
+<p>这是文本模式中使用的本地缩写表。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: lisp-mode-abbrev-table ¶
+</pre></div>
+<p>这是在 Lisp 模式中使用的本地缩写表。它是 Emacs Lisp 模式中使用的本地缩写表的父级。请参阅缩写表属性。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="37.6_缩写属性.html">缩写属性</a>, Previous: <a href="37.4_查找和扩展缩略语.html">查找和扩展缩略语</a>, Up: <a href="37_缩写和缩写扩展.html">缩写和缩写扩展.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

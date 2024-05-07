@@ -1,0 +1,35 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>35.8 编辑中使用的标准正则表达式</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">35.8 编辑中使用的标准正则表达式</h2>
+<div class="nav-panel"><p>Next: <a href="36_语法表.html">语法表</a>, Previous: <a href="35.7_搜索和替换.html">搜索和替换</a>, Up: <a href="35_搜索和匹配.html">搜索和匹配.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节描述了一些变量，这些变量包含在编辑中用于特定目的的正则表达式：
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: page-delimiter ¶
+</pre></div>
+<p>这是描述分隔页面的行开头的正则表达式。默认值为 <code>^\014</code> （即 <code>^^L</code> 或 <code>^\Cl</code> ）；  这匹配以换页符开头的行。
+</p>
+<p>以下两个正则表达式不应假定匹配总是从行首开始；  他们不应该使用 ’^’ 来锚定比赛。大多数情况下，段落命令只在行首检查匹配，这意味着 <code>^</code> 是多余的。当左边距不为零时，它们接受在左边距之后开始的匹配。在这种情况下，’^’ 将是不正确的。但是，在从不使用左边距的模式中，’^’ 是无害的。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: paragraph-separate ¶
+</pre></div>
+<p>这是用于识别分隔段落的行开头的正则表达式。（如果您更改此设置，您可能还必须更改段落开头。）默认值为 <code>[ \t\f]*$</code> ，它匹配完全由空格、制表符和换页符组成的行（在它之后左边距）。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: paragraph-start ¶
+</pre></div>
+<p>这是用于识别开始或分隔段落的行开头的正则表达式。默认值为 "\\|[ ]*$"，它匹配仅包含空格或以换页开头（在其左边距之后）的行。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: sentence-end ¶
+</pre></div>
+<p>如果非零，则该值应该是描述句子结尾的正则表达式，包括句子后面的空格。（无论如何，所有段落边界也结束句子。）
+</p>
+<p>如果该值为 nil（默认情况下），则函数 sentence-end 构造正则表达式。这就是为什么你应该总是调用函数 sentence-end 来获取用于识别句子结尾的正则表达式。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: sentence-end ¶
+</pre></div>
+<p>如果非 nil，此函数返回变量 sentence-end 的值。否则，它会根据变量 sentence-end-double-space（参见 sentence-end-double-space 的定义）、sentence-end-without-period 和 sentence-end-without-space 的值返回一个默认值。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="36_语法表.html">语法表</a>, Previous: <a href="35.7_搜索和替换.html">搜索和替换</a>, Up: <a href="35_搜索和匹配.html">搜索和匹配.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

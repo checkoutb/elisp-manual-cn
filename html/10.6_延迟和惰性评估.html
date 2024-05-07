@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>10.6 延迟和惰性评估</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">10.6 延迟和惰性评估</h2>
+<div class="nav-panel"><p>Next: <a href="11_控制结构.html">控制结构</a>, Previous: <a href="10.5_评估.html">评估</a>, Up: <a href="10_评估.html">评估.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>有时延迟表达式的计算是有用的，例如，如果你想避免执行耗时的计算，如果结果证明在程序的未来不需要结果。thunk 库提供以下函数和宏来支持这种延迟评估：
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: thunk-delay forms… ¶
+</pre></div>
+<p>返回一个用于评估表单的 thunk。thunk 是一个闭包（参见 Closures），它继承了 thunk-delay 调用的词法环境。使用这个宏需要词法绑定。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: thunk-force thunk ¶
+</pre></div>
+<p>强制 thunk 执行创建 thunk 的 thunk-delay 中指定的表单的评估。返回最后一个表单的评估结果。thunk 还 <code>记住</code> 它是被强制的：任何使用相同 thunk 的 thunk-force 进一步调用将只返回相同的结果，而无需再次评估表单。 
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: thunk-let (bindings…) forms… ¶
+</pre></div>
+<p>这个宏类似于 let 但创建 <code>惰性</code> 变量绑定。任何绑定都有形式（符号值形式）。与 let 不同，任何值形式的评估都被推迟到在评估形式时第一次使用相应符号的绑定。任何值形式最多被评估一次。使用这个宏需要词法绑定。 
+</p>
+<p>例子：
+</p>
+<div class="lisp">
+<pre class="lisp">(defun f (number)
+  (thunk-let ((derived-number
+              (progn (message "Calculating 1 plus 2 times %d" number)
+                     (1+ (* 2 number)))))
+    (if (&gt; number 10)
+        derived-number
+      number)))
+
+
+(f 5)
+⇒ 5
+
+
+(f 12)
+-| Calculating 1 plus 2 times 12
+⇒ 25
+</pre></div>
+<p>由于惰性绑定变量的特殊性质，设置它们是错误的（例如使用 setq）。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: thunk-let* (bindings…) forms… ¶
+</pre></div>
+<p>这类似于 thunk-let，但允许绑定中的任何表达式引用此 thunk-let* 形式中的先前绑定。使用这个宏需要词法绑定。 
+</p><div class="lisp">
+<pre class="lisp">(thunk-let* ((x (prog2 (message "Calculating x...")
+                    (+ 1 1)
+                  (message "Finished calculating x")))
+             (y (prog2 (message "Calculating y...")
+                    (+ x 1)
+                  (message "Finished calculating y")))
+             (z (prog2 (message "Calculating z...")
+                    (+ y 1)
+                  (message "Finished calculating z")))
+             (a (prog2 (message "Calculating a...")
+                    (+ z 1)
+                  (message "Finished calculating a"))))
+  (* z x))
+
+-| Calculating z...
+-| Calculating y...
+-| Calculating x...
+-| Finished calculating x
+-| Finished calculating y
+-| Finished calculating z
+⇒ 8
+</pre></div>
+<p>thunk-let 和 thunk-let* 隐式使用 thunk：它们的扩展创建辅助符号并将它们绑定到包装绑定表达式的 thunk。然后，对正文形式中原始变量的所有引用都将替换为调用 thunk-force 的表达式，并将相应的辅助变量作为参数。因此，任何使用 thunk-let 或 thunk-let* 的代码都可以重写为使用 thunk，但在许多情况下，使用这些宏会产生比显式使用 thunk 更好的代码。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="11_控制结构.html">控制结构</a>, Previous: <a href="10.5_评估.html">评估</a>, Up: <a href="10_评估.html">评估.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,20 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>36.6.2 查找位置的解析状态</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">36.6.2 查找位置的解析状态</h3>
+<div class="nav-panel"><p>Next: <a href="36.6.3_解析器状态.html">解析器状态</a>, Previous: <a href="36.6.1_基于解析的运动命令.html">基于解析的运动命令</a>, Up: <a href="36.6_解析表达式.html">解析表达式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>对于句法分析，例如缩进，通常有用的是计算对应于给定缓冲区位置的句法状态。这个功能很方便。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: syntax-ppss &amp;optional pos ¶
+</pre></div>
+<p>此函数返回解析器将从缓冲区可见部分的开头开始在位置 pos 处到达的解析器状态。有关解析器状态的描述，请参见解析器状态。
+</p>
+<p>返回值与调用低级解析函数 parse-partial-sexp 以从缓冲区的可见部分开头解析到 pos 相同（请参阅低级解析）。但是，syntax-ppss 使用缓存来加速计算。由于这种优化，返回的解析器状态中的第二个值（之前的完整子表达式）和第六个值（最小括号深度）没有意义。
+</p>
+<p>这个函数有一个副作用：它为语法-ppss-flush-cache（见下文）添加了一个缓冲区本地条目到 before-change-functions（见 Change Hooks）。当缓冲区被修改时，此条目保持高速缓存一致。但是，如果在 before-change-functions 临时让绑定时调用了 syntax-ppss，或者如果在没有运行钩子的情况下修改了缓冲区，例如在使用禁止修改钩子时，缓存可能不会更新。在这些情况下，有必要显式调用 syntax-ppss-flush-cache。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: syntax-ppss-flush-cache beg &amp;rest ignored-args ¶
+</pre></div>
+<p>此函数从位置 beg 开始刷新 syntax-ppss 使用的缓存。其余的参数，被忽略的参数，被忽略；  此函数接受它们，以便可以直接在诸如 before-change-functions 之类的钩子上使用（请参阅更改钩子）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="36.6.3_解析器状态.html">解析器状态</a>, Previous: <a href="36.6.1_基于解析的运动命令.html">基于解析的运动命令</a>, Up: <a href="36.6_解析表达式.html">解析表达式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>31.2.4 文本行的运动</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">31.2.4 文本行的运动</h3>
+<div class="nav-panel"><p>Next: <a href="31.2.5_屏幕线运动.html">屏幕线运动</a>, Previous: <a href="31.2.3_移动到缓冲区末端.html">移动到缓冲区末端</a>, Up: <a href="31.2_运动.html">运动.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>文本行是由换行符分隔的缓冲区部分，被视为前一行的一部分。第一个文本行从缓冲区的开头开始，最后一个文本行在缓冲区的末尾结束，无论最后一个字符是否为换行符。将缓冲区划分为文本行不受窗口宽度、显示中的行连续性或制表符和控制字符的显示方式的影响。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: beginning-of-line &amp;optional count ¶
+</pre></div>
+<p>此函数将点移动到当前行的开头。如果参数 count 不是 nil 或 1，它会向前移动 count-1 行，然后到行首。
+</p>
+<p>此函数不会将点移动到字段边界（请参阅定义和使用字段），除非这样做会越过那里移动到另一条线；  因此，如果 count 为 nil 或 1，并且 point 从场边界开始，则 point 不会移动。要忽略字段边界，要么将禁止字段文本运动绑定到 t，要么使用前向线函数。例如，(forward-line 0) 与 (beginning-of-line) 做同样的事情，只是它忽略了字段边界。
+</p>
+<p>如果此函数到达缓冲区的末尾（或可访问部分的末尾，如果变窄有效），它将指向那里。没有错误信号。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: line-beginning-position &amp;optional count ¶
+</pre></div>
+<p>返回（行首计数）将移动到的位置。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: end-of-line &amp;optional count ¶
+</pre></div>
+<p>此函数将点移动到当前行的末尾。如果参数 count 不是 nil 或 1，它会向前移动 count-1 行，然后到行尾。
+</p>
+<p>此函数不会将点移动到字段边界（请参阅定义和使用字段），除非这样做会越过那里移动到另一条线；  因此，如果 count 为 nil 或 1，并且 point 从场边界开始，则 point 不会移动。要忽略字段边界，请将 inhibitor-field-text-motion 绑定到 t。
+</p>
+<p>如果此函数到达缓冲区的末尾（或可访问部分的末尾，如果变窄有效），它将指向那里。没有错误信号。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: line-end-position &amp;optional count ¶
+</pre></div>
+<p>返回（行尾计数）将移动到的位置。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: forward-line &amp;optional count ¶
+</pre></div>
+<p>此函数将点向前移动计数行，到其后行的开头。如果 count 是负数，它会向后移动 point -count 行，到前一行的开头。如果 count 为零，它将指向当前行的开头。如果 count 为 nil，则表示 1。
+</p>
+<p>如果 forward-line 在找到那么多行之前遇到缓冲区（或可访问部分）的开头或结尾，它将指向那里。没有错误信号。
+</p>
+<p>forward-line 返回计数与实际移动的行数之间的差值。如果您尝试从只有三行的缓冲区的开头向下移动五行，则指向在最后一行的末尾停止，该值将为 2。作为一个明确的例外，如果最后一个可访问的行是非空，但没有换行符（例如，如果缓冲区结束时没有换行符），函数将指向该行的末尾，并且函数返回的值将该行计数为成功移动的一行。
+</p>
+<p>在交互式调用中，count 是数字前缀参数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: count-lines start end &amp;optional ignore-invisible-lines ¶
+</pre></div>
+<p>此函数返回当前缓冲区中位置 start 和 end 之间的行数。如果 start 和 end 相等，则返回 0。否则它至少返回 1，即使 start 和 end 在同一行。这是因为它们之间的文本，单独考虑，必须至少包含一行，除非它是空的。
+</p>
+<p>如果可选的 ignore-invisible-lines 不为零，则不可见行将不包括在计数中。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: count-words start end ¶
+</pre></div>
+<p>此函数返回当前缓冲区中位置 start 和 end 之间的字数。
+</p>
+<p>该函数也可以交互调用。在这种情况下，它会打印一条消息，报告缓冲区中的行数、单词数和字符数，或者如果该区域处于活动状态，则该区域中的字符数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: line-number-at-pos &amp;optional pos absolute ¶
+</pre></div>
+<p>该函数返回当前缓冲区中与缓冲区位置 pos 对应的行号。如果 pos 为 nil 或省略，则使用当前缓冲区位置。如果 absolute 为 nil，则默认计数从 (point-min) 开始，因此该值指的是（可能缩小的）缓冲区的可访问部分的内容。如果 absolute 不为零，则忽略任何缩小并返回绝对行号。
+</p>
+<p>另请参阅检查文本近点中的函数 bolp 和 eolp。这些函数不会移动点，而是测试它是否已经在一行的开头或结尾。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="31.2.5_屏幕线运动.html">屏幕线运动</a>, Previous: <a href="31.2.3_移动到缓冲区末端.html">移动到缓冲区末端</a>, Up: <a href="31.2_运动.html">运动.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

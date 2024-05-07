@@ -1,0 +1,100 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.20.2 抽象显示示例</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.20.2 抽象显示示例</h3>
+<div class="nav-panel"><p>Next: <a href="40.21_闪烁的括号.html">闪烁的括号</a>, Previous: <a href="40.20.1_抽象显示函数.html">抽象显示函数</a>, Up: <a href="40.20_抽象显示.html">抽象显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这是一个简单的例子，它使用 ewoc 包的函数来实现颜色分量显示，缓冲区中的一个区域以各种方式表示三个整数的向量（本身表示 24 位 RGB 值）。
+</p><div class="lisp">
+<pre class="lisp">(setq colorcomp-ewoc nil
+      colorcomp-data nil
+      colorcomp-mode-map nil
+      colorcomp-labels ["Red" "Green" "Blue"])
+
+(defun colorcomp-pp (data)
+  (if data
+      (let ((comp (aref colorcomp-data data)))
+        (insert (aref colorcomp-labels data) "\t: #x"
+                (format "%02X" comp) " "
+                (make-string (ash comp -2) ?#) "\n"))
+    (let ((cstr (format "#%02X%02X%02X"
+                        (aref colorcomp-data 0)
+                        (aref colorcomp-data 1)
+                        (aref colorcomp-data 2)))
+          (samp " (sample text) "))
+      (insert "Color\t: "
+              (propertize samp 'face
+                          `(foreground-color . ,cstr))
+              (propertize samp 'face
+                          `(background-color . ,cstr))
+              "\n"))))
+
+(defun colorcomp (color)
+  "Allow fiddling with COLOR in a new buffer.
+The buffer is in Color Components mode."
+  (interactive "sColor (name or #RGB or #RRGGBB): ")
+  (when (string= "" color)
+    (setq color "green"))
+  (unless (color-values color)
+    (error "No such color: %S" color))
+  (switch-to-buffer
+   (generate-new-buffer (format "originally: %s" color)))
+  (kill-all-local-variables)
+  (setq major-mode 'colorcomp-mode
+        mode-name "Color Components")
+  (use-local-map colorcomp-mode-map)
+  (erase-buffer)
+  (buffer-disable-undo)
+  (let ((data (apply 'vector (mapcar (lambda (n) (ash n -8))
+                                     (color-values color))))
+        (ewoc (ewoc-create 'colorcomp-pp
+                           "\nColor Components\n\n"
+                           (substitute-command-keys
+                            "\n\\{colorcomp-mode-map}"))))
+    (set (make-local-variable 'colorcomp-data) data)
+    (set (make-local-variable 'colorcomp-ewoc) ewoc)
+    (ewoc-enter-last ewoc 0)
+    (ewoc-enter-last ewoc 1)
+    (ewoc-enter-last ewoc 2)
+    (ewoc-enter-last ewoc nil)))
+</pre></div>
+<p>这个例子可以扩展为一个颜色选择小部件（换句话说， <code>模型-视图-控制器</code> 设计范例的 <code>控制器</code> 部分），通过定义命令来修改 colorcomp-data 并完成选择过程，以及键盘映射以方便地将它们捆绑在一起。
+</p><div class="lisp">
+<pre class="lisp">(defun colorcomp-mod (index limit delta)
+  (let ((cur (aref colorcomp-data index)))
+    (unless (= limit cur)
+      (aset colorcomp-data index (+ cur delta)))
+    (ewoc-invalidate
+     colorcomp-ewoc
+     (ewoc-nth colorcomp-ewoc index)
+     (ewoc-nth colorcomp-ewoc -1))))
+
+(defun colorcomp-R-more () (interactive) (colorcomp-mod 0 255 1))
+(defun colorcomp-G-more () (interactive) (colorcomp-mod 1 255 1))
+(defun colorcomp-B-more () (interactive) (colorcomp-mod 2 255 1))
+(defun colorcomp-R-less () (interactive) (colorcomp-mod 0 0 -1))
+(defun colorcomp-G-less () (interactive) (colorcomp-mod 1 0 -1))
+(defun colorcomp-B-less () (interactive) (colorcomp-mod 2 0 -1))
+
+(defun colorcomp-copy-as-kill-and-exit ()
+  "Copy the color components into the kill ring and kill the buffer.
+The string is formatted #RRGGBB (hash followed by six hex digits)."
+  (interactive)
+  (kill-new (format "#%02X%02X%02X"
+                    (aref colorcomp-data 0)
+                    (aref colorcomp-data 1)
+                    (aref colorcomp-data 2)))
+  (kill-buffer nil))
+
+(setq colorcomp-mode-map
+      (let ((m (make-sparse-keymap)))
+        (suppress-keymap m)
+        (define-key m "i" 'colorcomp-R-less)
+        (define-key m "o" 'colorcomp-R-more)
+        (define-key m "k" 'colorcomp-G-less)
+        (define-key m "l" 'colorcomp-G-more)
+        (define-key m "," 'colorcomp-B-less)
+        (define-key m "." 'colorcomp-B-more)
+        (define-key m " " 'colorcomp-copy-as-kill-and-exit)
+        m))
+</pre></div>
+<p>请注意，我们从不修改每个节点中的数据，当 ewoc 创建为 nil 或向量 colorcomp-data（实际颜色分量）的索引时，该数据是固定的。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.21_闪烁的括号.html">闪烁的括号</a>, Previous: <a href="40.20.1_抽象显示函数.html">抽象显示函数</a>, Up: <a href="40.20_抽象显示.html">抽象显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

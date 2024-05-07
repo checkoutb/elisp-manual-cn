@@ -1,0 +1,123 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>20.2 输入流</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">20.2 输入流</h2>
+<div class="nav-panel"><p>Next: <a href="20.3_输入函数.html">输入函数</a>, Previous: <a href="20.1_阅读与打印简介.html">阅读与打印简介</a>, Up: <a href="20_阅读和打印_Lisp_对象.html">阅读和打印_Lisp_对象.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>大多数用于读取文本的 Lisp 函数都将输入流作为参数。输入流指定从何处或如何获取要读取的文本字符。以下是可能的输入流类型：
+</p>
+<div class="lisp">
+<pre class="lisp">buffer ¶
+</pre></div>
+<p>输入字符从缓冲区中读取，从点之后的字符开始。读取字符时点前进。
+</p><div class="lisp">
+<pre class="lisp">marker ¶
+</pre></div>
+<p>输入字符从标记所在的缓冲区中读取，从标记之后的字符开始。标记位置随着字符的读取而前进。当流是标记时，缓冲区中的点值无效。
+</p><div class="lisp">
+<pre class="lisp">string ¶
+</pre></div>
+<p>输入字符取自字符串，从字符串中的第一个字符开始，并根据需要使用尽可能多的字符。
+</p><div class="lisp">
+<pre class="lisp">function ¶
+</pre></div>
+<p>输入字符由函数生成，必须支持两种调用：
+</p>
+<p>当不带参数调用它时，它应该返回下一个字符。
+当使用一个参数（总是一个字符）调用它时，函数应该保存参数并安排在下一次调用时返回它。这称为未读字符；  当 Lisp 阅读器读取一个字符过多并想将其放回原处时，就会发生这种情况。在这种情况下，值函数返回什么没有区别。
+</p>
+<div class="lisp">
+<pre class="lisp">t ¶
+</pre></div>
+<p>t 用作流意味着从 minibuffer 中读取输入。事实上，minibuffer 被调用一次，用户给出的文本被制成一个字符串，然后用作输入流。如果 Emacs 以批处理模式运行（请参阅批处理模式），则使用标准输入而不是 minibuffer。例如，
+</p>
+<div class="lisp">
+<pre class="lisp">(message "%s" (read t))
+</pre></div>
+<p>将以批处理模式从标准输入读取 Lisp 表达式并将结果打印到标准输出。
+</p><div class="lisp">
+<pre class="lisp">nil ¶
+</pre></div>
+<p>nil 作为输入流提供意味着使用标准输入的值来代替；  该值是默认输入流，并且必须是非零输入流。
+</p><div class="lisp">
+<pre class="lisp">symbol
+</pre></div>
+<p>作为输入流的符号等效于符号的函数定义（如果有）。
+</p>
+<p>这是一个从作为缓冲区的流中读取的示例，显示了点在之前和之后的位置：
+</p>
+<div class="lisp">
+<pre class="lisp">---------- Buffer: foo ----------
+This∗ is the contents of foo.
+---------- Buffer: foo ----------
+
+
+(read (get-buffer "foo"))
+     ⇒ is
+
+(read (get-buffer "foo"))
+     ⇒ the
+
+
+---------- Buffer: foo ----------
+This is the∗ contents of foo.
+---------- Buffer: foo ----------
+</pre></div>
+<p>请注意，第一次读取会跳过一个空格。阅读会跳过重要文本之前的任何数量的空白。
+</p>
+<p>这是一个从作为标记的流中读取的示例，最初位于所示缓冲区的开头。读取的值是符号This。
+</p>
+<div class="lisp">
+<pre class="lisp">---------- Buffer: foo ----------
+This is the contents of foo.
+---------- Buffer: foo ----------
+
+
+(setq m (set-marker (make-marker) 1 (get-buffer "foo")))
+     ⇒ #&lt;marker at 1 in foo&gt;
+
+(read m)
+     ⇒ This
+
+m
+     ⇒ #&lt;marker at 5 in foo&gt;   ;; Before the first space.
+</pre></div>
+<p>这里我们从一个字符串的内容中读取：
+</p><div class="lisp">
+<pre class="lisp">(read "(When in) the course")
+     ⇒ (When in)
+</pre></div>
+<p>以下示例从 minibuffer 中读取。提示是：’Lisp 表达式：’。（这始终是您从流 t 中读取时使用的提示。）用户的输入显示在提示之后。
+</p>
+<div class="lisp">
+<pre class="lisp">(read t)
+     ⇒ 23
+---------- Buffer: Minibuffer ----------
+Lisp expression: 23 RET
+---------- Buffer: Minibuffer ----------
+</pre></div>
+<p>最后，这是一个名为 useless-stream 的函数流示例。在我们使用流之前，我们将变量 useless-list 初始化为一个字符列表。然后对函数 useless-stream 的每次调用都会获取列表中的下一个字符，或者通过将一个字符添加到列表的前面来取消读取该字符。
+</p>
+<div class="lisp">
+<pre class="lisp">
+
+(setq useless-list (append "XY()" nil))
+     ⇒ (88 89 40 41)
+
+
+(defun useless-stream (&amp;optional unread)
+  (if unread
+      (setq useless-list (cons unread useless-list))
+    (prog1 (car useless-list)
+           (setq useless-list (cdr useless-list)))))
+     ⇒ useless-stream
+</pre></div>
+<p>现在我们使用这样构造的流来读取：
+</p><div class="lisp">
+<pre class="lisp">(read 'useless-stream)
+     ⇒ XY
+
+
+useless-list
+     ⇒ (40 41)
+</pre></div>
+<p>请注意，左括号和右括号仍保留在列表中。Lisp 阅读器遇到了左括号，决定结束输入，然后取消阅读。此时从流中读取的另一次尝试将读取 ’()’ 并返回 nil。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="20.3_输入函数.html">输入函数</a>, Previous: <a href="20.1_阅读与打印简介.html">阅读与打印简介</a>, Up: <a href="20_阅读和打印_Lisp_对象.html">阅读和打印_Lisp_对象.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

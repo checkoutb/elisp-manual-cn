@@ -1,0 +1,22 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>2.4.11 Bool-Vector 类型</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">2.4.11 Bool-Vector 类型</h3>
+<div class="nav-panel"><p>Next: <a href="02.4.12_哈希表类型.html">哈希表类型</a>, Previous: <a href="02.4.10_字符表类型.html">字符表类型</a>, Up: <a href="02.4_编程类型.html">编程类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>bool-vector 是一个一维数组，其元素必须为 t 或 nil。
+</p>
+<p>布尔向量的打印表示类似于字符串，只是它以 ’#&amp;’ 开头，后跟长度。后面的字符串常量实际上将 bool-vector 的内容指定为位图——字符串中的每个字符包含 8 位，它们指定 bool-vector 的下 8 个元素（1 代表 t，0 代表 nil）。字符的最低有效位对应于布尔向量中的最低索引。
+</p>
+<div class="lisp">
+<pre class="lisp">(make-bool-vector 3 t)
+   ⇒ #&amp;3"^G"
+(make-bool-vector 3 nil)
+   ⇒ #&amp;3"^@"
+</pre></div>
+<p>这些结果是有意义的，因为 <code>C-g</code> 的二进制代码是 111，而 <code>C-@</code> 是代码为 0 的字符。
+</p>
+<p>如果长度不是 8 的倍数，则打印的表示会显示额外的元素，但这些额外的元素实际上并没有什么区别。例如，在下一个示例中，两个布尔向量相等，因为只使用了前 3 位：
+</p>
+<div class="lisp">
+<pre class="lisp">(equal #&amp;3"\377" #&amp;3"\007")
+       ⇒ t
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="02.4.12_哈希表类型.html">哈希表类型</a>, Previous: <a href="02.4.10_字符表类型.html">字符表类型</a>, Up: <a href="02.4_编程类型.html">编程类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

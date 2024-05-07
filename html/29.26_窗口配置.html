@@ -1,0 +1,85 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>29.26 窗口配置</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">29.26 窗口配置</h2>
+<div class="nav-panel"><p>Next: <a href="29.27_窗口参数.html">窗口参数</a>, Previous: <a href="29.25_鼠标窗口自动选择.html">鼠标窗口自动选择</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>一个窗口配置记录了一帧的整个布局——所有窗口，它们的大小，它们的装饰，它们包含哪些缓冲区，这些缓冲区是如何滚动的，以及它们的点值，它还包括 minibuffer-scroll-window 的值。作为一个特殊的例外，窗口配置不会为当前缓冲区记录所选窗口中的点值。
+</p>
+<p>您可以通过恢复以前保存的窗口配置来恢复整个 <code>帧</code> ( <code>frame</code> )布局。如果要记录所有 <code>帧</code> ( <code>frame</code> )的布局而不是只记录一个，请使用 <code>帧</code> ( <code>frame</code> )配置而不是窗口配置。请参阅 <code>帧</code> ( <code>frame</code> )配置。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: current-window-configuration &amp;optional frame ¶
+</pre></div>
+<p>此函数返回一个表示 <code>帧</code> ( <code>frame</code> )当前窗口配置的新对象。 <code>帧</code> ( <code>frame</code> )的默认值是选定的 <code>帧</code> ( <code>frame</code> )。变量 window-persistent-parameters 指定此函数保存哪些窗口参数（如果有）。请参见窗口参数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-window-configuration configuration &amp;optional dont-set-frame dont-set-miniwindow ¶
+</pre></div>
+<p>此函数恢复配置指定的窗口和缓冲区的配置，对于为其创建配置的 <code>帧</code> ( <code>frame</code> )，无论是否选择了该 <code>帧</code> ( <code>frame</code> )。参数配置必须是先前由当前窗口配置为该帧返回的值。通常该函数也会选择配置中记录的帧，但如果 dont-set-frame 为非零，它会保留在函数开始时已选择的帧。
+</p>
+<p>通常，该函数会恢复保存的 minibuffer（如果有），但如果 dont-set-miniwindow 为非 nil，则函数开始时的 minibuffer 当前（如果有）仍保留在 mini-window 中。
+</p>
+<p>如果保存配置的帧已死，则此函数所做的只是恢复变量 minibuffer-scroll-window 的值并调整 minibuffer-selected-window 返回的值。在这种情况下，函数返回 nil。否则，它返回 t。
+</p>
+<p>如果配置窗口的缓冲区在配置完成后已被终止，则该窗口通常会从恢复的配置中删除。但是，如果该窗口是恢复配置中剩余的最后一个窗口，则会在其中显示另一个实时缓冲区。
+</p>
+<p>这是使用此函数获得与 save-window-excursion 相同效果的一种方法：
+</p><div class="lisp">
+<pre class="lisp">(let ((config (current-window-configuration)))
+  (unwind-protect
+      (progn (split-window-below nil)
+             …)
+    (set-window-configuration config)))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Macro: save-window-excursion forms… ¶
+</pre></div>
+<p>该宏记录选中 <code>帧</code> ( <code>frame</code> )的窗口配置，依次执行窗体，然后恢复之前的窗口配置。返回值是表单中最终表单的值。
+</p>
+<p>大多数 Lisp 代码不应该使用这个宏；  save-selected-window 通常就足够了。特别是，这个宏不能可靠地阻止表单中的代码打开新窗口，因为新窗口可能会在其他 <code>帧</code> ( <code>frame</code> )中打开（请参阅选择用于显示缓冲区的窗口），并且 save-window-excursion 仅保存和恢复窗口配置在当前帧上。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-configuration-p object ¶
+</pre></div>
+<p>如果对象是窗口配置，则此函数返回 t。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: compare-window-configurations config1 config2 ¶
+</pre></div>
+<p>这个函数在窗口结构方面比较两个窗口配置，但忽略点的值和保存的滚动位置——即使这些方面不同，它也可以返回 t。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-configuration-frame config ¶
+</pre></div>
+<p>此函数返回为其进行窗口配置配置的 <code>帧</code> ( <code>frame</code> )。
+</p>
+<p>查看窗口配置内部的其他原语是有意义的，但没有实现，因为我们不需要它们。有关 Windows 配置的更多操作，请参见文件 winner.el。
+</p>
+<p>current-window-configuration 返回的对象与 Emacs 进程一起死亡。为了将窗口配置存储在磁盘上并在另一个 Emacs 会话中读回，您可以使用接下来描述的功能。这些函数也可用于将帧的状态克隆到任意实时窗口（set-window-configuration 有效地将帧的窗口克隆到该帧的根窗口）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-state-get &amp;optional window writable ¶
+</pre></div>
+<p>此函数将窗口的状态作为 Lisp 对象返回。参数窗口必须是有效窗口，并且默认为所选 <code>帧</code> ( <code>frame</code> )的根窗口。
+</p>
+<p>如果可选参数 writable 为非零，这意味着不使用标记来采样位置，如窗口点或窗口开始。当状态将被写入磁盘并在另一个会话中读回时，此参数应为非零。
+</p>
+<p>参数 writable 和变量 window-persistent-parameters 一起指定此函数保存哪些窗口参数。请参见窗口参数。
+</p>
+<p>window-state-get 返回的值可以在同一个会话中用于在另一个窗口中克隆一个窗口。它也可以写入磁盘并在另一个会话中读回。无论哪种情况，都可以使用以下函数来恢复窗口的状态。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-state-put state &amp;optional window ignore ¶
+</pre></div>
+<p>该函数将窗口状态状态放入窗口。参数 state 应该是由较早的 window-state-get 调用返回的窗口的状态，见上文。可选参数窗口可以是实时窗口或内部窗口（请参阅窗口和 <code>帧</code> ( <code>frame</code> )）。如果 window 不是实时窗口，则在将状态放入其中之前，它会被在同一帧上创建的新实时窗口替换。如果 window 为 nil，它将窗口状态放入一个新窗口。
+</p>
+<p>如果可选参数 ignore 不为 nil，则意味着忽略最小窗口大小和固定大小限制。如果忽略是安全的，这意味着窗口可以小到一行和/或两列。
+</p>
+<p>函数 window-state-get 和 window-state-put 还允许交换两个活动窗口的内容。以下函数正是这样做的：
+</p>
+<div class="lisp">
+<pre class="lisp">Command: window-swap-states &amp;optional window-1 window-2 size ¶
+</pre></div>
+<p>此命令交换两个活动窗口 window-1 和 window-2 的状态。window-1 必须指定一个活动窗口并默认为选定的窗口。window-2 必须指定一个活动窗口，并且默认为在窗口的循环排序中跟随 window-1 的窗口，不包括 minibuffer 窗口并包括所有可见帧上的活动窗口。
+</p>
+<p>可选参数大小非零意味着尝试交换窗口 1 和窗口 2 的大小。height 值表示仅交换高度，width 值表示仅交换宽度，而 t 表示尽可能交换宽度和高度。此功能不会调整 <code>帧</code> ( <code>frame</code> )的大小。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="29.27_窗口参数.html">窗口参数</a>, Previous: <a href="29.25_鼠标窗口自动选择.html">鼠标窗口自动选择</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

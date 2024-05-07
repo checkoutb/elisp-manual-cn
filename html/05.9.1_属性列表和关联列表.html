@@ -1,0 +1,10 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>5.9.1 属性列表和关联列表</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">5.9.1 属性列表和关联列表</h3>
+<div class="nav-panel"><p>Next: <a href="05.9.2_符号外的属性列表.html">符号外的属性列表</a>, Previous: <a href="05.9_属性列表.html">属性列表</a>, Up: <a href="05.9_属性列表.html">属性列表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>关联列表（请参阅关联列表）与属性列表非常相似。与关联列表相反，属性列表中的对的顺序并不重要，因为属性名称必须是不同的。
+</p>
+<p>属性列表比关联列表更适合将信息附加到各种 Lisp 函数名称或变量。如果您的程序将所有此类信息保存在一个关联列表中，则通常需要在每次检查特定 Lisp 函数名称或变量的关联时搜索整个列表，这可能会很慢。相比之下，如果您在函数名或变量本身的属性列表中保留相同的信息，则每次搜索将仅扫描一个属性列表的长度，该长度通常很短。这就是为什么变量的文档记录在名为 variable-documentation 的属性中的原因。字节编译器同样使用属性来记录那些需要特殊处理的函数。
+</p>
+<p>但是，关联列表有其自身的优势。根据您的应用程序，将关联添加到关联列表的前面可能比更新属性更快。一个符号的所有属性都存储在同一个属性列表中，因此属性名称的不同用途之间可能会发生冲突。（出于这个原因，最好选择可能是唯一的属性名称，例如以程序通常的变量和函数名称前缀开始属性名称。）关联列表可以像堆栈一样使用，其中关联被推到列表的前面，后来被丢弃；  这对于属性列表是不可能的。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="05.9.2_符号外的属性列表.html">符号外的属性列表</a>, Previous: <a href="05.9_属性列表.html">属性列表</a>, Up: <a href="05.9_属性列表.html">属性列表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

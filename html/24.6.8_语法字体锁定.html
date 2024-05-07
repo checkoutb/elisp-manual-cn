@@ -1,0 +1,33 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.6.8 语法字体锁定</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">24.6.8 语法字体锁定</h3>
+<div class="nav-panel"><p>Next: <a href="24.6.9_多行字体锁定结构.html">多行字体锁定结构</a>, Previous: <a href="24.6.7_字体锁定面.html">字体锁定面</a>, Up: <a href="24.6_字体锁定模式.html">字体锁定模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>句法字体化使用句法表（参见句法表）来查找和突出显示与句法相关的文本。如果启用，它将在基于搜索的字体化之前运行。下面记录的变量 font-lock-syntactic-face-function 确定要突出显示的句法结构。有几个变量会影响句法字体化；  您应该通过 font-lock-defaults 设置它们（请参阅字体锁定基础）。
+</p>
+<p>每当 Font Lock 模式对一段文本进行语法字体化时，它首先调用 syntax-properize-function 指定的函数。主要模式可以使用它来应用语法表文本属性以在特殊情况下覆盖缓冲区的语法表。请参阅语法属性。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: font-lock-keywords-only ¶
+</pre></div>
+<p>如果这个变量的值是非零，Font Lock 不做语法字体化，只根据 font-lock-keywords 进行基于搜索的字体化。它通常由字体锁定模式基于 font-lock-defaults 中的关键字元素设置。如果值为 nil，字体锁定将调用 jit-lock-register（请参阅其他字体锁定变量）来设置缓冲区文本在修改后的自动重新字体化，以反映由于更改而产生的新语法上下文。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: font-lock-syntax-table ¶
+</pre></div>
+<p>此变量保存用于注释和字符串字体化的语法表。它通常由字体锁定模式基于 font-lock-defaults 中的 syntax-alist 元素设置。如果此值为 nil，则语法字体化使用缓冲区的语法表（由函数 syntax-table 返回的值；请参阅语法表函数）。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: font-lock-syntactic-face-function ¶
+</pre></div>
+<p>如果这个变量是非零，它应该是一个函数来确定给定句法元素（字符串或注释）使用哪个面。
+</p>
+<p>该函数使用一个参数调用，即 parse-partial-sexp 返回的点的解析状态，并且应该返回一张脸。默认值返回 font-lock-comment-face 用于注释和 font-lock-string-face 用于字符串（参见字体锁定面）。
+</p>
+<p>此变量通常通过 font-lock-defaults 中的 <code>其他</code> 元素设置：
+</p><div class="lisp">
+<pre class="lisp">(setq-local font-lock-defaults
+            `(,python-font-lock-keywords
+              nil nil nil nil
+              (font-lock-syntactic-face-function
+               . python-font-lock-syntactic-face-function)))
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="24.6.9_多行字体锁定结构.html">多行字体锁定结构</a>, Previous: <a href="24.6.7_字体锁定面.html">字体锁定面</a>, Up: <a href="24.6_字体锁定模式.html">字体锁定模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

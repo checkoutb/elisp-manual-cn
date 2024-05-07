@@ -1,0 +1,68 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>39.9.1 进程缓冲区</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">39.9.1 进程缓冲区</h3>
+<div class="nav-panel"><p>Next: <a href="39.9.2_过程过滤器函数.html">过程过滤器函数</a>, Previous: <a href="39.9_接收进程的输出.html">接收进程的输出</a>, Up: <a href="39.9_接收进程的输出.html">接收进程的输出.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>一个进程可以（并且通常确实）有一个关联的缓冲区，这是一个普通的 Emacs 缓冲区，用于两个目的：存储进程的输出，以及决定何时终止进程。您还可以使用缓冲区来标识要操作的进程，因为在正常实践中，只有一个进程与任何给定的缓冲区相关联。许多进程应用程序也使用缓冲区来编辑要发送到进程的输入，但这不是内置在 Emacs Lisp 中的。
+</p>
+<p>默认情况下，进程输出被插入到相关的缓冲区中。（您可以通过定义自定义过滤器函数来更改此设置，请参阅处理过滤器函数。）插入输出的位置由处理标记确定，然后将其更新为指向刚刚插入的文本的末尾。通常，但并非总是如此，进程标记位于缓冲区的末尾。
+</p>
+<p>终止进程的关联缓冲区也会终止该进程。如果进程的 process-query-on-exit-flag 不为 nil，Emacs 会首先要求确认（请参阅 Querying Before Exit）。此确认由函数 process-kill-buffer-query-function 完成，该函数从 kill-buffer-query-functions 运行（请参阅 Killing Buffers）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: process-buffer process ¶
+</pre></div>
+<p>此函数返回指定进程的关联缓冲区。
+</p><div class="lisp">
+<pre class="lisp">(process-buffer (get-process "shell"))
+     ⇒ #&lt;buffer *shell*&gt;
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: process-mark process ¶
+</pre></div>
+<p>此函数返回进程的进程标记，该标记表示在何处插入进程的输出。
+</p>
+<p>如果 process 没有缓冲区，则 process-mark 返回一个不指向任何地方的标记。
+</p>
+<p>默认过滤器函数使用此标记来决定在哪里插入流程输出，并将其更新为指向插入的文本之后。这就是连续插入连续批次输出的原因。
+</p>
+<p>自定义过滤器函数通常应该以相同的方式使用此标记。有关使用 process-mark 的过滤器函数的示例，请参阅处理过滤器示例。
+</p>
+<p>当期望用户在进程缓冲区中输入输入以传输到进程时，进程标记将新输入与先前的输出分开。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-process-buffer process buffer ¶
+</pre></div>
+<p>此函数将与进程关联的缓冲区设置为缓冲区。如果 buffer 为 nil，则进程与无缓冲区关联；  如果非零，进程标记将被设置为指向缓冲区的结尾。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: get-buffer-process buffer-or-name ¶
+</pre></div>
+<p>此函数返回与由 buffer-or-name 指定的缓冲区关联的未删除进程。如果有多个与之关联的进程，则此函数会选择一个（当前是最近创建的一个，但不要指望它）。删除进程（请参阅删除进程）使此函数无法返回。
+</p>
+<p>将多个进程与同一个缓冲区关联通常是一个坏主意。
+</p><div class="lisp">
+<pre class="lisp">(get-buffer-process "*shell*")
+     ⇒ #&lt;process shell&gt;
+</pre></div>
+<p>终止进程的缓冲区会删除该进程，该进程会使用 SIGHUP 信号终止子进程（请参阅向进程发送信号）。
+</p>
+<p>如果进程的缓冲区显示在一个窗口中，您的 Lisp 程序可能希望告诉进程该窗口的尺寸，以便进程可以使其输出适应这些尺寸，就像它适应屏幕尺寸一样。以下功能允许将此类信息传达给进程；  然而，并非所有系统都支持底层功能，因此最好提供回退，例如，通过命令行参数或环境变量。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-process-window-size process height width ¶
+</pre></div>
+<p>告诉进程它的逻辑窗口大小的尺寸是宽乘高，以字符为单位。如果此函数成功将此信息传递给进程，则返回 t；  否则返回零。
+</p>
+<p>当显示与进程关联的缓冲区的窗口更改其尺寸时，应告知受影响的进程这些更改。默认情况下，当窗口配置发生变化时，Emacs 将自动代表每个在窗口中显示缓冲区的进程调用 set-process-window-size，并将显示该进程缓冲区的所有窗口中的最小尺寸传递给它。这通过 window-configuration-change-hook 工作（参见 Hooks for Window Scrolling and Changes），它被告知调用函数，该函数是每个进程的变量 window-adjust-process-window-size-function 的值，其缓冲区显示在至少一个窗口中。您可以通过设置该变量的值来自定义此行为。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: window-adjust-process-window-size-function ¶
+</pre></div>
+<p>这个变量的值应该是两个参数的函数：一个进程和显示进程缓冲区的窗口列表。当函数被调用时，进程的缓冲区就是当前缓冲区。该函数应返回一个 cons 单元格 (width . height)，该单元格描述要通过调用 set-process-window-size 传递的逻辑进程窗口的尺寸。该函数也可以返回 nil，在这种情况下，Emacs 不会为此进程调用 set-process-window-size。
+</p>
+<p>Emacs 为这个变量提供了两个预定义的值：window-adjust-process-window-size-smallest，它返回显示进程缓冲区的所有窗口尺寸中最小的一个；  和 window-adjust-process-window-size-largest，它返回最大的尺寸。对于更复杂的策略，编写自己的函数。
+</p>
+<p>此变量可以是缓冲区本地的。
+</p>
+<p>如果进程具有 adjust-window-size-function 属性（请参阅进程信息），则其值将覆盖 window-adjust-process-window-size-function 的全局值和缓冲区本地值。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="39.9.2_过程过滤器函数.html">过程过滤器函数</a>, Previous: <a href="39.9_接收进程的输出.html">接收进程的输出</a>, Up: <a href="39.9_接收进程的输出.html">接收进程的输出.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

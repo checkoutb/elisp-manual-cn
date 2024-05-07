@@ -1,0 +1,126 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>23.9 控制激活的键盘映射</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">23.9 控制激活的键盘映射</h2>
+<div class="nav-panel"><p>Next: <a href="23.10_密钥查找.html">密钥查找</a>, Previous: <a href="23.8_搜索活动键盘映射.html">搜索活动键盘映射</a>, Up: <a href="23_键盘映射.html">键盘映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><div class="lisp">
+<pre class="lisp">Variable: global-map ¶
+</pre></div>
+<p>此变量包含将 Emacs 键盘输入映射到命令的默认全局键盘映射。全局键映射通常是这个键映射。默认的全局键映射是一个完整的键映射，它将 self-insert-command 绑定到所有打印字符。
+</p>
+<p>通常的做法是更改全局键映射中的绑定，但不应为该变量分配除它开始时使用的键映射之外的任何值。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: current-global-map ¶
+</pre></div>
+<p>此函数返回当前的全局键盘映射。这与 global-map 的值相同，除非您更改其中一个。返回值是一个引用，而不是一个副本；  如果您在其上使用 define-key 或其他功能，您将更改全局绑定。
+</p><div class="lisp">
+<pre class="lisp">
+
+(current-global-map)
+⇒ (keymap [set-mark-command beginning-of-line …
+            delete-backward-char])
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: current-local-map ¶
+</pre></div>
+<p>此函数返回当前缓冲区的本地键盘映射，如果没有则返回 nil。在以下示例中，*scratch* 缓冲区的键映射（使用 Lisp 交互模式）是一个稀疏键映射，其中 ESC 的条目 ASCII 代码 27 是另一个稀疏键映射。
+</p>
+<div class="lisp">
+<pre class="lisp">
+
+(current-local-map)
+⇒ (keymap
+    (10 . eval-print-last-sexp)
+    (9 . lisp-indent-line)
+    (127 . backward-delete-char-untabify)
+
+    (27 keymap
+        (24 . eval-defun)
+        (17 . indent-sexp)))
+</pre></div>
+<p>current-local-map 返回对本地键盘映射的引用，而不是它的副本；  如果您在其上使用 define-key 或其他功能，您将更改本地绑定。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: current-minor-mode-maps ¶
+</pre></div>
+<p>此函数返回当前启用的次要模式的键盘映射列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: use-global-map keymap ¶
+</pre></div>
+<p>此函数使键映射成为新的当前全局键映射。它返回零。
+</p>
+<p>更改全局键映射是非常不寻常的。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: use-local-map keymap ¶
+</pre></div>
+<p>此函数使 keymap 成为当前缓冲区的新本地 keymap。如果 keymap 为 nil，则缓冲区没有本地 keymap。use-local-map 返回 nil。大多数主要模式命令都使用此功能。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: minor-mode-map-alist ¶
+</pre></div>
+<p>这个变量是一个列表，描述了根据某些变量的值可能会或可能不会被激活的键映射。它的元素如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(variable . keymap)
+</pre></div>
+<p>每当变量具有非零值时，键映射键映射都是活动的。通常变量是启用或禁用次要模式的变量。请参阅键盘映射和次要模式。
+</p>
+<p>请注意，minor-mode-map-alist 的元素与 minor-mode-alist 的元素的结构不同。map必须是元素的CDR；  将地图作为第二个元素的列表是行不通的。CDR 可以是键映射（列表）或功能定义为键映射的符号。
+</p>
+<p>当多个次要模式键映射处于活动状态时，次要模式映射列表中较早的一个优先。但是您应该设计次要模式，以便它们不会相互干扰。如果您正确执行此操作，则顺序将无关紧要。
+</p>
+<p>有关次要模式的更多信息，请参阅键盘映射和次要模式。另请参阅次要模式键绑定（请参阅键查找函数）。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: minor-mode-overriding-map-alist ¶
+</pre></div>
+<p>此变量允许主要模式覆盖特定次要模式的键绑定。这个 alist 的元素看起来像 minor-mode-map-alist 的元素：（变量 .keymap）。
+</p>
+<p>如果变量显示为 minor-mode-overriding-map-alist 的元素，则该元素指定的映射完全替换为 minor-mode-map-alist 中相同变量指定的任何映射。
+</p>
+<p>minor-mode-overriding-map-alist 在所有缓冲区中自动为缓冲区本地。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: overriding-local-map ¶
+</pre></div>
+<p>如果非零，则此变量保存要使用的键映射，而不是缓冲区的本地键映射、任何文本属性或覆盖键映射以及任何次要模式键映射。此键映射（如果指定）将覆盖所有其他可能处于活动状态的映射，当前全局映射除外。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: overriding-terminal-local-map ¶
+</pre></div>
+<p>如果非零，则此变量保存要使用的键映射，而不是覆盖本地映射、缓冲区的本地键映射、文本属性或覆盖键映射以及所有次要模式键映射。
+</p>
+<p>此变量始终是当前终端的本地变量，不能是缓冲区本地的。请参阅多个终端。用于实现增量搜索模式。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: overriding-local-map-menu-flag ¶
+</pre></div>
+<p>如果此变量非零，overriding-local-map 或 overriding-terminal-local-map 的值会影响菜单栏的显示。默认值为 nil，因此这些地图变量对菜单栏没有影响。
+</p>
+<p>请注意，这两个映射变量确实会影响使用菜单栏输入的键序列的执行，即使它们不影响菜单栏的显示。因此，如果出现菜单栏键序列，则应在查找和执行该键序列之前清除变量。无论如何，使用变量的模式通常都会这样做；  通常，他们通过 <code>未读</code> 并退出来响应他们不处理的事件。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: special-event-map ¶
+</pre></div>
+<p>此变量保存特殊事件的键映射。如果一个事件类型在这个 keymap 中有一个绑定，那么它是特殊的，并且该事件的绑定直接由 read-event 运行。请参阅特别活动。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: emulation-mode-map-alists ¶
+</pre></div>
+<p>此变量保存用于仿真模式的键盘映射列表列表。它适用于使用多个次要模式键盘映射的模式或包。每个元素都是一个keymap alist，其格式和含义与minor-mode-map-alist 相同，或者是一个带有变量绑定的符号，就是这样一个alist。每个 alist 中的活动键映射在 minor-mode-map-alist 和 minor-mode-overriding-map-alist 之前使用。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-transient-map keymap &amp;optional keep-pred on-exit ¶
+</pre></div>
+<p>此函数将键映射添加为临时键映射，对于一个（或多个）后续键，它优先于其他键映射。
+</p>
+<p>通常，keymap 只使用一次，以查找下一个键。如果可选参数 keep-pred 为 t，只要用户键入 keymap 中定义的键，映射就会保持活动状态；  当用户键入不在键映射中的键时，临时键映射将被停用，并继续对该键进行正常键查找。
+</p>
+<p>keep-pred 参数也可以是一个函数。在这种情况下，在运行每个命令之前调用不带参数的函数，而键盘映射处于活动状态；  如果键映射应该保持活动状态，它应该返回非零。
+</p>
+<p>退出时的可选参数，如果非零，则指定在停用键盘映射后调用的不带参数的函数。
+</p>
+<p>此函数通过从变量 overriding-terminal-local-map 中添加和删除键盘映射来工作，该变量优先于所有其他活动键盘映射（请参阅搜索活动键盘映射）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="23.10_密钥查找.html">密钥查找</a>, Previous: <a href="23.8_搜索活动键盘映射.html">搜索活动键盘映射</a>, Up: <a href="23_键盘映射.html">键盘映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

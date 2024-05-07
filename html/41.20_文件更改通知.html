@@ -1,0 +1,174 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>41.20 文件更改通知</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">41.20 文件更改通知</h2>
+<div class="nav-panel"><p>Next: <a href="41.21_动态加载的库.html">动态加载的库</a>, Previous: <a href="41.19_桌面通知.html">桌面通知</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>一些操作系统支持监视文件系统以查找文件更改。如果配置正确，Emacs 会静态链接相应的库，如 inotify、kqueue、gfilenotify 或 w32notify。这些库可以监视本地机器上的文件系统。
+</p>
+<p>也可以查看远程机器上的文件系统，参见 GNU Emacs 手册中的远程文件 这不依赖于链接到 Emacs 的库之一。
+</p>
+<p>由于所有这些库都会在通知文件更改时发出不同的事件，因此 Emacs 库 filenotify 提供了一个统一的接口。想要接收文件通知的 Lisp 程序应该始终优先使用这个库而不是本地库。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-notify-add-watch file flags callback ¶
+</pre></div>
+<p>添加对与文件有关的文件系统事件的监视。这安排了与要报告给 Emacs 的文件有关的文件系统事件。
+</p>
+<p>返回值是添加的手表的描述符。它的类型取决于底层库，不能假定为整数，如下例所示。它应该仅用于相等的比较。
+</p>
+<p>如果由于某种原因无法查看文件，则此函数会发出 file-notify-error 错误信号。
+</p>
+<p>有时，无法监视已挂载的文件系统的文件更改。此函数未检测到这一点，非零返回值不保证将通知文件更改。
+</p>
+<p>flags 是设置要监视的条件的列表。它可以包括以下符号：
+</p>
+<div class="lisp">
+<pre class="lisp">change
+</pre></div>
+<p>监视文件更改
+</p><div class="lisp">
+<pre class="lisp">attribute-change
+</pre></div>
+<p>监视文件属性更改，例如权限或修改时间
+</p>
+<p>如果 file 是一个目录，则更改该目录中文件创建或删除的监视。一些文件通知后端报告还文件更改。这不能递归地工作。
+</p>
+<p>当任何事件发生时，Emacs 将调用回调函数传递给它一个单参数事件，其形式为
+</p>
+<div class="lisp">
+<pre class="lisp">(descriptor action file [file1])
+</pre></div>
+<p>描述符是与此函数返回的对象相同的对象。action 是事件的描述。它可以是以下任何一种符号：
+</p>
+<div class="lisp">
+<pre class="lisp">created
+</pre></div>
+<p>文件已创建
+</p><div class="lisp">
+<pre class="lisp">deleted
+</pre></div>
+<p>文件已被删除
+</p><div class="lisp">
+<pre class="lisp">changed
+</pre></div>
+<p>文件内容已更改；  使用 w32notify 库，还可以报告属性更改
+</p><div class="lisp">
+<pre class="lisp">renamed
+</pre></div>
+<p>文件已重命名为 file1
+</p><div class="lisp">
+<pre class="lisp">attribute-changed
+</pre></div>
+<p>文件属性已更改
+</p><div class="lisp">
+<pre class="lisp">stopped
+</pre></div>
+<p>观看文件已停止
+</p>
+<p>请注意，w32notify 库不报告属性更改事件。当某些文件的属性（例如权限或修改时间）发生更改时，此库会报告更改事件。同样，kqueue 库在监视目录时不会可靠地报告文件属性更改。
+</p>
+<p>停止事件报告，观看文件已停止。这可能是因为调用了 file-notify-rm-watch（见下文），或者因为正在监视的文件被删除，或者由于底层库报告了另一个错误。
+</p>
+<p>file 和 file1 是正在报告其事件的文件的名称。例如：
+</p><div class="lisp">
+<pre class="lisp">(require 'filenotify)
+     ⇒ filenotify
+
+
+(defun my-notify-callback (event)
+  (message "Event %S" event))
+     ⇒ my-notify-callback
+
+
+(file-notify-add-watch
+  "/tmp" '(change attribute-change) 'my-notify-callback)
+     ⇒ 35025468
+
+
+(write-region "foo" nil "/tmp/foo")
+     ⇒ Event (35025468 created "/tmp/.#foo")
+        Event (35025468 created "/tmp/foo")
+        Event (35025468 changed "/tmp/foo")
+        Event (35025468 deleted "/tmp/.#foo")
+
+
+(write-region "bla" nil "/tmp/foo")
+     ⇒ Event (35025468 created "/tmp/.#foo")
+        Event (35025468 changed "/tmp/foo")
+        Event (35025468 deleted "/tmp/.#foo")
+
+
+(set-file-modes "/tmp/foo" (default-file-modes) 'nofollow)
+     ⇒ Event (35025468 attribute-changed "/tmp/foo")
+</pre></div>
+<p>Whether the action renamed is returned, depends on the used watch library. Otherwise, the actions deleted and created could be returned in a random order.
+</p>
+<div class="lisp">
+<pre class="lisp">
+
+(rename-file "/tmp/foo" "/tmp/bla")
+     ⇒ Event (35025468 renamed "/tmp/foo" "/tmp/bla")
+
+
+(delete-file "/tmp/bla")
+     ⇒ Event (35025468 deleted "/tmp/bla")
+
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: file-notify-rm-watch descriptor ¶
+</pre></div>
+<p>删除由其描述符指定的现有文件监视。描述符应该是 file-notify-add-watch 返回的对象。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-notify-valid-p descriptor ¶
+</pre></div>
+<p>检查由其描述符指定的手表的有效性。描述符应该是 file-notify-add-watch 返回的对象。
+</p>
+<p>如果监视的文件或目录被删除，或者监视线程由于任何其他原因异常退出，则监视可能会变得无效。通过调用 file-notify-rm-watch 删除监视也会使其无效。
+</p><div class="lisp">
+<pre class="lisp">
+
+(make-directory "/tmp/foo")
+     ⇒ Event (35025468 created "/tmp/foo")
+
+
+(setq desc
+      (file-notify-add-watch
+        "/tmp/foo" '(change) 'my-notify-callback))
+     ⇒ 11359632
+
+
+(file-notify-valid-p desc)
+     ⇒ t
+
+
+(write-region "bla" nil "/tmp/foo/bla")
+     ⇒ Event (11359632 created "/tmp/foo/.#bla")
+        Event (11359632 created "/tmp/foo/bla")
+        Event (11359632 changed "/tmp/foo/bla")
+        Event (11359632 deleted "/tmp/foo/.#bla")
+
+
+;; Deleting a file in the directory doesn't invalidate the watch.
+(delete-file "/tmp/foo/bla")
+     ⇒ Event (11359632 deleted "/tmp/foo/bla")
+
+
+(write-region "bla" nil "/tmp/foo/bla")
+     ⇒ Event (11359632 created "/tmp/foo/.#bla")
+        Event (11359632 created "/tmp/foo/bla")
+        Event (11359632 changed "/tmp/foo/bla")
+        Event (11359632 deleted "/tmp/foo/.#bla")
+
+
+;; Deleting the directory invalidates the watch.
+;; Events arrive for different watch descriptors.
+(delete-directory "/tmp/foo" 'recursive)
+     ⇒ Event (35025468 deleted "/tmp/foo")
+        Event (11359632 deleted "/tmp/foo/bla")
+        Event (11359632 deleted "/tmp/foo")
+        Event (11359632 stopped "/tmp/foo")
+
+
+(file-notify-valid-p desc)
+     ⇒ nil
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="41.21_动态加载的库.html">动态加载的库</a>, Previous: <a href="41.19_桌面通知.html">桌面通知</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

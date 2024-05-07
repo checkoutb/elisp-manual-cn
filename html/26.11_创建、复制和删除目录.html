@@ -1,0 +1,38 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>26.11 创建、复制和删除目录</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">26.11 创建、复制和删除目录</h2>
+<div class="nav-panel"><p>Next: <a href="26.12_使某些文件名神奇.html">使某些文件名神奇</a>, Previous: <a href="26.10_目录的内容.html">目录的内容</a>, Up: <a href="26_文件.html">文件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>大多数 Emacs Lisp 文件操作函数在用于目录文件时都会出错。例如，您不能使用 delete-file 删除目录。这些特殊功能用于创建和删除目录。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: make-directory dirname &amp;optional parents ¶
+</pre></div>
+<p>此命令创建一个名为 dirname 的目录。如果 parents 不是 nil，就像交互式调用中的情况一样，这意味着首先创建父目录，如果它们不存在的话。mkdir 是这个的别名。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: make-empty-file filename &amp;optional parents ¶
+</pre></div>
+<p>此命令创建一个名为 filename 的空文件。作为 make-directory，如果 parents 不为 nil，此命令将创建父目录。如果文件名已经存在，则此命令会发出错误信号。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: copy-directory dirname newname &amp;optional keep-time parents copy-contents ¶
+</pre></div>
+<p>此命令将名为 dirname 的目录复制到 newname。如果 newname 是目录名，则 dirname 将被复制到那里的子目录中。请参阅目录名称。
+</p>
+<p>它始终设置复制文件的文件模式以匹配相应的原始文件。
+</p>
+<p>第三个参数 keep-time non-nil 表示保留复制文件的修改时间。前缀 arg 使保持时间非零。
+</p>
+<p>第四个参数 parents 表示如果父目录不存在，是否创建父目录。交互式地，这是默认情况下发生的。
+</p>
+<p>第五个参数copy-contents，如果非nil，表示如果后者是目录名，则将dirname的内容直接复制到newname中，而不是将dirname作为子目录复制到其中。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: delete-directory dirname &amp;optional recursive trash ¶
+</pre></div>
+<p>此命令删除名为 dirname 的目录。函数 delete-file 不适用于目录文件；  您必须为它们使用删除目录。如果 recursive 为 nil，并且目录包含任何文件，则 delete-directory 会发出错误信号。如果 recursive 不为零，则不会仅仅因为目录或其文件在 delete-directory 到达它们之前被其他进程删除而产生错误。
+</p>
+<p>delete-directory 仅遵循父目录级别的符号链接。
+</p>
+<p>如果可选参数垃圾是非零并且变量 delete-by-moving-to-trash 是非零，则此命令将文件移动到系统垃圾箱而不是删除它。请参阅 GNU Emacs 手册中的其他文件操作。当交互调用时，如果没有给出前缀参数，则垃圾为 t，否则为 nil。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="26.12_使某些文件名神奇.html">使某些文件名神奇</a>, Previous: <a href="26.10_目录的内容.html">目录的内容</a>, Up: <a href="26_文件.html">文件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

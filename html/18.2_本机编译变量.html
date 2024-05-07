@@ -1,0 +1,72 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>18.2 本机编译变量</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">18.2 本机编译变量</h2>
+<div class="nav-panel"><p>Next: <a href="19_调试_Lisp_程序.html">调试_Lisp_程序</a>, Previous: <a href="18.1_本机编译函数.html">本机编译函数</a>, Up: <a href="18_Lisp编译成Native代码.html">Lisp编译成Native代码.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节记录了控制本机编译的变量。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: native-comp-speed ¶
+</pre></div>
+<p>此变量指定本机编译的优化级别。它的值应该是介于 -1 和 3 之间的一个数字。介于 0 和 3 之间的值指定与编译器的相应编译器 -O0、-O1 等命令行选项等效的优化级别。值 -1 表示禁用本机编译；  函数和文件将仅进行字节编译。默认值为 2。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: native-comp-debug ¶
+</pre></div>
+<p>此变量指定本机编译产生的调试信息级别。它的值应该是一个介于 0 和 3 之间的数字，含义如下：
+</p>
+<div class="lisp">
+<pre class="lisp">0
+</pre></div>
+<p>没有调试输出。这是默认设置。
+</p><div class="lisp">
+<pre class="lisp">1
+</pre></div>
+<p>使用本机代码发出调试符号。这允许使用 gdb 等调试器更轻松地调试本机代码。
+</p><div class="lisp">
+<pre class="lisp">2
+</pre></div>
+<p>像 1，另外转储伪 C 代码。
+</p><div class="lisp">
+<pre class="lisp">3
+</pre></div>
+<p>像 2，另外转储 GCC 中间通道和 libgccjit 日志文件。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: native-comp-verbose ¶
+</pre></div>
+<p>此变量通过抑制其发出的部分或全部日志消息来控制本机编译的详细程度。如果它的值为零，默认情况下，所有日志消息都被抑制。将其设置为 1 到 3 之间的值将允许记录其级别高于该值的消息。这些值具有以下解释：
+</p>
+<div class="lisp">
+<pre class="lisp">0
+</pre></div>
+<p>没有记录。这是默认设置。
+</p><div class="lisp">
+<pre class="lisp">1
+</pre></div>
+<p>记录代码的最终 LIMPLE 表示。
+</p><div class="lisp">
+<pre class="lisp">2
+</pre></div>
+<p>记录 LAP、最后的 LIMPLE 和一些额外的通行证信息。
+</p><div class="lisp">
+<pre class="lisp">3
+</pre></div>
+<p>最大冗长：记录所有内容。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: native-comp-async-jobs-number ¶
+</pre></div>
+<p>此变量确定将同时启动的本机编译子进程的最大数量。它应该是一个非负数。默认值为 0，表示使用 CPU 执行单元数的一半，如果 CPU 只有一个执行单元，则为 1。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: native-comp-async-report-warnings-errors ¶
+</pre></div>
+<p>如果此变量的值为非零，则来自异步本机编译子进程的警告和错误将在名为 <strong>Warnings</strong> 的缓冲区中的主 Emacs 会话中报告。默认值 t 表示显示结果缓冲区。要在不弹出 <strong>Warnings</strong> 缓冲区的情况下记录警告，请将此变量设置为静默。
+</p>
+<p>异步本机编译产生警告的一个常见原因是编译缺少某些必要功能要求的文件。该功能可能会加载到主 emacs 中，但由于本机编译总是从具有原始环境的子进程开始，因此子进程可能并非如此。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: native-comp-async-query-on-exit ¶
+</pre></div>
+<p>如果该变量的值为非 nil，Emacs 将在退出时询问是否退出并杀死任何仍在运行的异步原生编译子进程，从而阻止写入相应的 .eln 文件。如果值为 nil，默认值，Emacs 将杀死这些子进程而不进行查询。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="19_调试_Lisp_程序.html">调试_Lisp_程序</a>, Previous: <a href="18.1_本机编译函数.html">本机编译函数</a>, Up: <a href="18_Lisp编译成Native代码.html">Lisp编译成Native代码.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

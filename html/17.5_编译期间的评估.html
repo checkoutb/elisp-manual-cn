@@ -1,0 +1,50 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>17.5 编译期间的评估</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">17.5 编译期间的评估</h2>
+<div class="nav-panel"><p>Next: <a href="17.6_编译器错误.html">编译器错误</a>, Previous: <a href="17.4_单个函数的动态加载.html">单个函数的动态加载</a>, Up: <a href="17_字节编译.html">字节编译.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这些功能允许您编写在程序编译期间进行评估的代码。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: eval-and-compile body… ¶
+</pre></div>
+<p>当您编译包含代码和运行它时（无论是否编译），此表单都标记要评估的主体。
+</p>
+<p>您可以通过将正文放在单独的文件中并使用 require 引用该文件来获得类似的结果。当体型较大时，该方法更可取。实际上 require 是自动 eval-and-compile ，在编译和执行时都会加载包。
+</p>
+<p>自动加载也是有效的评估和编译。它在编译时被识别，因此使用这样的函数不会产生 <code>未知被定义</code> 的警告。
+</p>
+<p>eval-and-compile 的大多数使用都相当复杂。
+</p>
+<p>如果一个宏有一个辅助函数来构建它的结果，并且该宏在本地和包外部都使用，那么 eval-and-compile 应该用于在编译时获取帮助器，然后在运行时获取帮助器。
+</p>
+<p>如果函数是通过程序定义的（比如 fset），那么 eval-and-compile 可用于在编译时和运行时完成，因此检查对这些函数的调用（以及有关 <code>未知被定义</code> 抑制）。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: eval-when-compile body… ¶
+</pre></div>
+<p>此表单标记要在编译时评估的主体，而不是在加载已编译的程序时。编译器的评估结果成为一个常量，出现在编译的程序中。如果您加载源文件，而不是编译它，则正常评估正文。
+</p>
+<p>如果你有一个常量需要一些计算来产生，eval-when-compile 可以在编译时完成。例如，
+</p>
+<div class="lisp">
+<pre class="lisp">(defvar my-regexp
+  (eval-when-compile (regexp-opt '("aaa" "aba" "abb"))))
+</pre></div>
+<p>如果您正在使用另一个包，但只需要其中的宏（字节编译器将扩​​展这些宏），则可以使用 eval-when-compile 加载它以进行编译，但不执行。例如，
+</p>
+<div class="lisp">
+<pre class="lisp">(eval-when-compile
+  (require 'my-macro-package))
+</pre></div>
+<p>同样的事情也适用于本地定义的宏和 defsubst 函数，并且只能在文件中使用。编译文件需要它们，但在大多数情况下，执行编译文件不需要它们。例如，
+</p>
+<div class="lisp">
+<pre class="lisp">(eval-when-compile
+  (unless (fboundp 'some-new-thing)
+    (defmacro 'some-new-thing ()
+      (compatibility code))))
+</pre></div>
+<p>这通常适用于仅作为与其他 Emacs 版本兼容的后备代码的代码。
+</p>
+<p>Common Lisp 注意：在顶层，eval-when-compile 类似于 Common Lisp 习语（eval-when (compile eval) …）。在其他地方，Common Lisp ’#.’  reader 宏（但不是在解释时）更接近 eval-when-compile 所做的。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="17.6_编译器错误.html">编译器错误</a>, Previous: <a href="17.4_单个函数的动态加载.html">单个函数的动态加载</a>, Up: <a href="17_字节编译.html">字节编译.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

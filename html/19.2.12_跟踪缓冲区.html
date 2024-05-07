@@ -1,0 +1,26 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>19.2.12 跟踪缓冲区</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">19.2.12 跟踪缓冲区</h3>
+<div class="nav-panel"><p>Next: <a href="19.2.13_覆盖测试.html">覆盖测试</a>, Previous: <a href="19.2.11_在_Edebug_中打印.html">在_Edebug_中打印</a>, Up: <a href="19.2_调试.html">调试.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Edebug 可以记录执行跟踪，将其存储在名为 <strong>edebug-trace</strong> 的缓冲区中。这是函数调用和返回的日志，显示函数名称及其参数和值。要启用跟踪记录，请将 edebug-trace 设置为非零值。
+</p>
+<p>创建跟踪缓冲区与使用跟踪执行模式不同（请参阅 Edebug 执行模式）。
+</p>
+<p>启用跟踪记录后，每个函数入口和出口都会向跟踪缓冲区添加行。函数入口记录由 ’::::{’ 组成，后跟函数名称和参数值。函数退出记录由 ’::::}’ 组成，后跟函数名和函数结果。
+</p>
+<p>条目中 ’:’ 的数量表示其递归深度。您可以使用跟踪缓冲区中的大括号来查找匹配的函数调用的开头或结尾。
+</p>
+<p>您可以通过重新定义函数 edebug-print-trace-before 和 edebug-print-trace-after 来自定义函数进入和退出的跟踪记录。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: edebug-tracing string body… ¶
+</pre></div>
+<p>此宏请求有关执行主体表单的附加跟踪信息。参数字符串指定要放入跟踪缓冲区的文本，位于 <code>{</code> 或 <code>}</code> 之后。所有参数都被评估，并且 edebug-tracing 返回正文中最后一个表单的值。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: edebug-trace format-string &amp;rest format-args ¶
+</pre></div>
+<p>此函数在跟踪缓冲区中插入文本。它使用 (apply ’format format-string format-args) 计算文本。它还将换行符附加到单独的条目。
+</p>
+<p>无论何时调用 edebug-tracing 和 edebug-trace 都会在跟踪缓冲区中插入行，即使 Edebug 未处于活动状态。将文本添加到跟踪缓冲区还会滚动其窗口以显示最后插入的行。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="19.2.13_覆盖测试.html">覆盖测试</a>, Previous: <a href="19.2.11_在_Edebug_中打印.html">在_Edebug_中打印</a>, Up: <a href="19.2_调试.html">调试.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>38.1 基本线程函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">38.1 基本线程函数</h2>
+<div class="nav-panel"><p>Next: <a href="38.2_互斥体.html">互斥体</a>, Previous: <a href="38_线程.html">线程</a>, Up: <a href="38_线程.html">线程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>可以创建和等待线程。一个线程不能直接退出，但是可以隐式退出当前线程，并且可以给其他线程发信号。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-thread function &amp;optional name ¶
+</pre></div>
+<p>创建一个调用函数的新执行线程。当函数返回时，线程退出。
+</p>
+<p>创建新线程时没有有效的局部变量绑定。新线程的当前缓冲区继承自当前线程。
+</p>
+<p>可以提供 name 来为线程命名。该名称仅用于调试和信息目的；  它对 Emacs 没有任何意义。如果提供了名称，则它必须是字符串。
+</p>
+<p>此函数返回新线程。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: threadp object ¶
+</pre></div>
+<p>如果 object 表示 Emacs 线程，则此函数返回 t，否则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: thread-join thread ¶
+</pre></div>
+<p>阻塞直到线程退出，或者直到当前线程发出信号。它返回线程函数的结果。如果线程已经退出，则立即返回。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: thread-signal thread error-symbol data ¶
+</pre></div>
+<p>与信号类似（参见如何发出错误信号），但信号是在线程线程中传递的。如果线程是当前线程，那么这只是立即调用信号。否则，线程将在信号变为当前时立即接收信号。如果线程被互斥锁、条件等待或线程连接调用阻塞；  线程信号将解锁它。
+</p>
+<p>如果线程是主线程，则信号不会在那里传播。相反，它在主线程中显示为消息。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: thread-yield ¶
+</pre></div>
+<p>让执行到下一个可运行线程。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: thread-name thread ¶
+</pre></div>
+<p>返回线程的名称，指定给 make-thread。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: thread-live-p thread ¶
+</pre></div>
+<p>如果线程处于活动状态，则返回 t，否则返回 nil。只要它的函数仍在执行，线程就处于活动状态。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: thread--blocker thread ¶
+</pre></div>
+<p>返回线程正在等待的对象。此函数主要用于调试，并被赋予 <code>双连字符</code> 名称以表明这一点。
+</p>
+<p>如果线程在线程连接中被阻塞，则返回它正在等待的线程。
+</p>
+<p>如果线程在互斥锁中被阻塞，则返回互斥锁。
+</p>
+<p>如果线程在条件等待中被阻塞，则返回条件变量。
+</p>
+<p>否则，这将返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: current-thread ¶
+</pre></div>
+<p>返回当前线程。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: all-threads ¶
+</pre></div>
+<p>返回所有活动线程对象的列表。每次调用都会返回一个新列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: main-thread ¶
+</pre></div>
+<p>此变量保持 Emacs 正在运行的主线程，如果 Emacs 在没有线程支持的情况下编译，则为 nil。
+</p>
+<p>当线程运行的代码发出未处理的错误信号时，线程退出。其他线程可以使用以下函数访问导致线程退出的错误表单。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: thread-last-error &amp;optional cleanup ¶
+</pre></div>
+<p>此函数返回线程因错误退出时记录的最后一个错误形式。每个异常退出的线程都会用一个新值覆盖前一个线程错误存储的表单，因此只能访问最后一个。如果 cleanup 不为零，则存储的表单将重置为 nil。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="38.2_互斥体.html">互斥体</a>, Previous: <a href="38_线程.html">线程</a>, Up: <a href="38_线程.html">线程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

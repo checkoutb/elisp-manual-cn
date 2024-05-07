@@ -1,0 +1,137 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.6.2 基于搜索的字体</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">24.6.2 基于搜索的字体</h3>
+<div class="nav-panel"><p>Next: <a href="24.6.3_自定义基于搜索的字体.html">自定义基于搜索的字体</a>, Previous: <a href="24.6.1_字体锁定基础.html">字体锁定基础</a>, Up: <a href="24.6_字体锁定模式.html">字体锁定模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>直接控制基于搜索的字体化的变量是 font-lock-keywords，通常通过 font-lock-defaults 中的关键字元素指定。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: font-lock-keywords ¶
+</pre></div>
+<p>此变量的值是要突出显示的关键字列表。Lisp 程序不应该直接设置这个变量。通常，该值由字体锁定模式自动设置，使用 font-lock-defaults 中的关键字元素。也可以使用函数 font-lock-add-keywords 和 font-lock-remove-keywords 更改该值（请参阅自定义基于搜索的字体）。
+</p>
+<p>font-lock-keywords 的每个元素都指定如何查找某些文本案例，以及如何突出显示这些案例。字体锁定模式会一个一个地处理 font-lock-keywords 的元素，并且对于每个元素，它会查找并处理所有匹配项。通常，一旦部分文本已经字体化，就不能被同一文本中的后续匹配覆盖；  但是您可以使用 subexp-highlighter 的 override 元素指定不同的行为。
+</p>
+<p>font-lock-keywords 的每个元素都应具有以下形式之一：
+</p>
+<div class="lisp">
+<pre class="lisp">regexp
+</pre></div>
+<p>使用 font-lock-keyword-face 突出显示正则表达式的所有匹配项。例如，
+</p>
+<div class="lisp">
+<pre class="lisp">;; Highlight occurrences of the word ‘foo’
+;; using font-lock-keyword-face.
+"\\&lt;foo\\&gt;"
+</pre></div>
+<p>编写这些正则表达式时要小心；  写得不好的模式会大大减慢速度！  函数 regexp-opt（请参阅正则表达式函数）对于计算最佳正则表达式以匹配多个关键字很有用。
+</p><div class="lisp">
+<pre class="lisp">function
+</pre></div>
+<p>通过调用函数查找文本，并使用 font-lock-keyword-face 突出显示它找到的匹配项。
+</p>
+<p>调用函数时，它接收一个参数，即搜索的限制；  它应该从点开始搜索，而不是搜索超出限制。如果成功，它应该返回非零，并设置匹配数据来描述找到的匹配。返回 nil 表示搜索失败。
+</p>
+<p>Fontification 会以相同的限制重复调用函数，并使用前一次调用离开它的点，直到函数失败。发生故障时，功能无需以任何特定方式重置点。
+</p><div class="lisp">
+<pre class="lisp">(matcher . subexp)
+</pre></div>
+<p>在这种元素中，matcher 或者是一个正则表达式或者一个函数，如上所述。CDR，subexp，指定应该突出显示匹配器的哪个子表达式（而不是匹配器匹配的整个文本）。
+</p><div class="lisp">
+<pre class="lisp">;; Highlight the ‘bar’ in each occurrence of ‘fubar’,
+;; using font-lock-keyword-face.
+("fu\\(bar\\)" . 1)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">(matcher . facespec)
+</pre></div>
+<p>在这种元素中，facespec 是一个表达式，其值指定用于突出显示的面部。在最简单的情况下，facespec 是一个 Lisp 变量（一个符号），它的值是一个面名。
+</p>
+<div class="lisp">
+<pre class="lisp">;; Highlight occurrences of ‘fubar’,
+;; using the face which is the value of fubar-face.
+("fubar" . fubar-face)
+</pre></div>
+<p>但是，facespec 也可以评估为这种形式的列表：
+</p>
+<div class="lisp">
+<pre class="lisp">(subexp
+(face face prop1 val1 prop2 val2…))
+</pre></div>
+<p>指定面部和各种附加文本属性以放置在匹配的文本上。如果您这样做，请务必将您以这种方式设置的其他文本属性名称添加到 font-lock-extra-managed-props 的值中，以便当这些属性不再适用时也会被清除。或者，您可以将变量 font-lock-unfontify-region-function 设置为清除这些属性的函数。请参阅其他字体锁定变量。
+</p><div class="lisp">
+<pre class="lisp">(matcher . subexp-highlighter)
+</pre></div>
+<p>在这种元素中，subexp-highlighter 是一个列表，它指定如何突出显示匹配器找到的匹配项。它具有以下形式：
+</p>
+<div class="lisp">
+<pre class="lisp">(subexp facespec [override [laxmatch]])
+</pre></div>
+<p>CAR subexp 是一个整数，指定要字体化的匹配子表达式（0 表示整个匹配文本）。第二个子元素 facespec 是一个表达式，其值指定面，如上所述。
+</p>
+<p>subexp-highlighter 中的最后两个值 override 和 laxmatch 是可选标志。如果 override 为 t，则此元素可以覆盖由 font-lock-keywords 的先前元素所做的现有字体化。如果保留，则如果每个字符尚未被其他元素字体化，则每个字符都会被字体化。如果它是前置的，则将 facespec 指定的面添加到 font-lock-face 属性的开头。如果是追加，则将面添加到 font-lock-face 属性的末尾。
+</p>
+<p>如果 laxmatch 为非 nil，则意味着如果 matcher 中没有子表达式编号 subexp，则应该没有错误。显然，子表达式编号 subexp 的字体化不会发生。但是，其他子表达式（和其他正则表达式）的字体化将继续。如果 laxmatch 为 nil，并且缺少指定的子表达式，则会发出错误信号，终止基于搜索的字体化。
+</p>
+<p>以下是此类元素的一些示例，以及它们的作用：
+</p>
+<div class="lisp">
+<pre class="lisp">;; Highlight occurrences of either ‘foo’ or ‘bar’, using
+;; foo-bar-face, even if they have already been highlighted.
+;; foo-bar-face should be a variable whose value is a face.
+("foo\\|bar" 0 foo-bar-face t)
+
+;; Highlight the first subexpression within each occurrence
+;; that the function fubar-match finds,
+;; using the face which is the value of fubar-face.
+(fubar-match 1 fubar-face)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">(matcher . anchored-highlighter)
+</pre></div>
+<p>在这种元素中，anchored-highlighter 指定如何突出显示匹配器找到的匹配项之后的文本。因此，matcher 找到的匹配项充当了由 anchored-highlighter 指定的进一步搜索的锚点。anchored-highlighter 是以下形式的列表：
+</p>
+<div class="lisp">
+<pre class="lisp">(anchored-matcher pre-form post-form
+                        subexp-highlighters…)
+</pre></div>
+<p>在这里，anchored-matcher 和 matcher 一样，要么是正则表达式，要么是函数。找到 matcher 的 match 后，point 位于 match 的末尾。现在，Font Lock 评估表单预制件。然后它搜索 anchored-matcher 的匹配项并使用 subexp-highlighters 突出显示这些。subexp-highlighter 如上所述。最后，Font Lock 评估表单后。
+</p>
+<p>表单 pre-form 和 post-form 可用于在使用锚定匹配器之前进行初始化和清理之后。通常，在使用锚定匹配器开始之前，预制件用于将点移动到相对于匹配器匹配的某个位置。在使用 matcher 恢复之前，可以使用 post-form 向后移动。
+</p>
+<p>在 Font Lock 评估 pre-form 之后，它不会搜索超出行尾的锚定匹配器。但是，如果 pre-form 在计算 pre-form 后返回的缓冲区位置大于 point 的位置，则使用 pre-form 返回的位置作为搜索的限制。返回大于行尾的位置通常是个坏主意；  换句话说，锚定匹配器搜索不应跨越行。
+</p>
+<p>例如，
+</p><div class="lisp">
+<pre class="lisp">;; Highlight occurrences of the word ‘item’ following
+;; an occurrence of the word ‘anchor’ (on the same line)
+;; in the value of item-face.
+("\\&lt;anchor\\&gt;" "\\&lt;item\\&gt;" nil nil (0 item-face))
+</pre></div>
+<p>在这里，pre-form 和 post-form 都是零。因此，搜索 <code>item</code> 在 <code>anchor</code> 匹配结束时开始，搜索 <code>anchor</code> 的后续实例从搜索 <code>item</code> 结束处开始。
+</p><div class="lisp">
+<pre class="lisp">(matcher highlighters…)
+</pre></div>
+<p>这种元素为单个匹配器指定了几个荧光笔列表。荧光笔列表可以是 subexp-highlighter 或anchored-highlighter 类型，如上所述。
+</p>
+<p>例如，
+</p><div class="lisp">
+<pre class="lisp">;; Highlight occurrences of the word ‘anchor’ in the value
+;; of anchor-face, and subsequent occurrences of the word
+;; ‘item’ (on the same line) in the value of item-face.
+("\\&lt;anchor\\&gt;" (0 anchor-face)
+                ("\\&lt;item\\&gt;" nil nil (0 item-face)))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">(eval . form)
+</pre></div>
+<p>这里的 form 是第一次在缓冲区中使用这个 font-lock-keywords 值时要评估的表达式。其值应具有此表中描述的形式之一。
+</p>
+<p>警告：不要设计一个 font-lock-keywords 元素来匹配跨行的文本；  这不能可靠地工作。有关详细信息，请参阅多行字体锁定结构。
+</p>
+<p>您可以在 font-lock-defaults 中使用 case-fold 来指定 font-lock-keywords-case-fold-search 的值，它表示基于搜索的字体化是否应该不区分大小写。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: font-lock-keywords-case-fold-search ¶
+</pre></div>
+<p>非零意味着为了字体锁定关键字的正则表达式匹配应该不区分大小写。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="24.6.3_自定义基于搜索的字体.html">自定义基于搜索的字体</a>, Previous: <a href="24.6.1_字体锁定基础.html">字体锁定基础</a>, Up: <a href="24.6_字体锁定模式.html">字体锁定模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.4.1 模式线基础</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">24.4.1 模式线基础</h3>
+<div class="nav-panel"><p>Next: <a href="24.4.2_模式行的数据结构.html">模式行的数据结构</a>, Previous: <a href="24.4_模式线格式.html">模式线格式</a>, Up: <a href="24.4_模式线格式.html">模式线格式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>每个模式行的内容由缓冲区局部变量模式行格式指定（请参阅模式行控制的顶层）。这个变量包含一个模式行结构：一个控制缓冲区模式行上显示内容的模板。header-line-format 的值以相同的方式指定缓冲区的标题行。相同缓冲区的所有窗口都使用相同的模式行格式和标题行格式，除非已为该窗口指定了模式行格式或标题行格式参数（请参阅窗口参数）。
+</p>
+<p>为了效率，Emacs 不会不断地重新计算每个窗口的模式行和标题行。当环境需要它时，它会这样做——例如，如果您更改窗口配置、切换缓冲区、缩小或扩大缓冲区、滚动或修改缓冲区。如果您更改了由 mode-line-format 或 header-line-format 引用的任何变量（请参阅在模式行中使用的变量），或任何其他影响文本显示方式的数据结构（请参阅 Emacs 显示），您应该使用函数 force-mode-line-update 更新显示。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: force-mode-line-update &amp;optional all ¶
+</pre></div>
+<p>该函数强制 Emacs 在下一个重新显示周期期间根据所有相关变量的最新值更新当前缓冲区的模式行和标题行。如果可选参数 all 不为零，则强制更新所有模式行和标题行。
+</p>
+<p>此函数还强制更新菜单栏和框架标题。
+</p>
+<p>所选窗口的模式线通常使用面部模式线以不同的颜色显示。其他窗口的模式线出现在 face mode-line-inactive 中。请参见面。
+</p>
+<p>一些模式将大量数据放在模式行中，将模式行末尾的元素推到右侧。如果 mode-line-compact 变量不为 nil，Emacs 可以通过将空格转换为单个空格来 <code>压缩</code> 模式行。如果此变量很长，则仅当模式线比当前选定的窗口宽时才会这样做。（这个计算是近似的，基于字符的数量，而不是它们的显示宽度。）这个变量可以是缓冲区局部的，只压缩某些缓冲区中的模式行。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="24.4.2_模式行的数据结构.html">模式行的数据结构</a>, Previous: <a href="24.4_模式线格式.html">模式线格式</a>, Up: <a href="24.4_模式线格式.html">模式线格式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

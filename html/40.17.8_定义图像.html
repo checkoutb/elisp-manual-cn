@@ -1,0 +1,81 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.17.8 定义图像</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.17.8 定义图像</h3>
+<div class="nav-panel"><p>Next: <a href="40.17.9_显示图像.html">显示图像</a>, Previous: <a href="40.17.7_其他图像类型.html">其他图像类型</a>, Up: <a href="40.17_图像.html">图像.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>函数 create-image、defimage 和 find-image 提供了创建图像描述符的便捷方法。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: create-image file-or-data &amp;optional type data-p &amp;rest props ¶
+</pre></div>
+<p>此函数创建并返回一个使用文件或数据中数据的图像描述符。file-or-data 可以是文件名或包含图像数据的字符串；  对于前一种情况，data-p 应为 nil，对于后一种情况，应为非 nil。
+</p>
+<p>可选参数类型是指定图像类型的符号。如果 type 被省略或为零，create-image 会尝试根据文件的前几个字节或文件名来确定图像类型。
+</p>
+<p>其余参数 props 指定附加图像属性，例如，
+</p>
+<div class="lisp">
+<pre class="lisp">(create-image "foo.xpm" 'xpm nil :heuristic-mask t)
+</pre></div>
+<p>如果不支持这种类型的图像，该函数将返回 nil。否则它返回一个图像描述符。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: defimage symbol specs &amp;optional doc ¶
+</pre></div>
+<p>该宏将符号定义为图像名称。参数 specs 是一个列表，它指定如何显示图像。第三个参数 doc 是一个可选的文档字符串。
+</p>
+<p>specs 中的每个参数都具有属性列表的形式，并且每个参数都应至少指定 :type 属性和 :file 或 :data 属性。:type 的值应该是指定图像类型的符号，:file 的值是要从中加载图像的文件，而 :data 的值是包含实际图像数据的字符串。这是一个例子：
+</p><div class="lisp">
+<pre class="lisp">(defimage test-image
+  ((:type xpm :file "~/test1.xpm")
+   (:type xbm :file "~/test1.xbm")))
+</pre></div>
+<p>defimage 一个一个地测试每个参数，看它是否可用——也就是说，是否支持该类型并且文件是否存在。第一个可用参数用于生成存储在符号中的图像描述符。
+</p>
+<p>如果没有一个替代方案有效，则符号被定义为 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: image-property image property ¶
+</pre></div>
+<p>返回图像中属性的值。可以使用 setf 设置属性。将属性设置为 nil 将从图像中删除该属性。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: find-image specs ¶
+</pre></div>
+<p>此功能提供了一种方便的方法来查找满足图像规范列表中的一个的图像。
+</p>
+<p>specs 中的每个规范都是一个属性列表，其内容取决于图像类型。所有规范必须至少包含属性 :type type 和 :file file 或 :data data，其中 type 是指定图像类型的符号，例如 xbm，file 是从中加载图像的文件，data 是字符串包含实际的图像数据。列表中支持类型且文件存在的第一个规范用于构造要返回的图像规范。如果不满足任何规范，则返回 nil。
+</p>
+<p>图像在图像加载路径中查找。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: image-load-path ¶
+</pre></div>
+<p>此变量的值是搜索图像文件的位置列表。如果元素是字符串或值为字符串的变量符号，则该字符串被视为要搜索的目录的名称。如果元素是一个变量符号，其值为一个列表，则将其视为要搜索的目录列表。
+</p>
+<p>默认是在data-directory指定的目录的images子目录中搜索，然后是data-directory指定的目录，最后是load-path中的目录。子目录不会自动包含在搜索中，因此如果将图像文件放在子目录中，则必须明确提供子目录。例如，要在数据目录中查找图像 images/foo/bar.xpm，您应该按如下方式指定图像：
+</p>
+<div class="lisp">
+<pre class="lisp">(defimage foo-image '((:type xpm :file "foo/bar.xpm")))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: image-load-path-for-library library image &amp;optional path no-error ¶
+</pre></div>
+<p>此函数为 Lisp 包库使用的图像返回合适的搜索路径。
+</p>
+<p>该函数首先使用 image-load-path 搜索图像，不包括 data-directory/images，然后在 load-path 中搜索适合库的路径，包括 ../../etc/images 和 ../ etc/images 相对于库文件本身，最后在 data-directory/images 中。
+</p>
+<p>然后此函数返回一个目录列表，其中首先包含找到图像的目录，然后是 load-path 的值。如果给出了路径，则使用它来代替加载路径。
+</p>
+<p>如果 no-error 不是 nil 并且找不到合适的路径，则不要发出错误信号。相反，像以前一样返回目录列表，除了 nil 出现在图像目录的位置。
+</p>
+<p>以下是使用 image-load-path-for-library 的示例：
+</p><div class="lisp">
+<pre class="lisp">(defvar image-load-path) ; shush compiler
+(let* ((load-path (image-load-path-for-library
+                    "mh-e" "mh-logo.xpm"))
+       (image-load-path (cons (car load-path)
+                              image-load-path)))
+  (mh-tool-bar-folder-buttons-init))
+</pre></div>
+<p>基于图像缩放因子变量创建图像时，图像会自动缩放。该值可以是浮点数（其中大于 1 的数字表示增加大小，而小于 1 表示缩小大小）或符号 auto，它将根据字体像素大小计算缩放因子。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.17.9_显示图像.html">显示图像</a>, Previous: <a href="40.17.7_其他图像类型.html">其他图像类型</a>, Up: <a href="40.17_图像.html">图像.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

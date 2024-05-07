@@ -1,0 +1,88 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.6 不可见文本</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">40.6 不可见文本</h2>
+<div class="nav-panel"><p>Next: <a href="40.7_选择性显示.html">选择性显示</a>, Previous: <a href="40.5.4_延迟警告.html">延迟警告</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>您可以使用 invisible 属性使字符不可见，以便它们不会出现在屏幕上。这可以是文本属性（请参阅文本属性）或覆盖属性（请参阅覆盖）。光标运动也部分忽略了这些字符；  如果命令循环在命令后发现该点位于不可见文本范围内，则它将点重新定位到文本的另一侧。
+</p>
+<p>在最简单的情况下，任何非 nil 不可见属性都会使字符不可见。这是默认情况——如果你不改变 buffer-invisibility-spec 的默认值，这就是 invisible 属性的工作方式。如果您不打算自己设置 buffer-invisibility-spec，通常应该使用 t 作为 invisible 属性的值。
+</p>
+<p>更一般地，您可以使用变量 buffer-invisibility-spec 来控制不可见属性的哪些值使文本不可见。这允许您预先将文本分类为不同的子集，通过赋予它们不同的不可见值，然后通过更改 buffer-invisibility-spec 的值使各种子集可见或不可见。
+</p>
+<p>使用 buffer-invisibility-spec 控制可见性在显示数据库中条目列表的程序中特别有用。它允许执行方便的过滤命令来查看数据库中的部分条目。设置此变量非常快，比扫描缓冲区中的所有文本以查找要更改的属性要快得多。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: buffer-invisibility-spec ¶
+</pre></div>
+<p>此变量指定哪些类型的不可见属性实际上使字符不可见。设置此变量使其成为缓冲区本地。
+</p>
+<div class="lisp">
+<pre class="lisp">t
+</pre></div>
+<p>如果一个字符的 invisible 属性为非 nil，则该字符是不可见的。这是默认设置。
+</p><div class="lisp">
+<pre class="lisp">a list
+</pre></div>
+<p>列表的每个元素都指定了不可见的标准；  如果角色的隐形属性符合这些条件中的任何一项，则该角色是隐形的。列表可以有两种元素：
+</p>
+<div class="lisp">
+<pre class="lisp">atom
+</pre></div>
+<p>如果一个字符的不可见属性值是 atom 或者它是一个以 atom 作为成员的列表，则该字符是不可见的；  比较是用eq完成的。
+</p><div class="lisp">
+<pre class="lisp">(atom . t)
+</pre></div>
+<p>如果一个字符的不可见属性值是 atom 或者它是一个以 atom 作为成员的列表，则该字符是不可见的；  比较是用eq完成的。此外，这些字符的序列显示为省略号。
+</p>
+<p>专门提供了两个函数来向 buffer-invisibility-spec 添加元素和从中删除元素。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: add-to-invisibility-spec element ¶
+</pre></div>
+<p>此函数将元素元素添加到 buffer-invisibility-spec。如果 buffer-invisibility-spec 是 t，它会变成一个列表 (t)，因此不可见属性为 t 的文本保持不可见。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: remove-from-invisibility-spec element ¶
+</pre></div>
+<p>这会从 buffer-invisibility-spec 中删除元素元素。如果元素不在列表中，则此操作无效。
+</p>
+<p>使用 buffer-invisibility-spec 的约定是主要模式应该使用模式自己的名称作为 buffer-invisibility-spec 的元素和 invisible 属性的值：
+</p>
+<div class="lisp">
+<pre class="lisp">
+
+;; If you want to display an ellipsis:
+(add-to-invisibility-spec '(my-symbol . t))
+;; If you don’t want ellipsis:
+(add-to-invisibility-spec 'my-symbol)
+
+(overlay-put (make-overlay beginning end)
+             'invisible 'my-symbol)
+
+;; When done with the invisibility:
+(remove-from-invisibility-spec '(my-symbol . t))
+;; Or respectively:
+(remove-from-invisibility-spec 'my-symbol)
+</pre></div>
+<p>您可以使用以下功能检查隐身性：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: invisible-p pos-or-prop ¶
+</pre></div>
+<p>如果 pos-or-prop 是标记或数字，如果该位置的文本当前不可见，则此函数返回非零值。
+</p>
+<p>如果 pos-or-prop 是任何其他类型的 Lisp 对象，则表示不可见文本或覆盖属性的可能值。在这种情况下，如果该值会导致文本变得不可见，则此函数将根据 buffer-invisibility-spec 的当前值返回一个非零值。
+</p>
+<p>如果文本将在显示时完全隐藏，则此函数的返回值为 t，如果文本将被省略号替换，则返回非零、非 t 值。
+</p>
+<p>通常，对文本或移动点进行操作的函数并不关心文本是否不可见，它们处理不可见字符和可见字符一样。如果 line-move-ignore-invisible 为非 nil（默认值），则用户级别的行移动命令，例如 next-line、previous-line，将忽略不可见的换行符，即表现得就像这些不可见的换行符在缓冲区，但仅仅是因为它们被明确编程为这样做。
+</p>
+<p>如果命令以不可见文本内部或边界处的点结束，则主编辑循环将点重新定位到不可见文本的两端之一。Emacs 选择重定位的方向，使其与命令的整体移动方向一致；  如果有疑问，它更喜欢插入的字符不会继承不可见属性的位置。此外，如果文本没有被省略号替换并且命令仅在不可见文本内移动，则将点移动一个额外的字符，以便尝试通过光标的可见移动来反映命令的移动。
+</p>
+<p>因此，如果命令将点移回不可见范围（具有通常的粘性），Emacs 会将点移回该范围的开头。如果命令将点向前移动到不可见范围内，Emacs 会将点向前移动到不可见文本后面的第一个可见字符，然后再向前移动一个字符。
+</p>
+<p>可以通过将 disable-point-adjustment 设置为非零值来禁用这些在不可见文本中间结束的点的调整。请参阅命令后调整点。
+</p>
+<p>当匹配包含不可见文本时，增量搜索可以使不可见覆盖暂时和/或永久可见。要启用此功能，叠加层应具有非零 isearch-open-invisible 属性。属性值应该是一个以叠加层作为参数调用的函数。此功能应使叠加层永久可见；  当匹配与退出搜索时的覆盖重叠时使用它。
+</p>
+<p>在搜索过程中，通过临时修改它们的不可见和无形属性，使此类叠加层临时可见。如果您希望对某个叠加层以不同的方式执行此操作，请给它一个 isearch-open-invisible-temporary 属性，它是一个函数。该函数使用两个参数调用：第一个是叠加层，第二个是 nil 使叠加层可见，或 t 使其再次不可见。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.7_选择性显示.html">选择性显示</a>, Previous: <a href="40.5.4_延迟警告.html">延迟警告</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

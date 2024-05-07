@@ -1,0 +1,119 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>30.10 输入焦点</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">30.10 输入焦点</h2>
+<div class="nav-panel"><p>Next: <a href="30.11_帧的可见性.html">帧的可见性</a>, Previous: <a href="30.9_小缓冲区和帧.html">小缓冲区和帧</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在任何时候，Emacs 中的一帧都是选中的帧。选定的窗口（请参阅选择窗口）始终驻留在选定的帧上。
+</p>
+<p>当 Emacs 在多个终端上显示其帧时（请参阅多个终端），每个终端都有自己的选定帧。但其中只有一个是选定的帧：它是属于最近输入的终端的帧。也就是说，当 Emacs 运行来自某个终端的命令时，选定的帧就是那个终端的帧。由于 Emacs 在任何给定时间只运行一个命令，它一次只需要考虑一个选定的帧；  这个帧就是我们在本手册中所说的选择帧。显示所选帧的显示器是所选帧的显示器。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: selected-frame ¶
+</pre></div>
+<p>此函数返回选定的帧。
+</p>
+<p>一些窗口系统和窗口管理器将键盘输入直接指向鼠标所在的窗口对象；  其他需要显式单击或命令才能将焦点转移到各种窗口对象。无论哪种方式，Emacs 都会自动跟踪哪些帧具有焦点。要从 Lisp 函数显式切换到不同的帧，请调用 select-frame-set-input-focus。
+</p>
+<p>上一段中的复数 <code>帧</code> 是经过深思熟虑的：虽然 Emacs 本身只有一个选定的帧，但 Emacs 可以在许多不同的终端上拥有帧（回想一下，与窗口系统的连接算作终端），并且每个终端都有自己的哪个帧具有输入焦点的想法。将输入焦点设置为帧时，您为该帧的终端设置焦点，但其他终端上的帧可能仍保持焦点。
+</p>
+<p>Lisp 程序可以通过调用函数 select-frame 来临时切换帧。这不会改变窗口系统的焦点概念；  相反，它会从窗口管理器的控制中逃脱，直到该控制以某种方式重新生效。
+</p>
+<p>使用文本终端时，终端上一次只能显示一帧，因此调用 select-frame 后，下一次重新显示实际上显示新选择的帧。此帧保持选中状态，直到随后调用 select-frame。文本终端上的每一帧都有一个数字，它出现在模式行中缓冲区名称之前（请参阅模式行中使用的变量）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: select-frame-set-input-focus frame &amp;optional norecord ¶
+</pre></div>
+<p>这个函数选择帧，提升它（如果它碰巧被其他帧遮住）并尝试给它窗口系统的焦点。在文本终端上，下一次重新显示会在整个终端屏幕上显示新帧。可选参数 norecord 与 select-frame 具有相同的含义（见下文）。这个函数的返回值并不重要。
+</p>
+<p>理想情况下，接下来描述的功能应该聚焦一个帧，而不会将其提升到其他帧之上。不幸的是，许多窗口系统或窗口管理器可能拒绝遵守。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: x-focus-frame frame &amp;optional noactivate ¶
+</pre></div>
+<p>这个函数让 frame 成为 X 服务器的焦点，而不必提升它。frame nil 表示使用选定的帧。在 X 下，可选参数 noactivate，如果非零，则意味着避免使帧的窗口系统窗口成为 <code>活动</code> 窗口，这应该更多地坚持避免将帧提升到其他帧之上。
+</p>
+<p>在 MS-Windows 上，noactivate 参数无效。但是，如果 frame 是子帧（请参阅子帧），此功能通常会聚焦帧而不将其提升到其他子帧之上。
+</p>
+<p>如果没有窗口系统支持，这个函数什么也不做。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: select-frame frame &amp;optional norecord ¶
+</pre></div>
+<p>此函数选择帧帧，暂时忽略 X 服务器的焦点（如果有）。帧的选择一直持续到用户下一次选择不同的帧，或者直到下一次调用这个函数。（如果您使用的是窗口系统，返回命令循环后可能会将之前选择的帧恢复为选择的帧，因为它仍然可能具有窗口系统的输入焦点。）
+</p>
+<p>指定的帧成为选定的帧，其终端成为选定的终端。然后这个函数调用 select-window 作为一个子例程，传递在 frame 中选择的窗口作为它的第一个参数和 norecord 作为它的第二个参数（因此，如果 norecord 是非零，这避免了改变最近选择的窗口和缓冲区列表的顺序）。请参阅选择窗口。
+</p>
+<p>此函数返回 frame，如果 frame 已被删除，则返回 nil。
+</p>
+<p>通常，您永远不应该以一种可以切换到不同终端的方式使用 select-frame，而无需在完成后切换回来。
+</p>
+<p>Emacs 通过安排选择帧作为服务器和窗口管理器的请求来与窗口系统协作。当窗口系统通知 Emacs 它的一个帧已被选中时，Emacs 会在内部生成一个焦点事件。当 Emacs 帧显示在文本终端模拟器上时，例如 xterm，它支持报告焦点更改通知，即使对于文本模式帧，焦点输入和焦点输出事件也可用。焦点事件通常由 handle-focus-in 处理。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: handle-focus-in event ¶
+</pre></div>
+<p>此函数处理来自支持显式焦点通知的窗口系统和终端的焦点事件。它更新帧焦点状态查询的每帧焦点标志，并调用 after-focus-change-function。此外，它会生成一个 switch-frame 事件，以便将所选帧的 Emacs 概念切换到最近聚焦在某个终端中的帧。需要注意的是，这种将 Emacs 选定帧切换到最近聚焦的帧并不意味着其他帧不会继续在其各自的终端中获得焦点。不要自己调用此函数：而是将逻辑附加到 after-focus-change-function。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: handle-switch-frame frame ¶
+</pre></div>
+<p>这个函数处理一个切换帧事件，Emacs 在焦点通知时或在涉及输入事件到达与上一个事件不同的帧的各种其他情况下为自己生成该事件。不要自己调用此函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: redirect-frame-focus frame &amp;optional focus-frame ¶
+</pre></div>
+<p>此功能将焦点从帧重定向到焦点帧。这意味着焦点帧将接收后续的击键和用于帧的事件。在这样的事件之后，last-event-frame 的值将是 focus-frame。此外，指定 frame 的 switch-frame 事件将改为选择 focus-frame。
+</p>
+<p>如果 focus-frame 被省略或为零，则取消任何现有的 frame 重定向，因此再次接收自己的事件。
+</p>
+<p>焦点重定向的一种用途是用于没有小缓冲区的帧。这些帧在其他帧上使用迷你缓冲区。在另一个帧上激活一个 minibuffer 会将焦点重定向到该帧。这将焦点放在它所属的 minibuffer 的帧上，即使鼠标停留在激活 minibuffer 的帧中。
+</p>
+<p>选择一个帧也可以改变焦点重定向。Selecting frame bar, when foo had been selected, changes any redirections pointing to foo so that they point to bar instead.  当用户使用选择窗口从一帧切换到另一帧时，这允许焦点重定向正常工作。
+</p>
+<p>这意味着焦点重定向到自身的帧与焦点未重定向的帧不同。select-frame 影响前者，但不影响后者。
+</p>
+<p>重定向一直持续到调用 redirect-frame-focus 来改变它。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: frame-focus-state frame ¶
+</pre></div>
+<p>此函数检索帧的最后一个已知焦点状态。
+</p>
+<p>如果已知帧没有被聚焦，则返回 nil，如果已知帧被聚焦，则返回 t，如果 Emacs 不知道帧的焦点状态，则返回 unknown。（您可能会在不支持显式焦点通知的终端上运行的 TTY 帧中看到最后一个状态。）
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: after-focus-change-function ¶
+</pre></div>
+<p>此函数是代码可用于接收焦点已更改通知的扩展点。
+</p>
+<p>当 Emacs 注意到焦点帧的集合可能已经改变时，这个函数被调用，不带任何参数。想要在帧焦点变化时做某事的代码应该使用 add-function 向这个函数添加一个函数，并在这个添加的函数中，重新扫描焦点帧集，调用 frame-focus-state 来检索最后一个已知的焦点状态每一帧。焦点事件是异步传递的，根据外部系统的帧输入焦点可能与 Emacs 选定帧的概念不对应。由于焦点事​​件传递的差异、多个 Emacs 终端的存在以及其他因素，多个帧可能看起来同时具有输入焦点，面对这种情况，代码应该是健壮的。
+</p>
+<p>根据窗口系统，焦点事件也可以在稳定到预期值之前以不同的焦点状态重复传递。依赖焦点通知的代码应该 <code>去抖动</code> 任何由焦点更改引起的用户可见的更新，也许是通过推迟工作直到重新显示。
+</p>
+<p>此函数可以在任意上下文中调用，包括从内部读取事件中调用，因此请像编写进程过滤器时一样小心。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: focus-follows-mouse ¶
+</pre></div>
+<p>当您将鼠标指针移动到帧中时，此选项会通知 Emacs 窗口管理器是否以及如何转移焦点。它可以具有三个有意义的值：
+</p>
+<div class="lisp">
+<pre class="lisp">nil
+</pre></div>
+<p>当您的窗口管理器遵循 <code>单击聚焦</code> 策略时，应使用默认值 nil，您必须在帧内单击鼠标才能使该帧获得焦点。
+</p><div class="lisp">
+<pre class="lisp">t
+</pre></div>
+<p>当您的窗口管理器的焦点自动跟随鼠标指针的位置但获得焦点的帧不会自动提升并且甚至可能被其他窗口系统窗口遮挡时，应该使用值 t。
+</p><div class="lisp">
+<pre class="lisp">auto-raise
+</pre></div>
+<p>当窗口管理器的焦点自动跟随鼠标指针的位置并且获得焦点的帧自动升起时，应该使用值 auto-raise。
+</p>
+<p>如果此选项非零，Emacs 将鼠标指针移动到由 select-frame-set-input-focus 选择的帧。该函数被许多命令使用，例如其他帧和弹出到缓冲区。
+</p>
+<p><code>正常</code> 帧不需要区分 t 值和 auto-raise 值，因为窗口管理器通常会负责提升它们。通过 mouse-autoselect-window 自动提升子帧很有用（请参阅鼠标窗口自动选择）。
+</p>
+<p>请注意，此选项不区分 <code>草率</code> 焦点（只要鼠标指针没有移动到另一个窗口系统窗口，先前具有焦点的帧保持焦点）与 <code>严格</code> 焦点（帧立即失去焦点）它由鼠标指针离开）。它也不识别您的窗口管理器是否支持延迟聚焦或自动提升，您可以在其中明确指定新帧获得焦点或自动提升的时间。
+</p>
+<p>您可以通过自定义变量 mouse-autoselect-window 为单个 Emacs 窗口提供 <code>焦点跟随鼠标</code> 策略（请参阅鼠标窗口自动选择）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="30.11_帧的可见性.html">帧的可见性</a>, Previous: <a href="30.9_小缓冲区和帧.html">小缓冲区和帧</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

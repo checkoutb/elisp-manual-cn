@@ -1,0 +1,94 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>26.6.1 测试可访问性</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">26.6.1 测试可访问性</h3>
+<div class="nav-panel"><p>Next: <a href="26.6.2_区分文件种类.html">区分文件种类</a>, Previous: <a href="26.6_文件信息.html">文件信息</a>, Up: <a href="26.6_文件信息.html">文件信息.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这些函数测试访问文件以进行读取、写入或执行的权限。除非另有明确说明，否则它们遵循符号链接。请参阅区分文件种类。
+</p>
+<p>在某些操作系统上，可以通过访问控制列表 (ACL) 等机制指定更复杂的访问权限集。请参阅扩展文件属性，了解如何查询和设置这些权限。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-exists-p filename ¶
+</pre></div>
+<p>如果一个名为 filename 的文件似乎存在，此函数将返回 t。这并不意味着您一定可以读取该文件，只是您可能会找出它的属性。（在 GNU 和其他类似 POSIX 的系统上，如果文件存在并且您对包含的目录具有执行权限，则无论文件本身的权限如何，都是如此。）
+</p>
+<p>如果文件不存在，或者无法确定文件是否存在，则此函数返回 nil。
+</p>
+<p>目录是文件，因此 file-exists-p 可以在给定目录时返回 t 。但是，因为 file-exists-p 遵循符号链接，所以仅当目标文件存在时，它才返回 t 作为符号链接名称。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-readable-p filename ¶
+</pre></div>
+<p>如果存在名为 filename 的文件并且您可以读取它，则此函数返回 t。否则返回 nil 。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-executable-p filename ¶
+</pre></div>
+<p>如果存在名为 filename 的文件并且您可以执行它，则此函数返回 t。否则返回 nil 。在 GNU 和其他类似 POSIX 的系统上，如果文件是目录，则执行权限意味着您可以检查目录中文件的存在和属性，并在其模式允许的情况下打开这些文件。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-writable-p filename ¶
+</pre></div>
+<p>如果文件 filename 可以由您编写或创建，则此函数返回 t，否则返回 nil。如果文件存在并且您可以写入，则文件是可写的。如果它不存在，它是可创建的，但它的父目录确实存在，您可以在该目录中写入。
+</p>
+<p>在下面的示例中， foo 不可写，因为父目录不存在，即使用户可以创建这样的目录。
+</p><div class="lisp">
+<pre class="lisp">(file-writable-p "~/no-such-dir/foo")
+     ⇒ nil
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: file-accessible-directory-p dirname ¶
+</pre></div>
+<p>如果您有权打开目录中的文件名为 dirname 的现有文件，则此函数返回 t；  否则（例如，如果没有这样的目录），它返回 nil。dirname 的值可以是目录名（例如 /foo/），也可以是作为目录的文件的文件名（例如 /foo，没有最后的斜杠）。
+</p>
+<p>例如，从以下我们推断，任何尝试读取 <em>foo</em> 中的文件都会出错：
+</p>
+<div class="lisp">
+<pre class="lisp">(file-accessible-directory-p "/foo")
+     ⇒ nil
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Macro: with-existing-directory body… ¶
+</pre></div>
+<p>此宏确保在执行正文之前将 default-directory 绑定到现有目录。如果 default-directory 已经存在，则首选，否则使用其他目录。例如，当调用要求它在存在的目录中运行的外部命令时，此宏可能很有用。不保证所选目录是可写的。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: access-file filename string ¶
+</pre></div>
+<p>如果您可以读取文件名，则此函数返回 nil；  否则，它使用字符串作为错误消息文本来表示错误。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-ownership-preserved-p filename &amp;optional group ¶
+</pre></div>
+<p>如果删除文件文件名然后重新创建它会保持文件所有者不变，则此函数返回 t。它还为不存在的文件返回 t。
+</p>
+<p>如果可选参数组不为零，则此函数还会检查文件的组是否未更改。
+</p>
+<p>此函数不遵循符号链接。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-modes filename &amp;optional flag ¶
+</pre></div>
+<p>该函数返回文件名的模式位——一个总结其读、写和执行权限的整数。此函数遵循符号链接。如果文件不存在，则返回值为 nil。
+</p>
+<p>有关模式位的描述，请参阅 GNU Coreutils 手册中的文件权限。例如，如果低位为 1，则该文件对所有用户都是可执行的；  如果倒数第二位为 1，则文件可被所有用户写入；  等。最高可能值为 4095（八进制 7777），表示每个人都有读、写和执行权限，为其他人和组设置 SUID 位，并设置粘性位。
+</p>
+<p>默认情况下，此函数遵循符号链接。但是，如果可选参数标志是符号nofollow，如果它是符号链接，则此函数不跟随文件名；  这可以帮助防止无意中在其他地方获取文件的模式位，并且与文件属性更一致（请参阅文件属性）。
+</p>
+<p>有关可用于设置这些权限的 set-file-modes 功能，请参阅更改文件名和属性。
+</p><div class="lisp">
+<pre class="lisp">(file-modes "~/junk/diffs" 'nofollow)
+     ⇒ 492               ; Decimal integer.
+
+(format "%o" 492)
+     ⇒ "754"             ; Convert to octal.
+
+
+(set-file-modes "~/junk/diffs" #o666 'nofollow)
+     ⇒ nil
+
+
+$ ls -l diffs
+-rw-rw-rw- 1 lewis lewis 3063 Oct 30 16:00 diffs
+</pre></div>
+<p>MS-DOS 注意：在 MS-DOS 上，没有可执行文件模式位之类的东西。因此，如果文件名以标准可执行扩展名之一（例如 .com、.bat、.exe 等）结尾，则 file-modes 认为文件是可执行文件。以 POSIX 标准 <code>#!</code> 开头的文件 签名，例如 shell 和 Perl 脚本，也被认为是可执行的。为了与 POSIX 兼容，目录也被报告为可执行文件。文件属性也遵循这些约定（请参阅文件属性）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="26.6.2_区分文件种类.html">区分文件种类</a>, Previous: <a href="26.6_文件信息.html">文件信息</a>, Up: <a href="26.6_文件信息.html">文件信息.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

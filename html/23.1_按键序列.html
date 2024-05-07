@@ -1,0 +1,29 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>23.1 按键序列</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">23.1 按键序列</h2>
+<div class="nav-panel"><p>Next: <a href="23.2_键盘映射基础.html">键盘映射基础</a>, Previous: <a href="23_键盘映射.html">键盘映射</a>, Up: <a href="23_键盘映射.html">键盘映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>键序列，或简称键，是一个或多个输入事件的序列，它们构成一个单元。输入事件包括字符、功能键、鼠标操作或 Emacs 外部的系统事件，例如 iconify-frame（请参阅输入事件）。键序列的 Emacs Lisp 表示是字符串或向量。除非另有说明，否则任何接受键序列作为参数的 Emacs Lisp 函数都可以处理这两种表示。
+</p>
+<p>在字符串表示中，字母数字字符通常代表它们自己；  例如， <code>a</code> 代表a， <code>2</code> 代表2。控制字符事件以子字符串 <code>\C-</code> 为前缀，元字符以 <code>\M-</code> 为前缀；  例如， <code>\Cx</code> 表示键 Cx。此外，TAB、RET、ESC 和 DEL 事件分别用 <code>\t</code> 、 <code>\r</code> 、 <code>\e</code> 和 <code>\d</code> 表示。完整键序列的字符串表示是组成事件的字符串表示的串联；  因此， <code>\C-xl</code> 表示密钥序列 Cxl。
+</p>
+<p>包含功能键、鼠标按钮事件、系统事件或非 ASCII 字符（如 C-= 或 Ha）的键序列不能表示为字符串；  它们必须表示为向量。
+</p>
+<p>在向量表示中，向量的每个元素都以 Lisp 形式表示一个输入事件。请参阅输入事件。例如，向量 [??l] 表示密钥序列 Cx l。
+</p>
+<p>有关以字符串和向量表示形式编写的键序列的示例，请参阅 The GNU Emacs Manual 中的 Init Rebinding。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: kbd keyseq-text ¶
+</pre></div>
+<p>此函数将文本 keyseq-text（字符串常量）转换为键序列（字符串或向量常量）。keyseq-text 的内容应该使用与 Cx Ck RET (kmacro-edit-macro) 命令调用的缓冲区中相同的语法；  特别是，您必须用 <code>&lt;…&gt;</code> 将功能键名称括起来。请参阅 GNU Emacs 手册中的编辑键盘宏。
+</p>
+<div class="lisp">
+<pre class="lisp">(kbd "C-x") ⇒ "\C-x"
+(kbd "C-x C-f") ⇒ "\C-x\C-f"
+(kbd "C-x 4 C-f") ⇒ "\C-x4\C-f"
+(kbd "X") ⇒ "X"
+(kbd "RET") ⇒ "\^M"
+(kbd "C-c SPC") ⇒ "\C-c "
+(kbd "&lt;f1&gt; SPC") ⇒ [f1 32]
+(kbd "C-M-&lt;down&gt;") ⇒ [C-M-down]
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="23.2_键盘映射基础.html">键盘映射基础</a>, Previous: <a href="23_键盘映射.html">键盘映射</a>, Up: <a href="23_键盘映射.html">键盘映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

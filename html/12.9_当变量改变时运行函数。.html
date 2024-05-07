@@ -1,0 +1,23 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>12.9 当变量改变时运行函数。</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">12.9 当变量改变时运行函数。</h2>
+<div class="nav-panel"><p>Next: <a href="12.9.1_限制.html">限制</a>, Previous: <a href="12.8_设置变量值.html">设置变量值</a>, Up: <a href="12_变量.html">变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当变量改变它的值时，采取一些行动有时是有用的。变量观察点工具提供了这样做的方法。此功能的一些可能用途包括使显示与变量设置保持同步，并调用调试器以跟踪对变量的意外更改（请参阅在修改变量时进入调试器）。
+</p>
+<p>以下函数可用于操作和查询变量的监视函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: add-variable-watcher symbol watch-function ¶
+</pre></div>
+<p>此函数安排在修改符号时调用 watch-function。通过别名进行修改（请参阅变量别名）将具有相同的效果。
+</p>
+<p>watch-function 将在更改 symbol 的值之前被调用，带有 4 个参数：symbol、newval、operation 和 where。symbol 是被改变的变量。newval 是将更改为的值。（旧值可作为 symbol 的值用于 watch-function，因为它尚未更改为 newval。） operation 是表示更改类型的符号，其中之一是：set、let、unlet、makunbound 或 defvaralias。如果变量的缓冲区局部值正在更改，则 where 是缓冲区，否则为 nil。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: remove-variable-watcher symbol watch-function ¶
+</pre></div>
+<p>此函数从符号的观察者列表中删除观察函数。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: get-variable-watchers symbol ¶
+</pre></div>
+<p>此函数返回符号的活动观察函数列表。 
+</p>
+<div class="nav-panel"><p>Next: <a href="12.9.1_限制.html">限制</a>, Previous: <a href="12.8_设置变量值.html">设置变量值</a>, Up: <a href="12_变量.html">变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

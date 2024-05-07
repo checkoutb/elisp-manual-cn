@@ -1,0 +1,22 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.4.6 模式行中的属性</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">24.4.6 模式行中的属性</h3>
+<div class="nav-panel"><p>Next: <a href="24.4.7_窗口标题行.html">窗口标题行</a>, Previous: <a href="24.4.5_%-_模式线中的构造.html">%-_模式线中的构造</a>, Up: <a href="24.4_模式线格式.html">模式线格式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>某些文本属性在模式行中是有意义的。face 属性影响文本的外观；  help-echo 属性将帮助字符串与文本相关联，而 keymap 可以使文本对鼠标敏感。
+</p>
+<p>有四种方法可以为模式行中的文本指定文本属性：
+</p>
+<ul>
+<li>
+将带有文本属性的字符串直接放入模式线数据结构中，但请参阅模式线的数据结构以了解相关注意事项。
+</li><li>
+将文本属性放在模式行 %-construct 例如 ’%12b’;  那么 %-construct 的扩展将具有相同的文本属性。
+</li><li>
+使用 (:properize elt props…) 构造给 elt 一个由 props 指定的文本属性。
+</li><li>
+在模式行数据结构中使用包含 :eval 形式的列表，并使形式评估为具有文本属性的字符串。
+</li></ul>
+<p>您可以使用 keymap 属性来指定键盘映射。这个keymap只对鼠标点击生效；  将字符键和功能键绑定到它没有效果，因为不可能将点移动到模式行中。
+</p>
+<p>当模式行引用不具有非零风险局部变量属性的变量时，将忽略该变量值中给出或指定的任何文本属性。这是因为这些属性可能会指定要调用的函数，并且这些函数可能来自文件局部变量。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="24.4.7_窗口标题行.html">窗口标题行</a>, Previous: <a href="24.4.5_%-_模式线中的构造.html">%-_模式线中的构造</a>, Up: <a href="24.4_模式线格式.html">模式线格式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

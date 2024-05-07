@@ -1,0 +1,30 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>41.18 会话管理</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">41.18 会话管理</h2>
+<div class="nav-panel"><p>Next: <a href="41.19_桌面通知.html">桌面通知</a>, Previous: <a href="41.17_批处理模式.html">批处理模式</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 支持 X 会话管理协议，该协议用于暂停和重新启动应用程序。在 X Window 系统中，一个称为会话管理器的程序负责跟踪正在运行的应用程序。当 X 服务器关闭时，会话管理器要求应用程序保存它们的状态，并延迟实际关闭，直到它们做出响应。应用程序也可以取消关闭。
+</p>
+<p>当会话管理器重新启动暂停的会话时，它会指示这些应用程序单独重新加载其保存的状态。它通过指定一个特殊的命令行参数来执行此操作，该参数说明要恢复的已保存会话。对于 Emacs，这个参数是 ’–smid session’。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: emacs-save-session-functions ¶
+</pre></div>
+<p>Emacs 通过名为 emacs-save-session-functions 的钩子支持保存状态。当会话管理器告诉它窗口系统正在关闭时，Emacs 运行这个钩子。这些函数在没有参数的情况下被调用，并且当前缓冲区设置为临时缓冲区。每个函数都可以使用 insert 将 Lisp 代码添加到此缓冲区。最后，Emacs 将缓冲区保存在一个文件中，称为会话文件。
+</p>
+<p>随后，当会话管理器重新启动 Emacs 时，它会自动加载会话文件（请参阅加载）。这是由一个名为 emacs-session-restore 的函数执行的，该函数在启动期间被调用。请参阅摘要：启动时的操作顺序。
+</p>
+<p>如果 emacs-save-session-functions 中的函数返回非 nil，Emacs 会告诉会话管理器取消关闭。
+</p>
+<p>这是一个示例，当会话管理器重新启动 Emacs 时，它只是在 <strong>scratch</strong> 中插入一些文本。
+</p><div class="lisp">
+<pre class="lisp">
+
+(add-hook 'emacs-save-session-functions 'save-yourself-test)
+
+
+(defun save-yourself-test ()
+  (insert
+   (format "%S" '(with-current-buffer "*scratch*"
+                   (insert "I am restored"))))
+  nil)
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="41.19_桌面通知.html">桌面通知</a>, Previous: <a href="41.17_批处理模式.html">批处理模式</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

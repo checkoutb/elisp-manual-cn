@@ -1,0 +1,27 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>29.25 鼠标窗口自动选择</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">29.25 鼠标窗口自动选择</h2>
+<div class="nav-panel"><p>Next: <a href="29.26_窗口配置.html">窗口配置</a>, Previous: <a href="29.24_坐标和窗口.html">坐标和窗口</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>以下选项允许自动选择鼠标指针下的窗口。这实现了类似于窗口管理器的策略，只要鼠标指针进入其窗口系统窗口（请参阅输入焦点），就会将焦点赋予 <code>帧</code> ( <code>frame</code> )（并因此触发其后续选择）。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: mouse-autoselect-window ¶
+</pre></div>
+<p>如果这个变量不为 nil，Emacs 将尝试自动选择鼠标指针下的窗口。以下值是有意义的：
+</p>
+<p>一个正数
+</p>
+<p>     这指定了以秒为单位的延迟，之后自动选择触发。在鼠标停留在整个延迟期间后，鼠标指针下方的窗口被选中。
+一个负数
+</p>
+<p>     负数具有与正数类似的效果，但只有在鼠标指针停留在该数字的绝对值的整个持续时间内并且停止移动之后，才会选择鼠标指针下方的窗口。
+其他价值
+</p>
+<p>任何其他非 nil 值意味着鼠标指针进入时立即选择一个窗口。
+</p>
+<p>在任何一种情况下，鼠标指针都必须进入窗口的文本区域才能触发其选择。从概念上讲，拖动滚动条滑块或窗口的模式线不应导致其自动选择。
+</p>
+<p>鼠标自动选择仅在 minibuffer 窗口处于活动状态时选择它，并且永远不会取消选择活动的 minibuffer 窗口。
+</p>
+<p>鼠标自动选择可用于模拟窗口管理器通常不跟踪的子 <code>帧</code> ( <code>frame</code> )的焦点跟随鼠标策略（请参阅子 <code>帧</code> ( <code>frame</code> )）。这需要将 focus-follows-mouse 的值（请参阅输入焦点）设置为非零值。如果 focus-follows-mouse 的值是 auto-raise，则使用鼠标进入子 <code>帧</code> ( <code>frame</code> )将自动将其提升到该 <code>帧</code> ( <code>frame</code> )的父 <code>帧</code> ( <code>frame</code> )的所有其他子 <code>帧</code> ( <code>frame</code> )之上。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="29.26_窗口配置.html">窗口配置</a>, Previous: <a href="29.24_坐标和窗口.html">坐标和窗口</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.31 原子变更组</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">33.31 原子变更组</h2>
+<div class="nav-panel"><p>Next: <a href="33.32_更改挂钩.html">更改挂钩</a>, Previous: <a href="33.30.4_延迟的_JSONRPC_请求.html">延迟的_JSONRPC_请求</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在数据库术语中，原子更改是不可分割的更改——它可以完全成功，也可以完全失败，但不能部分成功。Lisp 程序可以对一个或多个缓冲区进行一系列更改，作为一个原子更改组，这意味着整个系列的更改将安装在它们的缓冲区中，或者在发生错误的情况下，它们都不会安装。
+</p>
+<p>要对一个缓冲区执行此操作，一个已经是当前的缓冲区，只需在进行更改的代码周围编写一个对 atomic-change-group 的调用，如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(atomic-change-group
+  (insert foo)
+  (delete-region x y))
+</pre></div>
+<p>如果在 atomic-change-group 的主体内发生错误（或其他非本地退出），它将取消该缓冲区中在主体执行期间的所有更改。这种更改组对任何其他缓冲区都没有影响——任何此类更改都会保留。
+</p>
+<p>如果你需要更复杂的东西，比如让各种缓冲区中的更改构成一个原子组，你必须直接调用 atomic-change-group 使用的较低级别的函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: prepare-change-group &amp;optional buffer ¶
+</pre></div>
+<p>该函数为缓冲区缓冲区设置一个更改组，默认为当前缓冲区。它返回一个代表更改组的句柄。您必须使用此句柄来激活更改组并随后完成它。
+</p>
+<p>要使用更改组，您必须激活它。您必须在对缓冲区文本进行任何更改之前执行此操作。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: activate-change-group handle ¶
+</pre></div>
+<p>此功能激活处理指定的更改组。
+</p>
+<p>激活更改组后，您在该缓冲区中所做的任何更改都将成为其中的一部分。在缓冲区中完成所有所需的更改后，您必须完成更改组。有两种方法可以做到这一点：您可以接受（并最终确定）所有更改，也可以全部取消。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: accept-change-group handle ¶
+</pre></div>
+<p>该函数接受由句柄指定的更改组中的所有更改，使它们成为最终的。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: cancel-change-group handle ¶
+</pre></div>
+<p>该函数取消和撤消由句柄指定的更改组中的所有更改。
+</p>
+<p>您可以使用 undo-amalgamate-change-group 将更改组中的部分或全部更改视为单个单元，以用于撤消命令（请参阅撤消）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: undo-amalgamate-change-group ¶
+</pre></div>
+<p>合并自句柄标识的状态以来在更改组中所做的所有更改。此函数删除自句柄描述的状态以来更改的撤消记录之间的所有撤消边界。通常，handle 是 prepare-change-group 返回的句柄，在这种情况下，自 change-group 开始以来的所有更改都合并到一个单独的撤消单元中。
+</p>
+<p>您的代码应使用 unwind-protect 来确保该组始终完成。对 activate-change-group 的调用应该在 unwind-protect 内，以防用户在运行后键入 Cg。（这是 prepare-change-group 和 activate-change-group 是独立函数的原因之一，因为通常你会在 unwind-protect 开始之前调用 prepare-change-group。）一旦你完成了组，不要再次使用把手——特别是不要尝试完成同一组两次。
+</p>
+<p>要创建多缓冲区更改组，请为要覆盖的每个缓冲区调用一次 prepare-change-group，然后使用 nconc 组合返回值，如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(nconc (prepare-change-group buffer-1)
+       (prepare-change-group buffer-2))
+</pre></div>
+<p>然后，您可以通过一次调用 activate-change-group 来激活多缓冲区更改组，并通过一次调用 accept-change-group 或 cancel-change-group 来完成它。
+</p>
+<p>对同一个缓冲区嵌套使用多个更改组的工作方式与您期望的一样。对同一个缓冲区非嵌套使用更改组会使 Emacs 感到困惑，所以不要让它发生；  您为任何给定缓冲区启动的第一个更改组应该是最后一个完成的更改组。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.32_更改挂钩.html">更改挂钩</a>, Previous: <a href="33.30.4_延迟的_JSONRPC_请求.html">延迟的_JSONRPC_请求</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

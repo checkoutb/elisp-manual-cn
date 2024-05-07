@@ -1,0 +1,35 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>16.11 Emacs 动态模块</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">16.11 Emacs 动态模块</h2>
+<div class="nav-panel"><p>Next: <a href="17_字节编译.html">字节编译</a>, Previous: <a href="16.10_装载钩子.html">装载钩子</a>, Up: <a href="16_加载.html">加载.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>动态 Emacs 模块是一个共享库，它提供了用于 Emacs Lisp 程序的附加功能，就像用 Emacs Lisp 编写的包一样。
+</p>
+<p>加载 Emacs Lisp 包的函数也可以加载动态模块。他们通过查看文件扩展名来识别动态模块，也就是 <code>后缀</code> 。这个后缀是平台相关的。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: module-file-suffix ¶
+</pre></div>
+<p>此变量保存模块文件的文件扩展名的系统相关值。它的值在 POSIX 主机上是 .so，在 macOS 上是 .dylib，在 MS-Windows 上是 .dll。
+</p>
+<p>在 macOS 上，除了 .dylib 之外，动态模块还可以具有后缀 .so。
+</p>
+<p>每个动态模块都应该导出一个名为 emacs<em>_module</em><em>_init</em> 的 C 可调用函数，Emacs 将调用该函数作为 load 或 require 加载模块的调用的一部分。它还应该导出一个名为 plugin<em>_is</em><em>_GPL</em><em>_compatible</em> 的符号，以表明其代码是在 GPL 或兼容许可下发布的；  如果您的程序尝试加载不导出此类符号的模块，Emacs 将发出错误信号。
+</p>
+<p>如果一个模块需要调用 Emacs 函数，它应该通过在 Emacs 发行版的头文件 emacs-module.h 中定义和记录的 API（应用程序编程接口）来实现。有关在编写自己的模块时使用该 API 的详细信息，请参阅编写动态加载的模块。
+</p>
+<p>模块可以创建 user-ptr Lisp 对象，这些对象嵌入指向模块定义的 C 结构的指针。这对于保留由模块创建的复杂数据结构非常有用，以便传递回模块的函数。User-ptr 对象也可以有关联的终结器——当对象被 GC 时运行的函数；  这对于释放为底层数据结构分配的任何资源很有用，例如内存、打开的文件描述符等。请参阅 Lisp 和模块值之间的转换。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: user-ptrp object ¶
+</pre></div>
+<p>如果它的参数是一个 user-ptr 对象，这个函数返回 t。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: module-load file ¶
+</pre></div>
+<p>Emacs 调用这个低级原语从指定文件加载模块并执行模块的必要初始化。这是确保模块导出 plugin<em>_is</em><em>_GPL</em><em>_compatible</em> 符号、调用模块的 emacs<em>_module</em><em>_init</em> 函数并在该函数返回错误指示或用户在初始化期间键入 Cg 时发出错误信号的原语。如果初始化成功，module-load 返回 t。请注意，文件必须已经具有正确的文件扩展名，因为此函数不会尝试查找具有已知扩展名的文件，这与加载不同。
+</p>
+<p>与 load 不同，module-load 不会在 load-history 中记录模块，不会打印任何消息，也不会防止递归加载。因此，大多数用户应该使用 load、load-file、load-library 或 require 来代替 module-load。
+</p>
+<p>在配置时使用 –with-modules 选项启用 Emacs 中的可加载模块。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="17_字节编译.html">字节编译</a>, Previous: <a href="16.10_装载钩子.html">装载钩子</a>, Up: <a href="16_加载.html">加载.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

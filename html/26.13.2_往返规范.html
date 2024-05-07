@@ -1,0 +1,103 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>26.13.2 往返规范</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">26.13.2 往返规范</h3>
+<div class="nav-panel"><p>Next: <a href="26.13.3_零碎规格.html">零碎规格</a>, Previous: <a href="26.13.1_概述.html">概述</a>, Up: <a href="26.13_文件格式转换.html">文件格式转换.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这两个工具中最通用的是由变量 format-alist 控制，它是文件格式规范的列表，它描述了 Emacs 缓冲区中数据的文件中使用的文本表示。读取和写入的描述是成对的，这就是我们称之为 <code>往返</code> 规范的原因（参见 Piecemeal Specification，非成对规范）。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: format-alist ¶
+</pre></div>
+<p>此列表包含每个已定义文件格式的格式定义。每个格式定义都是这种形式的列表：
+</p>
+<div class="lisp">
+<pre class="lisp">(name doc-string regexp from-fn to-fn modify mode-fn preserve)
+</pre></div>
+<p>以下是格式定义中元素的含义：
+</p>
+<div class="lisp">
+<pre class="lisp">name
+</pre></div>
+<p>此格式的名称。
+</p><div class="lisp">
+<pre class="lisp">doc-string
+</pre></div>
+<p>格式的文档字符串。
+</p><div class="lisp">
+<pre class="lisp">regexp
+</pre></div>
+<p>用于识别以这种格式表示的文件的正则表达式。如果为零，则永远不会自动应用格式。
+</p><div class="lisp">
+<pre class="lisp">from-fn
+</pre></div>
+<p>以这种格式解码数据的 shell 命令或函数（将文件数据转换为通常的 Emacs 数据表示）。
+</p>
+<p>一个shell命令被表示为一个字符串；  Emacs 将该命令作为过滤器运行以执行转换。
+</p>
+<p>如果 from-fn 是一个函数，则使用两个参数调用它，begin 和 end，它们指定它应该转换的缓冲区部分。它应该通过就地编辑来转换文本。因为这可以改变文本的长度，所以 from-fn 应该返回修改后的结束位置。
+</p>
+<p>from-fn 的一项职责是确保文件的开头不再匹配正则表达式。否则很可能会再次被调用。此外，from-fn 不得涉及除被解码的缓冲区或文件之外的缓冲区或文件，否则可能会覆盖用于格式化的内部缓冲区。
+</p><div class="lisp">
+<pre class="lisp">to-fn
+</pre></div>
+<p>以这种格式编码数据的 shell 命令或函数——即将通常的 Emacs 数据表示转换为这种格式。
+</p>
+<p>如果 to-fn 为字符串，则为 shell 命令；  Emacs 将该命令作为过滤器运行以执行转换。
+</p>
+<p>如果 to-fn 是一个函数，则使用三个参数调用它：begin 和 end，它们指定它应该转换的缓冲区部分，以及 buffer，它指定哪个缓冲区。它可以通过两种方式进行转换：
+</p>
+<p>通过就地编辑缓冲区。在这种情况下， to-fn 应该返回文本范围的结束位置，如修改后的那样。
+通过返回注释列表。这是一个形式为 (position . string) 的元素列表，其中 position 是一个整数，指定要写入的文本中的相对位置，而 string 是要添加的注释。当 to-fn 返回时，列表必须按位置顺序排序。
+</p>
+<p>当 write-region 实际将文本从缓冲区写入文件时，它会在相应位置混合指定的注释。所有这些都发生在不修改缓冲区的情况下。
+</p>
+<p>to-fn 不得涉及除被编码的缓冲区或文件之外的缓冲区或文件，否则用于格式化的内部缓冲区可能会被覆盖。
+</p><div class="lisp">
+<pre class="lisp">modify
+</pre></div>
+<p>一个标志，如果编码函数修改了缓冲区，则为 t，如果它通过返回注释列表工作，则为 nil。
+</p><div class="lisp">
+<pre class="lisp">mode-fn
+</pre></div>
+<p>访问从这种格式转换的文件后调用的次要模式函数。该函数使用一个参数调用，整数 1；  告诉次要模式函数启用该模式。
+</p><div class="lisp">
+<pre class="lisp">preserve
+</pre></div>
+<p>一个标志，t 如果 format-write-file 不应该从 buffer-file-format 中删除此格式。
+</p>
+<p>insert-file-contents 函数在读取指定文件时自动识别文件格式。它根据格式定义的正则表达式检查文件开头的文本，如果找到匹配项，则调用该格式的解码函数。然后它再次检查所有已知的格式。它会不断检查它们，直到它们都不适用。
+</p>
+<p>使用 find-file-noselect 或使用它的命令访问文件，同样执行转换（因为它调用 insert-file-contents）；  它还为它解码的每种格式调用模式函数。它将格式名称列表存储在缓冲区局部变量 buffer-file-format 中。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: buffer-file-format ¶
+</pre></div>
+<p>此变量说明访问文件的格式。更准确地说，这是在访问当前缓冲区文件的过程中解码的文件格式名称列表。它在所有缓冲区中始终是缓冲区本地的。
+</p>
+<p>当 write-region 将数据写入文件时，它首先调用 buffer-file-format 中列出的格式的编码函数，按照在列表中出现的顺序。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: format-write-file file format &amp;optional confirm ¶
+</pre></div>
+<p>该命令将当前缓冲区内容以基于格式的格式写入文件文件，格式是格式名称的列表。它从 format 开始构造实际的格式，然后将 buffer-file-format 的值中的任何元素附加一个非 nil 保留标志（见上文），如果它们尚不存在于 format 中。然后它使用这种格式更新缓冲区文件格式，使其成为未来保存的默认值。除格式参数外，此命令类似于 write-file。特别是，confirm 与 write-file 的相应参数具有相同的含义和交互处理。请参阅写入文件的定义。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: format-find-file file format ¶
+</pre></div>
+<p>该命令查找文件文件，根据格式格式对其进行转换。如果稍后保存缓冲区，它也会将格式设置为默认值。
+</p>
+<p>参数格式是格式名称的列表。如果 format 为 nil，则不进行转换。交互地，只输入 RET 作为格式指定 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: format-insert-file file format &amp;optional beg end ¶
+</pre></div>
+<p>该命令插入文件file的内容，按照format格式进行转换。如果 beg 和 end 不是 nil，它们指定要读取文件的哪个部分，如 insert-file-contents （请参阅从文件中读取）。
+</p>
+<p>返回值类似于 insert-file-contents 返回的内容：绝对文件名和插入数据长度的列表（转换后）。
+</p>
+<p>参数格式是格式名称的列表。如果 format 为 nil，则不进行转换。交互地，只输入 RET 作为格式指定 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: buffer-auto-save-file-format ¶
+</pre></div>
+<p>此变量指定用于自动保存的格式。它的值是格式名称的列表，就像 buffer-file-format 的值一样；  但是，它被用来代替缓冲区文件格式来编写自动保存文件。如果值为 t，则默认自动保存使用与在同一缓冲区中的常规保存相同的格式。此变量在所有缓冲区中始终是缓冲区本地的。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="26.13.3_零碎规格.html">零碎规格</a>, Previous: <a href="26.13.1_概述.html">概述</a>, Up: <a href="26.13_文件格式转换.html">文件格式转换.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

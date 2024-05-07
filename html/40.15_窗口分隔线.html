@@ -1,0 +1,35 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.15 窗口分隔线</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">40.15 窗口分隔线</h2>
+<div class="nav-panel"><p>Next: <a href="40.16_display财产.html">display财产</a>, Previous: <a href="40.14_滚动条.html">滚动条</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>窗口分隔线是在框架的窗口之间绘制的条。在窗口和右侧的任何相邻窗口之间绘制右分隔线。它的宽度（厚度）由框架参数 right-divider-width 指定。在底部或回波区域的窗口和相邻窗口之间绘制底部分隔线。它的宽度由框架参数bottom-divider-width 指定。在任何一种情况下，将宽度指定为零意味着不绘制此类分隔线。请参阅布局参数。
+</p>
+<p>从技术上讲，右分隔线属于其左侧的窗口，这意味着它的宽度占该窗口的总宽度。底部分隔线属于它上面的窗口，这意味着它的宽度占该窗口的总高度。请参阅窗口大小。当窗口同时具有右分隔线和底部分隔线时，以底部分隔线为准。这意味着底部分隔线绘制在其窗口的整个总宽度上，而右侧分隔线在底部分隔线上方结束。
+</p>
+<p>分隔线可以用鼠标拖动，因此对于用鼠标调整相邻窗口的大小很有用。当不存在滚动条或模式行时，它们还用于在视觉上分隔相邻的窗口。以下三个面允许自定义分隔线的外观：
+</p>
+<div class="lisp">
+<pre class="lisp">window-divider
+</pre></div>
+<p>当分隔线的宽度小于三个像素时，它会与这张脸的前景一起绘制。对于较大的分隔线，此面仅用于内部，不包括第一个和最后一个像素。
+</p><div class="lisp">
+<pre class="lisp">window-divider-first-pixel
+</pre></div>
+<p>这是用于绘制至少三个像素宽的分隔线的第一个像素的面。要获得坚实的外观，请将其设置为与窗口分隔面相同的值。
+</p><div class="lisp">
+<pre class="lisp">window-divider-last-pixel
+</pre></div>
+<p>这是用于绘制至少三个像素宽的分隔线的最后一个像素的面。要获得坚实的外观，请将其设置为与窗口分隔面相同的值。
+</p>
+<p>您可以使用以下两个函数获取特定窗口的分隔线的大小。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-right-divider-width &amp;optional window ¶
+</pre></div>
+<p>返回窗口右分隔线的宽度（厚度）（以像素为单位）。window 必须是活动窗口，并且默认为选定的窗口。对于最右边的窗口，返回值始终为零。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-bottom-divider-width &amp;optional window ¶
+</pre></div>
+<p>返回窗口底部分隔线的宽度（厚度）（以像素为单位）。window 必须是活动窗口，并且默认为选定的窗口。对于 minibuffer 窗口或 minibuffer-less 帧上的最底部窗口，返回值为零。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.16_display财产.html">display财产</a>, Previous: <a href="40.14_滚动条.html">滚动条</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

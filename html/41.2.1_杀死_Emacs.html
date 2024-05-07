@@ -1,0 +1,33 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>41.2.1 杀死 Emacs</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">41.2.1 杀死 Emacs</h3>
+<div class="nav-panel"><p>Next: <a href="41.2.2_挂起_Emacs.html">挂起_Emacs</a>, Previous: <a href="41.2_退出_Emacs.html">退出_Emacs</a>, Up: <a href="41.2_退出_Emacs.html">退出_Emacs.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>杀死 Emacs 意味着结束 Emacs 进程的执行。如果您从终端启动 Emacs，父进程通常会恢复控制。杀死 Emacs 的低级原语是 kill-emacs。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: kill-emacs &amp;optional exit-data ¶
+</pre></div>
+<p>该命令调用 hook kill-emacs-hook，然后退出 Emacs 进程并杀死它。
+</p>
+<p>如果 exit-data 是一个整数，则用作 Emacs 进程的退出状态。（这主要在批处理操作中很有用；请参阅批处理模式。）
+</p>
+<p>如果 exit-data 是一个字符串，它的内容将被填充到终端输入缓冲区中，以便 shell（或接下来读取输入的任何程序）可以读取它们。
+</p>
+<p>如果 exit-data 既不是整数也不是字符串，或者被省略，这意味着使用（系统特定的）退出状态，表明程序成功终止。
+</p>
+<p>kill-emacs 函数通常通过更高级别的命令 Cx Cc (save-buffers-kill-terminal) 调用。请参阅 GNU Emacs 手册中的退出。如果 Emacs 接收到 SIGTERM 或 SIGHUP 操作系统信号（例如，当控制终端断开连接时），或者如果它在批处理模式下运行时接收到 SIGINT 信号（请参阅批处理模式），它也会自动调用。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: kill-emacs-hook ¶
+</pre></div>
+<p>这个普通的钩子在杀死 Emacs 之前由 kill-emacs 运行。
+</p>
+<p>因为 kill-emacs 可以在用户交互不可能的情况下被调用（例如，当终端断开时），这个钩子上的函数不应该尝试与用户交互。如果您想在 Emacs 关闭时与用户交互，请使用 kill-emacs-query-functions，如下所述。
+</p>
+<p>当 Emacs 被杀死时，Emacs 进程中的所有信息，除了已保存的文件，都将丢失。因为无意中杀死 Emacs 会丢失大量工作，所以 save-buffers-kill-terminal 命令会查询以确认您是否有需要保存的缓冲区或正在运行的子进程。它还运行异常的钩子kill-emacs-query-functions：
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: kill-emacs-query-functions ¶
+</pre></div>
+<p>当 save-buffers-kill-terminal 杀死 Emacs 时，它会在询问标准问题之后和调用 kill-emacs 之前调用此钩子中的函数。这些函数按出现的顺序调用，没有参数。每个功能都可以要求用户进行额外确认。如果其中任何一个返回 nil，则 save-buffers-kill-emacs 不会杀死 Emacs，并且不会运行此钩子中的其余函数。直接调用 kill-emacs 不会运行这个钩子。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="41.2.2_挂起_Emacs.html">挂起_Emacs</a>, Previous: <a href="41.2_退出_Emacs.html">退出_Emacs</a>, Up: <a href="41.2_退出_Emacs.html">退出_Emacs.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

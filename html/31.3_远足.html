@@ -1,0 +1,39 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>31.3 远足</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">31.3 远足</h2>
+<div class="nav-panel"><p>Next: <a href="31.4_收窄.html">收窄</a>, Previous: <a href="31.2.7_跳过字符.html">跳过字符</a>, Up: <a href="31_位置.html">位置.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在程序的局部区域内临时移动点通常很有用。这称为游览，它是通过保存游览特殊形式完成的。此构造记住当前缓冲区的初始标识及其点值，并在偏移完成后恢复它们。这是在程序的一部分内移动点并避免影响程序其余部分的标准方法，并且在 Emacs 的 Lisp 源代码中使用了数千次。
+</p>
+<p>如果您只需要保存和恢复当前缓冲区的标识，请改用 save-current-buffer 或 with-current-buffer（请参阅当前缓冲区）。如果您需要保存或恢复窗口配置，请参阅窗口配置和框架配置中描述的表格。
+</p>
+<div class="lisp">
+<pre class="lisp">Special Form: save-excursion body… ¶
+</pre></div>
+<p>这种特殊的形式保存了当前缓冲区的标识和其中的点值，评估主体，最后恢复缓冲区及其保存的点值。即使通过 throw 或 error 异常退出，两个保存的值也会恢复（请参阅非本地退出）。
+</p>
+<p>save-excursion 返回的值是 body 中最后一个形式的结果，如果没有给出 body 形式，则返回 nil。
+</p>
+<p>因为 save-excursion 仅保存在偏移开始时当前的缓冲区的点，所以在偏移期间对指向其他缓冲区所做的任何更改都将在之后保持有效。这经常会导致意想不到的后果，因此如果您在偏移期间调用 set-buffer，字节编译器会发出警告：
+</p>
+<div class="lisp">
+<pre class="lisp">Warning: Use ‘with-current-buffer’ rather than
+         save-excursion+set-buffer
+</pre></div>
+<p>为避免此类问题，您应仅在设置所需的当前缓冲区后调用 save-excursion，如下例所示：
+</p><div class="lisp">
+<pre class="lisp">(defun append-string-to-buffer (string buffer)
+  "Append STRING to the end of BUFFER."
+  (with-current-buffer buffer
+    (save-excursion
+      (goto-char (point-max))
+      (insert string))))
+</pre></div>
+<p>同样，save-excursion 不会恢复由 switch-to-buffer 等函数更改的窗口缓冲区对应关系。
+</p>
+<p>警告：与保存的点值相邻的普通文本插入会重新定位保存的值，就​​像它重新定位所有标记一样。更准确地说，保存的值是插入类型为 nil 的标记。请参阅标记插入类型。因此，当保存的点值恢复时，它通常在插入的文本之前。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: save-mark-and-excursion body… ¶
+</pre></div>
+<p>这个宏类似于save-excursion，但也可以保存和恢复mark location和mark-active。这个宏的作用与 Emacs 25.1 之前的 save-excursion 相同。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="31.4_收窄.html">收窄</a>, Previous: <a href="31.2.7_跳过字符.html">跳过字符</a>, Up: <a href="31_位置.html">位置.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

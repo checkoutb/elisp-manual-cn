@@ -1,0 +1,28 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>2.9 可变性</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">2.9 可变性</h2>
+<div class="nav-panel"><p>Next: <a href="03_数字.html">数字</a>, Previous: <a href="02.8_等式谓词.html">等式谓词</a>, Up: <a href="02_Lisp_数据类型.html">Lisp_数据类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>一些 Lisp 对象永远不应该改变。例如，Lisp 表达式 <code>aaa</code> 产生一个字符串，但你不应该改变它的内容。并且有些对象是不能改变的；  例如，虽然您可以通过计算一来创建一个新数字，但 Lisp 不提供更改现有数字值的操作。
+</p>
+<p>其他 Lisp 对象是可变的：通过涉及副作用的破坏性操作来更改它们的值是安全的。例如，可以通过将标记移动到其他位置来更改现有标记。
+</p>
+<p>尽管数字永远不会改变并且所有标记都是可变的，但有些类型的成员有些是可变的，有些则不是。这些类型包括 conses、vectors 和 strings。例如，虽然 "cons" 和 (symbol-name ’cons) 都产生不应更改的字符串，但 (copy-sequence "cons") 和 (make-string 3 ?a) 都产生可以通过以下方式更改的可变字符串后来调用了资产。
+</p>
+<p>如果可变对象是被评估的表达式的一部分，则它不再是可变的。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">(let* ((x (list 0.5))
+       (y (eval (list 'quote x))))
+  (setcar x 1.5) ;; The program should not do this.
+  y)
+</pre></div>
+<p>尽管列表 (0.5) 在创建时是可变的，但它不应该通过 setcar 进行更改，因为它是给 eval 的。相反的情况不会发生：不应更改的对象之后永远不会变得可变。
+</p>
+<p>如果程序试图更改不应该更改的对象，则结果行为是不确定的：Lisp 解释器可能会发出错误信号，或者它可能会崩溃或以其他方式出现不可预测的行为。 2
+</p>
+<p>当类似的常量作为程序的一部分出现时，Lisp 解释器可能会通过重用现有常量或其组件来节省时间或空间。例如， (eq "abc" "abc") 如果解释器只创建字符串文字 "abc" 的一个实例，则返回 t，如果它创建两个实例，则返回 nil。应该编写 Lisp 程序，以便无论是否使用此优化，它们都能正常工作。
+</p>
+<p>脚注 (2)
+</p>
+<p>这是为 Common Lisp 和 C 等语言为常量指定的行为，这与 JavaScript 和 Python 等语言不同，在这些语言中，如果程序试图更改不可变对象，则需要解释器发出错误信号。理想情况下，Emacs Lisp 解释器将朝后一个方向发展。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="03_数字.html">数字</a>, Previous: <a href="02.8_等式谓词.html">等式谓词</a>, Up: <a href="02_Lisp_数据类型.html">Lisp_数据类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

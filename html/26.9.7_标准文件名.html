@@ -1,0 +1,30 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>26.9.7 标准文件名</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">26.9.7 标准文件名</h3>
+<div class="nav-panel"><p>Next: <a href="26.10_目录的内容.html">目录的内容</a>, Previous: <a href="26.9.6_文件名补全.html">文件名补全</a>, Up: <a href="26.9_文件名.html">文件名.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>有时，Emacs Lisp 程序需要为特定用途指定标准文件名——通常是保存当前用户指定的配置数据。通常，此类文件应位于 user-emacs-directory 指定的目录中，默认情况下通常为 ~/.config/emacs/ 或 ~/.emacs.d/ （请参阅 Emacs 如何在 GNU Emacs 中查找您的初始化文件手动的）。例如，缩写定义默认存储在 ~/.config/emacs/abbrev<em>_defs</em> 或 ~/.emacs.d/abbrev<em>_defs</em> 中。指定此类文件名的最简单方法是使用函数 locate-user-emacs-file。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: locate-user-emacs-file base-name &amp;optional old-name ¶
+</pre></div>
+<p>此函数返回 Emacs 特定配置或数据文件的绝对文件名。参数 base-name 应该是一个相对文件名。返回值是user-emacs-directory指定的目录中文件的绝对名称；  如果该目录不存在，此函数将创建它。
+</p>
+<p>如果可选参数 old-name 不为 nil，则它指定用户主目录中的一个文件 ~/old-name。如果存在这样的文件，则返回值是该文件的绝对名称，而不是 base-name 指定的文件。此参数旨在供 Emacs 包使用以提供向后兼容性。例如，在引入 user-emacs-directory 之前，缩写文件位于 ~/.abbrev<em>_defs</em>。以下是 abbrev-file-name 的定义：
+</p><div class="lisp">
+<pre class="lisp">(defcustom abbrev-file-name
+  (locate-user-emacs-file "abbrev_defs" ".abbrev_defs")
+  "Default name of file from which to read abbrevs."
+  …
+  :type 'file)
+</pre></div>
+<p>locate-user-emacs-file 用作子例程的用于标准化文件名的低级函数是 convert-standard-filename。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: convert-standard-filename filename ¶
+</pre></div>
+<p>该函数根据文件名返回一个文件名，符合当前操作系统的约定。
+</p>
+<p>在 GNU 和其他类似 POSIX 的系统上，这只是返回文件名。在其他操作系统上，它可能会强制执行系统特定的文件名约定；  例如，在 MS-DOS 上，此函数执行各种更改以强制执行 MS-DOS 文件名限制，包括转换任何前导 ’.’  到 ’_’ 并在 ’.’ 之后截断为三个字符。
+</p>
+<p>使用此函数的推荐方法是指定一个符合 GNU 和 Unix 系统约定的名称，并将其传递给 convert-standard-filename。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="26.10_目录的内容.html">目录的内容</a>, Previous: <a href="26.9.6_文件名补全.html">文件名补全</a>, Up: <a href="26.9_文件名.html">文件名.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

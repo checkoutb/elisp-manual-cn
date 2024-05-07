@@ -1,0 +1,20 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.3 比较文本</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">33.3 比较文本</h2>
+<div class="nav-panel"><p>Next: <a href="33.4_插入文本.html">插入文本</a>, Previous: <a href="33.2_检查缓冲区内容.html">检查缓冲区内容</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>此函数允许您比较缓冲区中的部分文本，而无需先将它们复制到字符串中。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: compare-buffer-substrings buffer1 start1 end1 buffer2 start2 end2 ¶
+</pre></div>
+<p>此函数允许您比较同一缓冲区或两个不同缓冲区的两个子字符串。前三个参数指定一个子字符串，给出一个缓冲区（或缓冲区名称）和缓冲区内的两个位置。最后三个参数以相同的方式指定另一个子字符串。您可以使用 nil 表示 buffer1、buffer2 或两者都表示当前缓冲区。
+</p>
+<p>如果第一个子字符串较小，则值为负，如果第一个较大，则值为正，如果相等，则为零。结果的绝对值是子字符串中第一个不同字符的索引的加一。
+</p>
+<p>如果 case-fold-search 不为零，则此函数在比较字符时忽略大小写。它总是忽略文本属性。
+</p>
+<p>假设您有文本 <code>foobarbar haha​​！rara！</code>   在当前缓冲区中；  那么在这个例子中，两个子字符串是’rbar’和’rara！’。该值为 2，因为第一个子字符串在第二个字符处更大。
+</p><div class="lisp">
+<pre class="lisp">(compare-buffer-substrings nil 6 11 nil 16 21)
+     ⇒ 2
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.4_插入文本.html">插入文本</a>, Previous: <a href="33.2_检查缓冲区内容.html">检查缓冲区内容</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

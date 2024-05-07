@@ -1,0 +1,94 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>11.2 条件</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">11.2 条件</h2>
+<div class="nav-panel"><p>Next: <a href="11.3_组合条件的构造.html">组合条件的构造</a>, Previous: <a href="11.1_测序.html">测序</a>, Up: <a href="11_控制结构.html">控制结构.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>条件控制结构在备选方案中进行选择。Emacs Lisp 有五种条件形式：if，这和其他语言很相似；  when 和 unless，它们是 if 的变体；  cond，这是一个广义的案例陈述；  和 pcase，它是 cond 的概括（参见 Pattern-Matching Conditional）。
+</p>
+<div class="lisp">
+<pre class="lisp">Special Form: if condition then-form else-forms… ¶
+</pre></div>
+<p>if 根据条件的值在 then-form 和 else-forms 之间进行选择。如果评估的条件不为 nil，则评估 then-form 并返回结果。否则，else-forms 将按文本顺序进行评估，并返回最后一个的值。（if 的 else 部分是隐式 progn 的一个示例。请参阅 Sequencing。）
+</p>
+<p>如果 condition 的值为 nil，并且没有给出 else-forms，则 if 返回 nil。
+</p>
+<p>if 是一种特殊形式，因为未选择的分支永远不会被评估——它被忽略。因此，在此示例中，不会打印 true ，因为从不调用 print：
+</p>
+<div class="lisp">
+<pre class="lisp">(if nil
+    (print 'true)
+  'very-false)
+⇒ very-false
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Macro: when condition then-forms… ¶
+</pre></div>
+<p>这是 if 的一种变体，其中没有 else-forms，并且可能有几个 then-forms。尤其，
+</p>
+<div class="lisp">
+<pre class="lisp">(when condition a b c)
+</pre></div>
+<p>完全等同于
+</p>
+<div class="lisp">
+<pre class="lisp">(if condition (progn a b c) nil)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Macro: unless condition forms… ¶
+</pre></div>
+<p>这是没有 then 形式的 if 的变体：
+</p>
+<div class="lisp">
+<pre class="lisp">(unless condition a b c)
+</pre></div>
+<p>完全等同于
+</p><div class="lisp">
+<pre class="lisp">(if condition nil
+   a b c)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Special Form: cond clause… ¶
+</pre></div>
+<p>cond 在任意数量的备选方案中进行选择。cond 中的每个子句都必须是一个列表。此列表的 CAR 是条件；  其余的元素，如果有的话，身体形式。因此，一个子句如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(condition body-forms…)
+</pre></div>
+<p>cond 通过评估每个子句的条件，按文本顺序尝试子句。如果条件的值为非零，则该子句成功；  然后 cond 评估它的 body-forms，并返回最后一个 body-forms 的值。任何剩余的子句都将被忽略。
+</p>
+<p>如果 condition 的值为 nil，则该子句失败，因此 cond 转到下一个子句，尝试其条件。
+</p>
+<p>子句也可能如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(condition)
+</pre></div>
+<p>然后，如果条件在测试时不为零，则 cond 形式返回条件的值。
+</p>
+<p>如果每个条件的计算结果都为 nil，因此每个子句都失败，则 cond 返回 nil。
+</p>
+<p>以下示例有四个子句，分别测试 x 的值是数字、字符串、缓冲区和符号的情况：
+</p><div class="lisp">
+<pre class="lisp">(cond ((numberp x) x)
+      ((stringp x) x)
+      ((bufferp x)
+       (setq temporary-hack x) ; multiple body-forms
+       (buffer-name x))        ; in one clause
+      ((symbolp x) (symbol-value x)))
+</pre></div>
+<p>当前面的子句都没有成功时，我们经常希望执行最后一个子句。为此，我们使用 t 作为最后一个子句的条件，如下所示：(t body-forms)。形式 t 计算为 t，它永远不会是 nil，所以这个子句永远不会失败，只要 cond 得到它。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">(setq a 5)
+(cond ((eq a 'hack) 'foo)
+      (t "default"))
+⇒ "default"
+</pre></div>
+<p>如果 a 的值为 hack，则此 cond 表达式返回 foo，否则返回字符串 <code>default</code> 。
+</p>
+<p>任何条件构造都可以用 cond 或 if 表示。因此，它们之间的选择是风格问题。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">(if a b c)
+≡
+(cond (a b) (t c))
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="11.3_组合条件的构造.html">组合条件的构造</a>, Previous: <a href="11.1_测序.html">测序</a>, Up: <a href="11_控制结构.html">控制结构.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

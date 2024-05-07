@@ -1,0 +1,23 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>36.6.5 控制解析的参数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">36.6.5 控制解析的参数</h3>
+<div class="nav-panel"><p>Next: <a href="36.7_语法表内部.html">语法表内部</a>, Previous: <a href="36.6.4_低级解析.html">低级解析</a>, Up: <a href="36.6_解析表达式.html">解析表达式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><div class="lisp">
+<pre class="lisp">Variable: multibyte-syntax-as-symbol ¶
+</pre></div>
+<p>如果此变量不为零，则 scan-sexps 将所有非 ASCII 字符视为符号成分，而不管语法表对它们的说明如何。（但是，语法表文本属性仍然可以覆盖语法。）
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: parse-sexp-ignore-comments ¶
+</pre></div>
+<p>如果该值为非 nil，则注释被本节中的函数以及 forward-sexp、scan-lists 和 scan-sexps 视为空白。
+</p>
+<p>parse-partial-sexp 的行为也受 parse-sexp-lookup-properties 的影响（请参阅语法属性）。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: comment-end-can-be-escaped ¶
+</pre></div>
+<p>如果此缓冲区局部变量为非零，则通常终止注释的单个字符在转义该字符时不会这样做。这用于 C 和 C++ 模式，其中以 ’//’ 开头的行注释可以通过使用 ’\’ 转义换行符来继续到下一行。
+</p>
+<p>您可以使用 forward-comment 在一条或多条评论上向前或向后移动。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="36.7_语法表内部.html">语法表内部</a>, Previous: <a href="36.6.4_低级解析.html">低级解析</a>, Up: <a href="36.6_解析表达式.html">解析表达式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.22.3 活动显示表</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.22.3 活动显示表</h3>
+<div class="nav-panel"><p>Next: <a href="40.22.4_字形.html">字形</a>, Previous: <a href="40.22.2_显示表格.html">显示表格</a>, Up: <a href="40.22_字符显示.html">字符显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>每个窗口都可以指定一个显示表，每个缓冲区也可以。窗口的显示表（如果有）优先于缓冲区的显示表。如果两者都不存在，Emacs 会尝试使用标准显示表；  如果那是 nil，Emacs 使用通常的字符显示约定（请参阅通常的显示约定）。
+</p>
+<p>请注意，显示表会影响模式行的显示方式，因此如果您想使用新的显示表强制重新显示模式行，请调用 force-mode-line-update（请参阅模式行格式）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-display-table &amp;optional window ¶
+</pre></div>
+<p>此函数返回窗口的显示表，如果没有则返回 nil。窗口的默认值是选定的窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-window-display-table window table ¶
+</pre></div>
+<p>该函数将窗口的显示表格设置为表格。参数表应该是显示表或 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: buffer-display-table ¶
+</pre></div>
+<p>此变量在所有缓冲区中自动为缓冲区局部；  它的值指定缓冲区的显示表。如果为nil，则没有缓冲区显示表。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: standard-display-table ¶
+</pre></div>
+<p>此变量的值是标准显示表，当 Emacs 在没有定义窗口显示表或缓冲区显示表的窗口中显示缓冲区时，或者当 Emacs 将文本输出到标准输出或错误流时，使用该表。尽管它的默认值通常为 nil，但在交互式会话中，如果终端无法显示弯引号，它的默认值会将弯引号映射到 ASCII 近似值。请参阅文本引用样式。
+</p>
+<p>disp-table 库定义了几个用于更改标准显示表的函数。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.22.4_字形.html">字形</a>, Previous: <a href="40.22.2_显示表格.html">显示表格</a>, Up: <a href="40.22_字符显示.html">字符显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>19.2.11 在 Edebug 中打印</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">19.2.11 在 Edebug 中打印</h3>
+<div class="nav-panel"><p>Next: <a href="19.2.12_跟踪缓冲区.html">跟踪缓冲区</a>, Previous: <a href="19.2.10_评估列表缓冲区.html">评估列表缓冲区</a>, Up: <a href="19.2_调试.html">调试.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>如果您的程序中的表达式产生一个包含循环列表结构的值，当 Edebug 尝试打印它时，您可能会遇到错误。
+</p>
+<p>处理循环结构的一种方法是设置打印长度或打印级别以截断打印。Edebug 为你做这件事；  它将 print-length 和 print-level 绑定到变量 edebug-print-length 和 edebug-print-level 的值（只要它们具有非 nil 值）。请参阅影响输出的变量。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: edebug-print-length ¶
+</pre></div>
+<p>如果非零，Edebug 在打印结果时将 print-length 绑定到这个值。默认值为 50。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: edebug-print-level ¶
+</pre></div>
+<p>如果非 nil，Edebug 会在打印结果时将 print-level 绑定到该值。默认值为 50。
+</p>
+<p>您还可以通过将 print-circle 绑定到非 nil 值来打印循环结构和共享元素的结构。
+</p>
+<p>下面是一个创建循环结构的代码示例：
+</p>
+<div class="lisp">
+<pre class="lisp">(setq a (list 'x 'y))
+(setcar a a)
+</pre></div>
+<p>如果 print-circle 不为零，则打印函数（例如，prin1）会将 a 打印为 ’#1=(#1# y)’。’#1=’ 符号用标签 ’1’ 标记紧随其后的结构，而 ’#1#’ 符号引用先前标记的结构。此表示法用于列表或向量的任何共享元素。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: edebug-print-circle ¶
+</pre></div>
+<p>如果非零，Edebug 在打印结果时将 print-circle 绑定到这个值。默认值为 t。
+</p>
+<p>有关如何自定义打印的更多详细信息，请参阅输出函数。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="19.2.12_跟踪缓冲区.html">跟踪缓冲区</a>, Previous: <a href="19.2.10_评估列表缓冲区.html">评估列表缓冲区</a>, Up: <a href="19.2_调试.html">调试.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

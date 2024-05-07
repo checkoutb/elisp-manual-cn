@@ -1,0 +1,217 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.19.4 具有特殊含义的属性</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">33.19.4 具有特殊含义的属性</h3>
+<div class="nav-panel"><p>Next: <a href="33.19.5_格式化文本属性.html">格式化文本属性</a>, Previous: <a href="33.19.3_文本属性搜索功能.html">文本属性搜索功能</a>, Up: <a href="33.19_文本属性.html">文本属性.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这是具有特殊内置含义的文本属性名称表。以下部分列出了一些额外的特殊属性名称，用于控制填充和属性继承。所有其他名称都没有标准含义，您可以随意使用它们。
+</p>
+<p>注意：在每个 Emacs 命令之后，属性组合、显示、不可见和无形也可以导致点移动到可接受的位置。请参阅命令后调整点。
+</p>
+<div class="lisp">
+<pre class="lisp">category
+</pre></div>
+<p>如果一个角色有一个类别属性，我们称它为角色的属性类别。它应该是一个符号。此符号的属性用作字符属性的默认值。
+</p><div class="lisp">
+<pre class="lisp">face ¶
+</pre></div>
+<p>face 属性控制角色的外观（请参阅 Faces）。该属性的值可以如下：
+</p>
+<p>面名（符号或字符串）。
+匿名面孔：表单的属性列表（关键字值…），其中每个关键字是面孔属性名称，值是该属性的值。
+面孔列表。每个列表元素应该是人脸名称或匿名人脸。这指定了一个面，它是每个列出的面的属性的聚合。列表中较早出现的面孔具有更高的优先级。
+形式为 (foreground-color . color-name) 或 (background-color . color-name) 的 cons 单元格。这指定前景色或背景色，类似于 (:foreground color-name) 或 (:background color-name)。支持这种形式只是为了向后兼容，应该避免使用。
+(:filtered filter face-spec) 形式的 cons 单元格，它指定由 face-spec 给出的人脸，但只有当人脸用于显示时过滤器匹配。face-spec 可以使用上面提到的任何形式。过滤器的形式应该是 (:window param value)，它匹配参数 param 为 eq to value 的窗口。如果变量 face-filters-always-match 不为零，则认为所有面部过滤器都已匹配。
+</p>
+<p>字体锁定模式（请参阅字体锁定模式）通过根据上下文动态更新字符的 face 属性在大多数缓冲区中工作。
+</p>
+<p>add-face-text-property 函数提供了一种方便的方法来设置此文本属性。请参阅更改文本属性。
+</p><div class="lisp">
+<pre class="lisp">font-lock-face ¶
+</pre></div>
+<p>此属性指定字体锁定模式应应用于基础文本的 face 属性的值。它是 Font Lock 模式使用的字体化方法之一，对于实现自己突出显示的特殊模式很有用。请参阅预先计算的字体。禁用字体锁定模式时，font-lock-face 无效。
+</p><div class="lisp">
+<pre class="lisp">mouse-face ¶
+</pre></div>
+<p>当鼠标在角色上或角色附近时，使用此属性代替 face。为此， <code>near</code> 表示字符和鼠标所在位置之间的所有文本都具有相同的 mouse-face 属性值。
+</p>
+<p>Emacs 会忽略 mouse-face 属性中所有改变文本大小的 face 属性（例如，:height、:weight 和 :slant）。这些属性始终与未突出显示的文本相同。
+</p><div class="lisp">
+<pre class="lisp">fontified ¶
+</pre></div>
+<p>此属性表示文本是否已准备好显示。如果为 nil，Emacs 的重新显示例程会调用 fontification-functions 中的函数（请参阅 Automatic Face Assignment），以便在显示之前准备这部分缓冲区。它由即时字体锁定代码在内部使用。
+</p><div class="lisp">
+<pre class="lisp">display
+</pre></div>
+<p>该属性激活了改变文本显示方式的各种功能。例如，它可以使文本看起来更高或更短、更高或更低、更宽或更窄，或者被图像替换。请参阅显示属性。
+</p><div class="lisp">
+<pre class="lisp">help-echo ¶
+</pre></div>
+<p>如果文本有一个字符串作为它的 help-echo 属性，那么当您将鼠标移到该文本上时，Emacs 在通过替换命令键传递它之后，在回显区域或工具提示窗口中显示该字符串（请参阅工具提示） .
+</p>
+<p>如果 help-echo 属性的值是一个函数，则调用该函数时会使用三个参数，window、object 和 pos，并且应该返回帮助字符串，或者返回 nil 来表示无。第一个参数 window 是找到帮助的窗口。第二个对象是具有 help-echo 属性的缓冲区、覆盖层或字符串。pos 参数如下：
+</p>
+<p>如果 object 是缓冲区，则 pos 是缓冲区中的位置。
+如果 object 是叠加层，则该叠加层具有 help-echo 属性，而 pos 是叠加层缓冲区中的位置。
+如果 object 是字符串（覆盖字符串或使用 display 属性显示的字符串），则 pos 是该字符串中的位置。
+</p>
+<p>如果 help-echo 属性的值既不是函数也不是字符串，则对其求值以获得帮助字符串。
+</p>
+<p>您可以通过设置变量 show-help-function 来更改帮助文本的显示方式（请参阅帮助显示）。
+</p>
+<p>此功能用于模式行和其他活动文本。
+</p><div class="lisp">
+<pre class="lisp">help-echo-inhibit-substitution ¶
+</pre></div>
+<p>如果 help-echo 字符串的第一个字符具有非 nil 的 help-echo-inhibit-substitution 属性，那么它会由 show-help-function 按原样显示，而不通过substitute-command-keys 传递。
+</p><div class="lisp">
+<pre class="lisp">keymap ¶
+</pre></div>
+<p>keymap 属性为命令指定一个附加的键盘映射。当此键映射适用时，它用于在次要模式键映射之前和缓冲区的本地映射之前进行键查找。请参阅活动键盘映射。如果属性值是符号，则将符号的函数定义用作键映射。
+</p>
+<p>如果 point 之前的字符为非 nil 且后粘，则该字符的属性值适用，如果 point 之后的字符为非 nil 且前粘，则该字符的属性值适用。（对于鼠标点击，使用点击的位置而不是点的位置。）
+</p><div class="lisp">
+<pre class="lisp">local-map ¶
+</pre></div>
+<p>此属性的工作方式与 keymap 类似，只是它指定了要使用的 keymap，而不是缓冲区的本地映射。对于大多数目的（也许是所有目的），最好使用 keymap 属性。
+</p><div class="lisp">
+<pre class="lisp">syntax-table
+</pre></div>
+<p>syntax-table 属性覆盖了语法表中关于这个特定字符的内容。请参阅语法属性。
+</p><div class="lisp">
+<pre class="lisp">read-only ¶
+</pre></div>
+<p>如果字符具有只读属性，则不允许修改该字符。任何这样做的命令都会出错，文本只读。如果属性值是字符串，则该字符串用作错误消息。
+</p>
+<p>如果在此处插入普通文本会由于粘性而继承只读属性，则在只读字符旁边插入是错误的。因此，您可以通过控制粘性来控制在只读文本旁边插入的权限。请参阅文本属性的粘性。
+</p>
+<p>由于更改属性算作修改缓冲区，因此除非您知道特殊技巧，否则无法删除只读属性：将禁止只读绑定到非 nil 值，然后删除该属性。请参阅只读缓冲区。
+</p><div class="lisp">
+<pre class="lisp">inhibit-read-only ¶
+</pre></div>
+<p>即使在只读缓冲区中，也可以编辑具有禁止只读属性的字符。请参阅只读缓冲区。
+</p><div class="lisp">
+<pre class="lisp">invisible ¶
+</pre></div>
+<p>非 nil 不可见属性可以使角色在屏幕上不可见。有关详细信息，请参阅不可见文本。
+</p><div class="lisp">
+<pre class="lisp">intangible ¶
+</pre></div>
+<p>如果一组连续字符具有相等且非零的无形属性，则不能在它们之间放置点。如果您尝试将点向前移动到组中，点实际上会移动到组的末尾。如果您尝试将点向后移动到组中，点实际上会移动到组的开头。
+</p>
+<p>如果连续字符具有不相等的非零无形属性，则它们属于不同的组；  每组按上述方式单独处理。
+</p>
+<p>当变量 inhibitor-point-motion-hooks 不为 nil 时（默认情况下），无形属性将被忽略。
+</p>
+<p>注意：此属性在非常低的级别上运行，并以意想不到的方式影响大量代码。所以使用它时要格外小心。一个常见的误用是在不可见文本上设置无形属性，这实际上是不必要的，因为命令循环无论如何都会在每个命令结束时将点移到不可见文本之外。请参阅命令后调整点。由于这些原因，此属性已过时；  请改用 cursor-intangible 属性。
+</p><div class="lisp">
+<pre class="lisp">cursor-intangible ¶
+</pre></div>
+<p>当打开次要模式 cursor-intangible-mode 时，点会从任何具有非 nil cursor-intangible 属性的位置移开，就在重新显示发生之前。
+</p>
+<p>当变量 cursor-sensor-inhibit 为非 nil 时，cursor-intangible 属性和 cursor-sensor-functions 属性（如下所述）将被忽略。
+</p><div class="lisp">
+<pre class="lisp">field ¶
+</pre></div>
+<p>具有相同字段属性的连续字符构成一个字段。包括前向字和行首在内的一些运动功能在字段边界处停止移动。请参阅定义和使用字段。
+</p><div class="lisp">
+<pre class="lisp">cursor ¶
+</pre></div>
+<p>通常，光标显示在当前缓冲区位置的任何覆盖和文本属性字符串的开头或结尾。您可以改为告诉 Emacs 将光标放在这些字符串的任何所需字符上，方法是给该字符一个非零光标文本属性。此外，如果 cursor 属性的值是一个整数，它指定缓冲区的字符位置数，从 overlay 或 display 属性开始的位置开始，光标应显示在该字符上。具体来说，如果字符的 cursor 属性的值为数字 n，则光标将显示在该字符上，用于范围 [ovpos..ovpos+n) 中的任何缓冲区位置，其中 ovpos 是由下式给出的叠加层的起始位置覆盖开始（请参阅管理覆盖），或显示文本属性在缓冲区中开始的位置。
+</p>
+<p>换句话说，具有任何非零值光标属性的字符串字符是当覆盖或显示字符串使点在显示器上不可见时显示光标的字符。该属性的值表示在哪些缓冲区位置显示光标。如果该值为整数 n，则当点位于覆盖或显示属性的开头与之后的 n 个位置之间的任意位置时，光标将显示在那里。如果该值是其他任何值且非 nil，则仅当 point 位于作为 display 属性开始的缓冲区位置时，光标才会显示在那里，或者如果该位置在显示上不可见，则在 overlay-start 处显示。请注意，光标属性的整数值可能意味着即使点在显示器上可见，光标也会显示在该字符上。
+</p>
+<p>此属性的一个微妙之处在于，将此属性放在作为显示或覆盖字符串一部分的换行符上不起作用。这是因为换行符在屏幕上没有图形表示，以便 Emacs 在查找具有该光标属性的显示字符时查找。
+</p>
+<p>当缓冲区有许多覆盖字符串（例如，请参阅 before-string）隐藏一些缓冲区文本或显示字符串属性时，最好使用这些字符串上的 cursor 属性来提示 Emacs 显示的位置遍历这些字符串时将光标放在哪里。当点位于显示或覆盖字符串 <code>覆盖</code> 的某个缓冲区位置时，这直接与显示引擎通信 Lisp 程序想要放置光标的位置，或者用户期望光标的位置。
+</p><div class="lisp">
+<pre class="lisp">pointer ¶
+</pre></div>
+<p>当鼠标指针悬停在此文本或图像上时，这指定了特定的指针形状。有关可能的指针形状，请参阅指针形状。
+</p><div class="lisp">
+<pre class="lisp">line-spacing ¶
+</pre></div>
+<p>换行符可以具有行间距文本或覆盖属性，用于控制以该换行符结尾的显示行的高度。该属性值会覆盖默认帧行距和缓冲区本地行距变量。请参见行高。
+</p><div class="lisp">
+<pre class="lisp">line-height ¶
+</pre></div>
+<p>换行符可以具有行高文本或覆盖属性，用于控制以该换行符结尾的显示行的总高度。请参见行高。
+</p><div class="lisp">
+<pre class="lisp">wrap-prefix
+</pre></div>
+<p>如果文本具有 wrap-prefix 属性，则它定义的前缀将在显示时添加到由于文本换行的每个续行的开头（因此，如果行被截断，则永远不会使用 wrap-prefix）。它可以是字符串或图像（请参阅其他显示规范），或者是由 :width 或 :align-to 显示属性指定的一段空白（请参阅指定空格）。
+</p>
+<p>也可以使用 wrap-prefix 缓冲区局部变量为整个缓冲区指定 wrap-prefix（但是，wrap-prefix text-property 优先于 wrap-prefix 变量的值）。请参阅截断。
+</p><div class="lisp">
+<pre class="lisp">line-prefix
+</pre></div>
+<p>如果 text 具有 line-prefix 属性，则它定义的前缀将在显示时添加到每个非连续行的开头。它可以是字符串或图像（请参阅其他显示规范），或者是由 :width 或 :align-to 显示属性指定的一段空白（请参阅指定空格）。
+</p>
+<p>也可以使用行前缀缓冲区局部变量为整个缓冲区指定行前缀（但是，行前缀文本属性优先于行前缀变量的值）。请参阅截断。
+</p><div class="lisp">
+<pre class="lisp">modification-hooks ¶
+</pre></div>
+<p>如果一个字符有属性 modify-hooks，那么它的值应该是一个函数列表；  修改该字符会在实际修改之前调用所有这些函数。每个函数接收两个参数：被修改的缓冲区部分的开始和结束。请注意，如果特定的修改钩子函数出现在被单个原语修改的多个字符上，您无法预测该函数将被调用多少次。此外，插入不会修改任何现有字符，因此只有在删除某些字符、用其他字符替换它们或更改它们的文本属性时才会运行此挂钩。
+</p>
+<p>与其他类似的钩子不同，当 Emacs 调用这些函数时，禁止修改钩子不会绑定到非零。如果函数修改缓冲区，您应该考虑将此变量绑定到非 nil 以防止任何缓冲区更改运行更改挂钩。否则，您必须为递归调用做好准备。请参阅更改挂钩。
+</p>
+<p>Overlays 也支持 modify-hooks 属性，但细节有些不同（请参阅 Overlay 属性）。
+</p><div class="lisp">
+<pre class="lisp">insert-in-front-hooks ¶
+</pre></div>
+<div class="lisp">
+<pre class="lisp">insert-behind-hooks
+</pre></div>
+<p>在缓冲区中插入文本的操作还会调用后面字符的 insert-in-front-hooks 属性和前面字符的 insert-behind-hooks 属性中列出的函数。这些函数接收两个参数，即插入文本的开头和结尾。在实际插入发生后调用这些函数。
+</p>
+<p>当这些函数被调用时，禁止修改钩子被绑定到非零。如果函数修改了缓冲区，您可能希望将 inhibitor-modification-hooks 绑定到 nil，以便为这些修改运行更改挂钩。但是，这样做可能会递归调用您自己的更改挂钩，因此请务必为此做好准备。
+</p>
+<p>另请参阅更改挂钩，了解在更改缓冲区中的文本时调用的其他挂钩。
+</p><div class="lisp">
+<pre class="lisp">point-entered ¶
+</pre></div>
+<div class="lisp">
+<pre class="lisp">point-left
+</pre></div>
+<p>特殊属性 point-entered 和 point-left 记录了报告点运动的挂钩函数。每移动一个时间点，Emacs 都会比较这两个属性值：
+</p>
+<p>旧位置之后角色的左点属性，以及
+新位置后角色的 point-entered 属性。
+</p>
+<p>如果这两个值不同，则调用它们中的每一个（如果不是 nil），并带有两个参数：point 的旧值和新值。
+</p>
+<p>对旧位置和新位置之前的字符进行相同的比较。结果可能是执行两个左点函数（可能是相同的函数）和/或两个点输入函数（可能是相同的函数）。在任何情况下，首先调用所有左点函数，然后是所有输入点函数。
+</p>
+<p>可以使用 char-after 来检查不同缓冲区位置的字符，而无需将点移动到这些位置。只有点值的实际变化才会运行这些钩子函数。
+</p>
+<p>默认情况下，变量 inhibitor-point-motion-hooks 禁止运行 point-left 和 point-entered hooks，请参阅 Inhibit point motion hooks。
+</p>
+<p>这些属性已过时；  请改用光标传感器功能。
+</p><div class="lisp">
+<pre class="lisp">cursor-sensor-functions ¶
+</pre></div>
+<p>这个特殊属性记录了对光标移动做出反应的函数列表。列表中的每个函数都在重新显示之前被调用，带有 3 个参数：受影响的窗口、光标的先前已知位置以及输入或离开的符号之一，具体取决于光标是否正在输入具有此属性的文本或离开它。只有在打开次要模式 cursor-sensor-mode 时才会调用这些函数。
+</p>
+<p>当变量 cursor-sensor-inhibit 为非 nil 时，cursor-sensor-functions 属性将被忽略。
+</p><div class="lisp">
+<pre class="lisp">composition ¶
+</pre></div>
+<p>此文本属性用于将字符序列显示为由组件组成的单个字形。但是属性本身的值完全是 Emacs 内部的，不应该被直接操作，例如 put-text-property。
+</p><div class="lisp">
+<pre class="lisp">minibuffer-message ¶
+</pre></div>
+<p>此文本属性告诉在活动小缓冲区中的何处显示临时消息。具体来说，具有此属性的 minibuffer 文本的第一个字符将在其前面显示临时消息。默认是在 minibuffer 文本的末尾显示临时消息。此文本属性由作为 set-message-function 的默认值的函数使用（请参阅在回显区域中显示消息）。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: inhibit-point-motion-hooks ¶
+</pre></div>
+<p>当这个过时变量为非 nil 时，point-left 和 point-entered 钩子不会运行，并且无形属性没有效果。不要全局设置这个变量；  用 let 绑定它。由于受影响的属性已过时，因此该变量的默认值为 t，以有效禁用它们。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: show-help-function ¶
+</pre></div>
+<p>如果此变量不为 nil，则它指定一个调用来显示帮助字符串的函数。这些可能是帮助回显属性、菜单帮助字符串（请参阅简单菜单项，请参阅扩展菜单项）或工具栏帮助字符串（请参阅工具栏）。使用一个参数调用指定的函数，即要显示的帮助字符串，该参数在提供给函数之前通过替换命令键传递，除非帮助字符串在其上具有非零 help-echo-inhibit-substitution 属性第一个字符；  请参阅替换文档中的键绑定。有关使用 show-help-function 的模式示例，请参见 Tooltip 模式的代码（参见 The GNU Emacs Manual 中的 Tooltips）。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: face-filters-always-match ¶
+</pre></div>
+<p>如果此变量不为零，则指定仅在满足某些条件时应用的属性的面部过滤器将被视为始终匹配。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.19.5_格式化文本属性.html">格式化文本属性</a>, Previous: <a href="33.19.3_文本属性搜索功能.html">文本属性搜索功能</a>, Up: <a href="33.19_文本属性.html">文本属性.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

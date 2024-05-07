@@ -1,0 +1,82 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>13.6 映射函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">13.6 映射函数</h2>
+<div class="nav-panel"><p>Next: <a href="13.7_匿名函数.html">匿名函数</a>, Previous: <a href="13.5_调用函数.html">调用函数</a>, Up: <a href="13_函数.html">函数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>映射函数将给定函数（不是特殊形式或宏）应用于列表或其他集合的每个元素。Emacs Lisp 有几个这样的函数；  本节介绍 mapcar、mapc、mapconcat 和 mapcan，它们在列表上进行映射。有关映射 obarray 中符号的函数 mapatoms，请参见 mapatoms 的定义。有关映射哈希表中键/值关联的函数 maphash，请参见 maphash 的定义。
+</p>
+<p>这些映射函数不允许使用字符表，因为字符表是一个稀疏数组，其标称索引范围非常大。要以适当处理其稀疏性质的方式映射 char-table，请使用函数 map-char-table（请参阅 Char-Tables）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: mapcar function sequence ¶
+</pre></div>
+<p>mapcar 依次对序列的每个元素应用函数，并返回结果列表。
+</p>
+<p>参数序列可以是除字符表之外的任何类型的序列；  即列表、向量、布尔向量或字符串。结果始终是一个列表。结果的长度与序列的长度相同。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">
+
+(mapcar #'car '((a b) (c d) (e f)))
+     ⇒ (a c e)
+(mapcar #'1+ [1 2 3])
+     ⇒ (2 3 4)
+(mapcar #'string "abc")
+     ⇒ ("a" "b" "c")
+
+
+;; Call each function in my-hooks.
+(mapcar 'funcall my-hooks)
+
+
+(defun mapcar* (function &amp;rest args)
+  "Apply FUNCTION to successive cars of all ARGS.
+Return the list of results."
+  ;; If no list is exhausted,
+  (if (not (memq nil args))
+      ;; apply function to CARs.
+      (cons (apply function (mapcar #'car args))
+            (apply #'mapcar* function
+                   ;; Recurse for rest of elements.
+                   (mapcar #'cdr args)))))
+
+
+(mapcar* #'cons '(a b c) '(1 2 3 4))
+     ⇒ ((a . 1) (b . 2) (c . 3))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: mapcan function sequence ¶
+</pre></div>
+<p>此函数将函数应用于序列的每个元素，如 mapcar，但不是将结果收集到列表中，而是通过更改结果（使用 nconc;请参阅重新排列列表的函数）。与 mapcar 一样，序列可以是除字符表之外的任何类型。
+</p>
+<div class="lisp">
+<pre class="lisp">;; Contrast this:
+(mapcar #'list '(a b c d))
+     ⇒ ((a) (b) (c) (d))
+;; with this:
+(mapcan #'list '(a b c d))
+     ⇒ (a b c d)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: mapc function sequence ¶
+</pre></div>
+<p>mapc 与 mapcar 类似，只是该函数仅用于副作用——它返回的值被忽略，而不是收集到列表中。mapc 总是返回序列。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: mapconcat function sequence separator ¶
+</pre></div>
+<p>mapconcat 将函数应用于序列的每个元素；  结果，必须是字符序列（字符串、向量或列表），被连接成单个字符串返回值。在每对结果序列之间，mapconcat 从分隔符插入字符，分隔符也必须是字符串、向量或字符列表。请参阅序列、数组和向量。
+</p>
+<p>参数函数必须是一个可以接受一个参数并返回一系列字符的函数：字符串、向量或列表。参数序列可以是除字符表之外的任何类型的序列；  即列表、向量、布尔向量或字符串。
+</p>
+<div class="lisp">
+<pre class="lisp">(mapconcat #'symbol-name
+           '(The cat in the hat)
+           " ")
+     ⇒ "The cat in the hat"
+
+
+(mapconcat (lambda (x) (format "%c" (1+ x)))
+           "HAL-8000"
+           "")
+     ⇒ "IBM.9111"
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="13.7_匿名函数.html">匿名函数</a>, Previous: <a href="13.5_调用函数.html">调用函数</a>, Up: <a href="13_函数.html">函数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

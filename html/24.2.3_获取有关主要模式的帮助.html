@@ -1,0 +1,13 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.2.3 获取有关主要模式的帮助</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">24.2.3 获取有关主要模式的帮助</h3>
+<div class="nav-panel"><p>Next: <a href="24.2.4_定义派生模式.html">定义派生模式</a>, Previous: <a href="24.2.2_Emacs_如何选择主模式.html">Emacs_如何选择主模式</a>, Up: <a href="24.2_主要模式.html">主要模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>describe-mode 函数提供有关主要模式的信息。它通常绑定到 Ch m。它使用变量major-mode 的值（参见Major Modes），这就是为什么每个主要模式命令都需要设置该变量的原因。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: describe-mode &amp;optional buffer ¶
+</pre></div>
+<p>此命令显示当前缓冲区的主要模式和次要模式的文档。它使用文档功能来检索主要和次要模式命令的文档字符串（请参阅访问文档字符串）。
+</p>
+<p>如果使用非零缓冲区参数从 Lisp 调用，此函数将显示该缓冲区的主要和次要模式的文档，而不是当前缓冲区的文档。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="24.2.4_定义派生模式.html">定义派生模式</a>, Previous: <a href="24.2.2_Emacs_如何选择主模式.html">Emacs_如何选择主模式</a>, Up: <a href="24.2_主要模式.html">主要模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

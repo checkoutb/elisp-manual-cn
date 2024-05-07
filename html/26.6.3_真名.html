@@ -1,0 +1,59 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>26.6.3 真名</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">26.6.3 真名</h3>
+<div class="nav-panel"><p>Next: <a href="26.6.4_文件属性.html">文件属性</a>, Previous: <a href="26.6.2_区分文件种类.html">区分文件种类</a>, Up: <a href="26.6_文件信息.html">文件信息.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>文件的真实名称是您通过在所有级别跟踪符号链接直到没有剩余，然后简化掉 <code>。</code> 获得的名称。和 <code>..</code> 作为名称组件出现。这会产生一种文件的规范名称。文件并不总是具有唯一的真名；  一个文件具有的不同真名的数量等于该文件的硬链接数量。但是，真实名称很有用，因为它们消除了作为名称变化原因的符号链接。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-truename filename ¶
+</pre></div>
+<p>此函数返回文件文件名的真实名称。如果参数不是绝对文件名，则此函数首先将其扩展为默认目录。
+</p>
+<p>此函数不扩展环境变量。只有替换文件名才能做到这一点。请参阅替代文件名的定义。
+</p>
+<p>如果您可能需要遵循作为名称组件出现的 <code>..</code> 之前的符号链接，请调用 file-truename，而无需事先直接或间接调用 expand-file-name。否则，紧接在 <code>..</code> 之前的文件名组件将在调用 file-truename 之前被简化。为了消除调用expand-file-name 的需要，file-truename 以与expand-file-name 相同的方式处理’~’。
+</p>
+<p>如果符号链接的目标具有远程文件名语法，则 file-truename 将其返回引用。请参阅扩展文件名的函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-chase-links filename &amp;optional limit ¶
+</pre></div>
+<p>此函数跟随符号链接，从文件名开始，直到找到一个不是符号链接名称的文件名。然后它返回该文件名。此函数不遵循父目录级别的符号链接。
+</p>
+<p>如果您为限制指定一个数字，那么在遍历那么多链接之后，该函数只会返回它所拥有的内容，即使那仍然是一个符号链接。
+</p>
+<p>为了说明 file-chase-links 和 file-truename 之间的区别，假设 /usr/foo 是到目录 /home/foo 的符号链接，而 /home/foo/hello 是一个普通文件（或者至少不是符号链接）或不存在。然后我们会有：
+</p>
+<div class="lisp">
+<pre class="lisp">(file-chase-links "/usr/foo/hello")
+     ;; This does not follow the links in the parent directories.
+     ⇒ "/usr/foo/hello"
+(file-truename "/usr/foo/hello")
+     ;; Assuming that /home is not a symbolic link.
+     ⇒ "/home/foo/hello"
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: file-equal-p file1 file2 ¶
+</pre></div>
+<p>如果文件 file1 和 file2 名称相同，则此函数返回 t。这类似于比较它们的真名，除了远程文件名也以适当的方式处理。如果 file1 或 file2 不存在，则返回值未指定。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-name-case-insensitive-p filename ¶
+</pre></div>
+<p>有时需要将文件名或其部分作为字符串进行比较，在这种情况下，了解底层文件系统是否不区分大小写很重要。如果文件 filename 在不区分大小写的文件系统上，则此函数返回 t。它总是在 MS-DOS 和 MS-Windows 上返回 t。在 Cygwin 和 macOS 上，文件系统可能不区分大小写，并且该函数尝试通过运行时测试确定区分大小写。如果测试没有结果，函数在 Cygwin 上返回 t，在 macOS 上返回 nil。
+</p>
+<p>目前，此函数在 MS-DOS、MS-Windows、Cygwin 和 macOS 以外的平台上始终返回 nil。它不会检测已安装文件系统（例如 Samba 共享或 NFS 安装的 Windows 卷）的大小写不敏感。在远程主机上，它假定 t 用于 ’smb’ 方法。对于所有其他连接方法，执行运行时测试。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-in-directory-p file dir ¶
+</pre></div>
+<p>如果 file 是目录 dir 或 dir 的子目录中的文件，则此函数返回 t。如果 file 和 dir 是同一个目录，它也返回 t。它比较两个目录的真名。如果 dir 没有命名现有目录，则返回值为 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: vc-responsible-backend file ¶
+</pre></div>
+<p>此函数确定给定文件的负责 VC 后端。例如，如果 emacs.c 是 Git 跟踪的文件，则 (vc-responsible-backend "emacs.c") 返回 <code>Git</code> 。请注意，如果文件是符号链接，vc-responsible-backend 将不会解析它——报告符号链接文件本身的后端。要获取文件所引用文件的后端 VC，请使用符号链接解析函数（例如 file-chase-links）包装文件：
+</p>
+<div class="lisp">
+<pre class="lisp">(vc-responsible-backend (file-chase-links "emacs.c"))
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="26.6.4_文件属性.html">文件属性</a>, Previous: <a href="26.6.2_区分文件种类.html">区分文件种类</a>, Up: <a href="26.6_文件信息.html">文件信息.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

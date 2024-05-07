@@ -1,0 +1,31 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.8.2 杀死函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">33.8.2 杀死函数</h3>
+<div class="nav-panel"><p>Next: <a href="33.8.3_扬克.html">扬克</a>, Previous: <a href="33.8.1_环概念.html">环概念</a>, Up: <a href="33.8_环.html">环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>kill-region 是杀死文本的常用子程序。任何调用此函数的命令都是 kill 命令（并且名称中可能应该包含 <code>kill</code> ）。kill-region 将新删除的文本放入 kill ring 开头的新元素中，或将其添加到最近的元素中。它会自动（使用 last-command）确定前一个命令是否是 kill 命令，如果是，则将被杀死的文本附加到最近的条目中。
+</p>
+<p>下面描述的命令可以在将被杀死的文本保存在杀伤环中之前对其进行过滤。他们调用 filter-buffer-substring（参见检查缓冲区内容）来执行过滤。默认情况下，没有过滤，但主要和次要模式和钩子函数可以设置过滤，使保存在 kill ring 中的文本与缓冲区中的文本不同。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: kill-region start end &amp;optional region ¶
+</pre></div>
+<p>此功能会消除开始和结束之间的文本段；  但是如果可选参数 region 不是 nil，它会忽略 start 和 end，而是杀死当前区域中的文本。文本被删除，但连同其文本属性一起保存在杀伤环中。该值始终为零。
+</p>
+<p>在交互式调用中，开始和结束是点和标记，并且区域总是非零，因此该命令总是杀死当前区域中的文本。
+</p>
+<p>如果缓冲区或文本是只读的，kill-region 会修改同样的终止环，然后发出错误信号而不修改缓冲区。这很方便，因为它允许用户使用一系列 kill 命令将文本从只读缓冲区复制到 kill ring。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: kill-read-only-ok ¶
+</pre></div>
+<p>如果此选项不为零，则如果缓冲区或文本是只读的，则 kill-region 不会发出错误信号。相反，它只是简单地返回，更新 kill ring 但不更改缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: copy-region-as-kill start end &amp;optional region ¶
+</pre></div>
+<p>此函数保存终止环上开始和结束之间的一段文本（包括文本属性），但不会从缓冲区中删除文本。但是，如果可选参数 region 不为 nil，则该函数将忽略 start 和 end，而是保存当前区域。它总是返回零。
+</p>
+<p>在交互式调用中，start 和 end 是点和标记，并且 region 始终为非 nil，因此该命令始终将文本保存在当前区域中。
+</p>
+<p>该命令没有将 this-command 设置为 kill-region，因此后续的 kill 命令不会附加到同一个 kill ring 条目。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.8.3_扬克.html">扬克</a>, Previous: <a href="33.8.1_环概念.html">环概念</a>, Up: <a href="33.8_环.html">环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>3.5 数值转换</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">3.5 数值转换</h2>
+<div class="nav-panel"><p>Next: <a href="03.6_算术运算.html">算术运算</a>, Previous: <a href="03.4_数字比较.html">数字比较</a>, Up: <a href="03_数字.html">数字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>要将整数转换为浮点数，请使用函数 float。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: float number
+</pre></div>
+<p>这将返回转换为浮点数的数字。如果 number 已经是浮点数，则 float 将其原封不动地返回。
+</p>
+<p>有四个函数可以将浮点数转换为整数；  它们的舍入方式不同。都接受一个参数编号和一个可选的参数除数。两个参数都可以是整数或浮点数。除数也可能为零。如果 divisor 为 nil 或省略，这些函数将数字转换为整数，如果它已经是整数，则将其原样返回。如果 divisor 不为 nil，则它们将数字除以除数并将结果转换为整数。如果除数为零（无论是整数还是浮点数），Emacs 都会发出算术错误错误信号。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: truncate number &amp;optional divisor
+</pre></div>
+<p>这将返回数字，通过向零舍入转换为整数。
+</p>
+<div class="lisp">
+<pre class="lisp">(truncate 1.2)
+     ⇒ 1
+(truncate 1.7)
+     ⇒ 1
+(truncate -1.2)
+     ⇒ -1
+(truncate -1.7)
+     ⇒ -1
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: floor number &amp;optional divisor
+</pre></div>
+<p>这将返回数字，通过向下舍入（向负无穷大）转换为整数。
+</p>
+<p>如果指定了除数，则使用与 mod 对应的除法运算，向下舍入。
+</p>
+<div class="lisp">
+<pre class="lisp">(floor 1.2)
+     ⇒ 1
+(floor 1.7)
+     ⇒ 1
+(floor -1.2)
+     ⇒ -2
+(floor -1.7)
+     ⇒ -2
+(floor 5.99 3)
+     ⇒ 1
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: ceiling number &amp;optional divisor
+</pre></div>
+<p>这将返回数字，通过向上舍入（向正无穷大）转换为整数。
+</p>
+<div class="lisp">
+<pre class="lisp">(ceiling 1.2)
+     ⇒ 2
+(ceiling 1.7)
+     ⇒ 2
+(ceiling -1.2)
+     ⇒ -1
+(ceiling -1.7)
+     ⇒ -1
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: round number &amp;optional divisor
+</pre></div>
+<p>这将返回数字，通过向最接近的整数舍入转换为整数。舍入两个整数之间等距的值会返回偶数。
+</p>
+<div class="lisp">
+<pre class="lisp">(round 1.2)
+     ⇒ 1
+(round 1.7)
+     ⇒ 2
+(round -1.2)
+     ⇒ -1
+(round -1.7)
+     ⇒ -2
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="03.6_算术运算.html">算术运算</a>, Previous: <a href="03.4_数字比较.html">数字比较</a>, Up: <a href="03_数字.html">数字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

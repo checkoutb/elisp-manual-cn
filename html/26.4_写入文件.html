@@ -1,0 +1,57 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>26.4 写入文件</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">26.4 写入文件</h2>
+<div class="nav-panel"><p>Next: <a href="26.5_文件锁.html">文件锁</a>, Previous: <a href="26.3_从文件中读取.html">从文件中读取</a>, Up: <a href="26_文件.html">文件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>您可以使用 append-to-file 和 write-region 函数将缓冲区的内容或缓冲区的一部分直接写入磁盘上的文件。不要使用这些函数写入正在访问的文件；  这可能会导致访问机制的混乱。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: append-to-file start end filename ¶
+</pre></div>
+<p>此函数将当前缓冲区中由 start 和 end 分隔的区域的内容附加到文件 filename 的末尾。如果该文件不存在，则创建它。此函数返回零。
+</p>
+<p>如果您无法写入或创建文件名，则会发出错误信号。
+</p>
+<p>当从 Lisp 调用时，这个函数完全等价于：
+</p>
+<div class="lisp">
+<pre class="lisp">(write-region start end filename t)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Command: write-region start end filename &amp;optional append visit lockname mustbenew ¶
+</pre></div>
+<p>此函数将当前缓冲区中由 start 和 end 分隔的区域写入 filename 指定的文件中。
+</p>
+<p>如果 start 为 nil，则该命令将整个缓冲区内容（不仅仅是可访问部分）写入文件并忽略 end。
+</p>
+<p>如果 start 是字符串，则 write-region 写入或附加该字符串，而不是缓冲区中的文本。在这种情况下， end 被忽略。
+</p>
+<p>如果 append 不为零，则指定的文本将附加到现有文件内容（如果有）。如果 append 是一个数字，write-region 会寻找从文件开头的那个字节偏移量，并从那里写入数据。
+</p>
+<p>如果 mustbenew 不为零，则 write-region 会要求确认文件名是否命名了现有文件。如果 mustbenew 是符号 excl，则 write-region 不要求确认，而是如果文件已存在，则发出错误文件已存在的信号。尽管 write-region 通常跟随符号链接并在符号链接悬空时创建指向文件，但如果 mustbenew 为 excl，则它不跟随符号链接。
+</p>
+<p>当 mustbenew 为 excl 时，对现有文件的测试使用特殊的系统功能。至少对于本地磁盘上的文件，其他程序不可能在 Emacs 之前创建同名文件，而 Emacs 没有注意到。
+</p>
+<p>如果 visit 是 t，那么 Emacs 会在缓冲区和文件之间建立关联：然后缓冲区正在访问该文件。它还将当前缓冲区的最后文件修改时间设置为文件名的修改时间，并将缓冲区标记为未修改。此功能由保存缓冲区使用，但您可能不应该自己使用它。
+</p>
+<p>如果 visit 是一个字符串，它指定要访问的文件名。这样，您可以将数据写入一个文件（文件名），同时将缓冲区记录为访问另一个文件（访问）。参数 visit 用于回显区域消息，也用于文件锁定；  访问存储在缓冲区文件名中。该特性用于实现file-precious-flag；  除非您真的知道自己在做什么，否则不要自己使用它。
+</p>
+<p>可选参数 lockname，如果非 nil，指定用于锁定和解锁的文件名，覆盖文件名和访问。
+</p>
+<p>函数 write-region 将其写入的数据转换为由 buffer-file-format 指定的适当文件格式，并且还调用列表 write-region-annotate-functions 中的函数。请参阅文件格式转换。
+</p>
+<p>通常，write-region 在回显区域显示消息 <code>Wrote filename</code> 。如果 visit 既不是 t 也不是 nil 也不是字符串，或者如果 Emacs 以批处理模式运行（请参阅批处理模式），则禁止此消息。此功能对于将文件用于内部目的的程序（用户不需要知道的文件）很有用。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: write-region-inhibit-fsync ¶
+</pre></div>
+<p>如果此变量的值为 nil，则 write-region 在写入文件后使用 fsync 系统调用。虽然这会减慢 Emacs 的速度，但它降低了断电后数据丢失的风险。如果值为 t，则 Emacs 不使用 fsync。当 Emacs 是交互式的时，默认值为 nil，当 Emacs 以批处理模式运行时，默认值为 t。请参阅文件和辅助存储。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: with-temp-file file body… ¶
+</pre></div>
+<p>with-temp-file 宏以临时缓冲区作为当前缓冲区来评估正文表单；  然后，最后，它将缓冲区内容写入文件 file。它在完成时终止临时缓冲区，恢复在 with-temp-file 表单之前的当前缓冲区。然后它返回正文中最后一个表单的值。
+</p>
+<p>即使在通过 throw 或 error 异常退出的情况下也会恢复当前缓冲区（请参阅非本地退出）。
+</p>
+<p>与 with-temp-buffer（请参阅 Current Buffer）一样，此宏使用的临时缓冲区不会运行 hooks kill-buffer-hook、kill-buffer-query-functions（请参阅 Killing Buffers）和 buffer-list-update-挂钩（请参阅缓冲区列表）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="26.5_文件锁.html">文件锁</a>, Previous: <a href="26.3_从文件中读取.html">从文件中读取</a>, Up: <a href="26_文件.html">文件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

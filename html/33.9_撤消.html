@@ -1,0 +1,97 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.9 撤消</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">33.9 撤消</h2>
+<div class="nav-panel"><p>Next: <a href="33.10_维护撤销列表.html">维护撤销列表</a>, Previous: <a href="33.8.6_环的内部.html">环的内部</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>大多数缓冲区都有一个撤消列表，它记录对缓冲区文本所做的所有更改，以便可以撤消它们。（没有缓冲区的缓冲区通常是特殊用途的缓冲区，Emacs 认为撤消对它们没有用处。特别是，任何名称以空格开头的缓冲区都默认关闭其撤消记录；请参阅缓冲区名称。）修改缓冲区中文本的原语会自动将元素添加到撤消列表的前面，该列表位于变量 buffer-undo-list 中。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: buffer-undo-list ¶
+</pre></div>
+<p>这个缓冲区局部变量的值是当前缓冲区的撤消列表。t 值禁用撤销信息的记录。
+</p>
+<p>以下是撤消列表可以具有的元素种类：
+</p>
+<div class="lisp">
+<pre class="lisp">position
+</pre></div>
+<p>这种元素记录了点的前一个值；  撤消此元素将点移动到位置。普通光标移动不会进行任何类型的撤消记录，但删除操作使用这些条目来记录点在命令之前的位置。
+</p><div class="lisp">
+<pre class="lisp">(beg . end)
+</pre></div>
+<p>这种元素指示如何删除插入的文本。插入时，文本占据了缓冲区的起始范围。
+</p><div class="lisp">
+<pre class="lisp">(text . position)
+</pre></div>
+<p>这种元素指示如何重新插入已删除的文本。删除的文本本身就是字符串文本。重新插入的位置是（绝对位置）。如果 position 为正，则 point 位于删除文本的开头，否则位于末尾。零个或多个（标记.调整）元素紧跟在该元素之后。
+</p><div class="lisp">
+<pre class="lisp">(t . time-flag)
+</pre></div>
+<p>这种元素表示未修改的缓冲区已被修改。一个非整数 Lisp 时间戳的时间标志表示访问文件的修改时间，使用与当前时间相同的格式；  见时间。时间标志为 0 表示缓冲区不对应任何文件；  -1 表示之前访问过的文件不存在。原始撤消使用这些值来确定是否再次将缓冲区标记为未修改；  仅当文件的状态与时间标志的状态匹配时才会这样做。
+</p><div class="lisp">
+<pre class="lisp">(nil property value beg . end)
+</pre></div>
+<p>这种元素记录了文本属性的变化。以下是撤消更改的方法：
+</p>
+<div class="lisp">
+<pre class="lisp">(put-text-property beg end property value)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">(marker . adjustment)
+</pre></div>
+<p>这种元素记录了由于删除周围文本而重新定位了标记标记的事实，并且它移动了调整字符位置。如果标记的位置与撤消列表中它之前的 (text . position) 元素一致，则撤消此元素会移动标记 - 调整字符。
+</p><div class="lisp">
+<pre class="lisp">(apply funname . args)
+</pre></div>
+<p>这是一个可扩展的撤消项，可通过使用参数 args 调用 funname 来撤消。
+</p><div class="lisp">
+<pre class="lisp">(apply delta beg end funname . args)
+</pre></div>
+<p>这是一个可扩展的撤消项，它记录了限制在 beg to end 范围内的更改，这将缓冲区的大小增加了 delta 字符。通过使用参数 args 调用 funname 来撤消它。
+</p>
+<p>这种元素可以使撤销限制到一个区域，以确定该元素是否属于该区域。
+</p><div class="lisp">
+<pre class="lisp">nil
+</pre></div>
+<p>这个元素是一个边界。两个边界之间的元素称为变更组；  通常，每个更改组对应一个键盘命令，而撤消命令通常将整个组作为一个单元撤消。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: undo-boundary ¶
+</pre></div>
+<p>这个函数在撤销列表中放置一个边界元素。undo 命令在这样的边界处停止，随后的 undo 命令撤消到更早和更早的边界。此函数返回零。
+</p>
+<p>显式调用此函数对于将命令的效果拆分为多个单元很有用。例如，query-replace 在每次替换后调用 undo-boundary，以便用户可以一个一个地撤消单个替换。
+</p>
+<p>但是，大多数情况下，此函数会在适当的时间自动调用。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: undo-auto-amalgamate ¶
+</pre></div>
+<p>编辑器命令循环在执行每个键序列之前自动调用 undo-boundary，因此每个撤消通常都会撤消一个命令的效果。一些异常命令正在合并：这些命令通常会对缓冲区造成小的更改，因此这些命令仅每 20 个命令插入一个边界，允许作为一个组撤消更改。默认情况下，产生自插入输入字符的命令 self-insert-command（请参阅用户级插入命令）和删除字符（请参阅删除文本）的 delete-char 命令是合并的。当一个命令影响多个缓冲区的内容时，例如，当 post-command-hook 上的函数影响当前缓冲区以外的缓冲区时，将在每个受影响的缓冲区中调用 undo-boundary .
+</p>
+<p>该函数可以在合并命令之前调用。如果已经进行了一系列此类调用，它将删除先前的撤消边界。
+</p>
+<p>可以合并的最大更改数由 amalgamating-undo-limit 变量控制。如果此变量为 1，则不会合并任何更改。
+</p>
+<p>Lisp 程序可以通过调用 undo-amalgamate-change-group 将一系列更改合并到单个更改组中（请参阅原子更改组）。请注意，amalgamating-undo-limit 对该函数生成的组没有影响。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: undo-auto-current-boundary-timer ¶
+</pre></div>
+<p>即使没有命令正在执行，某些缓冲区（例如进程缓冲区）也会发生变化。在这些情况下，此变量中的计时器通常会定期调用 undo-boundary。将此变量设置为非零可防止此行为。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: undo-in-progress ¶
+</pre></div>
+<p>此变量通常为 nil，但撤消命令将其绑定到 t。这样一来，各种更改钩子就可以知道何时为了撤消而调用它们。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: primitive-undo count list ¶
+</pre></div>
+<p>这是撤消撤消列表元素的基本功能。它撤消列表的第一个计数元素，返回列表的其余部分。
+</p>
+<p>原始撤消在更改缓冲区时将元素添加到缓冲区的撤消列表中。撤消命令通过在撤消操作序列的开头保存撤消列表值来避免混淆。然后撤消操作使用并更新保存的值。通过撤消添加的新元素不是此保存值的一部分，因此它们不会干扰继续撤消。
+</p>
+<p>此函数不绑定 undo-in-progress。
+</p>
+<p>某些命令在执行后使该区域处于活动状态，从而干扰了该命令的选择性撤消。要使撤消在此类命令后立即调用时忽略活动区域，请将命令功能符号的属性 undo-inhibit-region 设置为非零值。请参阅标准符号属性。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.10_维护撤销列表.html">维护撤销列表</a>, Previous: <a href="33.8.6_环的内部.html">环的内部</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

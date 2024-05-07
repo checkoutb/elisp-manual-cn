@@ -1,0 +1,75 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.17.9 显示图像</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.17.9 显示图像</h3>
+<div class="nav-panel"><p>Next: <a href="40.17.10_多帧图像.html">多帧图像</a>, Previous: <a href="40.17.8_定义图像.html">定义图像</a>, Up: <a href="40.17_图像.html">图像.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>您可以通过自己设置显示属性来使用图像描述符，但使用本节中的函数更容易。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: insert-image image &amp;optional string area slice ¶
+</pre></div>
+<p>此函数将图像插入到当前缓冲区中的点。值图像应该是图像描述符；  它可以是 create-image 返回的值，也可以是用 defimage 定义的符号的值。参数字符串指定要放入缓冲区以保存图像的文本。如果省略或为零，则 insert-image 默认使用 ~~ 。
+</p>
+<p>参数 area 指定是否将图像放在边距中。如果是left-margin，图像出现在左边距；  right-margin 指定右边距。如果 area 为 nil 或省略，则图像显示在缓冲区文本内的某个点。
+</p>
+<p>参数 slice 指定要插入的图像切片。如果 slice 为 nil 或省略，则插入整个图像。（但是，请注意，图像在窗口的右边缘显示时会被截断，因为不支持环绕图像。）否则， slice 是一个列表（xy 宽度高度），它指定图像区域的 x 和 y 位置以及宽度和高度插入。整数值以像素为单位。0.0–1.0 范围内的浮点数代表整个图像的宽度或高度的一部分。
+</p>
+<p>在内部，这个函数在缓冲区中插入字符串，并给它一个指定图像的显示属性。请参阅显示属性。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: insert-sliced-image image &amp;optional string area rows cols ¶
+</pre></div>
+<p>该函数将图像插入当前缓冲区中的点，如 insert-image，但将图像拆分为 rowsxcols 大小相等的切片。
+</p>
+<p>Emacs 将每个切片显示为单独的图像，并允许更直观的向上/向下滚动，而不是在通过显示（大）图像的缓冲区分页时向上/向下跳转整个图像。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: put-image image pos &amp;optional string area ¶
+</pre></div>
+<p>此函数将图像 image 放在当前缓冲区中 pos 的前面。参数 pos 应该是一个整数或一个标记。它指定图像应该出现的缓冲区位置。参数字符串指定应保存图像的文本作为默认值的替代。
+</p>
+<p>参数 image 必须是一个图像描述符，可能由 create-image 返回或由 defimage 存储。
+</p>
+<p>参数 area 指定是否将图像放在边距中。如果是left-margin，图像出现在左边距；  right-margin 指定右边距。如果 area 为 nil 或省略，则图像显示在缓冲区文本内的某个点。
+</p>
+<p>在内部，此函数创建一个叠加层，并为其提供一个包含文本的前字符串属性，该文本具有一个显示属性，其值为图像。（哇！）
+</p>
+<div class="lisp">
+<pre class="lisp">Function: remove-images start end &amp;optional buffer ¶
+</pre></div>
+<p>此函数删除位置 start 和 end 之间的缓冲区中的图像。如果缓冲区被省略或为零，图像将从当前缓冲区中删除。
+</p>
+<p>这只会删除像 put-image 那样放入缓冲区的图像，而不是使用 insert-image 或其他方式插入的图像。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: image-size spec &amp;optional pixels frame ¶
+</pre></div>
+<p>此函数将图像的大小作为一对（宽度.高度）返回。spec 是图像规范。非零像素表示返回以像素为单位测量的大小，否则返回以帧的默认字符大小测量的大小（请参阅帧字体）。frame 是显示图像的框架。frame nil 或省略表示使用选定的帧（请参阅输入焦点）。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: max-image-size ¶
+</pre></div>
+<p>此变量用于定义 Emacs 将加载的图像的最大大小。Emacs 将拒绝加载（和显示）任何大于此限制的图像。
+</p>
+<p>如果该值为整数，则直接指定图像的最大高度和宽度，以像素为单位。如果是浮点数，它指定最大图像高度和宽度作为帧高度和宽度的比率。如果该值为非数字，则对图像的大小没有明确限制。
+</p>
+<p>这个变量的目的是防止不合理的大图像被意外加载到 Emacs 中。它仅在第一次加载图像时生效。一旦图像被放置在图像缓存中，它就可以一直显示，即使 max-image-size 的值随后发生了变化（参见图像缓存）。
+</p>
+<p>使用上述插入功能插入的图像还会在跨越显示图像的文本属性（或覆盖）中安装本地键映射。此键盘映射定义了以下命令：
+</p>
+<div class="lisp">
+<pre class="lisp">+
+</pre></div>
+<p>增加图像尺寸（image-increase-size）。前缀值 <code>4</code> 表示将大小增加 40%。默认值为 20%。
+</p><div class="lisp">
+<pre class="lisp">-
+</pre></div>
+<p>减小图像尺寸 (image-increase-size)。前缀值 <code>4</code> 表示将大小减小 40%。默认值为 20%。
+</p><div class="lisp">
+<pre class="lisp">r
+</pre></div>
+<p>将图像顺时针旋转 90 度（图像旋转）。前缀表示逆时针旋转 90 度。
+</p><div class="lisp">
+<pre class="lisp">o
+</pre></div>
+<p>将图像保存到文件（图像保存）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.17.10_多帧图像.html">多帧图像</a>, Previous: <a href="40.17.8_定义图像.html">定义图像</a>, Up: <a href="40.17_图像.html">图像.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

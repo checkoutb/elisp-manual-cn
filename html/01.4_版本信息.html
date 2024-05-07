@@ -1,0 +1,57 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>1.4 版本信息</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">1.4 版本信息</h2>
+<div class="nav-panel"><p>Next: <a href="01.5_致谢.html">致谢</a>, Previous: <a href="01.3.7_说明格式.html">说明格式</a>, Up: <a href="01_简介.html">简介.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这些工具提供有关正在使用的 Emacs 版本的信息。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: emacs-version &amp;optional here
+</pre></div>
+<p>这个函数返回一个描述正在运行的 Emacs 版本的字符串。在错误报告中包含此字符串很有用。
+</p>
+<div class="lisp">
+<pre class="lisp">(emacs-version)
+  ⇒ "GNU Emacs 26.1 (build 1, x86_64-unknown-linux-gnu,
+             GTK+ Version 3.16) of 2017-06-01"
+</pre></div>
+<p>如果 here 不是 nil，则将文本插入缓冲区中的 point 之前，并返回 nil。当这个函数被交互调用时，它会在回显区域打印相同的信息，但是给出一个前缀参数使得这里非零。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: emacs-build-time
+</pre></div>
+<p>这个变量的值表示 Emacs 的构建时间。它使用当前时间的样式（参见时间），如果信息不可用，则为 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">emacs-build-time
+     ⇒ (20614 63694 515336 438000)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Variable: emacs-version
+</pre></div>
+<p>这个变量的值是正在运行的 Emacs 的版本。它是一个字符串，例如 <code>26.1</code> 。具有三个数字分量的值，例如 <code>26.0.91</code> ，表示未发布的测试版本。（在 Emacs 26.1 之前，字符串包含一个额外的 final 组件，其整数现在存储在 emacs-build-number 中；例如， <code>25.1.1</code> 。）
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: emacs-major-version
+</pre></div>
+<p>Emacs 的主版本号，以整数表示。对于 Emacs 版本 23.1，该值为 23。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: emacs-minor-version
+</pre></div>
+<p>Emacs 的次要版本号，为整数。对于 Emacs 版本 23.1，该值为 1。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: emacs-build-number
+</pre></div>
+<p>每次在同一目录中构建 Emacs 时递增的整数（无需清理）。这仅在开发 Emacs 时具有相关性。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: emacs-repository-version
+</pre></div>
+<p>一个字符串，它给出了构建 Emacs 的存储库版本。如果 Emacs 是在版本控制之外构建的，则该值为 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: emacs-repository-branch
+</pre></div>
+<p>一个字符串，它给出了构建 Emacs 的存储库分支。在大多数情况下，这是 <code>主人</code> 。如果 Emacs 是在版本控制之外构建的，则该值为 nil。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="01.5_致谢.html">致谢</a>, Previous: <a href="01.3.7_说明格式.html">说明格式</a>, Up: <a href="01_简介.html">简介.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,12 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.6.5 字体锁定级别</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">24.6.5 字体锁定级别</h3>
+<div class="nav-panel"><p>Next: <a href="24.6.6_预计算字体.html">预计算字体</a>, Previous: <a href="24.6.4_其他字体锁定变量.html">其他字体锁定变量</a>, Up: <a href="24.6_字体锁定模式.html">字体锁定模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>一些主要模式提供三种不同级别的字体化。您可以通过使用 font-lock-defaults 中关键字的符号列表来定义多个级别。每个符号指定一个字体化级别；  由用户选择这些级别之一，通常通过设置 font-lock-maximum-decoration （请参阅 GNU Emacs 手册中的字体锁定）。所选级别的符号值用于初始化 font-lock-keywords。
+</p>
+<p>以下是如何定义字体化级别的约定：
+</p>
+<p>级别 1：突出显示函数声明、文件指令（例如包含或导入指令）、字符串和注释。这个想法是速度，所以只有最重要和顶级的组件被字体化。
+级别 2：除了级别 1，突出显示所有语言关键字，包括类似于关键字的类型名称，以及命名的常量值。这个想法是所有关键字（句法或语义）都应该适当地字体化。
+第 3 级：除第 2 级外，突出显示在函数和变量声明中定义的符号，以及所有内置函数名称，无论它们出现在何处。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="24.6.6_预计算字体.html">预计算字体</a>, Previous: <a href="24.6.4_其他字体锁定变量.html">其他字体锁定变量</a>, Up: <a href="24.6_字体锁定模式.html">字体锁定模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

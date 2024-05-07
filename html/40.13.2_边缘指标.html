@@ -1,0 +1,71 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.13.2 边缘指标</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.13.2 边缘指标</h3>
+<div class="nav-panel"><p>Next: <a href="40.13.3_边缘光标.html">边缘光标</a>, Previous: <a href="40.13.1_条纹尺寸和位置.html">条纹尺寸和位置</a>, Up: <a href="40.13_条纹.html">条纹.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>边缘指示器是显示在窗口边缘的小图标，用于指示截断或连续的行、缓冲区边界等。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: indicate-empty-lines ¶
+</pre></div>
+<p>当它不是 nil 时，Emacs 在图形显示的缓冲区末尾的每个空行的边缘显示一个特殊的字形。见边缘。这个变量在每个缓冲区中都是自动缓冲区局部的。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: indicate-buffer-boundaries ¶
+</pre></div>
+<p>此缓冲区局部变量控制缓冲区边界和窗口滚动在窗口边缘中的指示方式。
+</p>
+<p>Emacs 可以在屏幕上出现角度图标时指示缓冲区边界（即缓冲区中的第一行和最后一行）。此外，Emacs 可以在边缘显示一个向上箭头来表示屏幕上方有文本，以及一个向下箭头来显示屏幕下方有文本。
+</p>
+<p>基本价值分为三种：
+</p>
+<div class="lisp">
+<pre class="lisp">nil
+</pre></div>
+<p>不要显示任何这些边缘图标。
+</p><div class="lisp">
+<pre class="lisp">left
+</pre></div>
+<p>在左边缘显示角度图标和箭头。
+</p><div class="lisp">
+<pre class="lisp">right
+</pre></div>
+<p>在右边缘显示角度图标和箭头。
+</p><div class="lisp">
+<pre class="lisp">any non-alist
+</pre></div>
+<p>在左边缘显示角度图标，不显示箭头。
+</p>
+<p>否则，该值应该是一个列表，指定要显示哪些边缘指标以及在哪里显示。alist 的每个元素都应具有 (indicator . position) 形式。这里，indicator 是 top、bottom、up、down 和 t 之一（它涵盖了所有尚未指定的图标），而 position 是 left、right 和 nil 之一。
+</p>
+<p>例如， ((top . left) (t . right)) 将顶角位图放置在左边缘，将底角位图以及两个箭头位图放在右边缘。要在左边缘显示角度位图，而不是箭头位图，请使用 ((top . left) (bottom . left))。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: fringe-indicator-alist ¶
+</pre></div>
+<p>此缓冲区局部变量指定从逻辑边缘指示符到显示在窗口边缘中的实际位图的映射。该值是元素列表（indicator .bitmaps），其中indicator 指定逻辑指标类型，bitmaps 指定用于该指标的边缘位图。
+</p>
+<p>每个指标应为以下符号之一：
+</p>
+<div class="lisp">
+<pre class="lisp">truncation, continuation.
+</pre></div>
+<p>用于截断和续行。
+</p><div class="lisp">
+<pre class="lisp">up, down, top, bottom, top-bottom
+</pre></div>
+<p>当指示缓冲区边界为非零时使用：向上和向下表示位于窗口边缘上方或下方的缓冲区边界；  top 和 bottom 表示最顶层和最底层的缓冲区文本行；  top-bottom 表示缓冲区中只有一行文本的位置。
+</p><div class="lisp">
+<pre class="lisp">empty-line
+</pre></div>
+<p>当指示空行为非零时，用于指示缓冲区结束后的空行。
+</p><div class="lisp">
+<pre class="lisp">overlay-arrow
+</pre></div>
+<p>用于叠加箭头（请参阅叠加箭头）。
+</p>
+<p>每个位图值可能是一个符号列表（left right [left1 right1]）。左右符号为特定指标指定显示在左边缘和/或右边缘的位图。left1 和 right1 特定于底部和顶部底部指示符，用于指示最后一个文本行没有最终换行符。或者，位图可以是用于左右边缘的单个符号。
+</p>
+<p>有关标准位图符号的列表以及如何定义自己的符号，请参阅边缘位图。此外，nil 表示空位图（即未显示的指示符）。
+</p>
+<p>当 fringe-indicator-alist 具有缓冲区本地值，并且没有为逻辑指标定义位图，或者位图为 t 时，使用来自 fringe-indicator-alist 的默认值的对应值。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.13.3_边缘光标.html">边缘光标</a>, Previous: <a href="40.13.1_条纹尺寸和位置.html">条纹尺寸和位置</a>, Up: <a href="40.13_条纹.html">条纹.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

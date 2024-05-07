@@ -1,0 +1,119 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>4.8 自定义格式字符串</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">4.8 自定义格式字符串</h2>
+<div class="nav-panel"><p>Next: <a href="04.9_Lisp_中的大小写转换.html">Lisp_中的大小写转换</a>, Previous: <a href="04.7_格式化字符串.html">格式化字符串</a>, Up: <a href="04_字符串和字.html">字符串和字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>有时允许用户和 Lisp 程序等通过自定义格式控制字符串来控制某些文本的生成方式很有用。例如，格式字符串可以控制如何显示某人的名字、姓氏和电子邮件地址。使用上一节中描述的函数格式，格式字符串可能类似于 <code>%s %s &lt;%s&gt;</code> 。然而，这种方法很快变得不切实际，因为可能不清楚哪个规范字符对应于哪条信息。
+</p>
+<p>对于这种情况，更方便的格式字符串类似于 <code>%f %l &lt;%e&gt;</code> ，其中每个规范字符携带更多语义信息，并且可以相对于其他规范字符轻松重新排列，从而使此类格式字符串更容易通过以下方式定制用户。
+</p>
+<p>本节中描述的函数 format-spec 执行与 format 类似的功能，不同之处在于它对使用任意规范字符的格式控制字符串进行操作。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: format-spec template spec-alist &amp;optional ignore-missing split
+</pre></div>
+<p>此函数根据在 spec-alist 中指定的转换返回从格式字符串模板生成的字符串，该字符串是形式（字母 . 替换）的 alist（参见关联列表）。格式化结果字符串时，模板中的每个规范 %letter 将被替换替换。
+</p>
+<p>模板中的字符（格式规范除外）直接复制到输出中，包括它们的文本属性（如果有）。格式规范的任何文本属性都将复制到它们的替换位置。
+</p>
+<p>使用 alist 指定转换会产生一些有用的属性：
+</p>
+<p>如果 spec-alist 包含的唯一字母键多于模板中唯一规范字符的数量，则简单地忽略未使用的键。
+如果 spec-alist 包含多个具有相同字母的关联，则使用最接近列表开头的关联。
+如果 template 多次包含相同的规范字符，则在 spec-alist 中找到的相同替换将用作所有该字符替换的基础。
+模板中规范的顺序不必与规范列表中的关联顺序相对应。
+</p>
+<p>可选参数 ignore-missing 指示如何处理模板中未在 spec-alist 中找到的规范字符。如果它为 nil 或省略，则函数发出错误信号；  如果忽略，则将这些格式规范逐字保留在输出中，包括它们的文本属性（如果有）；  如果是删除，则从输出中删除这些格式规范；  任何其他非 nil 值都像忽略一样处理，但任何出现的 ’%%’ 也会逐字保留在输出中。
+</p>
+<p>如果可选参数 split 不为 nil，则 format-spec 将根据执行替换的位置将结果拆分为字符串列表，而不是返回单个字符串。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">(format-spec "foo %b bar" '((?b . "zot")) nil t)
+     ⇒ ("foo " "zot" " bar")
+</pre></div>
+<p>format-spec 接受的格式规范的语法与 format 接受的语法相似，但并不完全相同。在这两种情况下，格式规范都是以 <code>%</code> 开头并以 <code>s</code> 等字母结尾的字符序列。
+</p>
+<p>与为一组固定的规范字符分配特定含义的格式不同，格式规范接受任意规范字符并平等对待它们。例如：
+</p><div class="lisp">
+<pre class="lisp">(setq my-site-info
+      (list (cons ?s system-name)
+            (cons ?t (symbol-name system-type))
+            (cons ?c system-configuration)
+            (cons ?v emacs-version)
+            (cons ?e invocation-name)
+            (cons ?p (number-to-string (emacs-pid)))
+            (cons ?a user-mail-address)
+            (cons ?n user-full-name)))
+
+(format-spec "%e %v (%c)" my-site-info)
+     ⇒ "emacs 27.1 (x86_64-pc-linux-gnu)"
+
+(format-spec "%n &lt;%a&gt;" my-site-info)
+     ⇒ "Emacs Developers &lt;emacs-devel@gnu.org&gt;"
+</pre></div>
+<p>格式规范可以在 ’%’ 之后立即包含任意数量的以下标志字符，以修改替换的各个方面。
+</p><div class="lisp">
+<pre class="lisp">‘0’
+</pre></div>
+<p>此标志导致由宽度指定的任何填充由 <code>0</code> 字符而不是空格组成。
+</p>
+<div class="lisp">
+<pre class="lisp">‘-’
+</pre></div>
+<p>此标志会导致将宽度指定的任何填充插入右侧而不是左侧。
+</p>
+<div class="lisp">
+<pre class="lisp">‘&lt;’
+</pre></div>
+<p>如果指定，此标志会导致替换在左侧被截断到给定的宽度和精度。
+</p>
+<div class="lisp">
+<pre class="lisp">‘&gt;’
+</pre></div>
+<p>如果指定，此标志会导致在给定宽度的右侧截断替换。
+</p>
+<div class="lisp">
+<pre class="lisp">‘^’
+</pre></div>
+<p>此标志将替换的文本转换为大写（请参阅 Lisp 中的大小写转换）。
+</p><div class="lisp">
+<pre class="lisp">‘_’
+</pre></div>
+<p>此标志将替换的文本转换为小写（请参阅 Lisp 中的大小写转换）。
+</p>
+<p>使用矛盾标志（例如，大写和小写）的结果是未定义的。
+</p>
+<p>与格式一样，格式规范可以包括宽度（出现在任何标志之后的十进制数）和精度（小数点 <code>。</code> ）。后跟出现在任何标志和宽度之后的十进制数。
+</p>
+<p>如果替换包含的字符少于其指定宽度，则在左侧填充：
+</p><div class="lisp">
+<pre class="lisp">(format-spec "%8a is padded on the left with spaces"
+             '((?a . "alpha")))
+     ⇒ "   alpha is padded on the left with spaces"
+</pre></div>
+<p>如果替换包含的字符数超过其指定的精度，则会在右侧截断：
+</p>
+<div class="lisp">
+<pre class="lisp">(format-spec "%.2a is truncated on the right"
+             '((?a . "alpha")))
+     ⇒ "al is truncated on the right"
+</pre></div>
+<p>这是一个更复杂的示例，它结合了上述几个功能：
+</p>
+<div class="lisp">
+<pre class="lisp">(setq my-battery-info
+      (list (cons ?p "73")      ; Percentage
+            (cons ?L "Battery") ; Status
+            (cons ?t "2:23")    ; Remaining time
+            (cons ?c "24330")   ; Capacity
+            (cons ?r "10.6")))  ; Rate of discharge
+
+(format-spec "%&gt;^-3L : %3p%% (%05t left)" my-battery-info)
+     ⇒ "BAT :  73% (02:23 left)"
+
+(format-spec "%&gt;^-3L : %3p%% (%05t left)"
+             (cons (cons ?L "AC")
+                   my-battery-info))
+     ⇒ "AC  :  73% (02:23 left)"
+</pre></div>
+<p>正如本节中的示例所示，格式规范通常用于有选择地格式化各种不同的信息。这在提供用户可自定义格式字符串的程序中很有用，因为用户可以选择使用常规语法并以任何所需的顺序仅格式化程序提供的信息的子集。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="04.9_Lisp_中的大小写转换.html">Lisp_中的大小写转换</a>, Previous: <a href="04.7_格式化字符串.html">格式化字符串</a>, Up: <a href="04_字符串和字.html">字符串和字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

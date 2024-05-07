@@ -1,0 +1,34 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>32.6 移动标记位置</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">32.6 移动标记位置</h2>
+<div class="nav-panel"><p>Next: <a href="32.7_标记.html">标记</a>, Previous: <a href="32.5_标记插入类型.html">标记插入类型</a>, Up: <a href="32_标记.html">标记.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍如何更改现有标记的位置。当你这样做时，确保你知道标记是否在你的程序之外使用，如果是，移动它会产生什么效果——否则，在 Emacs 的其他部分可能会发生令人困惑的事情。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-marker marker position &amp;optional buffer ¶
+</pre></div>
+<p>此函数将标记移动到缓冲区中的位置。如果未提供缓冲区，则默认为当前缓冲区。
+</p>
+<p>如果 position 为 nil 或标记不指向任何地方，则标记设置为不指向任何地方。
+</p>
+<p>返回的值是标记。
+</p><div class="lisp">
+<pre class="lisp">
+
+(setq m (point-marker))
+     ⇒ #&lt;marker at 4714 in markers.texi&gt;
+
+(set-marker m 55)
+     ⇒ #&lt;marker at 55 in markers.texi&gt;
+
+(setq b (get-buffer "foo"))
+     ⇒ #&lt;buffer foo&gt;
+
+(set-marker m 0 b)
+     ⇒ #&lt;marker at 1 in foo&gt;
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: move-marker marker position &amp;optional buffer ¶
+</pre></div>
+<p>这是设置标记的另一个名称。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="32.7_标记.html">标记</a>, Previous: <a href="32.5_标记插入类型.html">标记插入类型</a>, Up: <a href="32_标记.html">标记.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

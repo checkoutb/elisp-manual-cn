@@ -1,0 +1,33 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>26.6.5 扩展文件属性</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">26.6.5 扩展文件属性</h3>
+<div class="nav-panel"><p>Next: <a href="26.6.6_在标准位置定位文件.html">在标准位置定位文件</a>, Previous: <a href="26.6.4_文件属性.html">文件属性</a>, Up: <a href="26.6_文件信息.html">文件信息.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>某些操作系统上，每个文件都可以与任意扩展文件属性相关联。目前，Emacs 支持查询和设置两组特定的扩展文件属性：访问控制列表 (ACL) 和 SELinux 上下文。在某些系统上，这些扩展文件属性用于实施比前几节中讨论的基本 Unix 样式权限更复杂的文件访问控制。
+</p>
+<p>ACL 和 SELinux 的详细说明超出了本手册的范围。出于我们的目的，每个文件都可以与一个 ACL 相关联，该 ACL 指定其在基于 ACL 的文件控制系统下的属性，和/或 SELinux 上下文，该上下文指定其在 SELinux 系统下的属性。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-acl filename ¶
+</pre></div>
+<p>此函数返回文件文件名的 ACL。ACL 的确切 Lisp 表示是未指定的（并且可能会在未来的 Emacs 版本中更改），但它与 set-file-acl 为其 acl 参数所采用的相同（请参阅更改文件名和属性）。
+</p>
+<p>底层 ACL 实现是平台特定的；  在 GNU/Linux 和 BSD 上，Emacs 使用 POSIX ACL 接口，而在 MS-Windows 上，Emacs 使用本机文件安全 API 模拟 POSIX ACL 接口。
+</p>
+<p>如果不支持 ACL 或文件不存在，则返回值为 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-selinux-context filename ¶
+</pre></div>
+<p>该函数返回文件文件名的 SELinux 上下文，以列表形式（用户角色类型范围）。列表元素分别是上下文的用户、角色、类型和范围，作为 Lisp 字符串；  有关这些实际含义的详细信息，请参阅 SELinux 文档。返回值的形式与 set-file-selinux-context 为其上下文参数所采用的形式相同（请参阅更改文件名和属性）。
+</p>
+<p>如果不支持 SELinux 或文件不存在，则返回值为 (nil nil nil nil)。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-extended-attributes filename ¶
+</pre></div>
+<p>此函数返回 Emacs 识别的文件 filename 扩展属性的列表。目前，它是检索 ACL 和 SELinux 上下文的便捷方式；  然后，您可以调用函数 set-file-extended-attributes，将返回的 alist 作为其第二个参数，以将相同的文件访问属性应用于另一个文件（请参阅更改文件名和属性）。
+</p>
+<p>其中一个元素是 (acl .acl)，其中 acl 与 file-acl 返回的形式相同。
+</p>
+<p>另一个元素是 (selinux-context . context)，其中 context 是 SELinux 上下文，与 file-selinux-context 返回的形式相同。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="26.6.6_在标准位置定位文件.html">在标准位置定位文件</a>, Previous: <a href="26.6.4_文件属性.html">文件属性</a>, Up: <a href="26.6_文件信息.html">文件信息.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

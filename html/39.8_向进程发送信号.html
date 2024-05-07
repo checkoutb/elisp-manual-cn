@@ -1,0 +1,61 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>39.8 向进程发送信号</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">39.8 向进程发送信号</h2>
+<div class="nav-panel"><p>Next: <a href="39.9_接收进程的输出.html">接收进程的输出</a>, Previous: <a href="39.7_向进程发送输入.html">向进程发送输入</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>向子流程发送信号是中断其活动的一种方式。有几种不同的信号，每一种都有自己的含义。信号集及其名称由操作系统定义。例如，信号 SIGINT 表示用户键入了  <code>C-c</code> ，或者发生了类似的事情。
+</p>
+<p>每个信号对子进程都有标准的影响。大多数信号会终止子进程，但有些信号会停止（或恢复）执行。大多数信号可以选择由程序处理；  如果程序处理了信号，那么我们一般就不能说它的效果。
+</p>
+<p>您可以通过调用本节中的函数来显式发送信号。Emacs 也会在某些时候自动发送信号：杀死一个缓冲区会向它的所有相关进程发送一个 SIGHUP 信号；  杀死 Emacs 会向所有剩余进程发送 SIGHUP 信号。（SIGHUP 是一个信号，通常表示用户 <code>挂断电话</code> ，即断开连接。）
+</p>
+<p>每个信号发送函数都有两个可选参数：process 和 current-group。
+</p>
+<p>参数 process 必须是进程、进程名称、缓冲区、缓冲区名称或 nil。缓冲区或缓冲区名称通过 get-buffer-process 代表一个进程。nil 代表与当前缓冲区关联的进程。除了 stop-process 和 continue-process 之外，如果 process 没有识别活动进程，或者它表示网络、串行或管道连接，则会发出错误信号。
+</p>
+<p>参数 current-group 是一个标志，当您将作业控制 shell 作为 Emacs 子进程运行时会有所不同。如果它是非零，那么信号被发送到 Emacs 用来与子进程通信的终端的当前进程组。如果进程是一个作业控制外壳，这意味着外壳的当前子作业。如果 current-group 为 nil，则将信号发送到 Emacs 的直接子进程的进程组。如果子进程是一个作业控制外壳，这就是外壳本身。如果 current-group 是 lambda，则信号被发送到拥有终端的进程组，但前提是它不是 shell 本身。
+</p>
+<p>当使用管道与子进程通信时，标志 current-group 无效，因为操作系统不支持管道情况下的区分。出于同样的原因，当使用管道时，作业控制 shell 将不起作用。请参阅创建异步进程中的 process-connection-type。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: interrupt-process &amp;optional process current-group ¶
+</pre></div>
+<p>该函数通过发送信号 SIGINT 来中断进程进程。在 Emacs 之外，键入中断字符（通常在某些系统上是  <code>C-c</code> ，而在其他系统上是 DEL）会发送此信号。当参数 current-group 不为 nil 时，您可以将此函数视为在 Emacs 与子进程对话的终端上键入  <code>C-c</code> 。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: kill-process &amp;optional process current-group ¶
+</pre></div>
+<p>该函数通过发送信号 SIGKILL 来终止进程进程。该信号立即杀死子进程，子进程无法处理。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: quit-process &amp;optional process current-group ¶
+</pre></div>
+<p>该函数向进程进程发送信号 SIGQUIT。当您不在 Emacs 中时，此信号是由退出字符（通常是 C-\）发送的信号。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: stop-process &amp;optional process current-group ¶
+</pre></div>
+<p>该函数停止指定的进程。如果它是运行程序的真正子进程，它会向该子进程发送信号 SIGTSTP。如果 process 表示网络、串行或管道连接，则此函数禁止处理来自连接的传入数据；  对于网络服务器，这意味着不接受新连接。使用 continue-process 恢复正常执行。
+</p>
+<p>在 Emacs 之外，在具有作业控制的系统上，停止字符（通常是 Cz）通常会将 SIGTSTP 信号发送到子进程。当 current-group 不为 nil 时，您可以将此函数视为在 Emacs 用来与子进程通信的终端上键入 Cz。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: continue-process &amp;optional process current-group ¶
+</pre></div>
+<p>该函数恢复进程进程的执行。如果是运行程序的真实子进程，则向该子进程发送信号 SIGCONT；  这假定该过程先前已停止。如果 process 表示网络、串行或管道连接，则此函数恢复处理来自连接的传入数据。对于串行连接，在进程停止期间到达的数据可能会丢失。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: signal-process process signal ¶
+</pre></div>
+<p>该函数向进程发送信号。参数信号指定发送哪个信号；  它应该是一个整数，或者一个名称为信号的符号。
+</p>
+<p>process 参数可以是系统进程 ID（整数）；  这允许您向不是 Emacs 子进程的进程发送信号。请参阅访问其他进程。
+</p>
+<p>有时，需要向非本地异步进程发送信号。这可以通过编写自己的中断进程实现来实现。然后必须将此函数添加到中断处理函数中。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: interrupt-process-functions ¶
+</pre></div>
+<p>此变量是要为中断进程调用的函数列表。函数的参数与中断进程相同。这些函数按列表的顺序调用，直到其中一个返回非零。默认函数是 internal-default-interrupt-process，它总是在这个列表中的最后一个。
+</p>
+<p>这就是 Tramp 如何实现中断进程的机制。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="39.9_接收进程的输出.html">接收进程的输出</a>, Previous: <a href="39.7_向进程发送输入.html">向进程发送输入</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

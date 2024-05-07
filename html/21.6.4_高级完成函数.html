@@ -1,0 +1,93 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>21.6.4 高级完成函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">21.6.4 高级完成函数</h3>
+<div class="nav-panel"><p>Next: <a href="21.6.5_读取文件名.html">读取文件名</a>, Previous: <a href="21.6.3_完成完成的_Minibuffer_命令.html">完成完成的_Minibuffer_命令</a>, Up: <a href="21.6_完成.html">完成.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节描述用于读取某些类型名称的高级便利函数。
+</p>
+<p>在大多数情况下，您不应该在 Lisp 函数的中间调用这些函数。如果可能，在交互式规范中，将所有 minibuffer 输入作为读取命令参数的一部分。请参阅定义命令。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: read-buffer prompt &amp;optional default require-match predicate ¶
+</pre></div>
+<p>此函数读取缓冲区的名称并将其作为字符串返回。它以提示的方式提示。参数 default 是要使用的默认名称，如果用户以空的 minibuffer 退出时返回的值。如果非零，它应该是一个字符串、一个字符串列表或一个缓冲区。如果是列表，则默认值为该列表的第一个元素。它在提示中被提及，但没有作为初始输入插入到 minibuffer 中。
+</p>
+<p>参数提示应该是一个以冒号和空格结尾的字符串。如果 default 不是 nil，该函数将它插入到冒号之前的提示符中，以遵循从 minibuffer 中读取默认值的约定（请参阅 Emacs 编程技巧）。
+</p>
+<p>可选参数 require-match 与完成读取具有相同的含义。请参阅完成和 Minibuffer。
+</p>
+<p>可选参数谓词，如果非 nil，则指定一个函数来过滤应考虑的缓冲区：该函数将以每个潜在候选者作为其参数调用，并应返回 nil 拒绝候选者，非 nil 接受它.
+</p>
+<p>在以下示例中，用户输入 <code>minibuffer.t</code> ，然后键入 RET。参数 require-match 是 t，唯一以给定输入开头的缓冲区名称是 <code>minibuffer.texi</code> ，因此该名称就是值。
+</p><div class="lisp">
+<pre class="lisp">(read-buffer "Buffer name: " "foo" t)
+
+;; After evaluation of the preceding expression,
+;;   the following prompt appears,
+;;   with an empty minibuffer:
+
+
+---------- Buffer: Minibuffer ----------
+Buffer name (default foo): ∗
+---------- Buffer: Minibuffer ----------
+
+
+;; The user types minibuffer.t RET.
+     ⇒ "minibuffer.texi"
+</pre></div>
+<div class="lisp">
+<pre class="lisp">User Option: read-buffer-function ¶
+</pre></div>
+<p>这个变量，如果非零，指定一个读取缓冲区名称的函数。read-buffer 调用此函数而不是执行其通常的工作，并将相同的参数传递给 read-buffer。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: read-buffer-completion-ignore-case ¶
+</pre></div>
+<p>如果此变量为非零，则读取缓冲区在读取缓冲区名称时执行完成时会忽略大小写。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: read-command prompt &amp;optional default ¶
+</pre></div>
+<p>此函数读取命令的名称并将其作为 Lisp 符号返回。参数提示在 read-from-minibuffer 中使用。回想一下，命令是 commandp 返回 t 的任何东西，命令名称是 commandp 返回 t 的符号。请参阅交互式呼叫。
+</p>
+<p>参数 default 指定用户输入空输入时返回的内容。它可以是符号、字符串或字符串列表。如果它是一个字符串，read-command 会在返回它之前对其进行实习。如果它是一个列表，则 read-command 会实习该列表的第一个元素。如果 default 为 nil，则表示没有指定默认值；  那么如果用户输入 null 输入，则返回值为 (intern "")，即名称为空字符串的符号，其打印表示为 ##（参见符号类型）。
+</p><div class="lisp">
+<pre class="lisp">
+
+(read-command "Command name? ")
+
+;; After evaluation of the preceding expression,
+;;   the following prompt appears with an empty minibuffer:
+
+
+---------- Buffer: Minibuffer ----------
+Command name?
+---------- Buffer: Minibuffer ----------
+</pre></div>
+<p>如果用户键入 forward-c RET，则此函数返回 forward-char。
+</p>
+<p>读取命令函数是完成读取的简化接口。它使用变量 obarray 以便在现存的 Lisp 符号集中完成，它使用 commandp 谓词以便只接受命令名称：
+</p>
+<div class="lisp">
+<pre class="lisp">(read-command prompt)
+≡
+(intern (completing-read prompt obarray
+                         'commandp t nil))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: read-variable prompt &amp;optional default ¶
+</pre></div>
+<p>此函数读取可自定义变量的名称并将其作为符号返回。它的参数与 read-command 的参数形式相同。它的行为与 read-command 类似，只是它使用谓词 custom-variable-p 而不是 commandp。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: read-color &amp;optional prompt convert allow-empty display ¶
+</pre></div>
+<p>此函数读取作为颜色规范的字符串，可以是颜色名称或 RGB 十六进制值，例如 #RRRGGGBBB。它提示提示符（默认值： <code>颜色（名称或#RGB 三元组）：</code> ）并为颜色名称提供补全，但不为十六进制 RGB 值提供补全。除了标准颜色的名称，完成候选包括点的前景色和背景色。
+</p>
+<p>颜色名称中描述了有效的 RGB 值。
+</p>
+<p>该函数的返回值是用户在 minibuffer 中键入的字符串。但是，当以交互方式调用或可选参数 convert 为非 nil 时，它会将任何输入颜色名称转换为相应的 RGB 值字符串并返回。此功能需要输入有效的颜色规范。当 allow-empty 为非 nil 并且用户输入 null 输入时，允许使用空颜色名称。
+</p>
+<p>交互方式，或者当 display 为非 nil 时，返回值也会显示在 echo 区域中。
+</p>
+<p>另请参见用户选择的编码系统中的函数 read-coding-system 和 read-non-nil-coding-system 以及输入法中的 read-input-method-name。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="21.6.5_读取文件名.html">读取文件名</a>, Previous: <a href="21.6.3_完成完成的_Minibuffer_命令.html">完成完成的_Minibuffer_命令</a>, Up: <a href="21.6_完成.html">完成.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

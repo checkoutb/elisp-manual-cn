@@ -1,0 +1,13 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>36.6 解析表达式</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">36.6 解析表达式</h2>
+<div class="nav-panel"><p>Next: <a href="36.6.1_基于解析的运动命令.html">基于解析的运动命令</a>, Previous: <a href="36.5_运动和句法.html">运动和句法</a>, Up: <a href="36_语法表.html">语法表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍解析和扫描平衡表达式的函数。我们将按照 Lisp 的术语将这些表达式称为 sexps，即使这些函数可以作用于 Lisp 以外的语言。基本上，sexp 是平衡的括号分组、字符串或符号（即，其语法是单词组成或符号组成的字符序列）。但是，表达式前缀语法类（参见语法类表）中的字符如果出现在它旁边，则被视为 sexp 的一部分。
+</p>
+<p>语法表控制字符的解释，因此这些函数可用于 Lisp 模式下的 Lisp 表达式和 C 模式下的 C 表达式。有关移动平衡表达式的便捷高级函数，请参见移动平衡表达式。
+</p>
+<p>字符的语法控制它如何改变解析器的状态，而不是描述状态本身。例如，字符串分隔符在字符串内和代码内切换解析器状态，但字符的语法并没有直接说明它们是否在字符串内。例如（注意 15 是通用字符串分隔符的语法代码），
+</p>
+<div class="lisp">
+<pre class="lisp">(put-text-property 1 9 'syntax-table '(15 . nil))
+</pre></div>
+<p>不会告诉 Emacs 当前缓冲区的前八个字符是字符串，而是告诉 Emacs 它们都是字符串分隔符。因此，Emacs 将它们视为四个连续的空字符串常量。
+</p>
+<div class="nav-panel"><p>Next: <a href="36.6.1_基于解析的运动命令.html">基于解析的运动命令</a>, Previous: <a href="36.5_运动和句法.html">运动和句法</a>, Up: <a href="36_语法表.html">语法表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

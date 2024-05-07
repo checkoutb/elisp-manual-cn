@@ -1,0 +1,254 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>41.19 桌面通知</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">41.19 桌面通知</h2>
+<div class="nav-panel"><p>Next: <a href="41.20_文件更改通知.html">文件更改通知</a>, Previous: <a href="41.18_会话管理.html">会话管理</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 能够在支持 freedesktop.org 桌面通知规范的系统和 MS-Windows 上发送通知。为了在 POSIX 主机上使用此功能，必须使用 D-Bus 支持编译 Emacs，并且必须加载通知库。请参阅 Emacs 中的 D-Bus 集成中的 D-Bus。当 D-Bus 支持可用时，支持以下功能：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: notifications-notify &amp;rest params ¶
+</pre></div>
+<p>该函数通过 D-Bus 向桌面发送通知，通知由 params 参数指定的参数组成。这些参数应该由交替的关键字和值对组成。支持的关键字和值如下：
+</p>
+<div class="lisp">
+<pre class="lisp">:bus bus
+</pre></div>
+<p>D-Bus 总线。仅当应使用 :session 以外的总线时才需要此参数。
+</p><div class="lisp">
+<pre class="lisp">:title title
+</pre></div>
+<p>通知标题。
+</p><div class="lisp">
+<pre class="lisp">:body text
+</pre></div>
+<p>通知正文。根据通知服务器的实现，文本可能包含 HTML 标记，如 <code>&lt;b&gt;粗体文本&lt;/b&gt;</code> 、超链接或图像。必须将特殊的 HTML 字符编码为 <code>联系 &lt;postmaster@localhost&gt;!</code> 。
+</p><div class="lisp">
+<pre class="lisp">:app-name name
+</pre></div>
+<p>发送通知的应用程序的名称。默认值为通知应用程序名称。
+</p><div class="lisp">
+<pre class="lisp">:replaces-id id
+</pre></div>
+<p>此通知替换的通知 ID。id 必须是先前通知通知调用的结果。
+</p><div class="lisp">
+<pre class="lisp">:app-icon icon-file
+</pre></div>
+<p>通知图标的文件名。如果设置为 nil，则不显示图标。默认为通知应用程序图标。
+</p><div class="lisp">
+<pre class="lisp">:actions (key title key title ...)
+</pre></div>
+<p>要应用的操作列表。key 和 title 都是字符串。默认操作（通常通过单击通知调用）应该有一个名为 <code>默认</code> 的键。标题可以是任何东西，尽管实现可以不显示它。
+</p><div class="lisp">
+<pre class="lisp">:timeout timeout
+</pre></div>
+<p>自显示通知后通知应自动关闭的超时时间（以毫秒为单位）。如果为 -1，则通知的到期时间取决于通知服务器的设置，并且可能因通知类型而异。如果为 0，则通知永不过期。默认值为 -1。
+</p><div class="lisp">
+<pre class="lisp">:urgency urgency
+</pre></div>
+<p>紧急程度。它可以是低的、正常的或严重的。
+</p><div class="lisp">
+<pre class="lisp">:action-items
+</pre></div>
+<p>当给出这个关键字时，动作的标题字符串被解释为图标名称。
+</p><div class="lisp">
+<pre class="lisp">:category category
+</pre></div>
+<p>通知的类型是字符串。有关标准类别的列表，请参阅桌面通知规范。
+</p><div class="lisp">
+<pre class="lisp">:desktop-entry filename
+</pre></div>
+<p>这指定了代表调用程序的桌面文件名的名称，例如 <code>emacs</code> 。
+</p><div class="lisp">
+<pre class="lisp">:image-data (width height rowstride has-alpha bits channels data)
+</pre></div>
+<p>这是一种原始数据图像格式，分别描述了宽度、高度、行距、是否有 alpha 通道、每个样本的位数、通道和图像数据。
+</p><div class="lisp">
+<pre class="lisp">:image-path path
+</pre></div>
+<p>这表示为 URI（ <code>file://</code> 是目前唯一支持的 URI 模式）或来自 <code>$XDG_DATA_DIRS/icons</code> 的符合 freedesktop.org 的图标主题中的名称。
+</p><div class="lisp">
+<pre class="lisp">:sound-file filename
+</pre></div>
+<p>弹出通知时要播放的声音文件的路径。
+</p><div class="lisp">
+<pre class="lisp">:sound-name name
+</pre></div>
+<p>来自 <code>$XDG_DATA_DIRS/sounds</code> 的 freedesktop.org 声音命名规范中的主题命名声音，在通知弹出时播放。类似于图标名称，仅用于声音。一个例子是’"message-new-instant"’。
+</p><div class="lisp">
+<pre class="lisp">:suppress-sound
+</pre></div>
+<p>使服务器抑制播放任何声音，如果它有能力的话。
+</p><div class="lisp">
+<pre class="lisp">:resident
+</pre></div>
+<p>设置后，服务器不会在调用操作时自动删除通知。通知将一直驻留在服务器中，直到它被用户或发送者明确删除。此提示可能仅在服务器具有 :persistence 功能时才有用。
+</p><div class="lisp">
+<pre class="lisp">:transient
+</pre></div>
+<p>设置时，服务器会将通知视为瞬态并绕过服务器的持久性能力（如果它应该存在）。
+</p><div class="lisp">
+<pre class="lisp">:x position
+</pre></div>
+<div class="lisp">
+<pre class="lisp">:y position
+</pre></div>
+<p>指定通知应指向的屏幕上的 X、Y 位置。两个参数必须一起使用。
+</p><div class="lisp">
+<pre class="lisp">:on-action function
+</pre></div>
+<p>调用动作时调用的函数。通知 id 和操作的键作为参数传递给函数。
+</p><div class="lisp">
+<pre class="lisp">:on-close function
+</pre></div>
+<p>当通知因超时或用户关闭时调用的函数。该函数接收通知 ID 和关闭原因作为参数：
+</p>
+<p>如果通知已过期，则过期
+如果通知被用户驳回，则驳回
+close-notification 如果通知是通过调用通知关闭通知关闭的
+如果通知服务器未提供原因，则未定义
+</p>
+<p>通知服务器接受哪些参数可以通过通知获取功能进行检查。
+</p>
+<p>此函数返回一个通知 id，一个整数，可用于使用通知关闭通知或另一个通知通知调用的 :replaces-id 参数来操作通知项。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">(defun my-on-action-function (id key)
+  (message "Message %d, key \"%s\" pressed" id key))
+     ⇒ my-on-action-function
+
+
+(defun my-on-close-function (id reason)
+  (message "Message %d, closed due to \"%s\"" id reason))
+     ⇒ my-on-close-function
+
+
+(notifications-notify
+ :title "Title"
+ :body "This is &lt;b&gt;important&lt;/b&gt;."
+ :actions '("Confirm" "I agree" "Refuse" "I disagree")
+ :on-action 'my-on-action-function
+ :on-close 'my-on-close-function)
+     ⇒ 22
+
+
+A message window opens on the desktop.  Press ``I agree''.
+     ⇒ Message 22, key "Confirm" pressed
+        Message 22, closed due to "dismissed"
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: notifications-close-notification id &amp;optional bus ¶
+</pre></div>
+<p>此函数关闭带有标识符 id 的通知。bus 可以是表示 D-Bus 连接的字符串，默认为 :session。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: notifications-get-capabilities &amp;optional bus ¶
+</pre></div>
+<p>返回通知服务器的功能，符号列表。bus 可以是表示 D-Bus 连接的字符串，默认为 :session。可以预期以下功能：
+</p>
+<div class="lisp">
+<pre class="lisp">:actions
+</pre></div>
+<p>服务器将向用户提供指定的操作。
+</p><div class="lisp">
+<pre class="lisp">:body
+</pre></div>
+<p>支持正文。
+</p><div class="lisp">
+<pre class="lisp">:body-hyperlinks
+</pre></div>
+<p>服务器支持通知中的超链接。
+</p><div class="lisp">
+<pre class="lisp">:body-images
+</pre></div>
+<p>服务器支持通知中的图像。
+</p><div class="lisp">
+<pre class="lisp">:body-markup
+</pre></div>
+<p>支持正文中的标记。
+</p><div class="lisp">
+<pre class="lisp">:icon-multi
+</pre></div>
+<p>服务器将渲染给定图像数组中所有帧的动画。
+</p><div class="lisp">
+<pre class="lisp">:icon-static
+</pre></div>
+<p>支持显示任何给定图像阵列的精确 1 帧。该值与 :icon-multi 互斥。
+</p><div class="lisp">
+<pre class="lisp">:persistence
+</pre></div>
+<p>服务器支持通知的持久性。
+</p><div class="lisp">
+<pre class="lisp">:sound
+</pre></div>
+<p>服务器支持通知声音。
+</p>
+<p>更多特定于供应商的上限以 :x-vendor 开头，例如 :x-gnome-foo-cap。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: notifications-get-server-information &amp;optional bus ¶
+</pre></div>
+<p>返回通知服务器上的信息，字符串列表。bus 可以是表示 D-Bus 连接的字符串，默认为 :session。返回的列表是 (name vendor version spec-version)。
+</p>
+<div class="lisp">
+<pre class="lisp">name
+</pre></div>
+<p>服务器的产品名称。
+</p><div class="lisp">
+<pre class="lisp">vendor
+</pre></div>
+<p>供应商名称。例如，’"KDE"’、’"GNOME"’。
+</p><div class="lisp">
+<pre class="lisp">version
+</pre></div>
+<p>服务器的版本号。
+</p><div class="lisp">
+<pre class="lisp">spec-version
+</pre></div>
+<p>服务器符合的规范版本。
+</p>
+<p>如果 spec<em>_version</em> 为 nil，则服务器支持 ’"1.0"’ 之前的规范。
+</p>
+<p>当 Emacs 作为 GUI 会话在 MS-Windows 上运行时，它通过原生原语支持一小部分 D-Bus 通知功能：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: w32-notification-notify &amp;rest params ¶
+</pre></div>
+<p>此函数显示由 params 指定的 MS-Windows 托盘通知。MS-Windows 托盘通知显示在任务栏通知区域中的图标的气球中。
+</p>
+<p>值是通知的整数唯一 ID，可用于使用 w32-notification-close 删除通知，如下所述。如果函数失败，则返回值为 nil。
+</p>
+<p>参数 params 被指定为关键字/值对。所有参数都是可选的，但是如果没有指定参数，函数什么也不做，返回 nil。
+</p>
+<p>支持以下参数：
+</p>
+<div class="lisp">
+<pre class="lisp">:icon icon
+</pre></div>
+<p>在系统托盘中显示图标。如果 icon 是一个字符串，它应该指定一个从中加载图标的文件名；  指定的文件应该是 .ico Windows 图标文件。如果 icon 不是字符串，或者没有指定此参数，则将使用标准 Emacs 图标。
+</p><div class="lisp">
+<pre class="lisp">:tip tip
+</pre></div>
+<p>使用tip 作为通知的工具提示。如果tip 是一个字符串，则这是当鼠标指针悬停在通知添加的托盘图标上时将显示的工具提示文本。如果tip 不是字符串，或者未指定此参数，则默认工具提示文本为 <code>Emacs 通知</code> 。工具提示文本最长可达 127 个字符（W2K 之前的 Windows 版本为 63 个）。较长的字符串将被截断。
+</p><div class="lisp">
+<pre class="lisp">:level level
+</pre></div>
+<p>通知严重性级别，信息、警告或错误之一。如果给定，则该值确定显示在通知标题左侧的图标，但前提是还指定了 :title 参数（见下文）并且是字符串。
+</p><div class="lisp">
+<pre class="lisp">:title title
+</pre></div>
+<p>通知的标题。如果标题是一个字符串，它会在正文上方以较大的字体显示。标题文本最长可达 63 个字符；  较长的文本将被截断。
+</p><div class="lisp">
+<pre class="lisp">:body body
+</pre></div>
+<p>通知的正文。如果 body 是一个字符串，它指定通知消息的文本。使用嵌入的换行符来控制文本被分成几行的方式。正文文本最长可达 255 个字符，如果过长将被截断。与 D-Bus 不同，正文应该是纯文本，没有标记。
+</p>
+<p>请注意，W2K 之前的 Windows 版本仅支持 :icon 和 :tip。可以传递其他参数，但在那些旧系统上它们将被忽略。
+</p>
+<p>在任何给定时间最多只能有一个活动通知。必须通过调用 w32-notification-close 删除活动通知，然后才能显示新通知。
+</p>
+<p>要从任务栏中删除通知及其图标，请使用以下函数：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: w32-notification-close id ¶
+</pre></div>
+<p>此函数删除由其唯一 ID 给出的托盘通知。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="41.20_文件更改通知.html">文件更改通知</a>, Previous: <a href="41.18_会话管理.html">会话管理</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

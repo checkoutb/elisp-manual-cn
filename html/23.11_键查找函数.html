@@ -1,0 +1,96 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>23.11 键查找函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">23.11 键查找函数</h2>
+<div class="nav-panel"><p>Next: <a href="23.12_更改键绑定.html">更改键绑定</a>, Previous: <a href="23.10_密钥查找.html">密钥查找</a>, Up: <a href="23_键盘映射.html">键盘映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>以下是与键查找有关的函数和变量。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: lookup-key keymap key &amp;optional accept-defaults ¶
+</pre></div>
+<p>此函数返回 keymap 中键的定义。本章描述的所有其他查找键的函数都使用查找键。以下是示例：
+</p><div class="lisp">
+<pre class="lisp">
+
+(lookup-key (current-global-map) "\C-x\C-f")
+    ⇒ find-file
+
+(lookup-key (current-global-map) (kbd "C-x C-f"))
+    ⇒ find-file
+
+(lookup-key (current-global-map) "\C-x\C-f12345")
+    ⇒ 2
+</pre></div>
+<p>如果根据 keymap 中指定的前缀键，字符串或向量键不是有效的键序列，则它必须太长并且末尾有额外的事件不适合单个键序列。然后 value 是一个数字，即构成完整 key 的 key 前面的事件数。
+</p>
+<p>如果accept-defaults 不为nil，则lookup-key 会考虑默认绑定以及key 中特定事件的绑定。否则，lookup-key 仅报告特定序列键的绑定，忽略默认绑定，除非您明确询问它们。（为此，提供 t 作为 key 的元素；请参阅 Keymap 的格式。）
+</p>
+<p>如果 key 包含元字符（不是功能键），则该字符隐式替换为两个字符序列：元前缀字符的值，后跟相应的非元字符。因此，下面的第一个示例通过转换为第二个示例来处理。
+</p><div class="lisp">
+<pre class="lisp">
+
+(lookup-key (current-global-map) "\M-f")
+    ⇒ forward-word
+
+(lookup-key (current-global-map) "\ef")
+    ⇒ forward-word
+</pre></div>
+<p>键映射参数也可以是键映射列表。
+</p>
+<p>与 read-key-sequence 不同，此函数不会以丢弃信息的方式修改指定的事件（请参阅 Key Sequence Input）。特别是，它不会将字母转换为小写，也不会将拖动事件更改为单击。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: undefined ¶
+</pre></div>
+<p>用于键映射以取消定义键。它调用 ding，但不会导致错误。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: local-key-binding key &amp;optional accept-defaults ¶
+</pre></div>
+<p>此函数返回当前本地键映射中键的绑定，如果未定义，则返回 nil。
+</p>
+<p>参数accept-defaults 控制检查默认绑定，如lookup-key（上图）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: global-key-binding key &amp;optional accept-defaults ¶
+</pre></div>
+<p>此函数返回当前全局键映射中命令键的绑定，如果在那里未定义，则返回 nil。
+</p>
+<p>参数accept-defaults 控制检查默认绑定，如lookup-key（上图）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: minor-mode-key-binding key &amp;optional accept-defaults ¶
+</pre></div>
+<p>此函数返回 key 的所有活动次要模式绑定的列表。更准确地说，它返回一个对列表（modename . binding），其中 modename 是启用次要模式的变量，而 binding 是该模式下的键绑定。如果 key 没有次要模式绑定，则值为 nil。
+</p>
+<p>如果找到的第一个绑定不是前缀定义（键映射或定义为键映射的符号），则忽略来自其他次要模式的所有后续绑定，因为它们将被完全隐藏。同样，该列表省略了前缀绑定之后的非前缀绑定。
+</p>
+<p>参数accept-defaults 控制检查默认绑定，如lookup-key（上图）。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: meta-prefix-char ¶
+</pre></div>
+<p>这个变量是元前缀字符代码。它用于将元字符转换为两个字符序列，以便可以在键盘映射中查找。对于有用的结果，该值应该是前缀事件（请参阅前缀键）。默认值为 27，这是 ESC 的 ASCII 码。
+</p>
+<p>只要 meta-prefix-char 的值保持为 27，key lookup 就会将 Mb 转换为 ESC b，这通常定义为 back-word 命令。但是，如果您将 meta-prefix-char 设置为 24，即 Cx 的代码，那么 Emacs 会将 Mb 转换为 Cx b，其标准绑定是 switch-to-buffer 命令。（实际上不要这样做！）以下是会发生什么的说明：
+</p><div class="lisp">
+<pre class="lisp">meta-prefix-char                    ; The default value.
+     ⇒ 27
+
+(key-binding "\M-b")
+     ⇒ backward-word
+
+?\C-x                               ; The print representation
+     ⇒ 24                          ;   of a character.
+
+(setq meta-prefix-char 24)
+     ⇒ 24
+
+(key-binding "\M-b")
+     ⇒ switch-to-buffer            ; Now, typing M-b is
+                                    ;   like typing C-x b.
+
+(setq meta-prefix-char 27)          ; Avoid confusion!
+     ⇒ 27                          ; Restore the default value!
+</pre></div>
+<p>这种将一个事件转换为两个事件仅发生在字符上，而不是其他类型的输入事件。因此，功能键 M-F1 不会转换为 ESC F1。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="23.12_更改键绑定.html">更改键绑定</a>, Previous: <a href="23.10_密钥查找.html">密钥查找</a>, Up: <a href="23_键盘映射.html">键盘映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

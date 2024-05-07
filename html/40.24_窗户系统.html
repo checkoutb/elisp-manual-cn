@@ -1,0 +1,44 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.24 窗户系统</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">40.24 窗户系统</h2>
+<div class="nav-panel"><p>Next: <a href="40.25_工具提示.html">工具提示</a>, Previous: <a href="40.23_哔哔声.html">哔哔声</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 可与多个窗口系统一起使用，其中最著名的是 X 窗口系统。Emacs 和 X 都使用术语 <code>窗口</code> ，但使用方式不同。就 X 而言，Emacs 框架是单个窗口；  X 根本不知道各个 Emacs 窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: window-system ¶
+</pre></div>
+<p>这个终端本地变量告诉 Lisp 程序 Emacs 使用什么窗口系统来显示框架。可能的值为
+</p>
+<div class="lisp">
+<pre class="lisp">x ¶
+</pre></div>
+<p>Emacs 使用 X 显示框架。
+</p><div class="lisp">
+<pre class="lisp">w32
+</pre></div>
+<p>Emacs 使用本机 MS-Windows GUI 显示框架。
+</p><div class="lisp">
+<pre class="lisp">ns
+</pre></div>
+<p>Emacs 使用 Nextstep 界面（在 GNUstep 和 macOS 上使用）显示框架。
+</p><div class="lisp">
+<pre class="lisp">pc
+</pre></div>
+<p>Emacs 使用 MS-DOS 直接屏幕写入来显示框架。
+</p><div class="lisp">
+<pre class="lisp">nil
+</pre></div>
+<p>Emacs 在基于字符的终端上显示框架。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: initial-window-system ¶
+</pre></div>
+<p>此变量保存用于 Emacs 在启动期间创建的第一帧的 window-system 的值。（当 Emacs 作为守护进程调用时，它不会创建任何初始帧，因此 initial-window-system 为 nil，除了在 MS-Windows 上，它仍然是 w32。请参阅 GNU Emacs 手册中的守护进程。）
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-system &amp;optional frame ¶
+</pre></div>
+<p>这个函数返回一个符号，它的名字告诉什么窗口系统用于显示框架（默认为当前选择的框架）。它返回的可能符号列表与上面为变量 window-system 记录的符号列表相同。
+</p>
+<p>如果您想编写在文本终端和图形显示上以不同方式工作的代码，请不要使用 window-system 和 initial-window-system 作为谓词或布尔标志变量。这是因为 window-system 在给定的显示类型上并不是 Emacs 功能的良好指标。相反，请使用 display-graphic-p 或显示功能测试中描述的任何其他 display-*-p 谓词。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.25_工具提示.html">工具提示</a>, Previous: <a href="40.23_哔哔声.html">哔哔声</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>31.2.5 屏幕线运动</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">31.2.5 屏幕线运动</h3>
+<div class="nav-panel"><p>Next: <a href="31.2.6_移动平衡表达式.html">移动平衡表达式</a>, Previous: <a href="31.2.4_文本行的运动.html">文本行的运动</a>, Up: <a href="31.2_运动.html">运动.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>上一节中的行函数计算文本行数，仅由换行符分隔。相比之下，这些函数计算屏幕行数，这是由文本在屏幕上出现的方式定义的。如果文本行足够短以适合所选窗口的宽度，则它是单个屏幕行，否则它可能会占用多个屏幕行。
+</p>
+<p>在某些情况下，屏幕上的文本行会被截断，而不是继续到其他屏幕行上。在这些情况下，垂直运动的移动点很像向前线。请参阅截断。
+</p>
+<p>因为给定字符串的宽度取决于控制某些字符外观的标志，所以对于给定的文本，垂直运动的行为不同，取决于它所在的缓冲区，甚至取决于选定的窗口（因为宽度，截断标志和显示表可能因窗口而异）。请参阅通常的显示约定。
+</p>
+<p>这些函数扫描文本以确定屏幕线在哪里中断，因此所花费的时间与扫描的距离成正比。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: vertical-motion count &amp;optional window cur-col ¶
+</pre></div>
+<p>此函数将点从包含点的屏幕行向下移动到屏幕行计数屏幕行的开头。如果计数是负数，它会向上移动。
+</p>
+<p>count 参数可以是一个 cons 单元格（cols .lines），而不是一个整数。然后该函数逐行移动屏幕行，并从该屏幕行的视觉开始放置点 cols 列。请注意，cols 是从行的视觉开始计算的；  如果窗口水平滚动（请参阅水平滚动），则该点将结束的列是文本滚动的列数之外的。
+</p>
+<p>返回值是移动点的屏幕行数。如果到达缓冲区的开头或结尾，则该值的绝对值可能小于 count。
+</p>
+<p>窗口窗口用于获取宽度、水平滚动、显示表格等参数。但是垂直运动总是在当前缓冲区上运行，即使窗口当前显示其他缓冲区。
+</p>
+<p>可选参数 cur-col 指定调用函数时的当前列。这是点的窗口相对水平坐标，以框架默认面的字体宽度为单位测量。提供它可以加速函数，尤其是在很长的行中，因为函数不必返回缓冲区来确定当前列。请注意，cur-col 也是从行的视觉开始计算的。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: count-screen-lines &amp;optional beg end count-final-newline window ¶
+</pre></div>
+<p>此函数返回文本中从 beg 到 end 的屏幕行数。由于行延续、显示表等原因，屏幕行数可能与实际行数不同。如果 beg 和 end 为 nil 或省略，则默认为缓冲区可访问部分的开头和结尾。
+</p>
+<p>如果该区域以换行符结尾，则将被忽略，除非可选的第三个参数 count-final-newline 为非零。
+</p>
+<p>可选的第四个参数window指定获取宽度、水平滚动等参数的窗口。默认是使用选定窗口的参数。
+</p>
+<p>与垂直运动一样，count-screen-lines 始终使用当前缓冲区，而不管窗口中显示的是哪个缓冲区。这使得在任何缓冲区中使用 count-screen-lines 成为可能，无论它当前是否显示在某个窗口中。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: move-to-window-line count ¶
+</pre></div>
+<p>此函数相对于当前显示在选定窗口中的文本移动点。它从窗口顶部移动点到屏幕行数屏幕行的开头；  零表示最上面的行。如果 count 为负数，则指定位置 - 从底部开始计数行（或缓冲区的最后一行，如果缓冲区在指定屏幕位置上方结束）；  因此，count of -1 指定窗口的最后一个完全可见的屏幕行。
+</p>
+<p>如果 count 为 nil，则 point 移动到窗口中间的行首。如果 count 的绝对值大于窗口的大小，那么如果窗口足够高，点就会移动到屏幕行上出现的位置。这可能会导致下一次重新显示滚动以将该位置带到屏幕上。
+</p>
+<p>在交互式调用中，count 是数字前缀参数。
+</p>
+<p>返回的值是相对于窗口顶行的屏幕行号点已移动到的位置。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: move-to-window-group-line count ¶
+</pre></div>
+<p>此功能类似于 move-to-window-line，只是当所选窗口是一组窗口的一部分时（请参阅窗口组），move-to-window-group-line 将移动到相对于整个组，而不仅仅是单个窗口。当缓冲区局部变量 move-to-window-group-line-function 设置为函数时，此条件成立。在这种情况下，move-to-window-group-line 使用参数 count 调用函数，然后返回其结果。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: compute-motion from frompos to topos width offsets window ¶
+</pre></div>
+<p>此函数扫描当前缓冲区，计算屏幕位置。它从位置 from 向前扫描缓冲区，假设在屏幕坐标 frompos 处，到 position to 或坐标 topos，以先到者为准。它返回结束缓冲区位置和屏幕坐标。
+</p>
+<p>来自pos 和 topos 的坐标参数是 (hpos . vpos) 形式的 cons 单元。
+</p>
+<p>参数宽度是可用于显示文本的列数；  这会影响对续行的处理。nil 表示窗口中实际可用的文本列数，相当于 (window-width window) 返回的值。
+</p>
+<p>参数 offsets 是 nil 或形式为 (hscroll . tab-offset) 的 cons 单元格。这里 hscroll 是不在左边距显示的列数；  大多数调用者通过调用 window-hscroll 来获得这个。同时，tab-offset 是屏幕上的列号和缓冲区中的列号之间的偏移量。当前面的屏幕行的宽度加起来不是制表符宽度的倍数时，这在续行中可以是非零的。在非连续行中它始终为零。
+</p>
+<p>窗口窗口仅用于指定要使用的显示表。无论窗口中显示什么缓冲区，计算运动始终在当前缓冲区上运行。
+</p>
+<p>返回值是五个元素的列表：
+</p><div class="lisp">
+<pre class="lisp">(pos hpos vpos prevhpos contin)
+</pre></div>
+<p>这里pos是扫描停止的缓冲位置，vpos是竖屏位置，hpos是横屏位置。
+</p>
+<p>结果 prevhpos 是从 pos 向后一个字符的水平位置。如果最后一行在前一个字符之后（或之内）继续，则结果 contin 为 t。
+</p>
+<p>例如，要查找某个窗口的屏幕行行列col的缓冲位置，将窗口的显示起始位置作为from，窗口的左上角坐标作为frompos。将缓冲区的 (point-max) 传递给 to，以将扫描限制在缓冲区可访问部分的末尾，并将 line 和 col 作为 topos 传递。这是一个执行此操作的函数：
+</p><div class="lisp">
+<pre class="lisp">(defun coordinates-of-position (col line)
+  (car (compute-motion (window-start)
+                       '(0 . 0)
+                       (point-max)
+                       (cons col line)
+                       (window-width)
+                       (cons (window-hscroll) 0)
+                       (selected-window))))
+</pre></div>
+<p>当您对 minibuffer 使用 compute-motion 时，您需要使用 minibuffer-prompt-width 来获取屏幕第一行开头的水平位置。请参阅 Minibuffer 内容。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="31.2.6_移动平衡表达式.html">移动平衡表达式</a>, Previous: <a href="31.2.4_文本行的运动.html">文本行的运动</a>, Up: <a href="31.2_运动.html">运动.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

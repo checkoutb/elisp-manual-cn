@@ -1,0 +1,22 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>2.4.1 整数类型</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">2.4.1 整数类型</h3>
+<div class="nav-panel"><p>Next: <a href="02.4.2_浮点型.html">浮点型</a>, Previous: <a href="02.4_编程类型.html">编程类型</a>, Up: <a href="02.4_编程类型.html">编程类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在底层，有两种整数——称为fixnums的小整数和称为bignums的大整数。
+</p>
+<p>fixnum 的值范围取决于机器。最小范围是 -536,870,912 到 536,870,911（30 位；即 -2**29 到 2**29 - 1），但许多机器提供的范围更广。
+</p>
+<p>Bignums 可以具有任意精度。溢出 fixnum 的操作将改为返回 bignum。
+</p>
+<p>所有数字都可以用 eql 或 = 进行比较；  fixnums 也可以与 eq 进行比较。要测试一个整数是 fixnum 还是 bignum，您可以将其与 most-negative-fixnum 和 most-positive-fixnum 进行比较，或者您可以在任何对象上使用便利谓词 fixnump 和 bignump。
+</p>
+<p>整数的读取语法是一个（以十为基数）数字序列，开头有一个可选的符号，结尾有一个可选的句点。Lisp 解释器生成的打印表示从不具有前导 <code>+</code> 或结尾 <code>.</code> 。
+</p>
+<div class="lisp">
+<pre class="lisp">-1               ; The integer -1.
+1                ; The integer 1.
+1.               ; Also the integer 1.
++1               ; Also the integer 1.
+</pre></div>
+<p>有关详细信息，请参阅数字。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="02.4.2_浮点型.html">浮点型</a>, Previous: <a href="02.4_编程类型.html">编程类型</a>, Up: <a href="02.4_编程类型.html">编程类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

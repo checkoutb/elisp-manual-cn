@@ -1,0 +1,118 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>17.8 反汇编字节码</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">17.8 反汇编字节码</h2>
+<div class="nav-panel"><p>Next: <a href="18_Lisp编译成Native代码.html">Lisp编译成Native代码</a>, Previous: <a href="17.7_字节码函数对象.html">字节码函数对象</a>, Up: <a href="17_字节编译.html">字节编译.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>人们不写字节码；  该工作留给字节编译器。但是我们提供了一个反汇编程序来满足猫一样的好奇心。反汇编器将字节编译的代码转换为人类可读的形式。
+</p>
+<p>字节码解释器被实现为一个简单的堆栈机器。它将值推送到自己的堆栈中，然后将它们弹出以在计算中使用它们，其结果本身被推回堆栈中。当字节码函数返回时，它会从堆栈中弹出一个值并将其作为函数的值返回。
+</p>
+<p>除了堆栈之外，字节码函数可以通过在变量和堆栈之间传输值来使用、绑定和设置普通的 Lisp 变量。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: disassemble object &amp;optional buffer-or-name ¶
+</pre></div>
+<p>此命令显示对象的反汇编代码。在交互式使用中，或者如果 buffer-or-name 为 nil 或省略，则输出进入名为 <strong>Disassemble</strong> 的缓冲区。如果 buffer-or-name 不为 nil，则它必须是缓冲区或现有缓冲区的名称。然后输出到那里，点，点在输出之前。
+</p>
+<p>参数对象可以是函数名称、lambda 表达式（请参阅 Lambda 表达式）或字节码对象（请参阅字节码函数对象）。如果它是一个 lambda 表达式，则 disassemble 对其进行编译并反汇编生成的编译代码。
+</p>
+<p>这里有两个使用反汇编函数的例子。我们添加了解释性注释来帮助您将字节码与 Lisp 源代码相关联；  这些不会出现在 disassemble 的输出中。
+</p><div class="lisp">
+<pre class="lisp">(defun factorial (integer)
+  "Compute factorial of an integer."
+  (if (= 1 integer) 1
+    (* integer (factorial (1- integer)))))
+     ⇒ factorial
+
+
+(factorial 4)
+     ⇒ 24
+
+
+(disassemble 'factorial)
+     -| byte-code for factorial:
+ doc: Compute factorial of an integer.
+ args: (integer)
+
+
+0   varref   integer      ; Get the value of integer and
+                          ;   push it onto the stack.
+1   constant 1            ; Push 1 onto stack.
+
+2   eqlsign               ; Pop top two values off stack, compare
+                          ;   them, and push result onto stack.
+
+3   goto-if-nil 1         ; Pop and test top of stack;
+                          ;   if nil, go to 1, else continue.
+6   constant 1            ; Push 1 onto top of stack.
+7   return                ; Return the top element of the stack.
+
+8:1 varref   integer      ; Push value of integer onto stack.
+9   constant factorial    ; Push factorial onto stack.
+10  varref   integer      ; Push value of integer onto stack.
+11  sub1                  ; Pop integer, decrement value,
+                          ;   push new value onto stack.
+12  call     1            ; Call function factorial using first
+                          ;   (i.e., top) stack element as argument;
+                          ;   push returned value onto stack.
+
+13 mult                   ; Pop top two values off stack, multiply
+                          ;   them, and push result onto stack.
+14 return                 ; Return the top element of the stack.
+</pre></div>
+<p>silly-loop 函数稍微复杂一些：
+</p><div class="lisp">
+<pre class="lisp">(defun silly-loop (n)
+  "Return time before and after N iterations of a loop."
+  (let ((t1 (current-time-string)))
+    (while (&gt; (setq n (1- n))
+              0))
+    (list t1 (current-time-string))))
+     ⇒ silly-loop
+
+
+(disassemble 'silly-loop)
+     -| byte-code for silly-loop:
+ doc: Return time before and after N iterations of a loop.
+ args: (n)
+
+
+0   constant current-time-string  ; Push current-time-string
+                                  ;   onto top of stack.
+
+1   call     0            ; Call current-time-string with no
+                          ;   argument, push result onto stack.
+
+2   varbind  t1           ; Pop stack and bind t1 to popped value.
+
+3:1 varref   n            ; Get value of n from the environment
+                          ;   and push the value on the stack.
+4   sub1                  ; Subtract 1 from top of stack.
+
+5   dup                   ; Duplicate top of stack; i.e., copy the top
+                          ;   of the stack and push copy onto stack.
+6   varset   n            ; Pop the top of the stack,
+                          ;   and bind n to the value.
+
+;; (In effect, the sequence dup varset copies the top of the stack
+;; into the value of n without popping it.)
+
+
+7   constant 0            ; Push 0 onto stack.
+8   gtr                   ; Pop top two values off stack,
+                          ;   test if n is greater than 0
+                          ;   and push result onto stack.
+
+9   goto-if-not-nil 1     ; Goto 1 if n &gt; 0
+                          ;   (this continues the while loop)
+                          ;   else continue.
+
+12  varref   t1           ; Push value of t1 onto stack.
+13  constant current-time-string  ; Push current-time-string
+                                  ;   onto the top of the stack.
+14  call     0            ; Call current-time-string again.
+
+15  unbind   1            ; Unbind t1 in local environment.
+16  list2                 ; Pop top two elements off stack, create a
+                          ;   list of them, and push it onto stack.
+17  return                ; Return value of the top of stack.
+</pre></div>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="18_Lisp编译成Native代码.html">Lisp编译成Native代码</a>, Previous: <a href="17.7_字节码函数对象.html">字节码函数对象</a>, Up: <a href="17_字节编译.html">字节编译.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

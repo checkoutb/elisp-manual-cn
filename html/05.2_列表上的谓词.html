@@ -1,0 +1,61 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>5.2 列表上的谓词</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">5.2 列表上的谓词</h2>
+<div class="nav-panel"><p>Next: <a href="05.3_访问列表元素.html">访问列表元素</a>, Previous: <a href="05.1_列表和缺点单元格.html">列表和缺点单元格</a>, Up: <a href="05_列表.html">列表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>下面的谓词测试一个 Lisp 对象是否是一个原子，它是一个 cons 单元格还是一个列表，或者它是否是可区分的对象 nil。（其中许多谓词可以根据其他谓词来定义，但它们的使用如此频繁以至于值得拥有它们。）
+</p>
+<div class="lisp">
+<pre class="lisp">Function: consp object
+</pre></div>
+<p>如果 object 是一个 cons 单元，此函数返回 t，否则返回 nil。nil 不是一个缺点单元格，尽管它是一个列表。
+</p><div class="lisp">
+<pre class="lisp">Function: atom object
+</pre></div>
+<p>如果 object 是原子，则此函数返回 t，否则返回 nil。除了 cons 单元之外的所有对象都是原子。符号 nil 是一个原子，也是一个列表；  它是唯一兼具两者的 Lisp 对象。
+</p>
+<div class="lisp">
+<pre class="lisp">(atom object) ≡ (not (consp object))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: listp object
+</pre></div>
+<p>如果 object 是 cons 单元格或 nil，则此函数返回 t。否则，它返回零。
+</p>
+<div class="lisp">
+<pre class="lisp">(listp '(1))
+     ⇒ t
+
+(listp '())
+     ⇒ t
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: nlistp object
+</pre></div>
+<p>此函数与 listp 相反：如果 object 不是列表，则返回 t。否则，它返回零。
+</p>
+<div class="lisp">
+<pre class="lisp">(listp object) ≡ (not (nlistp object))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: null object
+</pre></div>
+<p>如果 object 为 nil，此函数返回 t，否则返回 nil。此函数与 not 相同，但为了清楚起见，我们在将对象视为列表时使用 null，而不是在将其视为真值时使用 null（请参阅组合条件的构造中的 not）。
+</p>
+<div class="lisp">
+<pre class="lisp">(null '(1))
+     ⇒ nil
+
+(null '())
+     ⇒ t
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: proper-list-p object
+</pre></div>
+<p>如果对象是正确的列表，则此函数返回对象的长度，否则返回 nil（请参阅列表和 Cons 单元格）。除了满足 listp 之外，正确的列表既不是圆形的也不是点状的。
+</p><div class="lisp">
+<pre class="lisp">(proper-list-p '(a b c))
+    ⇒ 3
+
+(proper-list-p '(a b . c))
+    ⇒ nil
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="05.3_访问列表元素.html">访问列表元素</a>, Previous: <a href="05.1_列表和缺点单元格.html">列表和缺点单元格</a>, Up: <a href="05_列表.html">列表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

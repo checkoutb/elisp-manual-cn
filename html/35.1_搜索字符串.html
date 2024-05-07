@@ -1,0 +1,90 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>35.1 搜索字符串</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">35.1 搜索字符串</h2>
+<div class="nav-panel"><p>Next: <a href="35.2_搜索和案例.html">搜索和案例</a>, Previous: <a href="35_搜索和匹配.html">搜索和匹配</a>, Up: <a href="35_搜索和匹配.html">搜索和匹配.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这些是在缓冲区中搜索文本的原始函数。它们旨在用于程序中，但您可以交互地调用它们。如果您这样做，他们会提示您输入搜索字符串；  参数 limit 和 noerror 为 nil，repeat 为 1。有关交互式搜索的更多详细信息，请参阅 The GNU Emacs Manual 中的 Searching and Replacement。
+</p>
+<p>如果缓冲区是多字节的，这些搜索函数会将搜索字符串转换为多字节；  如果缓冲区是单字节的，它们会将搜索字符串转换为单字节。请参阅文本表示。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: search-forward string &amp;optional limit noerror count ¶
+</pre></div>
+<p>此函数从点向前搜索字符串的精确匹配。如果成功，它会将 point 设置为找到的事件的末尾，并返回 point 的新值。如果未找到匹配项，则值和副作用取决于 noerror（见下文）。
+</p>
+<p>在以下示例中，点最初位于行首。然后 (search-forward "fox") 在 ’fox’ 的最后一个字母之后移动点：
+</p><div class="lisp">
+<pre class="lisp">
+
+---------- Buffer: foo ----------
+∗The quick brown fox jumped over the lazy dog.
+---------- Buffer: foo ----------
+
+
+(search-forward "fox")
+     ⇒ 20
+
+---------- Buffer: foo ----------
+The quick brown fox∗ jumped over the lazy dog.
+---------- Buffer: foo ----------
+</pre></div>
+<p>参数限制指定搜索的边界，并且应该是当前缓冲区中的一个位置。在该位置之后不接受任何匹配。如果 limit 被省略或为零，则默认为缓冲区可访问部分的末尾。
+</p>
+<p>当搜索失败时会发生什么取决于 noerror 的值。如果 noerror 为 nil，则发出搜索失败错误信号。如果 noerror 为 t，则向前搜索返回 nil 并且什么也不做。如果 noerror 既不是 nil 也不是 t，则向前搜索移动指向上界并返回 nil。
+</p>
+<p>参数 noerror 仅影响无法找到匹配项的有效搜索。不管 noerror 是什么，无效的参数都会导致错误。
+</p>
+<p>如果count是正数n，则搜索n次；  每个连续的搜索都从前一个匹配的结尾开始。如果所有这些连续搜索成功，则函数调用成功，移动点并返回其新值。否则函数调用失败，结果取决于 noerror 的值，如上所述。如果 count 是负数 -n，则在相反（向后）方向上进行 n 次搜索。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: search-backward string &amp;optional limit noerror count ¶
+</pre></div>
+<p>此函数从点向后搜索字符串。它类似于向前搜索，只是它向后搜索而不是向前搜索。向后搜索在匹配开始时离开点。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: word-search-forward string &amp;optional limit noerror count ¶
+</pre></div>
+<p>此函数从点向前搜索字符串的单词匹配。如果找到匹配项，则将 point 设置为找到的匹配项的末尾，并返回 point 的新值。
+</p>
+<p>单词匹配将字符串视为单词序列，而忽略分隔它们的标点符号。它在缓冲区中搜索相同的单词序列。每个单词在缓冲区中必须是不同的（搜索单词 ’ball’ 与单词 ’balls’ 不匹配），但忽略标点和空格的细节（搜索 ’ball boy’ 匹配 ’ball.boy!’ ）。
+</p>
+<p>在本例中，point 最初位于缓冲区的开头；  搜索将其留在 <code>y</code> 和 <code>！</code> 之间。
+</p><div class="lisp">
+<pre class="lisp">
+
+---------- Buffer: foo ----------
+∗He said "Please!  Find
+the ball boy!"
+---------- Buffer: foo ----------
+
+
+(word-search-forward "Please find the ball, boy.")
+     ⇒ 39
+
+---------- Buffer: foo ----------
+He said "Please!  Find
+the ball boy∗!"
+---------- Buffer: foo ----------
+</pre></div>
+<p>如果limit是非零，它必须是当前缓冲区中的一个位置；  它指定搜索的上限。找到的匹配不得超出该位置。
+</p>
+<p>如果 noerror 为 nil，则 word-search-forward 会在搜索失败时发出错误信号。如果 noerror 为 t，则它返回 nil 而不是发出错误信号。如果 noerror 既不是 nil 也不是 t，它将点移动到限制（或缓冲区可访问部分的末尾）并返回 nil。
+</p>
+<p>如果 count 是一个正数，它指定要搜索的连续出现的次数。点位于最后一场比赛的末尾。如果 count 是负数，则向后搜索，并且 point 位于最后一个匹配项的开头。
+</p>
+<p>在内部，word-search-forward 和相关函数使用函数 word-search-regexp 将字符串转换为忽略标点符号的正则表达式。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: word-search-forward-lax string &amp;optional limit noerror count ¶
+</pre></div>
+<p>此命令与 word-search-forward 相同，除了字符串的开头或结尾不需要匹配单词边界，除非字符串以空格开头或结尾。例如，搜索 <code>ball boy</code> 匹配 <code>ball boyee</code> ，但不匹配 <code>balls boy</code> 。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: word-search-backward string &amp;optional limit noerror count ¶
+</pre></div>
+<p>此函数从点向后搜索与字符串匹配的单词。这个函数就像 word-search-forward 一样，只是它向后搜索并且通常在匹配的开头留下点。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: word-search-backward-lax string &amp;optional limit noerror count ¶
+</pre></div>
+<p>此命令与 word-search-backward 相同，只是字符串的开头或结尾不需要匹配单词边界，除非字符串以空格开头或结尾。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="35.2_搜索和案例.html">搜索和案例</a>, Previous: <a href="35_搜索和匹配.html">搜索和匹配</a>, Up: <a href="35_搜索和匹配.html">搜索和匹配.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

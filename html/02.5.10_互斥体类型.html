@@ -1,0 +1,13 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>2.5.10 互斥体类型</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">2.5.10 互斥体类型</h3>
+<div class="nav-panel"><p>Next: <a href="02.5.11_条件变量类型.html">条件变量类型</a>, Previous: <a href="02.5.9_线程类型.html">线程类型</a>, Up: <a href="02.5_编辑类型.html">编辑类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>互斥锁是线程可以拥有和不拥有的排他锁，以便在它们之间进行同步。请参阅互斥体。
+</p>
+<p>互斥对象没有读取语法。它们以哈希表示法打印，给出互斥体的名称（如果它已被命名）或其在核心中的地址：
+</p><div class="lisp">
+<pre class="lisp">(make-mutex "my-mutex")
+    ⇒ #&lt;mutex my-mutex&gt;
+(make-mutex)
+    ⇒ #&lt;mutex 01c7e4e0&gt;
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="02.5.11_条件变量类型.html">条件变量类型</a>, Previous: <a href="02.5.9_线程类型.html">线程类型</a>, Up: <a href="02.5_编辑类型.html">编辑类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

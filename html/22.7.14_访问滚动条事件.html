@@ -1,0 +1,25 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.7.14 访问滚动条事件</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">22.7.14 访问滚动条事件</h3>
+<div class="nav-panel"><p>Next: <a href="22.7.15_将键盘事件放入字符串中.html">将键盘事件放入字符串中</a>, Previous: <a href="22.7.13_访问鼠标事件.html">访问鼠标事件</a>, Up: <a href="22.7_输入事件.html">输入事件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这些函数对于解码滚动条事件很有用。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: scroll-bar-event-ratio event ¶
+</pre></div>
+<p>此函数返回滚动条事件在滚动条内的小数垂直位置。该值是一个 cons 单元格（部分。整体），其中包含两个整数，其比率是小数位置。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: scroll-bar-scale ratio total ¶
+</pre></div>
+<p>此函数将（实际上）比率乘以总数，将结果四舍五入为整数。参数 ratio 不是一个数字，而是一对 (num . denom)——通常是由 scroll-bar-event-ratio 返回的值。
+</p>
+<p>此函数可方便地将滚动条上的位置缩放到缓冲区位置。以下是如何做到这一点：
+</p><div class="lisp">
+<pre class="lisp">(+ (point-min)
+   (scroll-bar-scale
+      (posn-x-y (event-start event))
+      (- (point-max) (point-min))))
+</pre></div>
+<p>回想一下，滚动条事件有两个整数形成一个比率，而不是一对 x 和 y 坐标。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.7.15_将键盘事件放入字符串中.html">将键盘事件放入字符串中</a>, Previous: <a href="22.7.13_访问鼠标事件.html">访问鼠标事件</a>, Up: <a href="22.7_输入事件.html">输入事件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

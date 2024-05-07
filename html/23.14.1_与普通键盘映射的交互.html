@@ -1,0 +1,10 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>23.14.1 与普通键盘映射的交互</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">23.14.1 与普通键盘映射的交互</h3>
+<div class="nav-panel"><p>Next: <a href="23.15_绑定键的命令.html">绑定键的命令</a>, Previous: <a href="23.14_用于翻译事件序列的键映射.html">用于翻译事件序列的键映射</a>, Up: <a href="23.14_用于翻译事件序列的键映射.html">用于翻译事件序列的键映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当键序列绑定到命令时，或者当 Emacs 确定没有其他事件可以导致绑定到命令的序列时，会检测到键序列的结尾。
+</p>
+<p>这意味着，尽管无论原始键序列是否具有绑定，输入解码映射和键翻译映射都适用，但这种绑定的存在仍然会阻止翻译发生。例如，让我们回到上面的 VT100 示例，将 Cc ESC 的绑定添加到全局映射；  现在，当用户点击 Cc PF1 时，Emacs 将无法将 Cc ESC OP 解码为 Cc PF1，因为它将在 Cc ESC 之后立即停止读取键，将 OP 留待以后使用。这是在用户真的按下 Cc ESC 的情况下，在这种情况下 Emacs 不应该坐在那里等待下一个键来决定用户是真的按下 ESC 还是 PF1。
+</p>
+<p>出于这个原因，最好避免将命令绑定到键序列的结尾是键转换的前缀的键序列。此类有问题的后缀/前缀主要是 ESC、MO（实际上是 ESC O）和 M-[（实际上是 ESC [）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="23.15_绑定键的命令.html">绑定键的命令</a>, Previous: <a href="23.14_用于翻译事件序列的键映射.html">用于翻译事件序列的键映射</a>, Up: <a href="23.14_用于翻译事件序列的键映射.html">用于翻译事件序列的键映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

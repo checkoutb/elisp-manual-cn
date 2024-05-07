@@ -1,0 +1,51 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>21.15 小缓冲区杂记</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">21.15 小缓冲区杂记</h2>
+<div class="nav-panel"><p>Next: <a href="22_命令循环.html">命令循环</a>, Previous: <a href="21.14_抑制交互.html">抑制交互</a>, Up: <a href="21_小缓冲区.html">小缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><div class="lisp">
+<pre class="lisp">Function: minibufferp &amp;optional buffer-or-name live ¶
+</pre></div>
+<p>如果 buffer-or-name 是一个 minibuffer，这个函数返回非 nil。如果 buffer-or-name 被省略或为零，它会测试当前缓冲区。当 live 为非 nil 时，仅当 buffer-or-name 是活动的 minibuffer 时，该函数才返回非 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: minibuffer-setup-hook ¶
+</pre></div>
+<p>这是一个正常的钩子，只要进入一个小缓冲区就会运行。请参阅挂钩。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: minibuffer-with-setup-hook function &amp;rest body ¶
+</pre></div>
+<p>此宏在安排通过 minibuffer-setup-hook 调用指定函数后执行主体。默认情况下，在 minibuffer-setup-hook 列表中的其他函数之前调用 function，但如果 function 是 (:append func) 形式，则在其他 hook 函数之后调用 func。
+</p>
+<p>正文形式不应多次使用 minibuffer。如果 minibuffer 以递归方式重新进入，函数将只被调用一次，用于 minibuffer 的最外层使用。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: minibuffer-exit-hook ¶
+</pre></div>
+<p>这是一个正常的钩子，只要退出 minibuffer 就会运行。请参阅挂钩。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: minibuffer-help-form ¶
+</pre></div>
+<p>此变量的当前值用于在 minibuffer 中本地重新绑定帮助表单（请参阅帮助函数）。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: minibuffer-scroll-window ¶
+</pre></div>
+<p>如果这个变量的值是非零，它应该是一个窗口对象。当在 minibuffer 中调用函数 scroll-other-window 时，它会滚动这个窗口（参见 Textual Scrolling）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: minibuffer-selected-window ¶
+</pre></div>
+<p>此函数返回在选择 minibuffer 窗口之前选择的窗口。如果选定的窗口不是 minibuffer 窗口，则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: minibuffer-message string &amp;rest args ¶
+</pre></div>
+<p>此函数在 minibuffer 文本的末尾临时显示字符串几秒钟，或直到下一个输入事件到达，以先到者为准。变量 minibuffer-message-timeout 指定在没有输入的情况下等待的秒数。默认为 2。如果 args 为非 nil，则通过 format-message 传递 string 和 args 获得实际消息。请参阅格式化字符串。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: minibuffer-inactive-mode ¶
+</pre></div>
+<p>这是非活动小缓冲区中使用的主要模式。它使用键盘映射 minibuffer-inactive-mode-map。如果 minibuffer 在单独的帧中，这可能很有用。请参阅小缓冲区和帧。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="22_命令循环.html">命令循环</a>, Previous: <a href="21.14_抑制交互.html">抑制交互</a>, Up: <a href="21_小缓冲区.html">小缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

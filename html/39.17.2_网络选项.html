@@ -1,0 +1,50 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>39.17.2 网络选项</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">39.17.2 网络选项</h3>
+<div class="nav-panel"><p>Next: <a href="39.17.3_测试网络功能的可用性.html">测试网络功能的可用性</a>, Previous: <a href="39.17.1_make-network-process.html">make-network-process</a>, Up: <a href="39.17_低级网络访问.html">低级网络访问.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>创建网络进程时可以指定以下网络选项。除了 :reuseaddr，您还可以稍后使用 set-network-process-option 设置或修改这些选项。
+</p>
+<p>对于服务器进程，使用 make-network-process 指定的选项不会被客户端连接继承，因此您需要在创建每个子连接时为其设置必要的选项。
+</p>
+<div class="lisp">
+<pre class="lisp">:bindtodevice device-name
+</pre></div>
+<p>如果 device-name 是标识网络接口名称的非空字符串（请参阅 network-interface-list），则仅处理在该接口上接收到的数据包。如果 device-name 为 nil（默认值），则处理在任何接口上接收到的数据包。
+</p>
+<p>在某些系统上使用此选项可能需要特殊权限。
+</p><div class="lisp">
+<pre class="lisp">:broadcast broadcast-flag
+</pre></div>
+<p>如果一个数据报进程的broadcast-flag 为非nil，该进程将接收发送到广播地址的数据报包，并且能够将数据包发送到广播地址。对于流连接，这将被忽略。
+</p><div class="lisp">
+<pre class="lisp">:dontroute dontroute-flag
+</pre></div>
+<p>如果 dontroute-flag 为非 nil，则进程只能发送到与本地主机位于同一网络的主机。
+</p><div class="lisp">
+<pre class="lisp">:keepalive keepalive-flag
+</pre></div>
+<p>如果流连接的 keepalive-flag 为非 nil，则启用低级 keep-alive 消息的交换。
+</p><div class="lisp">
+<pre class="lisp">:linger linger-arg
+</pre></div>
+<p>如果 linger-arg 不为零，则在删除之前等待连接上所有排队数据包的成功传输（请参阅delete-process）。如果 linger-arg 是一个整数，它指定在关闭连接之前等待发送排队数据包的最长时间（以秒为单位）。默认为 nil，表示进程被删除时丢弃未发送的排队数据包。
+</p><div class="lisp">
+<pre class="lisp">:oobinline oobinline-flag
+</pre></div>
+<p>如果 oobinline-flag 对于流连接不为 nil，则在正常数据流中接收带外数据。否则，忽略带外数据。
+</p><div class="lisp">
+<pre class="lisp">:priority priority
+</pre></div>
+<p>将此连接上发送的数据包的优先级设置为整数优先级。这个数字的解释是协议特定的；  例如在此连接上发送的 IP 数据包上设置 TOS（服务类型）字段。它还可能具有系统相关的影响，例如在网络接口上选择特定的输出队列。
+</p><div class="lisp">
+<pre class="lisp">:reuseaddr reuseaddr-flag
+</pre></div>
+<p>如果对于流服务器进程，reuseaddr-flag 为非 nil（默认值），则允许此服务器重用特定端口号（请参阅 :service），除非此主机上的另一个进程已经在侦听该端口。如果reuseaddr-flag 为nil，则在最后一次使用该端口（主机上的任何进程）之后的一段时间内，可能无法在该端口上创建新服务器。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-network-process-option process option value &amp;optional no-error ¶
+</pre></div>
+<p>该函数设置或修改网络进程进程的网络选项。接受的选项和值与 make-network-process 相同。如果 no-error 为非 nil，则如果 option 不是受支持的选项，则此函数返回 nil 而不是发出错误信号。如果函数成功完成，则返回 t。
+</p>
+<p>选项的当前设置可通过过程联系功能获得。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="39.17.3_测试网络功能的可用性.html">测试网络功能的可用性</a>, Previous: <a href="39.17.1_make-network-process.html">make-network-process</a>, Up: <a href="39.17_低级网络访问.html">低级网络访问.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>30.6 帧标题</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">30.6 帧标题</h2>
+<div class="nav-panel"><p>Next: <a href="30.7_删除帧.html">删除帧</a>, Previous: <a href="30.5_终端参数.html">终端参数</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>每帧都有一个名称参数；  这用作窗口系统通常显示在帧顶部的帧标题的默认值。您可以通过设置名称帧属性显式指定名称。
+</p>
+<p>通常你不明确指定名称，Emacs 会根据存储在变量 frame-title-format 中的模板自动计算帧名称。每次重新显示帧时，Emacs 都会重新计算名称。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: frame-title-format ¶
+</pre></div>
+<p>当您没有明确指定一个帧时，此变量指定如何计算帧的名称。变量的值实际上是一个模式行结构，就像模式行格式一样，只是忽略了 <code>%c</code> 、 <code>%C</code> 和 <code>%l</code> 结构。请参阅模式行的数据结构。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: icon-title-format ¶
+</pre></div>
+<p>当您没有明确指定帧标题时，此变量指定如何计算图标化帧的名称。此标题出现在图标本身中。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: multiple-frames ¶
+</pre></div>
+<p>这个变量是由 Emacs 自动设置的。当有两个或更多帧（不包括 minibuffer-only 帧或不可见帧）时，其值为 t。frame-title-format 的默认值使用multiple-frames，以便只有在超过一帧时才将缓冲区名称放在帧标题中。
+</p>
+<p>除非在处理 frame-title-format 或 icon-title-format 时，不能保证此变量的值是准确的。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="30.7_删除帧.html">删除帧</a>, Previous: <a href="30.5_终端参数.html">终端参数</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

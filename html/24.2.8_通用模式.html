@@ -1,0 +1,19 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.2.8 通用模式</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">24.2.8 通用模式</h3>
+<div class="nav-panel"><p>Next: <a href="24.2.9_主要模式示例.html">主要模式示例</a>, Previous: <a href="24.2.7_列表模式.html">列表模式</a>, Up: <a href="24.2_主要模式.html">主要模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>通用模式是简单的主要模式，基本支持注释语法和字体锁定模式。要定义通用模式，请使用宏 define-generic-mode。有关使用 define-generic-mode 的一些示例，请参见文件 generic-x.el。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: define-generic-mode mode comment-list keyword-list font-lock-list auto-mode-list function-list &amp;optional docstring ¶
+</pre></div>
+<p>该宏定义了一个名为 mode 的通用模式命令（一个符号，不带引号）。可选参数 docstring 是 mode 命令的文档。如果您不提供它，define-generic-mode 默认会生成一个。
+</p>
+<p>参数注释列表是一个列表，其中每个元素要么是一个字符，要么是一个或两个字符的字符串，要么是一个 cons 单元格。在模式的语法表中设置一个字符或字符串作为注释起始符。如果条目是 cons 单元格，则将 CAR 设置为评论起始者，并将 CDR 设置为评论结束者。（如果您希望注释在行尾结束，则使用 nil 表示后者。）请注意，语法表机制对实际可能的注释起始符和结束符有限制。请参阅语法表。
+</p>
+<p>参数关键字列表是要使用 font-lock-keyword-face 突出显示的关键字列表。每个关键字都应该是一个字符串。同时，font-lock-list 是要突出显示的附加表达式的列表。此列表的每个元素都应具有与 font-lock-keywords 元素相同的形式。请参阅基于搜索的字体。
+</p>
+<p>参数 auto-mode-list 是要添加到变量 auto-mode-alist 的正则表达式列表。它们是通过执行 define-generic-mode 形式添加的，而不是通过扩展宏调用。
+</p>
+<p>最后，function-list 是 mode 命令调用额外设置的函数列表。它在运行模式挂钩变量 mode-hook 之前调用这些函数。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="24.2.9_主要模式示例.html">主要模式示例</a>, Previous: <a href="24.2.7_列表模式.html">列表模式</a>, Up: <a href="24.2_主要模式.html">主要模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

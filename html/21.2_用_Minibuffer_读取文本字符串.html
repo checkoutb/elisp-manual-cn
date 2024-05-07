@@ -1,0 +1,208 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>21.2 用 Minibuffer 读取文本字符串</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">21.2 用 Minibuffer 读取文本字符串</h2>
+<div class="nav-panel"><p>Next: <a href="21.3_用_Minibuffer_读取_Lisp_对象.html">用_Minibuffer_读取_Lisp_对象</a>, Previous: <a href="21.1_Minibuffers_简介.html">Minibuffers_简介</a>, Up: <a href="21_小缓冲区.html">小缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>minibuffer 输入最基本的原语是 read-from-minibuffer，它可以用来读取文本形式的字符串或 Lisp 对象。函数 read-regexp 用于读取正则表达式（参见正则表达式），这是一种特殊的字符串。还有用于读取命令、变量、文件名等的专用函数（参见完成）。
+</p>
+<p>在大多数情况下，您不应该在 Lisp 函数的中间调用 minibuffer 输入函数。相反，在交互式规范中，将所有 minibuffer 输入作为读取命令参数的一部分。请参阅定义命令。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: read-from-minibuffer prompt &amp;optional initial keymap read history default inherit-input-method ¶
+</pre></div>
+<p>此函数是从 minibuffer 获取输入的最通用方法。默认情况下，它接受任意文本并将其作为字符串返回；  但是，如果 read 不为零，则它使用 read 将文本转换为 Lisp 对象（请参阅输入函数）。
+</p>
+<p>这个函数做的第一件事是激活一个小缓冲区并以提示符（必须是一个字符串）作为提示符显示它。然后用户可以在 minibuffer 中编辑文本。
+</p>
+<p>当用户键入命令退出 minibuffer 时，read-from-minibuffer 从 minibuffer 中的文本构造返回值。通常它会返回一个包含该文本的字符串。但是，如果 read 不是 nil，read-from-minibuffer 会读取文本并返回结果 Lisp 对象，未计算。（有关阅读的信息，请参阅输入函数。）
+</p>
+<p>参数 default 指定通过历史命令可用的默认值。它应该是一个字符串、一个字符串列表或 nil。字符串或字符串成为 minibuffer 的 <code>未来历史</code> ，用户可以使用 Mn。
+</p>
+<p>如果 read 不为 nil，则如果用户输入空输入，则 default 也用作要读取的输入。如果 default 是字符串列表，则第一个字符串用作输入。如果默认值为 nil，则空输入会导致文件结束错误。但是，在通常情况下（read 为 nil），当用户输入空输入并返回空字符串 ~~ 时，从 minibuffer 读取会忽略默认值。在这方面，它不同于本章中的所有其他 minibuffer 输入函数。
+</p>
+<p>如果 keymap 不为零，则该 keymap 是要在 minibuffer 中使用的本地 keymap。如果 keymap 省略或为零，则 minibuffer-local-map 的值用作 keymap。指定 keymap 是为各种应用程序（例如完成）自定义 minibuffer 的最重要方法。
+</p>
+<p>参数 history 指定了一个历史列表变量，用于保存输入和 minibuffer 中使用的历史命令。它默认为 minibuffer-history。如果历史是符号 t，则不记录历史。您也可以选择在历史列表中指定起始位置。请参阅小缓冲区历史记录。
+</p>
+<p>如果变量 minibuffer-allow-text-properties 不为 nil，则返回的字符串包括 minibuffer 中存在的任何文本属性。否则，当返回值时，所有文本属性都会被剥离。
+</p>
+<p>minibuffer-prompt-properties 中的文本属性应用于提示。默认情况下，此属性列表定义用于提示的面。此面（如果存在）将应用于面列表的末尾并在显示前合并。
+</p>
+<p>如果用户想要完全控制提示的外观，最方便的方法是在所有面列表的末尾指定默认面。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">(read-from-minibuffer
+ (concat
+  (propertize "Bold" 'face '(bold default))
+  (propertize " and normal: " 'face '(default))))
+</pre></div>
+<p>如果参数inherit-input-method 不为nil，那么minibuffer 会继承当前输入法（参见Input Methods）和enable-multibyte-characters 的设置（参见Text Representations）从进入minibuffer 之前的当前缓冲区。
+</p>
+<p>不推荐使用 initial ；  我们建议仅在为历史指定 cons 单元格的同时使用非 nil 值。请参阅初始输入。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: read-string prompt &amp;optional initial history default inherit-input-method ¶
+</pre></div>
+<p>这个函数从 minibuffer 中读取一个字符串并返回它。参数 prompt、initial、history 和 inherit-input-method 与 read-from-minibuffer 一样使用。使用的键映射是 minibuffer-local-map。
+</p>
+<p>可选参数 default 在 read-from-minibuffer 中使用，除了如果非零，它还指定用户输入空输入时返回的默认值。就像在 read-from-minibuffer 中一样，它应该是一个字符串、一个字符串列表或 nil，相当于一个空字符串。当 default 是一个字符串时，该字符串是默认值。当它是一个字符串列表时，第一个字符串是默认值。（所有这些字符串都可以在 <code>未来的 minibuffer 历史</code> 中供用户使用。）
+</p>
+<p>此函数通过调用 read-from-minibuffer 函数来工作：
+</p><div class="lisp">
+<pre class="lisp">(read-string prompt initial history default inherit)
+≡
+(let ((value
+       (read-from-minibuffer prompt initial nil nil
+                             history default inherit)))
+  (if (and (equal value "") default)
+      (if (consp default) (car default) default)
+    value))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: read-regexp prompt &amp;optional defaults history ¶
+</pre></div>
+<p>此函数从 minibuffer 中读取一个正则表达式作为字符串并返回它。如果 minibuffer 提示字符串 prompt 不以 ’:’ 结尾（后跟可选空格），则函数添加 ’:’ 到末尾，前面是默认返回值（见下文），如果那是非空的。
+</p>
+<p>可选参数 defaults 控制用户输入 null 输入时返回的默认值，并且应该是以下之一：字符串；  nil，相当于一个空字符串；  字符串列表；  或一个符号。
+</p>
+<p>如果 defaults 是一个符号，read-regexp 会查询变量 read-regexp-defaults-function 的值（见下文），如果它不是 nil，则优先使用它而不是默认值。这种情况下的值应该是：
+</p>
+<ul>
+<li>
+regexp-history-last，这意味着使用适当的 minibuffer 历史列表的第一个元素（见下文）。
+</li><li>
+没有参数的函数，其返回值（应该是 nil、字符串或字符串列表）成为默认值。
+</li></ul>
+<p>read-regexp 现在确保处理默认值的结果是一个列表（即，如果值为 nil 或字符串，它会将其转换为一个元素的列表）。在这个列表中，read-regexp 会附加一些可能有用的候选输入。这些都是：
+</p>
+<ul>
+<li>
+点的单词或符号。
+</li><li>
+增量搜索中使用的最后一个正则表达式。
+</li><li>
+增量搜索中使用的最后一个字符串。
+</li><li>
+查询替换命令中使用的最后一个字符串或模式。
+</li></ul>
+<p>该函数现在有一个正则表达式列表，它传递给 read-from-minibuffer 以获取用户的输入。列表的第一个元素是空输入时的默认结果。列表中的所有元素都可以作为 <code>future minibuffer history</code> 列表供用户使用（参见 GNU Emacs 手册中的 future 列表）。
+</p>
+<p>可选参数历史，如果非零，是一个符号，指定要使用的小缓冲区历史列表（请参阅小缓冲区历史）。如果省略或为零，历史列表默认为 regexp-history。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: read-regexp-defaults-function ¶
+</pre></div>
+<p>函数 read-regexp 可以使用这个变量的值来确定它的默认正则表达式列表。如果非零，则此变量的值应为：
+</p>
+<ul>
+<li>
+符号 regexp-history-last。
+</li><li>
+一个没有参数的函数，它返回 nil、字符串或字符串列表。
+</li></ul>
+<p>有关如何使用这些值的详细信息，请参阅上面的 read-regexp。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: minibuffer-allow-text-properties ¶
+</pre></div>
+<p>如果此变量为 nil，则 read-from-minibuffer 和 read-string 在返回之前从 minibuffer 输入中去除所有文本属性。然而，read-no-blanks-input（见下文），以及 read-minibuffer 和相关函数（见Reading Lisp Objects With the Minibuffer），以及所有完成 minibuffer 输入的函数，无条件移除 face 属性，不管这个变量的值。
+</p>
+<p>如果此变量不为 nil，则完成表中字符串的大多数文本属性都将保留——但仅保留在已完成的部分字符串上。
+</p><div class="lisp">
+<pre class="lisp">(let ((minibuffer-allow-text-properties t))
+  (completing-read "String: " (list (propertize "foobar" 'data 'zot))))
+=&gt; #("foobar" 3 6 (data zot))
+</pre></div>
+<p>在此示例中，用户键入 <code>foo</code> ，然后按 TAB 键，因此仅保留最后三个字符的文本属性。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: minibuffer-local-map ¶
+</pre></div>
+<p>这是用于从 minibuffer 中读取的默认本地键映射。默认情况下，它进行以下绑定：
+</p>
+<p>Cj
+</p>
+<p>     退出小缓冲区
+RET
+</p>
+<p>     退出小缓冲区
+M-&lt;
+</p>
+<p>     minibuffer-beginning-of-buffer
+CG
+</p>
+<p>     中止递归编辑
+锰
+向下
+</p>
+<p>     下一个历史元素
+国会议员
+向上
+</p>
+<p>     以前的历史元素
+小姐
+</p>
+<p>     下一个匹配历史元素
+先生
+</p>
+<p>先前匹配的历史元素
+</p>
+<div class="lisp">
+<pre class="lisp">Function: read-no-blanks-input prompt &amp;optional initial inherit-input-method ¶
+</pre></div>
+<p>此函数从 minibuffer 中读取字符串，但不允许空白字符作为输入的一部分：相反，这些字符会终止输入。参数prompt、initial 和inherit-input-method 用于read-from-minibuffer。
+</p>
+<p>这是 read-from-minibuffer 函数的简化接口，并将 minibuffer-local-ns-map 键映射的值作为该函数的键映射参数传递。由于 keymap minibuffer-local-ns-map 不会重新绑定 Cq，因此可以通过引用将空格放入字符串中。
+</p>
+<p>无论 minibuffer-allow-text-properties 的值如何，此函数都会丢弃文本属性。
+</p>
+<div class="lisp">
+<pre class="lisp">(read-no-blanks-input prompt initial)
+≡
+(let (minibuffer-allow-text-properties)
+  (read-from-minibuffer prompt initial minibuffer-local-ns-map))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Variable: minibuffer-local-ns-map ¶
+</pre></div>
+<p>这个内置变量是在函数 read-no-blanks-input 中用作 minibuffer 本地键映射的键映射。默认情况下，除了 minibuffer-local-map 之外，它还会进行以下绑定：
+</p>
+<div class="lisp">
+<pre class="lisp">SPC ¶
+</pre></div>
+<p>退出小缓冲区
+</p><div class="lisp">
+<pre class="lisp">TAB ¶
+</pre></div>
+<p>退出小缓冲区
+</p><div class="lisp">
+<pre class="lisp">? ¶
+</pre></div>
+<p>自插入退出
+</p>
+<div class="lisp">
+<pre class="lisp">Function: format-prompt prompt default &amp;rest format-args ¶
+</pre></div>
+<p>根据 minibuffer-default-prompt-format 变量使用默认值 default 格式化提示。
+</p>
+<p>minibuffer-default-prompt-format 是一个格式字符串（默认为 ’" (default %s)"’ ，它表示提示中的 <code>默认</code> 位如 ’"Local filename (default somefile): "’ 将如何被格式化。
+</p>
+<p>为了允许用户自定义其显示方式，提示用户输入值（并具有默认值）的代码应类似于以下代码片段：
+</p>
+<div class="lisp">
+<pre class="lisp">(read-file-name
+ (format-prompt "Local filename" file)
+ nil file)
+</pre></div>
+<p>如果 format-args 为 nil，则将 prompt 用作文字字符串。如果 format-args 不为零，则将 prompt 用作格式控制字符串，并将 prompt 和 format-args 传递给 format（请参阅格式化字符串）。
+</p>
+<p>minibuffer-default-prompt-format 可以是 ’""’，在这种情况下不显示默认值。
+</p>
+<p>如果 default 为 nil，则没有默认值，因此结果值中不包含 <code>默认值</code> 字符串。如果 default 是非 nil 列表，则在提示中使用列表的第一个元素。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: read-minibuffer-restore-windows ¶
+</pre></div>
+<p>如果此选项为非 nil（默认值），则从 minibuffer 获取输入将在退出时恢复输入 minibuffer 的帧的窗口配置，如果不同，则恢复拥有 minibuffer 窗口的帧。这意味着，例如，如果用户在同一帧上从 minibuffer 获取输入时拆分窗口，则在退出 minibuffer 时该拆分将被撤消。
+</p>
+<p>如果此选项为零，则不进行此类恢复。因此，上面提到的窗口拆分将在退出 minibuffer 后持续存在。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="21.3_用_Minibuffer_读取_Lisp_对象.html">用_Minibuffer_读取_Lisp_对象</a>, Previous: <a href="21.1_Minibuffers_简介.html">Minibuffers_简介</a>, Up: <a href="21_小缓冲区.html">小缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

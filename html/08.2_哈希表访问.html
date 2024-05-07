@@ -1,0 +1,35 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>8.2 哈希表访问</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">8.2 哈希表访问</h2>
+<div class="nav-panel"><p>Next: <a href="08.3_定义哈希比较.html">定义哈希比较</a>, Previous: <a href="08.1_创建哈希表.html">创建哈希表</a>, Up: <a href="08_哈希表.html">哈希表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节描述了在哈希表中访问和存储关联的函数。一般来说，任何 Lisp 对象都可以用作散列键，除非比较方法有限制。任何 Lisp 对象也可以用作值。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: gethash key table &amp;optional default ¶
+</pre></div>
+<p>此函数在 table 中查找 key，并返回其关联值 - 或默认值，如果 key 在 table 中没有关联。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: puthash key value table ¶
+</pre></div>
+<p>此函数为表中的键输入关联，并带有值值。如果 key 在 table 中已经有关联，则 value 替换旧的关联 value。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: remhash key table ¶
+</pre></div>
+<p>此函数从表中删除键的关联，如果有的话。如果 key 没有关联，remhash 什么也不做。
+</p>
+<p>Common Lisp 注意：在 Common Lisp 中，如果 remhash 实际删除了关联，则返回非 nil，否则返回 nil。在 Emacs Lisp 中，remhash 总是返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: clrhash table ¶
+</pre></div>
+<p>此函数从哈希表中删除所有关联，使其变为空。这也称为清除哈希表。
+</p>
+<p>Common Lisp 注意：在 Common Lisp 中，clrhash 返回空表。在 Emacs Lisp 中，它返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: maphash function table ¶
+</pre></div>
+<p>该函数为表中的每个关联调用一次函数。函数函数应该接受两个参数——表中列出的键及其关联的值。maphash 返回零。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="08.3_定义哈希比较.html">定义哈希比较</a>, Previous: <a href="08.1_创建哈希表.html">创建哈希表</a>, Up: <a href="08_哈希表.html">哈希表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

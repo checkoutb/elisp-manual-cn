@@ -1,0 +1,25 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>13.2.4 函数的文档字符串</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">13.2.4 函数的文档字符串</h3>
+<div class="nav-panel"><p>Next: <a href="13.3_命名函数.html">命名函数</a>, Previous: <a href="13.2.3_参数列表的特点.html">参数列表的特点</a>, Up: <a href="13.2_Lambda_表达式.html">Lambda_表达式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>lambda 表达式可以选择在 lambda 列表之后有一个文档字符串。该字符串不影响函数的执行；  它是一种注释，是一种系统化的注释，它实际上出现在 Lisp 世界中，并且可以被 Emacs 帮助工具使用。请参阅文档，了解如何访问文档字符串。
+</p>
+<p>为程序中的所有函数提供文档字符串是一个好主意，即使是那些仅从程序中调用的函数。文档字符串类似于注释，只是它们更易于访问。
+</p>
+<p>文档字符串的第一行应该独立存在，因为 apropos 只显示第一行。它应该由一两个完整的句子组成，总结了函数的目的。
+</p>
+<p>文档字符串的开头通常在源文件中缩进，但由于这些空格位于起始双引号之前，它们不是字符串的一部分。有些人习惯于缩进字符串的任何其他行，以便文本在程序源中对齐。这是一个错误。以下行的缩进在字符串内部；  当帮助命令显示时，源代码中看起来不错的东西看起来很难看。
+</p>
+<p>您可能想知道文档字符串如何是可选的，因为它后面有函数的必需组件（主体）。由于字符串的评估返回该字符串，没有任何副作用，如果它不是正文中的最后一个形式，则它没有任何效果。因此，在实践中，正文的第一种形式和文档字符串之间没有混淆；  如果唯一的主体形式是一个字符串，那么它既可以用作返回值，也可以用作文档。
+</p>
+<p>文档字符串的最后一行可以指定不同于实际函数参数的调用约定。像这样写文本：
+</p>
+<div class="lisp">
+<pre class="lisp">\(fn arglist)
+</pre></div>
+<p>在行首的空行之后，文档字符串中没有换行符。（’\’ 用于避免混淆 Emacs 运动命令。）以这种方式指定的调用约定出现在帮助消息中，代替从函数的实际参数派生的调用约定。
+</p>
+<p>此功能对宏定义特别有用，因为宏定义中编写的参数通常与用户对宏调用部分的看法不符。
+</p>
+<p>如果您想弃用调用约定并支持您按上述规范宣传的调用约定，请不要使用此功能。相反，使用advertised-calling-convention 声明（参见声明表单）或set-advertised-calling-convention（参见声明过时函数），因为这两个将导致字节编译器在编译Lisp程序时发出警告消息已弃用的调用约定。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="13.3_命名函数.html">命名函数</a>, Previous: <a href="13.2.3_参数列表的特点.html">参数列表的特点</a>, Up: <a href="13.2_Lambda_表达式.html">Lambda_表达式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

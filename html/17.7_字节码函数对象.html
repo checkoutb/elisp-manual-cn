@@ -1,0 +1,54 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>17.7 字节码函数对象</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">17.7 字节码函数对象</h2>
+<div class="nav-panel"><p>Next: <a href="17.8_反汇编字节码.html">反汇编字节码</a>, Previous: <a href="17.6_编译器错误.html">编译器错误</a>, Up: <a href="17_字节编译.html">字节编译.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>字节编译函数有一种特殊的数据类型：它们是字节码函数对象。每当这样的对象作为要调用的函数出现时，Emacs 就会使用字节码解释器来执行字节码。
+</p>
+<p>在内部，字节码函数对象很像一个向量。可以使用 aref 访问其元素。它的打印表示类似于矢量，在开头的 <code>[</code> 之前有一个附加的 <code>#</code> 。它必须至少有四个元素；  没有最大数量，但只有前六个元素可以正常使用。他们是：
+</p>
+<div class="lisp">
+<pre class="lisp">argdesc
+</pre></div>
+<p>参数的描述符。这可以是参数列表，如参数列表的特性中所述，也可以是编码所需参数数量的整数。在后一种情况下，描述符的值指定第 0 到 6 位中的最小参数数量，以及第 8 到 14 位中的最大参数数量。如果参数列表使用 &amp;rest，则设置第 7 位；  否则它被清除。
+</p>
+<p>如果 argdesc 是一个列表，则参数将在执行字节码之前动态绑定。如果 argdesc 是整数，则在执行代码之前，参数将被推送到字节码解释器的堆栈中。
+</p><div class="lisp">
+<pre class="lisp">byte-code
+</pre></div>
+<p>包含字节码指令的字符串。
+</p><div class="lisp">
+<pre class="lisp">constants
+</pre></div>
+<p>字节码引用的 Lisp 对象的向量。这些包括用作函数名和变量名的符号。
+</p><div class="lisp">
+<pre class="lisp">stacksize
+</pre></div>
+<p>此函数所需的最大堆栈大小。
+</p><div class="lisp">
+<pre class="lisp">docstring
+</pre></div>
+<p>文档字符串（如果有）；  否则，无。如果文档字符串存储在文件中，则该值可以是数字或列表。使用函数文档获取真正的文档字符串（请参阅访问文档字符串）。
+</p><div class="lisp">
+<pre class="lisp">interactive
+</pre></div>
+<p>交互式规范（如果有）。这可以是字符串或 Lisp 表达式。对于非交互式功能，它是 nil。
+</p>
+<p>这是一个字节码函数对象的示例，以印刷形式表示。它是命令backward-sexp 的定义。
+</p>
+<div class="lisp">
+<pre class="lisp">#[256
+  "\211\204^G^@\300\262^A\301^A[!\207"
+  [1 forward-sexp]
+  3
+  1793299
+  "^p"]
+</pre></div>
+<p>创建字节码对象的原始方法是使用 make-byte-code：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-byte-code &amp;rest elements ¶
+</pre></div>
+<p>该函数构造并返回一个以元素为元素的字节码函数对象。
+</p>
+<p>您不应该尝试自己提出字节码函数的元素，因为如果它们不一致，Emacs 可能会在您调用该函数时崩溃。始终将其留给字节编译器来创建这些对象；  它使元素保持一致（我们希望）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="17.8_反汇编字节码.html">反汇编字节码</a>, Previous: <a href="17.6_编译器错误.html">编译器错误</a>, Up: <a href="17_字节编译.html">字节编译.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

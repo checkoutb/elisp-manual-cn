@@ -1,0 +1,162 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>3.8 整数的按位运算</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">3.8 整数的按位运算</h2>
+<div class="nav-panel"><p>Next: <a href="03.9_标准数学函数.html">标准数学函数</a>, Previous: <a href="03.7_舍入操作.html">舍入操作</a>, Up: <a href="03_数字.html">数字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在计算机中，整数表示为二进制数、位序列（数字为 0 或 1）。从概念上讲，左侧的位序列是无限的，最高有效位全为零或全一。逐位运算作用于此类序列的各个位。例如，shifting 将整个序列向左或向右移动一个或多个位置，再现移动过的相同模式。
+</p>
+<p>Emacs Lisp 中的按位运算仅适用于整数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ash integer1 count
+</pre></div>
+<p>ash（算术移位）将 integer1 中的位移动到左侧 count 位，如果 count 为负数，则向右移动。左移在右边引入零位；  右移丢弃最右边的位。考虑为整数运算，ash 将 integer1 乘以 2**count，然后通过向下舍入将结果转换为整数，朝向负无穷大。
+</p>
+<p>以下是 ash 的示例，将位模式向左和向右移动一个位置。这些示例仅显示了二进制模式的低位；  前导位都与所示的最高位一致。如您所见，左移一相当于乘以二，而右移一相当于除以二，然后向负无穷大舍入。
+</p>
+<div class="lisp">
+<pre class="lisp">(ash 7 1) ⇒ 14
+;; Decimal 7 becomes decimal 14.
+…000111
+     ⇒
+…001110
+
+
+(ash 7 -1) ⇒ 3
+…000111
+     ⇒
+…000011
+
+
+(ash -7 1) ⇒ -14
+…111001
+     ⇒
+…110010
+
+
+(ash -7 -1) ⇒ -4
+…111001
+     ⇒
+…111100
+</pre></div>
+<p>以下是左移或右移两位的示例：
+</p><div class="lisp">
+<pre class="lisp">                  ;         binary values
+(ash 5 2)         ;   5  =  …000101
+     ⇒ 20         ;      =  …010100
+(ash -5 2)        ;  -5  =  …111011
+     ⇒ -20        ;      =  …101100
+
+(ash 5 -2)
+     ⇒ 1          ;      =  …000001
+
+(ash -5 -2)
+     ⇒ -2         ;      =  …111110
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: lsh integer1 count
+</pre></div>
+<p>lsh 是逻辑移位的缩写，它将整数 1 中的位移动到左侧计数位置，或者如果计数为负数则向右移动，将零带入空出的位。如果 count 是负数，那么 integer1 必须是一个 fixnum 或一个正 bignum，并且 lsh 通过在移位前减去两次 most-negative-fixnum 来将负的 fixnum 视为无符号，从而产生非负结果。这种古怪的行为可以追溯到 Emacs 仅支持 fixnums 的时候。如今，灰烬是更好的选择。
+</p>
+<p>由于 lsh 的行为与 ash 类似，但 integer1 和 count1 均为负数时，以下示例将重点介绍这些例外情况。这些示例假定使用 30 位的固定编号。
+</p>
+<div class="lisp">
+<pre class="lisp">                 ;      binary values
+(ash -7 -1)      ; -7 = …111111111111111111111111111001
+     ⇒ -4        ;    = …111111111111111111111111111100
+(lsh -7 -1)
+     ⇒ 536870908 ;    = …011111111111111111111111111100
+
+(ash -5 -2)      ; -5 = …111111111111111111111111111011
+     ⇒ -2        ;    = …111111111111111111111111111110
+(lsh -5 -2)
+     ⇒ 268435454 ;    = …001111111111111111111111111110
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: logand &amp;rest ints-or-markers
+</pre></div>
+<p>此函数返回参数的按位与：当且仅当所有参数中的第 n 位为 1 时，结果中的第 n 位为 1。
+</p>
+<p>例如，使用 4 位二进制数，13 和 12 的按位与为 12：1101 与 1100 组合产生 1100。在这两个二进制数中，最左边的两位都是 1，因此返回值的最左边的两位是两者都是1。但是，对于最右边的两位，至少有一个参数中的每一位都是0，因此返回值的最右边的两位都是0。
+</p>
+<p>所以，
+</p><div class="lisp">
+<pre class="lisp">(logand 13 12)
+     ⇒ 12
+</pre></div>
+<p>如果 logand 未传递任何参数，则返回值 -1。这个数字是 logand 的标识元素，因为它的二进制表示完全由 1 组成。如果 logand 只传递了一个参数，它将返回该参数。
+</p>
+<div class="lisp">
+<pre class="lisp">                   ;        binary values
+
+(logand 14 13)     ; 14  =  …001110
+                   ; 13  =  …001101
+     ⇒ 12         ; 12  =  …001100
+
+
+(logand 14 13 4)   ; 14  =  …001110
+                   ; 13  =  …001101
+                   ;  4  =  …000100
+     ⇒ 4          ;  4  =  …000100
+
+
+(logand)
+     ⇒ -1         ; -1  =  …111111
+
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: logior &amp;rest ints-or-markers
+</pre></div>
+<p>此函数返回其参数的按位或运算：当且仅当至少一个参数中的第 n 位为 1 时，结果中的第 n 位为 1。如果没有参数，则结果为 0，这是此操作的标识元素。如果 logior 仅传递一个参数，则返回该参数。
+</p>
+<div class="lisp">
+<pre class="lisp">                   ;        binary values
+
+(logior 12 5)      ; 12  =  …001100
+                   ;  5  =  …000101
+     ⇒ 13         ; 13  =  …001101
+
+
+(logior 12 5 7)    ; 12  =  …001100
+                   ;  5  =  …000101
+                   ;  7  =  …000111
+     ⇒ 15         ; 15  =  …001111
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: logxor &amp;rest ints-or-markers
+</pre></div>
+<p>此函数返回其参数的按位异或：当且仅当第 n 位在奇数个参数中为 1 时，结果中的第 n 位为 1。如果没有参数，则结果为 0，这是此操作的标识元素。如果 logxor 只传递了一个参数，它将返回该参数。
+</p>
+<div class="lisp">
+<pre class="lisp">                   ;        binary values
+
+(logxor 12 5)      ; 12  =  …001100
+                   ;  5  =  …000101
+     ⇒ 9          ;  9  =  …001001
+
+
+(logxor 12 5 7)    ; 12  =  …001100
+                   ;  5  =  …000101
+                   ;  7  =  …000111
+     ⇒ 14         ; 14  =  …001110
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: lognot integer
+</pre></div>
+<p>此函数返回其参数的按位补码：当且仅当第 n 位在整数中为零时，结果中的第 n 位为 1，反之亦然。结果等于 -1 - 整数。
+</p><div class="lisp">
+<pre class="lisp">(lognot 5)
+     ⇒ -6
+;;  5  =  …000101
+;; becomes
+;; -6  =  …111010
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: logcount integer
+</pre></div>
+<p>该函数返回整数的汉明权重：整数的二进制表示中的个数。如果整数为负数，则返回二进制补码表示中的零位数。结果总是非负的。
+</p><div class="lisp">
+<pre class="lisp">(logcount 43)     ;  43 = …000101011
+     ⇒ 4
+(logcount -43)    ; -43 = …111010101
+     ⇒ 3
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="03.9_标准数学函数.html">标准数学函数</a>, Previous: <a href="03.7_舍入操作.html">舍入操作</a>, Up: <a href="03_数字.html">数字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

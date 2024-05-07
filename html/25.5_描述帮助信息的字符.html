@@ -1,0 +1,64 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>25.5 描述帮助信息的字符</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">25.5 描述帮助信息的字符</h2>
+<div class="nav-panel"><p>Next: <a href="25.6_帮助功能.html">帮助功能</a>, Previous: <a href="25.4_文本引用样式.html">文本引用样式</a>, Up: <a href="25_文档.html">文档.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这些函数将事件、按键序列或字符转换为文本描述。这些描述对于在消息中包含任意文本字符或键序列很有用，因为它们将非打印字符和空白字符转换为打印字符序列。非空白打印字符的描述是字符本身。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: key-description sequence &amp;optional prefix ¶
+</pre></div>
+<p>此函数返回一个字符串，其中包含按顺序输入事件的 Emacs 标准表示法。如果前缀是非零，它是导致序列的输入事件序列，并包含在返回值中。两个参数都可以是字符串、向量或列表。有关有效事件的更多信息，请参阅输入事件。
+</p><div class="lisp">
+<pre class="lisp">
+
+(key-description [?\M-3 delete])
+     ⇒ "M-3 &lt;delete&gt;"
+
+(key-description [delete] "\M-3")
+     ⇒ "M-3 &lt;delete&gt;"
+</pre></div>
+<p>另请参阅下面的单键描述示例。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: single-key-description event &amp;optional no-angles ¶
+</pre></div>
+<p>此函数以标准 Emacs 表示法返回一个描述事件的字符串，用于键盘输入。正常的打印字符显示为自身，但控制字符变为以’C-’开头的字符串，元字符变为以’M-’开头的字符串，空格、制表符等显示为’SPC’ , ’TAB’ 等。功能键符号出现在尖括号 ’&lt;…&gt;’ 内。作为列表的事件显示为列表的 CAR 中尖括号内的符号名称。
+</p>
+<p>如果可选参数 no-angles 不为 nil，则省略功能键和事件符号周围的尖括号；  这是为了与不使用括号的旧版本的 Emacs 兼容。
+</p><div class="lisp">
+<pre class="lisp">
+
+(single-key-description ?\C-x)
+     ⇒ "C-x"
+
+(key-description "\C-x \M-y \n \t \r \f123")
+     ⇒ "C-x SPC M-y SPC C-j SPC TAB SPC RET SPC C-l 1 2 3"
+
+(single-key-description 'delete)
+     ⇒ "&lt;delete&gt;"
+
+(single-key-description 'C-mouse-1)
+     ⇒ "C-&lt;mouse-1&gt;"
+
+(single-key-description 'C-mouse-1 t)
+     ⇒ "C-mouse-1"
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: text-char-description character ¶
+</pre></div>
+<p>这个函数返回一个字符串，以标准 Emacs 表示法描述可以出现在文本中的字符——类似于单键描述，除了参数必须是通过 characterp 测试的有效字符代码（请参阅字符代码）。该函数生成带有前导插入符号的控制字符的描述（这是 Emacs 通常在缓冲区中显示控制字符的方式）。带有修饰位的字符将导致该函数发出错误信号（带有 Control 修饰符的 ASCII 字符是一个例外，它们表示为控制字符）。
+</p>
+<div class="lisp">
+<pre class="lisp">
+
+(text-char-description ?\C-c)
+     ⇒ "^C"
+
+(text-char-description ?\M-m)
+     error→ Wrong type argument: characterp, 134217837
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Command: read-kbd-macro string &amp;optional need-vector ¶
+</pre></div>
+<p>该函数主要用于对键盘宏进行操作，但也可以作为按键描述的粗略逆向使用。你用一个包含键描述的字符串来调用它，用空格分隔；  它返回一个包含相应事件的字符串或向量。（这可能是也可能不是单个有效键序列，具体取决于您使用的事件；请参阅键序列。）如果需要向量不为零，则返回值始终是向量。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="25.6_帮助功能.html">帮助功能</a>, Previous: <a href="25.4_文本引用样式.html">文本引用样式</a>, Up: <a href="25_文档.html">文档.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

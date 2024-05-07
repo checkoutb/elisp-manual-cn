@@ -1,0 +1,24 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>5.1 列表和缺点单元格</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">5.1 列表和缺点单元格</h2>
+<div class="nav-panel"><p>Next: <a href="05.2_列表上的谓词.html">列表上的谓词</a>, Previous: <a href="05_列表.html">列表</a>, Up: <a href="05_列表.html">列表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Lisp 中的列表不是原始数据类型；  它们是由 cons 单元格构建的（请参阅 Cons 单元格和列表类型）。cons 单元格是表示有序对的数据对象。也就是说，它有两个插槽，每个插槽都保存或引用某个 Lisp 对象。一个插槽称为 CAR，另一个称为 CDR。（这些名称是传统的；请参阅 Cons Cell 和 List Types。） CDR 发音为 <code>could-er</code> 。
+</p>
+<p>我们说 <code>这个 cons 单元的 CAR 是</code> 它的 CAR 槽当前持有的任何对象，对于 CDR 也是如此。
+</p>
+<p>列表是一系列链接在一​​起的 cons 单元格，因此每个单元格都指向下一个单元格。列表的每个元素都有一个 cons 单元格。按照约定，cons 单元的 CAR 保存列表的元素，CDR 用于链接列表（CAR 和 CDR 之间的这种不对称完全是约定问题；在 cons 单元的级别，CAR 和 CDR插槽具有相似的属性）。因此，列表中每个 cons 信元的 CDR 时隙指的是后面的 cons 信元。
+</p>
+<p>同样按照惯例，列表中最后一个 cons 单元的 CDR 为 nil。我们称这样的零终止结构为适当的列表3。在 Emacs Lisp 中，符号 nil 既是符号又是没有元素的列表。为方便起见，符号 nil 被认为将 nil 作为其 CDR（也作为其 CAR）。
+</p>
+<p>因此，正确列表的 CDR 始终是正确列表。非空真列表的 CDR 是包含除第一个之外的所有元素的真列表。
+</p>
+<p>如果列表的最后一个 cons 单元格的 CDR 是 nil 以外的某个值，我们将结构称为点列表，因为它的打印表示将使用点对表示法（请参阅点对表示法）。还有另一种可能性：某个 cons 单元格的 CDR 可能指向列表中先前的 cons 单元格之一。我们称该结构为循环列表。
+</p>
+<p>出于某些目的，列表是正确的、循环的还是点状的并不重要。如果一个程序在列表中看不到最后一个 cons 单元的 CDR，它不会在意。但是，某些对列表进行操作的函数需要正确的列表，如果给定一个点列表，则会发出错误信号。如果给定一个循环列表，大多数尝试查找列表末尾的函数都会进入无限循环。
+</p>
+<p>因为大多数 cons 单元被用作列表的一部分，所以我们将任何由 cons 单元组成的结构称为列表结构。
+脚注
+(3)
+</p>
+<p>它有时也被称为真实列表，但我们通常不会在本手册中使用此术语。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="05.2_列表上的谓词.html">列表上的谓词</a>, Previous: <a href="05_列表.html">列表</a>, Up: <a href="05_列表.html">列表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

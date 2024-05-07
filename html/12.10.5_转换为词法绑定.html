@@ -1,0 +1,30 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>12.10.5 转换为词法绑定</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">12.10.5 转换为词法绑定</h3>
+<div class="nav-panel"><p>Next: <a href="12.11_缓冲区局部变量.html">缓冲区局部变量</a>, Previous: <a href="12.10.4_使用词法绑定.html">使用词法绑定</a>, Up: <a href="12.10_变量绑定的作用域规则.html">变量绑定的作用域规则.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>将 Emacs Lisp 程序转换为词法绑定很容易。首先，在 Emacs Lisp 源文件的标题行中添加 lexical-binding to t 的文件局部变量设置（请参阅文件局部变量）。其次，检查程序中每个需要动态绑定的变量是否都有一个变量定义，以免无意中被词法绑定。
+</p>
+<p>找出哪些变量需要变量定义的一种简单方法是对源文件进行字节编译。请参阅字节编译。如果在 let 形式之外使用了非特殊变量，字节编译器将警告对自由变量的引用或赋值。如果非特殊变量被绑定但未在 let 形式中使用，字节编译器将警告未使用的词法变量。如果您使用特殊变量作为函数参数，字节编译器也会发出警告。
+</p>
+<p>关于对自由变量的引用或赋值的警告通常是一个明确的信号，表明该变量应标记为动态范围，因此您需要在第一次使用该变量之前添加适当的 defvar。
+</p>
+<p>关于未使用变量的警告可能是一个很好的暗示，表明该变量是动态范围的（因为它实际上被使用，但在另一个函数中），但它也可能表明该变量实际上根本没有使用并且可以简单地被删除。因此，您需要找出它是哪种情况，并在此基础上添加一个 defvar 或完全删除该变量。如果删除是不可能或不可取的（通常是因为它是一个正式参数并且我们不能或不想更改所有调用者），您还可以在变量名称中添加前导下划线以向编译器表明此是一个已知不会使用的变量。）
+跨文件变量检查
+</p>
+<p>注意：这是一项实验性功能，可能会更改或消失，恕不另行通知。
+</p>
+<p>字节编译器还可以警告其他 Emacs Lisp 文件中特殊的词法变量，通常表明缺少 defvar 声明。这种有用但有些专业的检查需要三个步骤：
+</p>
+<p>字节编译所有可能感兴趣的特殊变量声明的文件，环境变量 EMACS<em>_GENERATE</em><em>_DYNVARS</em> 设置为非空字符串。这些通常是同一个包或相关包或 Emacs 子系统中的所有文件。该过程将为每个已编译的 Emacs Lisp 文件生成一个名称以 .dynvars 结尾的文件。
+将 .dynvars 文件连接成一个文件。
+字节编译需要检查的文件，这次将环境变量 EMACS<em>_DYNVARS</em><em>_FILE</em> 设置为在步骤 2 中创建的聚合文件的名称。 
+</p>
+<p>下面是一个示例，说明如何做到这一点，假设 Unix shell 和 make 用于字节编译：
+</p>
+<div class="example">
+<pre class="example">$ rm *.elc                                # force recompilation
+$ EMACS_GENERATE_DYNVARS=1 make           # generate .dynvars
+$ cat *.dynvars &gt; ~/my-dynvars            # combine .dynvars
+$ rm *.elc                                # force recompilation
+$ EMACS_DYNVARS_FILE=~/my-dynvars make    # perform checks
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="12.11_缓冲区局部变量.html">缓冲区局部变量</a>, Previous: <a href="12.10.4_使用词法绑定.html">使用词法绑定</a>, Up: <a href="12.10_变量绑定的作用域规则.html">变量绑定的作用域规则.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

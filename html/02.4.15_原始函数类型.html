@@ -1,0 +1,19 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>2.4.15 原始函数类型</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">2.4.15 原始函数类型</h3>
+<div class="nav-panel"><p>Next: <a href="02.4.16_字节码函数类型.html">字节码函数类型</a>, Previous: <a href="02.4.14_宏类型.html">宏类型</a>, Up: <a href="02.4_编程类型.html">编程类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>原始函数是可从 Lisp 调用但用 C 编程语言编写的函数。原始函数也称为子函数或内置函数。（ <code>subr</code> 这个词是从 <code>subroutine</code> 派生的。）大多数原始函数在调用它们时都会评估它们的所有参数。不评估其所有参数的原始函数称为特殊形式（请参阅特殊形式）。
+</p>
+<p>函数是否是原始函数对函数的调用者无关紧要。但是，如果您尝试使用用 Lisp 编写的函数重新定义原语，这确实很重要。原因是可以直接从 C 代码调用原始函数。从 Lisp 调用重新定义的函数将使用新定义，但从 C 代码调用仍可能使用内置定义。因此，我们不鼓励重新定义原始函数。
+</p>
+<p>术语函数指的是所有 Emacs 函数，无论是用 Lisp 还是 C 编写的。有关用 Lisp 编写的函数的信息，请参阅函数类型。
+</p>
+<p>原始函数没有读取语法，并以散列表示法打印子例程的名称。
+</p>
+<div class="lisp">
+<pre class="lisp">(symbol-function 'car)          ; Access the function cell
+                                  ;   of the symbol.
+     ⇒ #&lt;subr car&gt;
+(subrp (symbol-function 'car))  ; Is this a primitive function?
+     ⇒ t                       ; Yes.
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="02.4.16_字节码函数类型.html">字节码函数类型</a>, Previous: <a href="02.4.14_宏类型.html">宏类型</a>, Up: <a href="02.4_编程类型.html">编程类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

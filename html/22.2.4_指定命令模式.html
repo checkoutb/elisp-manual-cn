@@ -1,0 +1,38 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.2.4 指定命令模式</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">22.2.4 指定命令模式</h3>
+<div class="nav-panel"><p>Next: <a href="22.2.5_在命令选项中进行选择.html">在命令选项中进行选择</a>, Previous: <a href="22.2.3_使用示例_interactive.html">使用示例_interactive</a>, Up: <a href="22.2_定义命令.html">定义命令.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 中的许多命令都是通用的，与任何特定模式无关。例如，Mx kill-region 几乎可以在任何具有可编辑文本的模式下使用，而显示信息的命令（如 Mx 列表缓冲区）几乎可以在任何上下文中使用。
+</p>
+<p>然而，许多其他命令专门与模式相关联，并且在该上下文之外没有任何意义。例如，如果在 Dired 缓冲区之外使用， Mx dired-diff 只会发出错误信号。
+</p>
+<p>因此，Emacs 有一种机制来指定命令 <code>属于</code> 什么模式（或模式）：
+</p><div class="lisp">
+<pre class="lisp">(defun dired-diff (...)
+  ...
+  (interactive "p" dired-mode)
+  ...)
+</pre></div>
+<p>这会将命令标记为仅适用于 dired-mode（或从 dired-mode 派生的任何模式）。可以将任意数量的模式添加到交互式表单中。
+</p>
+<p>指定模式会影响 MSx 中的命令完成（execute-extended-command-for-buffer，请参阅交互式调用）。它还可能影响 Mx 中的完成，具体取决于 read-extended-command-predicate 的值。
+</p>
+<p>例如，当使用 command-completion-default-include-p 谓词作为 read-extended-command-predicate 的值时，Mx 不会列出已标记为适用于特定模式的命令（除非您在当然是使用该模式的缓冲区）。这适用于主要和次要模式。（相比之下，MSx 总是从补全候选中省略不适用的命令。）
+</p>
+<p>默认情况下，read-extended-command-predicate 为 nil，Mx 中的完成会列出与用户键入的内容匹配的所有命令，无论这些命令是否标记为适用于当前缓冲区的模式。
+</p>
+<p>将命令标记为适用于模式也会使 Ch m 列出这些命令（如果它们未绑定到任何键）。
+</p>
+<p>如果使用这个扩展的交互表单不方便（因为代码应该在不支持扩展交互表单的旧版本的 Emacs 中工作），可以使用以下等效声明（请参阅声明表单）：
+</p>
+<div class="lisp">
+<pre class="lisp">(declare (modes dired-mode))
+</pre></div>
+<p>用模式标记哪些命令在某种程度上是个人喜好问题，但显然不能在模式之外工作的命令应该被标记。这包括如果从其他地方调用将发出错误信号的命令，也包括从意外模式调用时具有破坏性的命令。（这通常包括为特殊（即非编辑）模式编写的大多数命令。）
+</p>
+<p>某些命令可能是无害的，并且在从其他模式调用时 <code>有效</code> ，但如果它们在其他地方使用实际上没有多大意义，则仍应使用模式标记。例如，许多特殊模式具有退出绑定到 q 的缓冲区的命令，并且可能什么都不做，只是发出一条消息，如 <code>从此模式再见</code> ，然后调用 kill-buffer。此命令将在任何模式下 <code>工作</code> ，但任何人都不太可能真正想要在此特殊模式的上下文之外使用该命令。
+</p>
+<p>许多模式都有一组不同的命令，它们以不同的方式启动模式（例如，eww-open-in-new-buffer 和 eww-open-file）。像这样的命令永远不应该被标记为特定于模式的，因为它们可以由用户从几乎任何上下文中发出。
+</p>
+<p>请注意，在 Emacs 28.1 中的本机编译函数中不支持指定命令模式（但在以后的 Emacs 版本中已修复此问题）。这意味着本机编译版本也不支持 read-extended-command-predicate 。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.2.5_在命令选项中进行选择.html">在命令选项中进行选择</a>, Previous: <a href="22.2.3_使用示例_interactive.html">使用示例_interactive</a>, Up: <a href="22.2_定义命令.html">定义命令.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

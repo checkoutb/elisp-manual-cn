@@ -1,0 +1,141 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>41.1.1 小结：启动时的动作顺序</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">41.1.1 小结：启动时的动作顺序</h3>
+<div class="nav-panel"><p>Next: <a href="41.1.2_初始化文件.html">初始化文件</a>, Previous: <a href="41.1_启动_Emacs.html">启动_Emacs</a>, Up: <a href="41.1_启动_Emacs.html">启动_Emacs.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当 Emacs 启动时，它会执行以下操作（参见 startup.el 中的 normal-top-level ）：
+</p>
+<ol>
+<li>
+它通过在列表中的每个目录中运行名为 subdirs.el 的文件，将子目录添加到加载路径。通常，此文件会将目录的子目录添加到列表中，然后依次扫描这些子目录。subdirs.el 文件通常在安装 Emacs 时自动生成。
+</li><li>
+它加载它在加载路径目录中找到的任何 leim-list.el。该文件用于注册输入法。仅搜索您可能创建的任何个人 leim-list.el 文件；  它会跳过包含标准 Emacs 库的目录（这些应该只包含一个 leim-list.el 文件，该文件被编译成 Emacs 可执行文件）。
+</li><li>
+它将变量 before-init-time 设置为 current-time 的值（请参阅时间）。它还将 after-init-time 设置为 nil，这向 Lisp 程序发出 Emacs 正在初始化的信号。
+</li><li>
+如果 LANG 等环境变量要求，它设置语言环境和终端编码系统。
+</li><li>
+它对命令行参数进行一些基本的解析。
+</li><li>
+它加载您的早期初始化文件（请参阅 GNU Emacs 手册中的早期初始化文件）。如果指定了选项 <code>-q</code> 、 <code>-Q</code> 或 <code>--batch</code> ，则不会执行此操作。如果指定了 ’-u’ 选项，Emacs 会在该用户的主目录中查找 init 文件。
+</li><li>
+它调用函数 package-activate-all 来激活任何已安装的可选 Emacs Lisp 包。请参阅包装基础知识。但是，当 package-enable-at-startup 为 nil 或使用选项 <code>-q</code> 、 <code>-Q</code> 或 <code>--batch</code> 之一启动时，Emacs 不会激活包。要在后一种情况下激活包，应该显式调用 package-activate-all（例如，通过 <code>--funcall</code> 选项）。
+</li><li>
+如果不在批处理模式下运行，它会初始化变量 initial-window-system 指定的窗口系统（参见 initial-window-system）。初始化函数 window-system-initialization 是一个通用函数（请参阅通用函数），其实际实现对于每个支持的窗口系统都不同。如果initial-window-system的值为windowsystem，那么初始化函数的适当实现定义在文件term/windowsystem-win.el中。该文件在构建时应该已经编译到 Emacs 可执行文件中。
+</li><li>
+它在初始化钩子之前运行正常的钩子。
+</li><li>
+如果合适，它会创建一个图形框架。作为创建图形框架的一部分，它通过为该窗口系统调用 window-system-initialization 函数来为图形框架初始化由 initial-frame-alist 和 default-frame-alist 指定的窗口系统（请参阅初始帧参数） .  这不是在批处理（非交互）或守护程序模式下完成的。
+</li><li>
+它初始化初始帧的面，并在需要时设置菜单栏和工具栏。如果支持图形框架，即使当前框架不是图形框架，它也会设置工具栏，因为稍后可能会创建图形框架。
+</li><li>
+它使用 custom-reevaluate-setting 重新初始化列表 custom-delayed-init-variables 的成员。这些是任何预加载的用户选项，其默认值取决于运行时而不是构建时上下文。请参阅自定义初始化延迟。
+</li><li>
+它会加载库站点启动（如果存在）。如果指定了选项 <code>-Q</code> 或 <code>--no-site-file</code> ，则不会这样做。
+</li><li>
+它加载您的初始化文件（请参阅初始化文件）。如果指定了选项 <code>-q</code> 、 <code>-Q</code> 或 <code>--batch</code> ，则不会执行此操作。如果指定了 ’-u’ 选项，Emacs 会在该用户的主目录中查找 init 文件。
+</li><li>
+它加载库默认值（如果存在）。如果 inhibitor-default-init 为非 nil，或者指定了选项 <code>-q</code> 、 <code>-Q</code> 或 <code>--batch</code> ，则不会执行此操作。
+</li><li>
+它从 abbrev-file-name 指定的文件加载您的缩写，如果该文件存在并且可以读取（请参阅 abbrev-file-name）。如果指定了选项 <code>--batch</code> ，则不会这样做。
+</li><li>
+它将变量 after-init-time 设置为 current-time 的值。这个变量之前被设置为 nil；  将其设置为当前时间表示初始化阶段结束，并与 before-init-time 一起提供对所用时间的测量。
+</li><li>
+它在初始化钩子之后运行正常的钩子。
+</li><li>
+如果缓冲区 <strong>scratch</strong> 存在并且仍处于基本模式（默认情况下应该如此），它会根据 initial-major-mode 设置其主要模式。
+</li><li>
+如果在文本终端上启动，它会加载特定于终端的 Lisp 库（请参阅特定于终端的初始化），并运行挂钩 tty-setup-hook。这不是在 –batch 模式下完成的，如果 term-file-prefix 为 nil 也不会。
+</li><li>
+它会显示初始回声区域消息，除非您使用禁止启动回声区域消息抑制了该消息。
+</li><li>
+它处理之前未处理的任何命令行选项。
+</li><li>
+如果指定了 –batch 选项，它现在退出。
+</li><li>
+如果 <strong>scratch</strong> 缓冲区存在并且为空，它会将 (substitute-command-keys initial-scratch-message) 插入该缓冲区。
+</li><li>
+如果 initial-buffer-choice 是一个字符串，它会访问具有该名称的文件（或目录）。如果它是一个函数，它会调用不带参数的函数并选择它返回的缓冲区。如果一个文件作为命令行参数给出，则访问该文件并将其缓冲区显示在 initial-buffer-choice 旁边。如果给出了多个文件，则访问所有文件并且 <strong>Buffer List</strong> 缓冲区显示在 initial-buffer-choice 旁边。
+</li><li>
+它运行 emacs-startup-hook。
+</li><li>
+它调用 frame-notice-user-settings，它根据 init 文件指定的任何内容修改所选框架的参数。
+</li><li>
+它运行窗口设置挂钩。这个钩子和 emacs-startup-hook 的唯一区别是这个钩子是在前面提到的对帧参数的修改之后运行的。
+</li><li>
+它显示启动屏幕，这是一个特殊的缓冲区，包含有关 copyleft 和基本 Emacs 使用的信息。如果 inhibitor-startup-screen 或 initial-buffer-choice 不为零，或者指定了 <code>--no-splash</code> 或 <code>-Q</code> 命令行选项，则不会执行此操作。
+</li><li>
+如果请求了一个守护进程，它会调用 server-start。（在 POSIX 系统上，如果请求后台守护程序，它会从控制终端分离。）请参阅 The GNU Emacs Manual 中的 Emacs Server。
+</li><li>
+如果由 X 会话管理器启动，它会调用 emacs-session-restore 将前一个会话的 ID 作为参数传递给它。请参阅会话管理。
+</li></ol>
+<p>以下选项会影响启动顺序的某些方面。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: inhibit-startup-screen ¶
+</pre></div>
+<p>此变量，如果非零，禁止启动屏幕。在这种情况下，Emacs 通常会显示 <strong>scratch</strong> 缓冲区；  但请参阅下面的初始缓冲区选择。
+</p>
+<p>不要在新用户的 init 文件中设置此变量，或者以影响多个用户的方式设置此变量，因为这会阻止新用户接收有关 copyleft 和基本 Emacs 使用的信息。
+</p>
+<p>禁止启动消息和禁止启动屏幕是此变量的别名。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: initial-buffer-choice ¶
+</pre></div>
+<p>如果非零，此变量是一个字符串，它指定 Emacs 在启动后显示的文件或目录，而不是启动屏幕。如果它的值是一个函数，Emacs 调用该函数，该函数必须返回一个缓冲区，然后显示该缓冲区。如果它的值为 t，Emacs 将显示 <strong>scratch</strong> 缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: inhibit-startup-echo-area-message ¶
+</pre></div>
+<p>此变量控制启动回显区域消息的显示。您可以通过将此表单的文本添加到您的 init 文件来抑制启动回显区域消息：
+</p>
+<div class="lisp">
+<pre class="lisp">(setq inhibit-startup-echo-area-message
+      "your-login-name")
+</pre></div>
+<p>Emacs 在你的 init 文件中显式检查如上所示的表达式；  您的登录名必须作为 Lisp 字符串常量出现在表达式中。您还可以使用自定义界面。将 inhibitor-startup-echo-area-message 设置为相同值的其他方法不会禁止启动消息。这样，如果您愿意，您可以轻松地为自己禁止消息，但不假思索地复制您的 init 文件不会禁止其他人的消息。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: initial-scratch-message ¶
+</pre></div>
+<p>这个变量，如果非零，应该是一个字符串，当 Emacs 启动时，它被当作文档插入到 <strong>scratch</strong> 缓冲区中。如果为 nil，则 <strong>scratch</strong> 缓冲区为空。
+</p>
+<p>以下命令行选项会影响启动顺序的某些方面。请参阅 GNU Emacs 手册中的初始选项。
+</p>
+<div class="lisp">
+<pre class="lisp">--no-splash
+</pre></div>
+<p>不要显示启动画面。
+</p><div class="lisp">
+<pre class="lisp">--batch
+</pre></div>
+<p>在没有交互式终端的情况下运行。请参阅批处理模式。
+</p><div class="lisp">
+<pre class="lisp">--daemon
+</pre></div>
+<div class="lisp">
+<pre class="lisp">--bg-daemon
+</pre></div>
+<div class="lisp">
+<pre class="lisp">--fg-daemon
+</pre></div>
+<p>不要初始化任何显示；  只需启动一个服务器。（ <code>后台</code> 守护程序自动在后台运行。）
+</p><div class="lisp">
+<pre class="lisp">--no-init-file
+</pre></div>
+<div class="lisp">
+<pre class="lisp">-q
+</pre></div>
+<p>不要加载初始化文件或默认库。
+</p><div class="lisp">
+<pre class="lisp">--no-site-file
+</pre></div>
+<p>不要加载站点启动库。
+</p><div class="lisp">
+<pre class="lisp">--quick
+</pre></div>
+<div class="lisp">
+<pre class="lisp">-Q
+</pre></div>
+<p>相当于’-q –no-site-file –no-splash’。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="41.1.2_初始化文件.html">初始化文件</a>, Previous: <a href="41.1_启动_Emacs.html">启动_Emacs</a>, Up: <a href="41.1_启动_Emacs.html">启动_Emacs.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

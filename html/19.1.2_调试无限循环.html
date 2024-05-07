@@ -1,0 +1,15 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>19.1.2 调试无限循环</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">19.1.2 调试无限循环</h3>
+<div class="nav-panel"><p>Next: <a href="19.1.3_在函数调用中进入调试器.html">在函数调用中进入调试器</a>, Previous: <a href="19.1.1_出错时进入调试器.html">出错时进入调试器</a>, Up: <a href="19.1_Lisp_调试器.html">Lisp_调试器.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当程序无限循环并且无法返回时，您的第一个问题就是停止循环。在大多数操作系统上，您可以使用 Cg 执行此操作，这会导致退出。请参阅退出。
+</p>
+<p>普通退出不会提供有关程序为何循环的信息。要获取更多信息，您可以将变量 debug-on-quit 设置为非零。一旦调试器在无限循环的中间运行，您就可以使用步进命令从调试器继续。如果您逐步完成整个循环，您可能会获得足够的信息来解决问题。
+</p>
+<p>用 Cg 退出不被认为是错误，debug-on-error 对 Cg 的处理没有影响。同样，debug-on-quit 对错误没有影响。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: debug-on-quit ¶
+</pre></div>
+<p>此变量确定在发出退出信号但未处理时是否调用调试器。如果 debug-on-quit 不为 nil，则在您退出时调用调试器（即，键入 Cg）。如果 debug-on-quit 为 nil（默认值），则退出时不会调用调试器。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="19.1.3_在函数调用中进入调试器.html">在函数调用中进入调试器</a>, Previous: <a href="19.1.1_出错时进入调试器.html">出错时进入调试器</a>, Up: <a href="19.1_Lisp_调试器.html">Lisp_调试器.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

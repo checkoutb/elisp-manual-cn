@@ -1,0 +1,67 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>12.4 当变量为空时</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">12.4 当变量为空时</h2>
+<div class="nav-panel"><p>Next: <a href="12.5_定义全局变量.html">定义全局变量</a>, Previous: <a href="12.3_局部变量.html">局部变量</a>, Up: <a href="12_变量.html">变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>如果一个变量的符号有一个未赋值的单元格，我们就说这个变量是无效的（参见符号组件）。
+</p>
+<p>在 Emacs Lisp 的默认动态范围规则下（请参阅变量绑定的范围规则），值单元格存储变量的当前（本地或全局）值。请注意，未分配的值单元格与值单元格中的 nil 不同。符号 nil 是一个 Lisp 对象，可以是变量的值，就像任何其他对象一样；  但它仍然是一个值。如果变量为 void，则尝试评估该变量会发出 void-variable 错误信号，而不是返回值。
+</p>
+<p>在可选的词法范围规则下，值单元仅保存变量的全局值——任何词法绑定结构之外的值。当一个变量被词法绑定时，局部值由词法环境决定；  因此，即使变量符号的值单元未分配，变量也可以具有局部值。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: makunbound symbol ¶
+</pre></div>
+<p>该函数清空符号的值单元格，使变量无效。它返回符号。
+</p>
+<p>如果 symbol 具有动态局部绑定，makunbound 会使当前绑定无效，并且这种无效只会在局部绑定有效时持续。之后，先前被遮蔽的局部或全局绑定被重新暴露；  那么变量将不再是无效的，除非重新暴露的绑定也是无效的。
+</p>
+<p>以下是一些示例（假设动态绑定有效）：
+</p><div class="lisp">
+<pre class="lisp">
+
+(setq x 1)               ; Put a value in the global binding.
+     ⇒ 1
+(let ((x 2))             ; Locally bind it.
+  (makunbound 'x)        ; Void the local binding.
+  x)
+error→ Symbol's value as variable is void: x
+
+x                        ; The global binding is unchanged.
+     ⇒ 1
+
+(let ((x 2))             ; Locally bind it.
+  (let ((x 3))           ; And again.
+    (makunbound 'x)      ; Void the innermost-local binding.
+    x))                  ; And refer: it’s void.
+error→ Symbol's value as variable is void: x
+
+
+(let ((x 2))
+  (let ((x 3))
+    (makunbound 'x))     ; Void inner binding, then remove it.
+  x)                     ; Now outer let binding is visible.
+     ⇒ 2
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: boundp variable ¶
+</pre></div>
+<p>如果变量（符号）不为 void，则此函数返回 t，如果为 void，则返回 nil。
+</p>
+<p>以下是一些示例（假设动态绑定有效）：
+</p><div class="lisp">
+<pre class="lisp">(boundp 'abracadabra)          ; Starts out void.
+     ⇒ nil
+
+(let ((abracadabra 5))         ; Locally bind it.
+  (boundp 'abracadabra))
+     ⇒ t
+
+(boundp 'abracadabra)          ; Still globally void.
+     ⇒ nil
+
+(setq abracadabra 5)           ; Make it globally nonvoid.
+     ⇒ 5
+
+(boundp 'abracadabra)
+     ⇒ t
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="12.5_定义全局变量.html">定义全局变量</a>, Previous: <a href="12.3_局部变量.html">局部变量</a>, Up: <a href="12_变量.html">变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

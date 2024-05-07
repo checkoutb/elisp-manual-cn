@@ -1,0 +1,52 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>9.5 速记</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">9.5 速记</h2>
+<div class="nav-panel"><p>Next: <a href="09.5.1_例外.html">例外</a>, Previous: <a href="09.4.2_标准符号属性.html">标准符号属性</a>, Up: <a href="09_符号.html">符号.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>符号速记，有时称为~ 重命名符号~ ，是在 Lisp 源代码中发现的符号形式。它们就像常规的符号形式，除了当 Lisp 阅读器遇到它们时，它会生成具有不同且通常更长的打印名称的符号（请参阅符号组件）。
+</p>
+<p>将速记视为预期符号全名的缩写很有用。尽管如此，不要将速记与缩写系统混淆，请参阅缩写和缩写扩展。
+</p>
+<p>简写使 Emacs Lisp 的命名空间礼仪更易于使用。由于所有符号都存储在单个 obarray 中（请参阅创建和内部符号），程序员通常在每个符号名称前加上它所在的库的名称。例如，函数 text-property-search-forward 和 text-property-search-backward 都属于 text-property-search.el 库（请参阅加载）。通过正确地为符号名称添加前缀，可以有效地防止属于不同库的类似名称符号之间的冲突，从而执行不同的操作。然而，这种做法通常会产生很长的符号名称，一段时间后输入和阅读不方便。速记以干净的方式解决了这些问题。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: read-symbol-shorthands ¶
+</pre></div>
+<p>这个变量的值是一个alist，其元素的格式为(shorthand-prefix . longhand-prefix)。每个元素都指示 Lisp 阅读器读取以 shorthand-prefix 开头的每个符号形式，就好像它以 longhand-prefix 开头一样。
+</p>
+<p>此变量只能在文件局部变量中设置（请参阅 GNU Emacs 手册中的文件中的局部变量）。
+</p>
+<p>这是一个假设的字符串操作库 some-nice-string-utils.el 中的速记用法示例。
+</p>
+<div class="lisp">
+<pre class="lisp">(defun some-nice-string-utils-split (separator s &amp;optional omit-nulls)
+  "A match-data saving variant of `split-string'."
+  (save-match-data (split-string s separator omit-nulls)))
+
+(defun some-nice-string-utils-lines (s)
+  "Split string S at newline characters into a list of strings."
+  (some-nice-string-utils-split "\\(\r\n\\|[\n\r]\\)" s))
+</pre></div>
+<p>可以看出，由于要输入的符号名称很长，因此阅读或开发此代码非常乏味。我们可以使用速记来缓解这种情况。
+</p>
+<div class="lisp">
+<pre class="lisp">(defun snu-split (separator s &amp;optional omit-nulls)
+  "A match-data saving variation on `split-string'."
+  (save-match-data (split-string s separator omit-nulls)))
+
+(defun snu-lines (s)
+  "Split string S into a list of strings on newline characters."
+  (snu-split "\\(\r\n\\|[\n\r]\\)" s))
+
+;; Local Variables:
+;; read-symbol-shorthands: (("snu-" . "some-nice-string-utils-"))
+;; End:
+</pre></div>
+<p>尽管这两个摘录看起来不同，但在 Lisp 阅读器处理它们之后它们是完全相同的。两者都将导致相同的符号被实习（请参阅创建和实习符号）。因此，加载或字节编译这两个文件中的任何一个都具有相同的结果。在第二个版本中使用的简写 snu-split 和 snu-lines 没有被嵌入到 obarray 中。这很容易通过将点移动到使用速记的位置并等待 ElDoc（参见 GNU Emacs 手册中的文件中的局部变量）提示回显区域中点下符号的真实全名。
+</p>
+<p>由于 read-symbol-shorthands 是文件局部变量，因此依赖于 some-nice-string-utils-lines.el 的多个库可能会在不同的简写下引用相同的符号，或者根本不使用简写。在下一个示例中，my-tricks.el 库使用 sns- 前缀而不是 snu- 来引用符号 some-nice-string-utils-lines。
+</p><div class="lisp">
+<pre class="lisp">(defun t-reverse-lines (s) (string-join (reverse (sns-lines s)) "\n")
+
+;; Local Variables:
+;; read-symbol-shorthands: (("t-" . "my-tricks-")
+;;                          ("sns-" . "some-nice-string-utils-"))
+       ;; End:
+</pre></div>
+<div class="nav-panel"><p>Next: <a href="09.5.1_例外.html">例外</a>, Previous: <a href="09.4.2_标准符号属性.html">标准符号属性</a>, Up: <a href="09_符号.html">符号.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

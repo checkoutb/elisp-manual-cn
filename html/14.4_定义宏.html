@@ -1,0 +1,30 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>14.4 定义宏</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">14.4 定义宏</h2>
+<div class="nav-panel"><p>Next: <a href="14.5_使用宏的常见问题.html">使用宏的常见问题</a>, Previous: <a href="14.3_宏和字节编译.html">宏和字节编译</a>, Up: <a href="14_宏.html">宏.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Lisp 宏对象是一个列表，其 CAR 为宏，其 CDR 为函数。宏的扩展通过将函数（使用 apply）应用于宏调用中未计算的参数列表来实现。
+</p>
+<p>可以像使用匿名函数一样使用匿名 Lisp 宏，但这永远不会这样做，因为将匿名宏传递给诸如 mapcar 之类的函数是没有意义的。在实践中，所有的 Lisp 宏都有名字，而且它们几乎总是用 defmacro 宏定义的。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: defmacro name args [doc] [declare] body… ¶
+</pre></div>
+<p>defmacro 将符号名称（不应被引用）定义为如下所示的宏：
+</p><div class="lisp">
+<pre class="lisp">(macro lambda args . body)
+</pre></div>
+<p>（注意这个列表的 CDR 是一个 lambda 表达式。）这个宏对象存储在 name 的函数单元格中。args 的含义与函数中的含义相同，可以使用关键字 &amp;rest 和 &amp;optional（参见参数列表的特性）。name 和 args 都不应该被引用。defmacro 的返回值是未定义的。
+</p>
+<p>doc，如果存在的话，应该是一个指定宏的文档字符串的字符串。如果存在，则声明应该是为宏指定元数据的声明表单（请参阅声明表单）。请注意，宏不能有交互式声明，因为它们不能被交互式调用。
+</p>
+<p>宏通常需要从常量和非常量部分的混合中构建大型列表结构。为了使这更容易，请使用 ’‘’ 语法（请参阅反引号）。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">(defmacro t-becomes-nil (variable)
+  `(if (eq ,variable t)
+       (setq ,variable nil)))
+
+
+(t-becomes-nil foo)
+     ≡ (if (eq foo t) (setq foo nil))
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="14.5_使用宏的常见问题.html">使用宏的常见问题</a>, Previous: <a href="14.3_宏和字节编译.html">宏和字节编译</a>, Up: <a href="14_宏.html">宏.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

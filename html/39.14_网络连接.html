@@ -1,0 +1,129 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>39.14 网络连接</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">39.14 网络连接</h2>
+<div class="nav-panel"><p>Next: <a href="39.15_网络服务器.html">网络服务器</a>, Previous: <a href="39.13_事务队列.html">事务队列</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs Lisp 程序可以打开流 (TCP) 和数据报 (UDP) 网络连接（请参阅数据报）到同一机器或其他机器上的其他进程。网络连接由 Lisp 处理，就像子进程一样，由进程对象表示。但是，您正在与之通信的进程不是 Emacs 进程的子进程，没有进程 ID，您无法杀死它或向它发送信号。您所能做的就是发送和接收数据。delete-process 关闭连接，但不会杀死另一端的程序；  该程序必须决定如何关闭连接。
+</p>
+<p>Lisp 程序可以通过创建网络服务器来监听连接。网络服务器也由一种进程对象表示，但与网络连接不同，网络服务器本身从不传输数据。当它收到一个连接请求时，它会创建一个新的网络连接来代表刚刚建立的连接。（网络连接从服务器继承某些信息，包括进程 plist。）然后网络服务器返回侦听更多连接请求。
+</p>
+<p>网络连接和服务器是通过使用由关键字/参数对组成的参数列表调用 make-network-process 创建的，例如 :server t 创建服务器进程，或 :type ’datagram 创建数据报连接。有关详细信息，请参阅低级网络访问。您还可以使用下面描述的 open-network-stream 功能。
+</p>
+<p>为了区分不同类型的进程，process-type 函数返回符号 network 表示网络连接或服务器，serial 表示串行端口连接，pipe 表示管道连接，或 real 表示真正的子进程。
+</p>
+<p>进程状态函数返回网络连接的打开、关闭、连接、停止或失败。对于网络服务器，状态始终是监听。除了 stop 之外，对于真正的子进程，这些值都不可能。请参阅过程信息。
+</p>
+<p>您可以通过调用 stop-process 和 continue-process 来停止和恢复网络进程的操作。对于服务器进程，停止意味着不接受新连接。（当您恢复服务器时，最多将有 5 个连接请求排队；您可以增加此限制，除非它是由操作系统强加的——请参阅 make-network-process、make-network-process 的 :server 关键字。）对于网络流连接，停止意味着不处理输入（任何到达的输入都会等待，直到您恢复连接）。对于数据报连接，一些数据包可能会排队，但输入可能会丢失。您可以使用函数 process-command 来确定是否停止了网络连接或服务器；  非零值表示是。
+</p>
+<p>Emacs 可以使用对 GnuTLS 传输层安全库的内置支持创建加密网络连接；  请参阅 GnuTLS 项目页面。如果你的 Emacs 是用 GnuTLS 支持编译的，函数 gnutls-available-p 被定义并返回非零。有关更多详细信息，请参阅 Emacs-GnuTLS 手册中的概述。open-network-stream 功能可以使用任何可用的支持透明地处理为您创建加密连接的细节。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: open-network-stream name buffer host service &amp;rest parameters ¶
+</pre></div>
+<p>此函数打开一个 TCP 连接，带有可选的加密，并返回一个表示该连接的进程对象。
+</p>
+<p>name 参数指定进程对象的名称。根据需要对其进行修改以使其唯一。
+</p>
+<p>buffer 参数是与连接关联的缓冲区。连接的输出被插入缓冲区，除非您指定自己的过滤器函数来处理输出。如果 buffer 为 nil，则表示该连接未与任何缓冲区关联。
+</p>
+<p>参数 host 和 service 指定连接到哪里；  host 是主机名（字符串），service 是定义的网络服务的名称（字符串）或端口号（整数，如 80 或整数字符串，如 <code>80</code> ）。
+</p>
+<p>其余参数参数是主要与加密连接相关的关键字/参数对：
+</p>
+<div class="lisp">
+<pre class="lisp">:nowait boolean
+</pre></div>
+<p>如果非零，尝试建立一个异步连接。
+</p><div class="lisp">
+<pre class="lisp">:coding coding
+</pre></div>
+<p>使用它来设置网络进程使用的编码系统，而不是绑定coding-system-for-read或coding-system-for-write。有关详细信息，请参阅 make-network-process。
+</p><div class="lisp">
+<pre class="lisp">:type type
+</pre></div>
+<p>连接的类型。选项是：
+</p>
+<div class="lisp">
+<pre class="lisp">plain
+</pre></div>
+<p>一个普通的、未加密的连接。
+</p><div class="lisp">
+<pre class="lisp">tls
+</pre></div>
+<div class="lisp">
+<pre class="lisp">ssl
+</pre></div>
+<p>TLS（传输层安全）连接。
+</p><div class="lisp">
+<pre class="lisp">nil
+</pre></div>
+<div class="lisp">
+<pre class="lisp">network
+</pre></div>
+<p>从普通连接开始，如果提供参数 ’:success’ 和 ’:capability-command’，尝试通过 STARTTLS 升级到加密连接。如果失败，请保留未加密的连接。
+</p><div class="lisp">
+<pre class="lisp">starttls
+</pre></div>
+<p>至于 nil，但如果 STARTTLS 失败则断开连接。
+</p><div class="lisp">
+<pre class="lisp">shell
+</pre></div>
+<p>外壳连接。
+</p>
+<div class="lisp">
+<pre class="lisp">:always-query-capabilities boolean
+</pre></div>
+<p>如果非零，请始终询问服务器的功能，即使在进行 <code>普通</code> 连接时也是如此。
+</p><div class="lisp">
+<pre class="lisp">:capability-command capability-command
+</pre></div>
+<p>查询主机能力的命令。这可以是一个字符串（然后将逐字发送到服务器），也可以是一个函数（使用单个参数调用；连接时来自服务器的 <code>问候</code> ），并且应该返回一个字符串。
+</p><div class="lisp">
+<pre class="lisp">:end-of-command regexp
+</pre></div>
+<div class="lisp">
+<pre class="lisp">:end-of-capability regexp
+</pre></div>
+<p>正则表达式匹配命令的结尾，或命令的结尾capability-command。后者默认为前者。
+</p><div class="lisp">
+<pre class="lisp">:starttls-function function
+</pre></div>
+<p>一个参数的函数（对能力命令的响应），它返回 nil，或者如果支持，则返回激活 STARTTLS 的命令。
+</p><div class="lisp">
+<pre class="lisp">:success regexp
+</pre></div>
+<p>匹配成功的 STARTTLS 协商的正则表达式。
+</p><div class="lisp">
+<pre class="lisp">:use-starttls-if-possible boolean
+</pre></div>
+<p>如果非 nil，即使 Emacs 没有内置的 TLS 支持，也要进行机会性 STARTTLS 升级。
+</p><div class="lisp">
+<pre class="lisp">:warn-unless-encrypted boolean
+</pre></div>
+<p>如果非 nil 并且 :return-value 也非 nil，如果连接未加密，Emacs 将发出警告。这对于 IMAP 等协议很有用，大多数用户都希望网络流量被加密。
+</p><div class="lisp">
+<pre class="lisp">:client-certificate list-or-t
+</pre></div>
+<p>要么是形式列表（key-file cert-file），命名证书密钥文件和证书文件本身，要么是 t，意思是查询 auth-source 以获取此信息（请参阅 Emacs auth-source 库中的 auth-source）。仅用于 TLS 或 STARTTLS。要在未指定 :client-certificate 时启用 auth-source 的自动查询，请将 network-stream-use-client-certificates 自定义为 t。
+</p><div class="lisp">
+<pre class="lisp">:return-list cons-or-nil
+</pre></div>
+<p>此函数的返回值。如果省略或为零，则返回一个进程对象。否则，形式的缺点 (process-object . plist)，其中 plist 有关键字：
+</p>
+<div class="lisp">
+<pre class="lisp">:greeting string-or-nil
+</pre></div>
+<p>如果非零，则主机返回的问候字符串。
+</p><div class="lisp">
+<pre class="lisp">:capabilities string-or-nil
+</pre></div>
+<p>如果非零，主机的能力字符串。
+</p><div class="lisp">
+<pre class="lisp">:type symbol
+</pre></div>
+<p>连接类型： <code>普通</code> 或 <code>tls</code> 。
+</p>
+<div class="lisp">
+<pre class="lisp">:shell-command string-or-nil
+</pre></div>
+<p>如果连接类型是 shell，则此参数将被解释为将执行以建立连接的格式规范字符串。可用的规范是主机名的 <code>%s</code> 和端口号的 <code>%p</code> 。例如，如果您想在建立普通连接之前先 ssh 到 <code>网关</code> ，那么此参数可能类似于 <code>ssh gateway nc %s %p</code> 。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="39.15_网络服务器.html">网络服务器</a>, Previous: <a href="39.13_事务队列.html">事务队列</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

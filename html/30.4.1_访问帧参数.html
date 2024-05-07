@@ -1,0 +1,37 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>30.4.1 访问帧参数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">30.4.1 访问帧参数</h3>
+<div class="nav-panel"><p>Next: <a href="30.4.2_初始帧参数.html">初始帧参数</a>, Previous: <a href="30.4_帧参数.html">帧参数</a>, Up: <a href="30.4_帧参数.html">帧参数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这些函数使您可以读取和更改帧的参数值。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: frame-parameter frame parameter ¶
+</pre></div>
+<p>该函数返回frame的参数parameter（一个符号）的值。如果 frame 为 nil，则返回所选帧的参数。如果 frame 没有设置参数，则此函数返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: frame-parameters &amp;optional frame ¶
+</pre></div>
+<p>函数 frame-parameters 返回一个列表，列出 frame 的所有参数及其值。如果 frame 为 nil 或省略，则返回所选帧的参数
+</p>
+<div class="lisp">
+<pre class="lisp">Function: modify-frame-parameters frame alist ¶
+</pre></div>
+<p>此函数根据 alist 的元素更改帧帧。alist 的每个元素都具有 (parm . value) 形式，其中 parm 是命名参数的符号。如果 alist 中没有提及参数，则其值不会改变。如果 frame 为 nil，则默认为选定的帧。
+</p>
+<p>某些参数仅对特定类型显示器上的帧有意义（请参阅帧）。如果 alist 包含对帧的显示没有意义的参数，则此函数将更改其在帧参数列表中的值，否则将忽略它。
+</p>
+<p>当 alist 指定多个参数的值会影响新的帧大小时，帧的最终大小可能会根据使用的工具包而有所不同。例如，指定一个帧从现在开始应该有一个菜单和/或工具栏而不是没有，同时指定帧的新高度将不可避免地导致重新计算帧的高度。从概念上讲，在这种情况下，此函数将尝试使显式高度规范占上风。但是，不能排除菜单或工具栏的添加（或删除）最终由工具包执行时会破坏此意图。
+</p>
+<p>有时，将 frame-inhibit-implied-resize（请参阅 Implied Frame Resizing）绑定到调用此函数的非零值可能会解决此处描述的问题。然而，有时，正是这样的绑定可能会受到问题的影响。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-frame-parameter frame parm value ¶
+</pre></div>
+<p>此函数将帧参数 parm 设置为指定值。如果 frame 为 nil，则默认为选定的帧。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: modify-all-frames-parameters alist ¶
+</pre></div>
+<p>此函数根据 alist 更改所有现有帧的帧参数，然后修改 default-frame-alist（以及，如果需要，initial-frame-alist）以将相同的参数值应用于以后创建的帧。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="30.4.2_初始帧参数.html">初始帧参数</a>, Previous: <a href="30.4_帧参数.html">帧参数</a>, Up: <a href="30.4_帧参数.html">帧参数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

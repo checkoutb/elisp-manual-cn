@@ -1,0 +1,51 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>21.10 小缓冲区命令</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">21.10 小缓冲区命令</h2>
+<div class="nav-panel"><p>Next: <a href="21.11_小缓冲窗口.html">小缓冲窗口</a>, Previous: <a href="21.9_读取密码.html">读取密码</a>, Up: <a href="21_小缓冲区.html">小缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节描述了一些用于 minibuffer 的命令。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: exit-minibuffer ¶
+</pre></div>
+<p>此命令退出活动的 minibuffer。它通常绑定到 minibuffer 本地键映射中的键。如果当前缓冲区是一个小缓冲区，而不是活动的小缓冲区，该命令将引发错误。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: self-insert-and-exit ¶
+</pre></div>
+<p>此命令在插入键盘上键入的最后一个字符后退出活动的小缓冲区（在 last-command-event 中找到；请参阅命令循环中的信息）。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: previous-history-element n ¶
+</pre></div>
+<p>此命令将 minibuffer 内容替换为第 n 个先前（较旧）历史元素的值。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: next-history-element n ¶
+</pre></div>
+<p>此命令将 minibuffer 内容替换为第 n 个最近的历史元素的值。历史中的位置可以超出当前位置并调用 <code>未来历史</code> （请参阅​​使用 Minibuffer 读取文本字符串）。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: previous-matching-history-element pattern n ¶
+</pre></div>
+<p>此命令将 minibuffer 内容替换为匹配模式（正则表达式）的第 n 个先前（较旧）历史元素的值。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: next-matching-history-element pattern n ¶
+</pre></div>
+<p>此命令将 minibuffer 内容替换为匹配模式（正则表达式）的第 n 个下一个（较新）历史元素的值。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: previous-complete-history-element n ¶
+</pre></div>
+<p>此命令将 minibuffer 内容替换为第 n 个先前（较旧）历史元素的值，该历史元素在该点之前完成了 minibuffer 的当前内容。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: next-complete-history-element n ¶
+</pre></div>
+<p>此命令将 minibuffer 内容替换为第 n 个下一个（较新）历史元素的值，该历史元素在该点之前完成了 minibuffer 的当前内容。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: goto-history-element nabs ¶
+</pre></div>
+<p>此函数将 minibuffer 历史的元素放入 minibuffer。参数 nabs 以降序指定绝对历史位置，其中 0 表示当前元素，正数 n 表示前第 n 个元素。NABS 为负数 -n 表示 <code>未来历史</code> 的第 n 个条目。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="21.11_小缓冲窗口.html">小缓冲窗口</a>, Previous: <a href="21.9_读取密码.html">读取密码</a>, Up: <a href="21_小缓冲区.html">小缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

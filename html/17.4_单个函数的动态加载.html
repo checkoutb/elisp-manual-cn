@@ -1,0 +1,32 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>17.4 单个函数的动态加载</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">17.4 单个函数的动态加载</h2>
+<div class="nav-panel"><p>Next: <a href="17.5_编译期间的评估.html">编译期间的评估</a>, Previous: <a href="17.3_文档字符串和编译.html">文档字符串和编译</a>, Up: <a href="17_字节编译.html">字节编译.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>编译文件时，您可以选择启用动态函数加载功能（也称为延迟加载）。使用动态函数加载，加载文件不会完全读取文件中的函数定义。相反，每个函数定义都包含一个引用文件的占位符。第一次调用每个函数时，它会从文件中读取完整的定义，以替换占位符。
+</p>
+<p>动态函数加载的优点是加载文件应该变得更快。对于包含许多单独的用户可调用函数的文件来说，这是一件好事，如果使用其中一个并不意味着您可能还会使用其余的。提供许多键盘命令的专用模式通常具有这种使用模式：用户可以调用该模式，但只使用它提供的少数命令。
+</p>
+<p>动态加载功能有一定的缺点：
+</p>
+<p>如果在加载后删除或移动已编译的文件，Emacs 将无法再加载其余尚未加载的函数定义。
+如果您更改编译的文件（例如通过编译新版本），那么尝试加载任何尚未加载的函数通常会产生无意义的结果。
+</p>
+<p>在安装 Emacs 文件的正常情况下，这些问题永远不会发生。但是它们很可能发生在您正在更改的 Lisp 文件中。防止这些问题的最简单方法是在每次重新编译后立即重新加载新的编译文件。
+</p>
+<p>经验表明，使用动态函数加载提供了难以衡量的好处，因此自 Emacs 27.1 起，此功能已被弃用。
+</p>
+<p>如果变量 byte-compile-dynamic 在编译时不为零，则字节编译器使用动态函数加载功能。不要全局设置此变量，因为动态加载仅适用于某些文件。相反，为具有文件局部变量绑定的特定源文件启用该功能。例如，您可以通过在源文件的第一行写入以下文本来做到这一点：
+</p>
+<div class="lisp">
+<pre class="lisp">-*-byte-compile-dynamic: t;-*-
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Variable: byte-compile-dynamic ¶
+</pre></div>
+<p>如果这是非零，字节编译器生成为动态函数加载设置的编译文件。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: fetch-bytecode function ¶
+</pre></div>
+<p>如果 function 是一个字节码函数对象，如果它还没有完全加载，这将立即完成从其字节编译文件中加载函数的字节码。否则，它什么也不做。它总是返回函数。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="17.5_编译期间的评估.html">编译期间的评估</a>, Previous: <a href="17.3_文档字符串和编译.html">文档字符串和编译</a>, Up: <a href="17_字节编译.html">字节编译.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

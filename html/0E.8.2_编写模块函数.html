@@ -1,0 +1,89 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>E.8.2 编写模块函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">E.8.2 编写模块函数</h3>
+<div class="nav-panel"><p>Next: <a href="0E.8.3_Lisp和模块值之间的转换.html">Lisp和模块值之间的转换</a>, Previous: <a href="0E.8.1_模块初始化代码.html">模块初始化代码</a>, Up: <a href="0E.8_编写动态加载的模块.html">编写动态加载的模块.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>编写 Emacs 模块的主要原因是为加载该模块的 Lisp 程序提供附加功能。本小节介绍如何编写此类模块函数。
+</p>
+<p>模块函数具有以下一般形式和签名：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: emacs_value emacs_function (emacs_env *env, ptrdiff_t nargs, emacs_value *args, void *data) ¶
+</pre></div>
+<p>env 参数提供了一个指向 API 环境的指针，需要访问 Emacs 对象和函数。nargs 参数是所需的参数数量，可以为零（参见下面的 make_function 以获得更灵活的参数数量规范），而 args 是指向函数参数数组的指针。参数 data 指向函数所需的附加数据，这些数据是在调用 make_function（见下文）从 emacs_function 创建 Emacs 函数时安排的。
+</p>
+<p>模块函数使用 emacs_value 类型在 Emacs 和模块之间通信 Lisp 对象（请参阅 Lisp 和模块值之间的转换）。API，在下面和以下小节中描述，为基本 C 数据类型和相应的 emacs_value 对象之间的转换提供了便利。
+</p>
+<p>模块函数总是返回一个值。如果函数正常返回，调用它的 Lisp 代码会看到函数返回的 emacs_value 值对应的 Lisp 对象。但是，如果用户键入 Cg，或者如果模块函数或其被调用者发出错误信号或非本地退出（请参阅模块中的非本地退出），Emacs 将忽略返回值并退出或抛出，就像 Lisp 代码遇到相同情况时一样.
+</p>
+<p>头文件 emacs-module.h 提供类型 emacs_function 作为指向模块函数的函数指针的别名类型。
+</p>
+<p>在为模块函数编写 C 代码之后，您应该使用 make_function 函数从中创建一个 Lisp 函数对象，该函数的指针在环境中提供（回想一下，指向环境的指针由 get_environment 返回）。这通常在模块初始化函数中完成（参见模块初始化函数），在验证 API 兼容性之后。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: emacs_value make_function (emacs_env *env, ptrdiff_t min_arity, ptrdiff_t max_arity, emacs_function func, const char *docstring, void *data) ¶
+</pre></div>
+<p>这将返回一个从 C 函数 func 创建的 Emacs 函数，其签名与上面对 emacs_function 的描述相同。参数 min_arity 和 max_arity 指定 func 可以接受的参数的最小和最大数量。max_arity 参数可以具有特殊值 emacs_variadic_function，这使得函数可以接受无限数量的参数，就像 Lisp 中的 &amp;rest 关键字（参见参数列表的特性）。
+</p>
+<p>参数 data 是一种安排任意附加数据在调用时传递给 func 的方法。无论传递给 make_function 的指针都会原封不动地传递给 func。
+</p>
+<p>参数 docstring 指定函数的文档字符串。它应该是 ASCII 字符串，或 UTF-8 编码的非 ASCII 字符串，或 NULL 指针；  在后一种情况下，该函数将没有文档。文档字符串可以以指定广告调用约定的行结尾，请参阅函数的文档字符串。
+</p>
+<p>由于每个模块函数都必须接受指向环境的指针作为其第一个参数，因此可以从任何模块函数调用 make_function，但您通常希望从模块初始化函数中执行此操作，以便知道所有模块函数加载模块后到 Emacs。
+</p>
+<p>最后，您应该将 Lisp 函数绑定到一个符号，以便 Lisp 代码可以通过名称调用您的函数。为此，请使用模块 API 函数实习生（请参阅实习生），其指针也在模块函数可以访问的环境中提供。
+</p>
+<p>结合上述步骤，安排 C 函数 module_func 可作为 Lisp 中的 module-func 调用的代码将如下所示，作为模块初始化函数的一部分：
+</p><div class="lisp">
+<pre class="lisp">emacs_env *env = runtime-&gt;get_environment (runtime);
+emacs_value func = env-&gt;make_function (env, min_arity, max_arity,
+                                       module_func, docstring, data);
+emacs_value symbol = env-&gt;intern (env, "module-func");
+emacs_value args[] = {symbol, func};
+env-&gt;funcall (env, env-&gt;intern (env, "defalias"), 2, args);
+</pre></div>
+<p>这通过调用 env-&gt;intern 使 Emacs 知道符号 module-func，然后从 Emacs 调用 defalias 以将函数绑定到该符号。请注意，可以使用 fset 代替 defalias；  差异在 defalias 中描述。
+</p>
+<p>包括 emacs_module_init 函数的模块函数（请参阅模块初始化函数）只能通过从一些实时 emacs_env 指针调用环境函数来与 Emacs 交互，同时从 Emacs 直接或间接调用。换句话说，如果模块函数想要调用 Lisp 函数或 Emacs 原语，将 emacs_value 对象与 C 数据类型转换（参见 Lisp 和模块值之间的转换），或者以任何其他方式与 Emacs 交互，则从 Emacs 调用 emacs_module_init或者一个模块函数必须在调用堆栈中。垃圾收集运行时，模块函数可能无法与 Emacs 交互；  请参阅垃圾收集。它们只能通过 Emacs 创建的 Lisp 解释器线程（包括主线程）与 Emacs 交互；  请参阅线程。–module-assertions 命令行选项可以检测到一些违反上述要求的情况。请参阅 GNU Emacs 手册中的初始选项。
+</p>
+<p>使用模块 API，可以定义更复杂的函数和数据类型：内联函数、宏等。但是，生成的 C 代码会很麻烦且难以阅读。因此，我们建议您将创建函数和数据结构的模块代码限制在绝对最小值，并将其余部分留给模块随附的 Lisp 包，因为在 Lisp 中执行这些额外任务要容易得多，并且会产生更具可读性的代码。例如，给定一个如上所述定义的模块函数 module-func，基于它制作宏 module-macro 的一种方法是使用以下简单的 Lisp 包装器：
+</p>
+<div class="lisp">
+<pre class="lisp">(defmacro module-macro (&amp;rest args)
+  "Documentation string for the macro."
+  (module-func args))
+</pre></div>
+<p>当包被加载到 Emacs 中时，与你的模块一起的 Lisp 包可以使用加载原语（参见 Emacs 动态模块）加载模块。
+</p>
+<p>默认情况下，make_function 创建的模块函数不是交互式的。要使它们具有交互性，您可以使用以下功能。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: void make_interactive (emacs_env *env, emacs_value function, emacs_value spec) ¶
+</pre></div>
+<p>这个函数从 Emacs 28 开始可用，使用交互规范规范使函数函数交互。Emacs 将规范解释为交互式表单的参数。使用交互，请参阅 Code Characters 进行交互。function 必须是 make_function 返回的 Emacs 模块函数。
+</p>
+<p>请注意，没有本地模块支持检索模块功能的交互式规范。为此使用功能交互形式。使用交互式。一旦使用 make_interactive 使其具有交互性，就不可能使模块功能成为非交互性的。
+</p>
+<p>如果你想在模块函数对象（即 make_function 返回的对象）被垃圾回收时运行一些代码，你可以安装一个函数终结器。函数终结器从 Emacs 28 开始可用。例如，如果您已将一些堆分配的结构传递给 make_function 的数据参数，则可以使用终结器来释放结构。请参阅 (libc)Basic Allocation，并参阅 (libc)Freeing after Malloc。终结器函数具有以下签名：
+</p>
+<div class="lisp">
+<pre class="lisp">void finalizer (void *data)
+</pre></div>
+<p>这里，data 接收调用 make_function 时传递给 data 的值。请注意，终结器不能以任何方式与 Emacs 交互。
+</p>
+<p>直接在调用 make_function 之后，新创建的函数没有终结器。如果需要，使用 set_function_finalizer 添加一个。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: void emacs_finalizer (void *ptr) ¶
+</pre></div>
+<p>头文件 emacs-module.h 提供类型 emacs_finalizer 作为 Emacs 终结器函数的类型别名。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: emacs_finalizer get_function_finalizer (emacs_env *env, emacs_value arg) ¶
+</pre></div>
+<p>该函数从 Emacs 28 开始可用，它返回与 arg 表示的模块函数关联的函数终结器。arg 必须引用模块函数，即 make_function 返回的对象。如果没有终结器与函数关联，则返回 NULL。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: void set_function_finalizer (emacs_env *env, emacs_value arg, emacs_finalizer fin) ¶
+</pre></div>
+<p>该函数从 Emacs 28 开始可用，它将与 arg 表示的模块函数关联的函数终结器设置为 fin。arg 必须引用模块函数，即 make_function 返回的对象。fin 可以是 NULL 以清除 arg 的函数终结器，也可以是指向要在 arg 表示的对象被垃圾回收时调用的函数的指针。每个函数最多可以设置一个函数终结器；  如果 arg 已经有一个终结器，则将其替换为 fin。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="0E.8.3_Lisp和模块值之间的转换.html">Lisp和模块值之间的转换</a>, Previous: <a href="0E.8.1_模块初始化代码.html">模块初始化代码</a>, Up: <a href="0E.8_编写动态加载的模块.html">编写动态加载的模块.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

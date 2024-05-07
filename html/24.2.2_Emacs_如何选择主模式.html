@@ -1,0 +1,90 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.2.2 Emacs 如何选择主模式</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">24.2.2 Emacs 如何选择主模式</h3>
+<div class="nav-panel"><p>Next: <a href="24.2.3_获取有关主要模式的帮助.html">获取有关主要模式的帮助</a>, Previous: <a href="24.2.1_主要模式约定.html">主要模式约定</a>, Up: <a href="24.2_主要模式.html">主要模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当 Emacs 访问一个文件时，它会根据文件名或文件本身的信息自动为缓冲区选择一个主要模式。它还处理文件文本中指定的局部变量。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: normal-mode &amp;optional find-file ¶
+</pre></div>
+<p>此函数为当前缓冲区建立正确的主模式和缓冲区局部变量绑定。它调用 set-auto-mode（见下文）。从 Emacs 26.1 开始，它不再运行 hack-local-variables，这现在在主要模式初始化时在 run-mode-hooks 中完成（请参阅 Mode Hooks）。
+</p>
+<p>如果 normal-mode 的 find-file 参数不为 nil，则 normal-mode 假定 find-file 函数正在调用它。在这种情况下，它可能会在 <code>-*-</code> 行或文件末尾处理局部变量。变量 enable-local-variables 控制是否这样做。有关文件的局部变量部分的语法，请参阅 GNU Emacs 手册中的文件中的局部变量。
+</p>
+<p>如果您以交互方式运行正常模式，则参数 find-file 通常为零。在这种情况下，正常模式无条件地处理任何文件局部变量。
+</p>
+<p>该函数调用 set-auto-mode 来选择和设置主模式。如果这没有指定模式，则缓冲区保持在由默认值 major-mode 确定的主要模式（见下文）。
+</p>
+<p>normal-mode 在对主要模式命令的调用周围使用条件大小写，因此错误被捕获并报告为 <code>文件模式规范错误</code> ，然后是原始错误消息。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-auto-mode &amp;optional keep-mode-if-same ¶
+</pre></div>
+<p>该函数选择和设置适合当前缓冲区的主要模式。它基于 <code>-*-</code> 行、文件末尾附近的任何 <code>模式：</code> 局部变量、 <code>#！</code> 做出决定（按优先顺序）  行（使用interpreter-mode-alist），缓冲区开头的文本（使用magic-mode-alist），最后是访问的文件名（使用auto-mode-alist）。请参阅 GNU Emacs 手册中的如何选择主要模式。如果 enable-local-variables 为 nil，set-auto-mode 不会检查 ’-*-’ 行或文件末尾附近的任何模式标记。
+</p>
+<p>有些文件类型不适合扫描文件内容以查找模式说明符。例如，一个 tar 归档文件可能碰巧在文件末尾附近包含一个成员文件，该文件具有一个局部变量部分，该部分指定该特定文件的模式。这不应应用于包含的 tar 文件。类似地，一个 tiff 图像文件可能恰好包含似乎与 <code>-*-</code> 模式匹配的第一行。由于这些原因，这两个文件扩展名都是禁止本地变量正则表达式列表的成员。将模式添加到此列表以防止 Emacs 搜索它们以查找任何类型的局部变量（不仅仅是模式说明符）。
+</p>
+<p>如果 keep-mode-if-same 不为零，如果缓冲区已经处于正确的主模式，则此函数不会调用模式命令。例如， set-visited-file-name 将其设置为 t 以避免杀死用户可能已设置的缓冲区局部变量。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-buffer-major-mode buffer ¶
+</pre></div>
+<p>该函数将缓冲区的主模式设置为默认值major-mode；  如果为 nil，则使用当前缓冲区的主要模式（如果合适的话）。作为一个例外，如果缓冲区的名称是 *scratch*，它会将模式设置为 initial-major-mode。
+</p>
+<p>用于创建缓冲区的低级原语不使用此函数，但中级命令（例如 switch-to-buffer 和 find-file-noselect）在创建缓冲区时使用它。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: initial-major-mode ¶
+</pre></div>
+<p>该变量的值决定了初始 <strong>scratch</strong> 缓冲区的主要模式。该值应该是一个主要模式命令的符号。默认值为 lisp-interaction-mode。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: interpreter-mode-alist ¶
+</pre></div>
+<p>此变量指定用于在 <code>#！</code> 中指定命令解释器的脚本的主要模式 线。它的值是一个具有表单元素的列表（regexp .mode）；  如果文件指定了与 \\‘regexp\\’ 匹配的解释器，则表示使用模式模式。例如，默认元素之一是 ("python[0-9.]*" .python-mode)。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: magic-mode-alist ¶
+</pre></div>
+<p>该变量的值是一个具有 (regexp . function) 形式元素的列表，其中 regexp 是正则表达式，而 function 是函数或 nil。访问文件后，如果缓冲区开头的文本与正则表达式匹配且函数非零，则 set-auto-mode 调用函数；  如果 function 为 nil，则 auto-mode-alist 将决定模式。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: magic-fallback-mode-alist ¶
+</pre></div>
+<p>这与magic-mode-alist 类似，但仅在auto-mode-alist 未指定此文件的模式时才处理。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: auto-mode-alist ¶
+</pre></div>
+<p>此变量包含文件名模式（正则表达式）和相应的主要模式命令的关联列表。通常，文件名模式会测试后缀，例如 <code>.el</code> 和 <code>.c</code> ，但不必如此。alist 的一个普通元素看起来像 (regexp . mode-function)。
+</p>
+<p>例如，
+</p><div class="lisp">
+<pre class="lisp">(("\\`/tmp/fol/" . text-mode)
+ ("\\.texinfo\\'" . texinfo-mode)
+ ("\\.texi\\'" . texinfo-mode)
+
+ ("\\.el\\'" . emacs-lisp-mode)
+ ("\\.c\\'" . c-mode)
+ ("\\.h\\'" . c-mode)
+ …)
+</pre></div>
+<p>当您访问扩展文件名（请参阅扩展文件名的函数）的文件时，使用 file-name-sans-versions（请参阅文件名组件）删除版本号和备份后缀，匹配正则表达式，set-auto-mode 调用相应的模式功能。此功能使 Emacs 能够为大多数文件选择正确的主要模式。
+</p>
+<p>如果 auto-mode-alist 的元素具有 (regexp function t) 形式，那么在调用函数之后，Emacs 会再次搜索 auto-mode-alist 以匹配文件名中之前不匹配的部分。这个特性对解压包很有用：一个形式的条目（ <code>\\.gz\\'</code> 函数t）可以解压文件，然后根据名称sans’.gz’将解压后的文件置于正确的模式。
+</p>
+<p>如果 auto-mode-alist 有多个元素的正则表达式匹配文件名，Emacs 将使用第一个匹配项。
+</p>
+<p>下面是一个示例，说明如何将几个模式对添加到 auto-mode-alist。（你可以在你的 init 文件中使用这种表达式。）
+</p>
+<div class="lisp">
+<pre class="lisp">(setq auto-mode-alist
+  (append
+   ;; File name (within directory) starts with a dot.
+   '(("/\\.[^/]*\\'" . fundamental-mode)
+     ;; File name has no dot.
+     ("/[^\\./]*\\'" . fundamental-mode)
+     ;; File name ends in ‘.C’.
+     ("\\.C\\'" . c++-mode))
+   auto-mode-alist))
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="24.2.3_获取有关主要模式的帮助.html">获取有关主要模式的帮助</a>, Previous: <a href="24.2.1_主要模式约定.html">主要模式约定</a>, Up: <a href="24.2_主要模式.html">主要模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

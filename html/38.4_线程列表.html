@@ -1,0 +1,28 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>38.4 线程列表</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">38.4 线程列表</h2>
+<div class="nav-panel"><p>Next: <a href="39_进程.html">进程</a>, Previous: <a href="38.3_条件变量.html">条件变量</a>, Up: <a href="38_线程.html">线程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>list-threads 命令列出所有当前活动的线程。在结果缓冲区中，每个线程要么通过传递给 make-thread 的名称（参见基本线程函数）来标识，要么通过其唯一的内部标识符（如果它不是用名称创建的话）来标识。显示创建或上次更新缓冲区时每个线程的状态，以及线程当时被阻塞的对象（如果它被阻塞）。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: thread-list-refresh-seconds ¶
+</pre></div>
+<p><strong>Threads</strong> 缓冲区将每秒自动更新两次。您可以通过自定义此变量来加快或减慢刷新率。
+</p>
+<p>以下是线程列表缓冲区中可用的命令：
+</p>
+<div class="lisp">
+<pre class="lisp">b
+</pre></div>
+<p>在该点显示线程的回溯。这将显示在您按下 b 时线程在其代码中的哪个位置产生或被阻塞。请注意，回溯是快照；  线程可能同时恢复执行，并处于不同的状态，或者可能已经退出。
+</p>
+<p>您可以在线程的回溯缓冲区中使用 g 来获取更新的回溯，因为回溯缓冲区不会自动更新。请参阅 Backtraces，了解对回溯和其他对其起作用的命令的描述。
+</p><div class="lisp">
+<pre class="lisp">s
+</pre></div>
+<p>信号点的线程。在 s 之后，键入 q 以发送退出信号或键入 e 以发送错误信号。线程可以实现对信号的处理，但默认行为是退出任何信号。因此，仅当您了解如何重新启动目标线程时才应该使用此命令，因为如果必要的线程被杀死，您的 Emacs 会话可能会表现不正确。
+</p><div class="lisp">
+<pre class="lisp">g
+</pre></div>
+<p>更新线程列表及其状态。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="39_进程.html">进程</a>, Previous: <a href="38.3_条件变量.html">条件变量</a>, Up: <a href="38_线程.html">线程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

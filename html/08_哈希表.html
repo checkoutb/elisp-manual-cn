@@ -1,0 +1,12 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>8 哈希表</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h1 class="chapter">8 哈希表</h1>
+<div class="nav-panel"><p>Next: <a href="08.1_创建哈希表.html">创建哈希表</a>, Previous: <a href="07.2_向后兼容性.html">向后兼容性</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>哈希表是一种非常快速的查找表，有点像 alist（请参阅关联列表），因为它将键映射到相应的值。它在以下方面与 alist 不同：
+</p>
+<p>在散列表中查找对于大型表来说非常快——事实上，所需的时间基本上与表中存储了多少元素无关。对于较小的表（几十个元素），alist 可能仍然更快，因为哈希表具有或多或少的恒定开销。
+哈希表中的对应关系没有特定的顺序。
+没有办法在两个哈希表之间共享结构，就像两个 alist 可以共享一个共同的尾部一样。
+</p>
+<p>Emacs Lisp 提供了一种通用的哈希表数据类型，以及一系列对其进行操作的函数。哈希表有一个特殊的打印表示，它由~ #s~ 和一个指定哈希表属性和内容的列表组成。请参阅创建哈希表。（哈希表示法，在没有读取表示的对象的打印表示中使用的初始~ #~ 字符，与哈希表无关。请参阅打印表示和读取语法。）
+</p>
+<p>Obarrays 也是一种哈希表，但它们是不同类型的对象，仅用于记录内部符号（请参阅创建和内部符号）。
+</p>
+<div class="nav-panel"><p>Next: <a href="08.1_创建哈希表.html">创建哈希表</a>, Previous: <a href="07.2_向后兼容性.html">向后兼容性</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

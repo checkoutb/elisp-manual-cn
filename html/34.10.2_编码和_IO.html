@@ -1,0 +1,40 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>34.10.2 编码和 I/O</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">34.10.2 编码和 I/O</h3>
+<div class="nav-panel"><p>Next: <a href="34.10.3_Lisp_中的编码系统.html">Lisp_中的编码系统</a>, Previous: <a href="34.10.1_编码系统的基本概念.html">编码系统的基本概念</a>, Up: <a href="34.10_编码系统.html">编码系统.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>编码系统的主要目的是用于读取和写入文件。函数 insert-file-contents 使用编码系统对文件数据进行解码，而 write-region 使用编码系统对缓冲区内容进行编码。
+</p>
+<p>您可以指定要显式使用的编码系统（请参阅为一个操作指定编码系统），或隐式使用默认机制（请参阅默认编码系统）。但这些方法可能无法完全指定要做什么。例如，他们可以选择一种编码系统，例如未决定的，这使得字符代码转换由数据来确定。在这些情况下，I/O 操作完成了选择编码系统的工作。很多时候你会想知道选择了哪种编码系统。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: buffer-file-coding-system ¶
+</pre></div>
+<p>这个缓冲区局部变量记录了用于保存缓冲区和用 write-region 写入部分缓冲区的编码系统。如果无法使用此变量指定的编码系统对要写入的文本进行安全编码，则这些操作会通过调用函数 select-safe-coding-system 来选择替代编码（请参阅用户选择的编码系统）。如果选择不同的编码需要要求用户指定编码系统，则将缓冲区文件编码系统更新为新选择的编码系统。
+</p>
+<p>buffer-file-coding-system 不会影响将文本发送到子进程。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: save-buffer-coding-system ¶
+</pre></div>
+<p>此变量指定用于保存缓冲区的编码系统（通过覆盖缓冲区文件编码系统）。请注意，它不用于写入区域。
+</p>
+<p>当保存缓冲区的命令开始使用缓冲区文件编码系统（或保存缓冲区编码系统）时，该编码系统无法处理缓冲区中的实际文本，该命令要求用户选择另一个编码系统（通过调用 select-safe-coding-system）。之后，该命令还会更新 buffer-file-coding-system 以表示用户指定的编码系统。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: last-coding-system-used ¶
+</pre></div>
+<p>文件和子进程的 I/O 操作将此变量设置为所使用的编码系统名称。显式编码和解码功能（请参阅显式编码和解码）也设置了它。
+</p>
+<p>警告：由于接收子进程输出设置了这个变量，它可以在 Emacs 等待时改变；  因此，您应该在存储您感兴趣的值的函数调用之后立即复制该值。
+</p>
+<p>变量 selection-coding-system 指定如何对窗口系统的选择进行编码。请参阅窗口系统选择。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: file-name-coding-system ¶
+</pre></div>
+<p>变量 file-name-coding-system 指定用于编码文件名的编码系统。Emacs 使用该编码系统对所有文件操作的文件名进行编码。如果 file-name-coding-system 为 nil，则 Emacs 使用由所选语言环境确定的默认编码系统。在默认语言环境下，文件名中的任何非 ASCII 字符都不会进行特殊编码；  它们使用内部 Emacs 表示出现在文件系统中。
+</p>
+<p>警告：如果您在 Emacs 会话中更改文件名编码系统（或语言环境），如果您已经访问过名称使用早期编码系统编码的文件，并且在新的编码系统。如果您尝试将这些缓冲区之一保存在访问的文件名下，则保存可能会使用错误的文件名，或者可能会出错。如果发生此类问题，请使用 Cx Cw 为该缓冲区指定新文件名。
+</p>
+<p>在 Windows 2000 及更高版本上，Emacs 默认使用 Unicode API 将文件名传递给操作系统，因此 file-name-coding-system 的值在很大程度上被忽略了。当系统类型为 windows-nt 时，需要在 Lisp 级别对文件名进行编码或解码的 Lisp 应用程序应使用 utf-8 编码系统；  将 UTF-8 编码的文件名转换为适合与操作系统通信的编码是由 Emacs 内部执行的。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="34.10.3_Lisp_中的编码系统.html">Lisp_中的编码系统</a>, Previous: <a href="34.10.1_编码系统的基本概念.html">编码系统的基本概念</a>, Up: <a href="34.10_编码系统.html">编码系统.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

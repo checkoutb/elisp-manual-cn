@@ -1,0 +1,44 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>41.15 声音输出</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">41.15 声音输出</h2>
+<div class="nav-panel"><p>Next: <a href="41.16_X11_Keysyms_上的操作.html">X11_Keysyms_上的操作</a>, Previous: <a href="41.14_终端输出.html">终端输出</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>要使用 Emacs 播放声音，请使用函数 play-sound。仅支持某些系统；  如果您在无法真正完成工作的系统上调用 play-sound，则会出现错误。
+</p>
+<p>声音必须存储为 RIFF-WAVE 格式 (’.wav’) 或 Sun Audio 格式 (’.au’) 的文件。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: play-sound sound ¶
+</pre></div>
+<p>此函数播放指定的声音。参数 sound 的形式为 (sound properties…)，其中属性由交替的关键字（特别识别的特定符号）和对应的值组成。
+</p>
+<p>以下是当前在声音中有意义的关键字及其含义的表格：
+</p>
+<div class="lisp">
+<pre class="lisp">:file file
+</pre></div>
+<p>这指定了包含要播放的声音的文件。如果文件名不是绝对的，则根据目录数据目录进行扩展。
+</p><div class="lisp">
+<pre class="lisp">:data data
+</pre></div>
+<p>这指定了无需引用文件即可播放的声音。值 data 应该是一个字符串，包含与声音文件相同的字节。我们建议使用单字节字符串。
+</p><div class="lisp">
+<pre class="lisp">:volume volume
+</pre></div>
+<p>这指定了播放声音的音量。它应该是 0 到 1 范围内的数字。默认值是使用之前指定的任何音量。
+</p><div class="lisp">
+<pre class="lisp">:device device
+</pre></div>
+<p>这将在其上播放声音的系统设备指定为字符串。默认设备取决于系统。
+</p>
+<p>在实际播放声音之前，play-sound 会调用列表 play-sound-functions 中的函数。每个函数都用一个参数调用，声音。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: play-sound-file file &amp;optional volume device ¶
+</pre></div>
+<p>此功能是播放指定可选音量和设备的声音文件的替代接口。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: play-sound-functions ¶
+</pre></div>
+<p>在播放声音之前要调用的函数列表。每个函数都用一个参数调用，一个描述声音的属性列表。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="41.16_X11_Keysyms_上的操作.html">X11_Keysyms_上的操作</a>, Previous: <a href="41.14_终端输出.html">终端输出</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>11.7.4 清理非本地出口</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">11.7.4 清理非本地出口</h3>
+<div class="nav-panel"><p>Next: <a href="12_变量.html">变量</a>, Previous: <a href="11.7.3_错误.html">错误</a>, Up: <a href="11.7_非本地出口.html">非本地出口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>每当您临时将数据结构置于不一致状态时，unwind-protect 构造都是必不可少的。它允许您在发生错误或抛出时再次使数据保持一致。（另一个仅用于更改缓冲区内容的更具体的清理结构是原子更改组；原子更改组。）
+</p>
+<div class="lisp">
+<pre class="lisp">Special Form: unwind-protect body-form cleanup-forms… ¶
+</pre></div>
+<p>unwind-protect 执行 body-form 并保证在控制离开 body-form 时将评估清理表单，无论这种情况如何发生。body-form 可以正常完成，或者执行一个 throw out of the unwind-protect，或者导致错误；  在所有情况下，都会评估清理表单。
+</p>
+<p>如果 body-form 正常完成，unwind-protect 在评估 cleanup-forms 后返回 body-form 的值。如果 body-form 没有完成， unwind-protect 不会返回任何正常意义上的值。
+</p>
+<p>只有身体形态受 unwind-protect 保护。如果任何清理表单本身非本地退出（通过抛出或错误），则不能保证 unwind-protect 评估其余的。如果其中一个清理表单的故障有可能造成麻烦，则在该表单周围使用另一个展开保护来保护它。
+</p>
+<p>当前活动的展开保护表单的数量与局部变量绑定的数量一起根据 max-specpdl-size 限制进行计数（请参阅局部变量）。 
+</p>
+<p>例如，这里我们制作了一个不可见的缓冲区以供临时使用，并确保在完成之前将其杀死：
+</p>
+<div class="lisp">
+<pre class="lisp">(let ((buffer (get-buffer-create " *temp*")))
+  (with-current-buffer buffer
+    (unwind-protect
+        body-form
+      (kill-buffer buffer))))
+</pre></div>
+<p>你可能认为我们也可以写 (kill-buffer (current-buffer)) 并省去变量缓冲区。但是，如果 body-form 在切换到不同的缓冲区后发生错误，上面显示的方式更安全！  （或者，您可以在 body-form 周围编写一个 save-current-buffer，以确保临时缓冲区及时再次变为当前缓冲区以杀死它。）
+</p>
+<p>Emacs 包含一个名为 with-temp-buffer 的标准宏，它或多或少地扩展为上面显示的代码（请参阅当前缓冲区）。本手册中定义的几个宏以这种方式使用 unwind-protect。
+</p>
+<p>这是一个从 FTP 包派生的实际示例。它创建一个进程（参见进程）来尝试建立与远程机器的连接。由于函数 ftp-login 极易受到函数编写者无法预料的许多问题的影响，因此它受到一种形式的保护，该形式保证在发生故障时删除进程。否则，Emacs 可能会充满无用的子进程。
+</p><div class="lisp">
+<pre class="lisp">(let ((win nil))
+  (unwind-protect
+      (progn
+        (setq process (ftp-setup-buffer host file))
+        (if (setq win (ftp-login process host user password))
+            (message "Logged in")
+          (error "Ftp login failed")))
+    (or win (and process (delete-process process)))))
+</pre></div>
+<p>这个例子有一个小bug：如果用户键入Cg 退出，并且在函数ftp-setup-buffer 返回之后但在变量process 设置之前立即退出，该进程不会被杀死。修复此错误没有简单的方法，但至少不太可能。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="12_变量.html">变量</a>, Previous: <a href="11.7.3_错误.html">错误</a>, Up: <a href="11.7_非本地出口.html">非本地出口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

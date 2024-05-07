@@ -1,0 +1,65 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>12.15 变量别名</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">12.15 变量别名</h2>
+<div class="nav-panel"><p>Next: <a href="12.16_有限制值的变量.html">有限制值的变量</a>, Previous: <a href="12.14_连接局部变量.html">连接局部变量</a>, Up: <a href="12_变量.html">变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>有时将两个变量设为同义词很有用，这样两个变量总是具有相同的值，并且改变其中一个变量也会改变另一个变量。每当您更改一个变量的名称时——要么是因为您意识到它的旧名称选择得不好，要么是因为它的含义已经部分改变了——为了兼容性，保留旧名称作为新名称的别名会很有用。你可以用 defvaralias 做到这一点。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: defvaralias new-alias base-variable &amp;optional docstring ¶
+</pre></div>
+<p>此函数将符号 new-alias 定义为符号 base-variable 的变量别名。这意味着检索 new-alias 的值会返回 base-variable 的值，而改变 new-alias 的值会改变 base-variable 的值。两个别名变量名称始终共享相同的值和相同的绑定。
+</p>
+<p>如果 docstring 参数不为 nil，它指定新别名的文档；  否则，别名将获得与 base-variable 相同的文档（如果有），除非 base-variable 本身就是一个别名，在这种情况下，new-alias 会在别名链的末尾获取变量的文档。
+</p>
+<p>此函数返回基变量。 
+</p>
+<p>变量别名便于用新名称替换变量的旧名称。make-obsolete-variable 声明旧名称已过时，因此它可能会在将来的某个阶段被删除。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-obsolete-variable obsolete-name current-name when &amp;optional access-type ¶
+</pre></div>
+<p>此函数使字节编译器警告变量 obsolete-name 已过时。如果 current-name 是符号，则它是变量的新名称；  然后警告消息说使用当前名称而不是过时名称。如果 current-name 是一个字符串，这就是消息并且没有替换变量。when 应该是一个字符串，指示变量第一次被废弃的时间（通常是版本号字符串）。
+</p>
+<p>可选参数访问类型，如果非零，应该指定将触发过时警告的访问类型；  它可以是获取或设置。 
+</p>
+<p>您可以使用宏define-obsolete-variable-alias 使两个变量同义并同时声明一个已过时。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: define-obsolete-variable-alias obsolete-name current-name &amp;optional when docstring ¶
+</pre></div>
+<p>此宏将变量 obsolete-name 标记为已过时，并使其成为变量 current-name 的别名。它等价于以下内容：
+</p>
+<div class="lisp">
+<pre class="lisp">(defvaralias obsolete-name current-name docstring)
+(make-obsolete-variable obsolete-name current-name when)
+</pre></div>
+<p>这个宏计算它的所有参数，过时名称和当前名称都应该是符号，所以典型用法如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(define-obsolete-variable-alias 'foo-thing 'bar-thing "27.1")
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: indirect-variable variable ¶
+</pre></div>
+<p>此函数返回变量别名链末尾的变量。如果 variable 不是符号，或者 variable 没有定义为别名，则函数返回 variable。
+</p>
+<p>如果符号链中存在循环，则此函数会发出循环变量间接错误信号。
+</p><div class="lisp">
+<pre class="lisp">(defvaralias 'foo 'bar)
+(indirect-variable 'foo)
+     ⇒ bar
+(indirect-variable 'bar)
+     ⇒ bar
+(setq bar 2)
+bar
+     ⇒ 2
+
+foo
+     ⇒ 2
+
+(setq foo 0)
+bar
+     ⇒ 0
+foo
+     ⇒ 0
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="12.16_有限制值的变量.html">有限制值的变量</a>, Previous: <a href="12.14_连接局部变量.html">连接局部变量</a>, Up: <a href="12_变量.html">变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

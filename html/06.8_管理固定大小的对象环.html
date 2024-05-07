@@ -1,0 +1,84 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>6.8 管理固定大小的对象环</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">6.8 管理固定大小的对象环</h2>
+<div class="nav-panel"><p>Next: <a href="07_记录.html">记录</a>, Previous: <a href="06.7_布尔向量.html">布尔向量</a>, Up: <a href="06_序列、数组和向量.html">序列、数组和向量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>环是一种固定大小的数据结构，支持插入、删除、旋转和模索引引用和遍历。ring 包实现了一个高效的环数据结构。它提供了本节中列出的功能。
+</p>
+<p>请注意，Emacs 中的几个环，例如 kill ring 和 mark ring，实际上是作为简单列表实现的，而不是使用 ring 包；  因此以下功能对它们不起作用。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-ring size ¶
+</pre></div>
+<p>这将返回一个能够容纳 size 对象的新环。大小应该是一个整数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ring-p object ¶
+</pre></div>
+<p>如果对象是环，则返回 t，否则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ring-size ring ¶
+</pre></div>
+<p>这将返回环的最大容量。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ring-length ring ¶
+</pre></div>
+<p>这将返回 ring 当前包含的对象数。该值永远不会超过 ring-size 返回的值。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ring-elements ring ¶
+</pre></div>
+<p>这将按顺序返回环中对象的列表，最新的在前。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ring-copy ring ¶
+</pre></div>
+<p>这将返回一个新的环，它是环的副本。新环包含与环相同的 (eq) 对象。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ring-empty-p ring ¶
+</pre></div>
+<p>如果 ring 为空，则返回 t，否则返回 nil。
+</p>
+<p>环中最新的元素始终具有索引 0。更高的索引对应于较旧的元素。索引以环长度为模计算。索引 -1 对应于最旧的元素，-2 对应于下一个最旧的元素，依此类推。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ring-ref ring index ¶
+</pre></div>
+<p>这将返回在索引索引处找到的环中的对象。index 可能为负数或大于环长度。如果 ring 为空，则 ring-ref 发出错误信号。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ring-insert ring object ¶
+</pre></div>
+<p>这会将对象插入到环中，使其成为最新元素，并返回对象。
+</p>
+<p>如果环已满，插入会删除最旧的元素，为新元素腾出空间。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ring-remove ring &amp;optional index ¶
+</pre></div>
+<p>从环中移除一个对象，并返回该对象。参数 index 指定要删除的项目；  如果为 nil，则表示删除最旧的项目。如果 ring 为空，则 ring-remove 会发出错误信号。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ring-insert-at-beginning ring object ¶
+</pre></div>
+<p>这会将对象插入到环中，将其视为最旧的元素。返回值不重要。
+</p>
+<p>如果环已满，此函数将删除最新的元素，为插入的元素腾出空间。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ring-resize ring size ¶
+</pre></div>
+<p>将环的大小设置为大小。如果新大小更小，则丢弃环中最旧的项目。
+</p>
+<p>如果您注意不要超过环大小，则可以将环用作先进先出队列。例如：
+</p><div class="lisp">
+<pre class="lisp">(let ((fifo (make-ring 5)))
+  (mapc (lambda (obj) (ring-insert fifo obj))
+        '(0 one "two"))
+  (list (ring-remove fifo) t
+        (ring-remove fifo) t
+        (ring-remove fifo)))
+     ⇒ (0 t one t "two")
+</pre></div>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="07_记录.html">记录</a>, Previous: <a href="06.7_布尔向量.html">布尔向量</a>, Up: <a href="06_序列、数组和向量.html">序列、数组和向量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

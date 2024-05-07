@@ -1,0 +1,25 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>14.5.4 评估扩展中的宏观参数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">14.5.4 评估扩展中的宏观参数</h3>
+<div class="nav-panel"><p>Next: <a href="14.5.5_宏扩展了多少次？.html">宏扩展了多少次？</a>, Previous: <a href="14.5.3_宏展开中的局部变量.html">宏展开中的局部变量</a>, Up: <a href="14.5_使用宏的常见问题.html">使用宏的常见问题.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>如果宏定义本身评估任何宏参数表达式，例如通过调用 eval（请参阅 Eval），则可能会出现另一个问题。您必须考虑到宏扩展可能在代码执行之前很久就发生了，此时调用者的上下文（将评估宏扩展）还无法访问。
+</p>
+<p>此外，如果您的宏定义不使用词法绑定，则其形式参数可能会隐藏用户的同名变量。在宏体内，宏参数绑定是此类变量的最局部绑定，因此正在评估的表单内的任何引用都会引用它。这是一个例子：
+</p><div class="lisp">
+<pre class="lisp">(defmacro foo (a)
+  (list 'setq (eval a) t))
+
+(setq x 'b)
+(foo x) → (setq b t)
+     ⇒ t                  ; and b has been set.
+;; but
+(setq a 'c)
+(foo a) → (setq a t)
+     ⇒ t                  ; but this set a, not c.
+</pre></div>
+<p>用户变量命名为 a 还是 x 会有所不同，因为 a 与宏参数变量 a 冲突。
+</p>
+<p>此外，上面的 (foo x) 的扩展将在编译代码时返回不同的东西或发出错误信号，因为在这种情况下 (foo x) 在编译期间被扩展，而 (setq x ’b) 的执行将只需要在代码执行后放置。
+</p>
+<p>为避免这些问题，在计算宏展开时不要计算参数表达式。相反，将表达式替换为宏扩展，以便其值将作为执行扩展的一部分进行计算。这就是本章中其他示例的工作方式。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="14.5.5_宏扩展了多少次？.html">宏扩展了多少次？</a>, Previous: <a href="14.5.3_宏展开中的局部变量.html">宏展开中的局部变量</a>, Up: <a href="14.5_使用宏的常见问题.html">使用宏的常见问题.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.6.4 其他字体锁定变量</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">24.6.4 其他字体锁定变量</h3>
+<div class="nav-panel"><p>Next: <a href="24.6.5_字体锁定级别.html">字体锁定级别</a>, Previous: <a href="24.6.3_自定义基于搜索的字体.html">自定义基于搜索的字体</a>, Up: <a href="24.6_字体锁定模式.html">字体锁定模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍主要模式可以通过 font-lock-defaults 中的 other-vars 设置的其他变量（请参阅字体锁定基础知识）。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: font-lock-mark-block-function ¶
+</pre></div>
+<p>如果这个变量是非零，它应该是一个不带参数调用的函数，为命令 Mx font-lock-fontify-block 选择一个封闭的文本范围进行重新字体化。
+</p>
+<p>该函数应通过在其周围放置区域来报告其选择。一个好的选择是足够大的文本范围以提供适当的结果，但不要太大，以免重新字体变慢。典型值是用于编程模式的 mark-defun 或用于文本模式的 mark-paragraph。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: font-lock-extra-managed-props ¶
+</pre></div>
+<p>此变量指定由字体锁定模式管理的其他属性（font-lock-face 除外）。它由 font-lock-default-unfontify-region 使用，它通常只管理 font-lock-face 属性。如果您还希望 Font Lock 管理其他属性，则必须在 font-lock-keywords 的 facespec 中指定它们并将它们添加到此列表中。请参阅基于搜索的字体。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: font-lock-fontify-buffer-function ¶
+</pre></div>
+<p>用于字体化缓冲区的函数。默认值为 font-lock-default-fontify-buffer。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: font-lock-unfontify-buffer-function ¶
+</pre></div>
+<p>用于取消字体化缓冲区的函数。这在关闭字体锁定模式时使用。默认值为 font-lock-default-unfontify-buffer。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: font-lock-fontify-region-function ¶
+</pre></div>
+<p>用于字体化区域的函数。它应该有两个参数，区域的开始和结束，以及可选的第三个参数详细。如果详细信息不为零，则该函数应打印状态消息。默认值为 font-lock-default-fontify-region。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: font-lock-unfontify-region-function ¶
+</pre></div>
+<p>用于取消字体化区域的函数。它应该有两个参数，区域的开始和结束。默认值为 font-lock-default-unfontify-region。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: font-lock-flush-function ¶
+</pre></div>
+<p>用于声明区域字体已过期的函数。它需要两个参数，区域的开始和结束。此变量的默认值为 font-lock-after-change-function。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: font-lock-ensure-function ¶
+</pre></div>
+<p>用于确保当前缓冲区的区域已被字体化的函数。它用两个参数调用，区域的开始和结束。该变量的默认值是一个函数，如果缓冲区没有字体化，则调用 font-lock-default-fontify-buffer；  效果是确保缓冲区的整个可访问部分被字体化。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: jit-lock-register function &amp;optional contextual ¶
+</pre></div>
+<p>这个函数告诉字体锁定模式在任何时候必须对当前缓冲区的一部分进行字体化或重新字体化时运行 Lisp 函数。它在调用默认字体化函数之前调用函数，并给它两个参数，开始和结束，指定要字体化或重新字体化的区域。如果函数进行字体化，它可以返回一个表单列表（jit-lock-bounds beg .end），以指示它实际字体化的区域的边界；  JIT font-lock 将使用此信息来优化随后的重新显示周期和缓冲区文本区域，它将传递给未来的函数调用。
+</p>
+<p>可选参数上下文，如果非零，强制字体锁定模式总是重新字体缓冲区的语法相关部分，而不仅仅是修改的行。这个参数通常可以省略。
+</p>
+<p>当在缓冲区中激活字体锁定时，如果 font-lock-keywords-only 的值（请参阅语法字体锁定）为 nil，它会使用上下文的非 nil 值调用此函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: jit-lock-unregister function ¶
+</pre></div>
+<p>如果函数之前使用 jit-lock-register 注册为字体化函数，则此函数将取消注册它。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="24.6.5_字体锁定级别.html">字体锁定级别</a>, Previous: <a href="24.6.3_自定义基于搜索的字体.html">自定义基于搜索的字体</a>, Up: <a href="24.6_字体锁定模式.html">字体锁定模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

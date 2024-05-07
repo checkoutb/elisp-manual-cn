@@ -1,0 +1,57 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>12.13 目录局部变量</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">12.13 目录局部变量</h2>
+<div class="nav-panel"><p>Next: <a href="12.14_连接局部变量.html">连接局部变量</a>, Previous: <a href="12.12_文件局部变量.html">文件局部变量</a>, Up: <a href="12_变量.html">变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>一个目录可以指定该目录中所有文件共有的局部变量值；  Emacs 使用这些为访问该目录中任何文件的缓冲区中的变量创建缓冲区本地绑定。当目录中的文件属于某个项目并因此共享相同的局部变量时，这很有用。
+</p>
+<p>指定目录局部变量有两种不同的方法：将它们放在一个特殊的文件中，或者为该目录定义一个项目类。
+</p>
+<div class="lisp">
+<pre class="lisp">Constant: dir-locals-file ¶
+</pre></div>
+<p>这个常量是 Emacs 期望在其中找到目录局部变量的文件的名称。该文件的名称是 .dir-locals.el10。目录中具有该名称的文件会导致 Emacs 将其设置应用于该目录或其任何子目录中的任何文件（可选地，您可以排除子目录；见下文）。如果某些子目录有自己的 .dir-locals.el 文件，Emacs 会使用它找到的最深文件中的设置，从文件目录开始向上移动目录树。此常量还用于派生第二个 dir-locals 文件 .dir-locals-2.el 的名称。如果存在第二个 dir-locals 文件，则除了 .dir-locals.el 之外还会加载该文件。当 .dir-locals.el 在共享存储库中受版本控制且不能用于个人定制时，这很有用。该文件将局部变量指定为特殊格式的列表；  有关更多详细信息，请参阅 The GNU Emacs Manual 中的 Per-directory Local Variables。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: hack-dir-local-variables ¶
+</pre></div>
+<p>此函数读取 .dir-locals.el 文件并将目录局部变量存储在 file-local-variables-alist 中，该变量对于访问目录中的任何文件的缓冲区来说是本地的，而不应用它们。它还将目录本地设置存储在 dir-locals-class-alist 中，其中它为找到 .dir-locals.el 文件的目录定义了一个特殊类。此函数通过调用 dir-locals-set-class-variables 和 dir-locals-set-directory-class 来工作，如下所述。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: hack-dir-local-variables-non-file-buffer ¶
+</pre></div>
+<p>此函数查找目录局部变量，并立即将它们应用到当前缓冲区中。它旨在在非文件缓冲区（例如 Dired 缓冲区）的模式命令中调用，以让它们服从目录局部变量设置。对于非文件缓冲区，Emacs 在 default-directory 及其父目录中查找目录局部变量。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: dir-locals-set-class-variables class variables ¶
+</pre></div>
+<p>该函数为命名类定义了一组变量设置，这是一个符号。您可以稍后将类分配给一个或多个目录，Emacs 会将这些变量设置应用到这些目录中的所有文件。变量中的列表可以是以下两种形式之一：（major-mode .alist）或（directory .list）。对于第一种形式，如果文件的缓冲区打开了从主要模式派生的模式，则应用关联 alist 中的所有变量；  alist 应该是 (name . value) 的形式。主模式的特殊值 nil 表示设置适用于任何模式。在 alist 中，您可以使用一个特殊的名称：subdirs。如果关联值为 nil，则 alist 仅适用于相关目录中的文件，而不适用于任何子目录中的文件。
+</p>
+<p>对于第二种形式的变量，如果目录是文件目录的初始子字符串，则按照上述规则递归应用列表；  list 应该是此函数在变量中接受的两种形式之一。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: dir-locals-set-directory-class directory class &amp;optional mtime ¶
+</pre></div>
+<p>该函数将类分配给目录及其子目录中的所有文件。此后，为类指定的所有变量设置将应用于目录及其子目录中的任何访问文件。类必须已经由 dir-locals-set-class-variables 定义。
+</p>
+<p>当 Emacs 从 .dir-locals.el 文件加载目录变量时，它在内部使用这个函数。在这种情况下，可选参数 mtime 保存文件修改时间（由文件属性返回）。Emacs 使用这个时间来检查存储的局部变量是否仍然有效。如果你是直接分配一个类，而不是通过一个文件，这个参数应该是 nil。 
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: dir-locals-class-alist ¶
+</pre></div>
+<p>此列表保存类符号和相关的变量设置。它由 dir-locals-set-class-variables 更新。 
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: dir-locals-directory-cache ¶
+</pre></div>
+<p>这个列表保存了目录名、它们分配的类名和相关目录局部变量文件的修改时间（如果有的话）。函数 dir-locals-set-directory-class 更新此列表。 
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: enable-dir-local-variables ¶
+</pre></div>
+<p>如果为零，则忽略目录局部变量。此变量对于希望忽略本地目录但仍尊重文件本地变量的模式可能很有用（请参阅文件本地变量）。 
+</p>
+<p>脚注
+(10)
+</p>
+<p>由于 DOS 文件系统的限制，Emacs 的 MS-DOS 版本使用 _dir-locals.el。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="12.14_连接局部变量.html">连接局部变量</a>, Previous: <a href="12.12_文件局部变量.html">文件局部变量</a>, Up: <a href="12_变量.html">变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

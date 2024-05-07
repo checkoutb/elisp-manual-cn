@@ -1,0 +1,80 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>26.9.5 生成唯一文件名</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">26.9.5 生成唯一文件名</h3>
+<div class="nav-panel"><p>Next: <a href="26.9.6_文件名补全.html">文件名补全</a>, Previous: <a href="26.9.4_扩展文件名的函数.html">扩展文件名的函数</a>, Up: <a href="26.9_文件名.html">文件名.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>有些程序需要写入临时文件。以下是为此类文件构造名称的常用方法：
+</p>
+<div class="lisp">
+<pre class="lisp">(make-temp-file name-of-application)
+</pre></div>
+<p>make-temp-file 的工作是防止两个不同的用户或两个不同的工作尝试使用完全相同的文件名。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-temp-file prefix &amp;optional dir-flag suffix text ¶
+</pre></div>
+<p>此函数创建一个临时文件并返回其名称。Emacs 通过在每个 Emacs 作业中添加一些不同的随机字符作为前缀来创建临时文件的名称。结果保证是一个新创建的文件，如果以字符串形式给出，则包含文本，否则为空。在 MS-DOS 上，此函数可以截断前缀以适应 8+3 文件名限制。如果前缀是一个相对文件名，它会针对临时文件目录进行扩展。
+</p>
+<div class="lisp">
+<pre class="lisp">(make-temp-file "foo")
+     ⇒ "/tmp/foo232J6v"
+</pre></div>
+<p>当 make-temp-file 返回时，文件已创建并且为空。此时，您应该将预期的内容写入文件。
+</p>
+<p>如果 dir-flag 不是 nil，make-temp-file 会创建一个空目录而不是空文件。它返回该目录的文件名，而不是目录名。请参阅目录名称。
+</p>
+<p>如果 suffix 不为 nil，make-temp-file 会将其添加到文件名的末尾。
+</p>
+<p>如果 text 是一个字符串，make-temp-file 将它插入到文件中。
+</p>
+<p>为了防止在同一个 Emacs 中运行的不同库之间发生冲突，每个使用 make-temp-file 的 Lisp 程序都应该有自己的前缀。添加到前缀末尾的数字用于区分在不同 Emacs 作业中运行的同一应用程序。即使在一个 Emacs 作业中，额外添加的字符也允许使用大量不同的名称。
+</p>
+<p>临时文件的默认目录由变量temporary-file-directory 控制。此变量为用户提供了一种统一的方式来指定所有临时文件的目录。一些程序使用 small-temporary-file-directory 代替，如果它不是 nil 的话。要使用它，您应该在调用 make-temp-file 之前针对正确的目录展开前缀。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: temporary-file-directory ¶
+</pre></div>
+<p>此变量指定用于创建临时文件的目录名称。它的值应该是一个目录名（参见目录名），但是如果该值是一个目录的文件名，那么 Lisp 程序可以很好地应对。使用该值作为 expand-file-name 的第二个参数是实现此目的的好方法。
+</p>
+<p>默认值根据您的操作系统以合理的方式确定；  它基于 TMPDIR、TMP 和 TEMP 环境变量，如果未定义这些变量，则回退到系统相关名称。
+</p>
+<p>即使你不使用 make-temp-file 创建临时文件，你仍然应该使用这个变量来决定将文件放在哪个目录。但是，如果你希望文件很小，你应该使用 small-temporary -file-directory 如果那是非零的话。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: small-temporary-file-directory ¶
+</pre></div>
+<p>此变量指定用于创建某些可能很小的临时文件的目录名称。
+</p>
+<p>如果你想写一个可能很小的临时文件，你应该像这样计算目录：
+</p>
+<div class="lisp">
+<pre class="lisp">(make-temp-file
+  (expand-file-name prefix
+                    (or small-temporary-file-directory
+                        temporary-file-directory)))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: make-temp-name base-name ¶
+</pre></div>
+<p>此函数生成一个可能是唯一文件名的字符串。该名称以 base-name 开头，并附加了几个随机字符，这些字符在每个 Emacs 作业中都不同。它类似于 make-temp-file，除了 (i) 它只是构造一个名称而不创建文件，(ii) base-name 应该是一个绝对文件名，而不是魔术，以及 (iii) 如果返回的文件name 很神奇，它可能会命名一个现有的文件。请参阅使某些文件名 <code>神奇</code> 。
+</p>
+<p>警告：在大多数情况下，您不应该使用此功能；  改用 make-temp-file ！  此函数容易受到 make-temp-name 调用和文件创建之间的竞争条件的影响，这在某些情况下可能会导致安全漏洞。
+</p>
+<p>有时，需要在远程主机或挂载目录上创建临时文件。以下两个函数支持这一点。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-nearby-temp-file prefix &amp;optional dir-flag suffix ¶
+</pre></div>
+<p>此功能类似于 make-temp-file，但它创建一个尽可能靠近默认目录的临时文件。如果 prefix 是相对文件名，而 default-directory 是远程文件名或位于已挂载的文件系统上，则在函数 temporary-file-directory 返回的目录中创建临时文件。否则，使用函数 make-temp-file。prefix、dir-flag 和 suffix 与 make-temp-file 中的含义相同。
+</p>
+<div class="lisp">
+<pre class="lisp">(let ((default-directory "/ssh:remotehost:"))
+  (make-nearby-temp-file "foo"))
+     ⇒ "/ssh:remotehost:/tmp/foo232J6v"
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: temporary-file-directory ¶
+</pre></div>
+<p>通过 make-nearby-temp-file 写入临时文件的目录。在远程默认目录的情况下，这是该远程主机上临时文件的目录。如果这样的目录不存在，或者默认目录应该位于已安装的文件系统上（请参阅mounted-file-systems），则该函数返回默认目录。对于非远程和非挂载的默认目录，返回变量临时文件目录的值。
+</p>
+<p>要提取临时文件的文件名的本地部分，请使用 file-local-name（请参阅使某些文件名 <code>变魔术</code> ）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="26.9.6_文件名补全.html">文件名补全</a>, Previous: <a href="26.9.4_扩展文件名的函数.html">扩展文件名的函数</a>, Up: <a href="26.9_文件名.html">文件名.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

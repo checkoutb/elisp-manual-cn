@@ -1,0 +1,10 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.30.4 延迟的 JSONRPC 请求</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">33.30.4 延迟的 JSONRPC 请求</h3>
+<div class="nav-panel"><p>Next: <a href="33.31_原子变更组.html">原子变更组</a>, Previous: <a href="33.30.3_JSONRPC_JSON对象格式.html">JSONRPC_JSON对象格式</a>, Up: <a href="33.30_JSONRPC_通信.html">JSONRPC_通信.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在许多 RPC 情况下，两个通信端点之间的同步是正确设计 RPC 应用程序的问题：当需要同步时，应该使用请求（阻塞）；  如果不是，通知就足够了。但是，当 Emacs 充当这些端点之一时，可能会触发异步事件（例如，与计时器或进程相关的事件），而远程端点的状态仍然不确定。此外，根据事件的具体性质，对这些事件采取行动有时可能只需要同步。
+</p>
+<p>jsonrpc-request 和 jsonrpc-async-request 的 :deferred 关键字参数旨在让调用者指示特定请求需要同步，并且其实际发出可能会延迟到将来，直到满足某些条件。为请求指定 :deferred 并不意味着它会被延迟，只是可以。如果请求没有立即发送，jsonrpc 将重新努力在通信过程中的某些关键时刻发送它，例如在接收或发送其他消息到端点时。
+</p>
+<p>在任何尝试发送请求之前，都会检查特定于应用程序的条件。由于 jsonrpc 库无法知道这些条件是什么，因此程序可以使用 jsonrpc-connection-ready-p 泛型函数（请参阅泛型函数）来指定它们。此函数的默认方法返回 t，但您可以添加在某些情况下返回 nil 的覆盖方法，基于传递给它的参数，即 jsonrpc-connection 对象（请参阅概述）和您作为 :deferred 传递的任何值关键字参数。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.31_原子变更组.html">原子变更组</a>, Previous: <a href="33.30.3_JSONRPC_JSON对象格式.html">JSONRPC_JSON对象格式</a>, Up: <a href="33.30_JSONRPC_通信.html">JSONRPC_通信.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

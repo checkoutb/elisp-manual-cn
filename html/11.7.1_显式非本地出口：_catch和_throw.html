@@ -1,0 +1,45 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>11.7.1 显式非本地出口： catch和 throw</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">11.7.1 显式非本地出口： catch和 throw</h3>
+<div class="nav-panel"><p>Next: <a href="11.7.2_示例_catch和_throw.html">示例_catch和_throw</a>, Previous: <a href="11.7_非本地出口.html">非本地出口</a>, Up: <a href="11.7_非本地出口.html">非本地出口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>大多数控制结构只影响结构本身的控制流。函数 throw 是正常程序执行规则的一个例外：它根据请求执行非本地退出。（还有其他异常，但它们仅用于错误处理。） throw 在 catch 内使用，并跳转回该 catch。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">(defun foo-outer ()
+  (catch 'foo
+    (foo-inner)))
+
+(defun foo-inner ()
+  …
+  (if x
+      (throw 'foo t))
+  …)
+</pre></div>
+<p>如果执行 throw 形式，则将控制权直接转移回相应的 catch，该 catch 立即返回。throw 后面的代码不会被执行。throw 的第二个参数用作 catch 的返回值。
+</p>
+<p>throw 函数根据第一个参数找到匹配的 catch：它搜索第一个参数等于 throw 中指定的参数的 catch。如果有多个适用的捕获，则最里面的捕获优先。因此，在上面的示例中，throw 指定了 foo，而 foo-outer 中的 catch 指定了相同的符号，因此 catch 是适用的（假设两者之间没有其他匹配的 catch）。
+</p>
+<p>执行 throw 会退出所有 Lisp 结构，直到匹配的 catch，包括函数调用。当以这种方式退出诸如 let 或函数调用之类的绑定构造时，绑定是未绑定的，就像这些构造正常退出时一样（请参阅局部变量）。同样， throw 恢复由 save-excursion 保存的缓冲区和位置（请参阅 Excursions），以及由 save-restriction 保存的缩小状态。当它退出该表单时，它还会运行使用 unwind-protect 特殊表单建立的任何清理（请参阅从非本地出口清理）。
+</p>
+<p>throw 不需要在它跳转到的 catch 中出现在词汇上。它同样可以从 catch 中调用的另一个函数中调用。只要投掷是在进入接球之后按时间顺序进行的，并且在退出接球之前按时间顺序进行，它就可以访问该接球。这就是为什么 throw 可以在诸如 exit-recursive-edit 之类的命令中使用，这些命令会返回到编辑器命令循环（请参阅递归编辑）。
+</p>
+<p>Common Lisp 注意：大多数其他版本的 Lisp，包括 Common Lisp，都有几种非顺序转移控制的方法：例如，return、return-from 和 go。Emacs Lisp 只有 throw。cl-lib 库提供了其中一些版本。请参阅 Common Lisp 扩展中的块和退出。 
+</p>
+<div class="lisp">
+<pre class="lisp">Special Form: catch tag body… ¶
+</pre></div>
+<p>catch 为 throw 函数建立一个返回点。返回点通过标签与其他此类返回点区分开来，标签可以是除 nil 之外的任何 Lisp 对象。在建立返回点之前，通常会评估参数标记。
+</p>
+<p>在返回点生效的情况下，catch 按文本顺序评估正文的形式。如果表单正常执行（没有错误或非本地退出），则从 catch 返回最后一个正文表单的值。
+</p>
+<p>如果在body执行过程中执行了throw，指定了相同的value标签，catch表单立即退出；  它返回的值是指定为 throw 的第二个参数的值。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: throw tag value ¶
+</pre></div>
+<p>throw 的目的是从先前用 catch 建立的返回点返回。参数标签用于在现有的各种返回点中进行选择；  它必须等于 catch 中指定的值。如果多个返回点与标签匹配，则使用最里面的一个。
+</p>
+<p>参数值用作从该捕获返回的值。
+</p>
+<p>如果没有返回点对标签标签有效，则使用数据（标签值）发出未捕获错误信号。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="11.7.2_示例_catch和_throw.html">示例_catch和_throw</a>, Previous: <a href="11.7_非本地出口.html">非本地出口</a>, Up: <a href="11.7_非本地出口.html">非本地出口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

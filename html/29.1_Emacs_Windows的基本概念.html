@@ -1,0 +1,70 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>29.1 Emacs Windows的基本概念</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">29.1 Emacs Windows的基本概念</h2>
+<div class="nav-panel"><p>Next: <a href="29.2_窗口和帧.html">窗口和帧</a>, Previous: <a href="29_窗口.html">窗口</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>窗口是可用于显示缓冲区的屏幕区域（请参阅缓冲区）。窗户被分组到 <code>帧</code> ( <code>frame</code> )中（请参阅 <code>帧</code> ( <code>frame</code> )）。每一帧至少包含一个窗口；  用户可以将一个帧细分为多个不重叠的窗口，以便一次查看多个缓冲区。Lisp 程序可以将多个窗口用于各种目的。例如，在 Rmail 中，您可以在一个窗口中查看邮件标题的摘要，并在另一个窗口中查看所选邮件的内容。
+</p>
+<p>Emacs 使用的术语 <code>窗口</code> 与图形桌面环境和窗口系统（例如 X 窗口系统）中的含义不同。当 Emacs 在 X 上运行时，Emacs 进程拥有的每个图形 X 窗口对应一个 Emacs  <code>帧</code> ( <code>frame</code> )。当 Emacs 在文本终端上运行时，每个 Emacs  <code>帧</code> ( <code>frame</code> )会填满整个终端屏幕。在任何一种情况下， <code>帧</code> ( <code>frame</code> )都可能包含一个或多个 Emacs 窗口。为了消除歧义，当我们指的是对应于 Emacs  <code>帧</code> ( <code>frame</code> )的窗口系统窗口时，我们使用术语窗口系统窗口。
+</p>
+<p>与 X 窗口不同，Emacs 窗口是平铺的；  它们从不在 <code>帧</code> ( <code>frame</code> )区域内重叠。当创建、调整大小或删除窗口时，窗口空间的变化取自或给予同一 <code>帧</code> ( <code>frame</code> )上的其他窗口，因此 <code>帧</code> ( <code>frame</code> )的总面积不变。
+</p>
+<p>在 Emacs Lisp 中，窗口由一种特殊的 Lisp 对象类型表示（参见窗口类型）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: windowp object ¶
+</pre></div>
+<p>如果对象是窗口（无论它是否显示缓冲区），此函数将返回 t。否则，它返回零。
+</p>
+<p>实时窗口是实际在帧中显示缓冲区的窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-live-p object ¶
+</pre></div>
+<p>如果对象是活动窗口，则此函数返回 t，否则返回 nil。实时窗口是显示缓冲区的窗口。
+</p>
+<p>每个 <code>帧</code> ( <code>frame</code> )中的窗口被组织成一个窗口树。请参阅窗和 <code>帧</code> ( <code>frame</code> )。每个窗口树的叶节点都是活动窗口——实际显示缓冲区的窗口。窗口树的内部节点是内部窗口，它们不是活的。
+</p>
+<p>有效的窗口是活动的或内部的。一个有效的窗口可以被删除，即从它的 <code>帧</code> ( <code>frame</code> )中删除（见删除窗口）；  那么它不再有效，但表示它的 Lisp 对象可能仍被其他 Lisp 对象引用。通过恢复已保存的窗口配置，可以使已删除的窗口再次生效（请参阅窗口配置）。
+</p>
+<p>您可以使用 window-valid-p 区分有效窗口和已删除窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-valid-p object ¶
+</pre></div>
+<p>如果对象是活动窗口或窗口树中的内部窗口，则此函数返回 t。否则，它返回 nil，包括对象是已删除窗口的情况。
+</p>
+<p>以下示意图显示了实时窗口的结构：
+</p>
+<div class="lisp">
+<pre class="lisp">        ____________________________________________
+       |________________ Tab Line _______________|RD| ^
+       |______________ Header Line ______________|  | |
+     ^ |LS|LM|LF|                       |RF|RM|RS|  | |
+     | |  |  |  |                       |  |  |  |  | |
+Window |  |  |  |                       |  |  |  |  | Window
+Body | |  |  |  |      Window Body      |  |  |  |  | Total
+Height |  |  |  |                       |  |  |  |  | Height
+     | |  |  |  |&lt;- Window Body Width -&gt;|  |  |  |  | |
+     v |__|__|__|_______________________|__|__|__|  | |
+       |_________ Horizontal Scroll Bar _________|  | |
+       |_______________ Mode Line _______________|__| |
+       |_____________ Bottom Divider _______________| v
+        &lt;---------- Window Total Width ------------&gt;
+</pre></div>
+<p>该窗口的中心是显示缓冲区文本的主体。身体可以被一系列我们称之为窗户装饰的可选区域包围。在左边和右边，从最里面到最外面，这些是左右边缘，用LF和RF表示（见Fringes）；  左右边距，在示意图中用 LM 和 RM 表示（参见在边距中显示）；  左侧或右侧垂直滚动条，在任何时候都只存在一个，用 LS 和 RS 表示（参见滚动条）；  右分隔线，用 RD 表示（参见窗口分隔线）。这些一起是窗户的左右装饰。
+</p>
+<p>窗口顶部是选项卡行和标题行（请参阅窗口标题行）。窗口的文本区域包括标题行和制表符行（如果它们存在于窗口中）。窗口底部是水平滚动条（参见滚动条）；  模式线（参见模式线格式）；  和底部分隔线（请参阅窗口分隔线）。这些共同构成了窗户的顶部和底部装饰。
+</p>
+<p>原理图中省略了两个特殊区域：
+</p>
+<p>当缺少任何边缘时，如果文本行不适合窗口，则显示引擎可能会使用一个字符单元来显示延续或截断字形。
+当垂直滚动条和右分隔线都缺失时，如果存在这样的窗口，则显示引擎会占用一个像素来在该窗口与其右侧的窗口之间绘制一条垂直分隔线。在文本终端上，此分隔符始终占据整个字符单元格。
+</p>
+<p>在任何一种情况下，生成的工件都​​被视为窗口主体的一部分，尽管它的屏幕空间不能用于显示缓冲区文本。
+</p>
+<p>另请注意，由 display-line-numbers-mode 显示的行号（及其周围的空白）（请参阅 GNU Emacs 手册中的 Display Custom ）也不算作装饰；  它们也是窗户主体的一部分。
+</p>
+<p>内部窗口既不显示任何文字，也没有装饰。因此， <code>身体</code> 的概念对他们来说没有意义。事实上，大多数在窗口主体上运行的函数在应用于内部窗口时都会产生错误。
+</p>
+<p>默认情况下，Emacs  <code>帧</code> ( <code>frame</code> )展示了一个特殊的实时窗口，用于显示消息和接受用户输入 - minibuffer 窗口（请参阅 Minibuffer Windows）。由于 minibuffer 窗口用于显示文本，它有一个主体，但它没有制表符或标题行或任何边距。最后，用于在工具提示 <code>帧</code> ( <code>frame</code> )中显示工具提示的工具提示窗口（请参阅工具提示）也有一个主体，但根本没有装饰。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="29.2_窗口和帧.html">窗口和帧</a>, Previous: <a href="29_窗口.html">窗口</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

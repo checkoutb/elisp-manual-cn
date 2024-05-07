@@ -1,0 +1,35 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>26.3 从文件中读取</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">26.3 从文件中读取</h2>
+<div class="nav-panel"><p>Next: <a href="26.4_写入文件.html">写入文件</a>, Previous: <a href="26.2_保存缓冲区.html">保存缓冲区</a>, Up: <a href="26_文件.html">文件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>要将文件的内容复制到缓冲区中，请使用函数 insert-file-contents。（不要在 Lisp 程序中使用命令 insert-file，因为它会设置标记。）
+</p>
+<div class="lisp">
+<pre class="lisp">Function: insert-file-contents filename &amp;optional visit beg end replace ¶
+</pre></div>
+<p>此函数将文件 filename 的内容插入到当前缓冲区中的点之后。它返回绝对文件名和插入数据长度的列表。如果文件名不是可以读取的文件名，则会发出错误信号。
+</p>
+<p>此函数根据定义的文件格式检查文件内容，并在适当时转换文件内容，并调用列表后插入文件函数中的函数。请参阅文件格式转换。通常，after-insert-file-functions 列表中的函数之一确定用于解码文件内容的编码系统（请参阅编码系统），包括行尾转换。但是，如果文件包含空字节，则默认情况下会在不进行任何代码转换的情况下对其进行访问。请参见禁止空字节检测。
+</p>
+<p>如果 visit 不为 nil，则此函数另外将缓冲区标记为未修改，并在缓冲区中设置各种字段，以便它正在访问文件文件名：这些字段包括缓冲区的访问文件名及其最后保存文件的修改时间。此功能由 find-file-noselect 使用，您可能不应该自己使用它。
+</p>
+<p>如果 beg 和 end 不是 nil，它们应该是字节偏移的数字，指定要插入的文件部分。在这种情况下，访问必须为零。例如，
+</p>
+<div class="lisp">
+<pre class="lisp">(insert-file-contents filename nil 0 500)
+</pre></div>
+<p>插入由文件的前 500 个字节编码的字符。
+</p>
+<p>如果 beg 或 end 恰好在一个字符的多字节序列的中间，Emacs 的字符代码转换将插入一个或多个八位字符（也称为 <code>原始字节</code> ）（参见字符集）到缓冲区中。如果您想以这种方式读取文件的一部分，我们建议在调用此函数时将 coding-system-for-read 绑定到合适的值（请参阅为一个操作指定编码系统），并编写 Lisp 代码将检查边界处的原始字节，读取这些字节的整个序列，并将它们转换回有效字符。
+</p>
+<p>如果参数 replace 不为 nil，则表示将缓冲区的内容（实际上只是可访问部分）替换为文件的内容。这比简单地删除缓冲区内容并插入整个文件要好，因为（1）它保留了一些标记位置，（2）它在撤消列表中放置的数据更少。
+</p>
+<p>可以使用 insert-file-contents 读取特殊文件（例如 FIFO 或 I/O 设备），只要 replace 和 visit 为 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: insert-file-contents-literally filename &amp;optional visit beg end replace ¶
+</pre></div>
+<p>此函数的工作方式与 insert-file-contents 类似，只是文件中的每个字节都是单独处理的，如果需要，可以转换为 8 位字符。它不运行after-insert-file-functions，也不做格式解码、字符代码转换、自动解压缩等。
+</p>
+<p>如果要将文件名传递给另一个进程以便另一个程序可以读取该文件，请使用函数 file-local-copy;  请参阅使某些文件名 <code>神奇</code> 。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="26.4_写入文件.html">写入文件</a>, Previous: <a href="26.2_保存缓冲区.html">保存缓冲区</a>, Up: <a href="26_文件.html">文件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

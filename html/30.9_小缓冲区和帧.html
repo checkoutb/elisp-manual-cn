@@ -1,0 +1,17 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>30.9 小缓冲区和帧</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">30.9 小缓冲区和帧</h2>
+<div class="nav-panel"><p>Next: <a href="30.10_输入焦点.html">输入焦点</a>, Previous: <a href="30.8_查找所有帧.html">查找所有帧</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Normally, each frame has its own minibuffer window at the bottom, which is used whenever that frame is selected.  您可以使用 minibuffer-window 函数获取该窗口（请参阅 Minibuffer Windows）。
+</p>
+<p>但是，您也可以创建一个没有 minibuffer 的帧。这样的帧必须使用某个其他帧的 minibuffer 窗口。该其他帧将用作该帧的代理微型缓冲区帧，并且只要该帧处于活动状态，就不能通过删除帧删除（请参阅删除帧）。
+</p>
+<p>创建帧时，您可以使用 minibuffer 帧参数（请参阅缓冲区参数）显式指定其 minibuffer 窗口（在某些其他帧中）。如果你不这样做，那么 minibuffer 会在 frame 中找到，它是变量 default-minibuffer-frame 的值。它的值应该是一个确实有一个小缓冲区的帧。
+</p>
+<p>如果您使用一个仅包含 minibuffer 的帧，您可能希望在进入 minibuffer 时提升该帧。如果是这样，请将变量 minibuffer-auto-raise 设置为 t。请参阅提升、降低和重新堆叠帧。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: default-minibuffer-frame ¶
+</pre></div>
+<p>默认情况下，此变量指定用于 minibuffer 窗口的帧。它不会影响现有帧。它始终是当前终端本地的，不能是缓冲区本地的。请参阅多个终端。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="30.10_输入焦点.html">输入焦点</a>, Previous: <a href="30.8_查找所有帧.html">查找所有帧</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

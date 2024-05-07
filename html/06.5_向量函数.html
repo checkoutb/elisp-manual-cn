@@ -1,0 +1,67 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>6.5 向量函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">6.5 向量函数</h2>
+<div class="nav-panel"><p>Next: <a href="06.6_字符表.html">字符表</a>, Previous: <a href="06.4_向量.html">向量</a>, Up: <a href="06_序列、数组和向量.html">序列、数组和向量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>以下是一些与向量相关的函数：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: vectorp object ¶
+</pre></div>
+<p>如果 object 是向量，则此函数返回 t。
+</p>
+<div class="lisp">
+<pre class="lisp">(vectorp [a])
+     ⇒ t
+(vectorp "asdf")
+     ⇒ nil
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: vector &amp;rest objects ¶
+</pre></div>
+<p>此函数创建并返回一个向量，其元素是参数、对象。
+</p>
+<div class="lisp">
+<pre class="lisp">(vector 'foo 23 [bar baz] "rats")
+     ⇒ [foo 23 [bar baz] "rats"]
+(vector)
+     ⇒ []
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: make-vector length object ¶
+</pre></div>
+<p>此函数返回一个由长度元素组成的新向量，每个元素都初始化为对象。
+</p>
+<div class="lisp">
+<pre class="lisp">(setq sleepy (make-vector 9 'Z))
+     ⇒ [Z Z Z Z Z Z Z Z Z]
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: vconcat &amp;rest sequences ¶
+</pre></div>
+<p>此函数返回一个包含序列所有元素的新向量。参数序列可以是正确的列表、向量、字符串或布尔向量。如果没有给出序列，则返回空向量。
+</p>
+<p>该值要么是空向量，要么是新构造的非空向量，它与任何现有向量都不相等。
+</p>
+<div class="lisp">
+<pre class="lisp">(setq a (vconcat '(A B C) '(D E F)))
+     ⇒ [A B C D E F]
+(eq a (vconcat a))
+     ⇒ nil
+
+(vconcat)
+     ⇒ []
+(vconcat [A B C] "aa" '(foo (6 7)))
+     ⇒ [A B C 97 97 foo (6 7)]
+</pre></div>
+<p>vconcat 函数还允许字节码函数对象作为参数。这是一个特殊功能，可以轻松访问字节码函数对象的全部内容。请参阅字节码函数对象。
+</p>
+<p>有关其他连接函数，请参阅映射函数中的 mapconcat、创建字符串中的 concat 和构建 Cons 单元格和列表中的 append。
+</p>
+<p>append 函数还提供了一种将向量转换为具有相同元素的列表的方法：
+</p>
+<div class="lisp">
+<pre class="lisp">(setq avector [1 two (quote (three)) "four" [five]])
+     ⇒ [1 two '(three) "four" [five]]
+(append avector nil)
+     ⇒ (1 two '(three) "four" [five])
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="06.6_字符表.html">字符表</a>, Previous: <a href="06.4_向量.html">向量</a>, Up: <a href="06_序列、数组和向量.html">序列、数组和向量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>37.2 定义缩写</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">37.2 定义缩写</h2>
+<div class="nav-panel"><p>Next: <a href="37.3_在文件中保存缩写.html">在文件中保存缩写</a>, Previous: <a href="37.1_缩略表.html">缩略表</a>, Up: <a href="37_缩写和缩写扩展.html">缩写和缩写扩展.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>define-abbrev 是用于在缩写表中定义缩写的低级基本函数。
+</p>
+<p>当主要模式定义系统缩写时，它应该调用 define-abbrev 并为 :system 属性指定 t。请注意，任何保存的非系统缩写都会在启动时恢复，即在加载某些主要模式之前。因此，主要模式不应假定它们的缩写表在首次加载时为空。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: define-abbrev abbrev-table name expansion &amp;optional hook &amp;rest props ¶
+</pre></div>
+<p>该函数在 abbrev-table 中定义了一个名为 name 的缩写，用于扩展为展开和调用钩子，带有属性 props（参见缩写属性）。返回值为名称。props 中的 :system 属性在这里被特殊对待：如果它具有值 force，那么即使对于同名的非系统缩写，它也会覆盖现有定义。
+</p>
+<p>名称应该是一个字符串。参数扩展通常是所需的扩展（字符串），或者 nil 取消定义缩写。如果它不是字符串或 nil，则缩写仅通过运行 hook 扩展。
+</p>
+<p>参数挂钩是一个函数或 nil。如果 hook 不为 nil，则在将缩写替换为展开式后不带参数调用它；  当调用 hook 时，point 位于展开的末尾。
+</p>
+<p>如果 hook 是一个非 nil 符号，其 no-self-insert 属性为非 nil，则 hook 可以显式控制是否插入触发扩展的自插入输入字符。如果在这种情况下钩子返回非零，则禁止插入字符。相反，如果钩子返回 nil，expand-abbrev（或 abbrev-insert）也返回 nil，就好像展开并没有真正发生一样。
+</p>
+<p>通常，define-abbrev 将变量 abbrevs-changed 设置为 t，如果它实际上更改了 abbrev。这样一些命令将提供保存缩写。它不会对系统缩写执行此操作，因为无论如何都不会保存这些缩写。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: only-global-abbrevs ¶
+</pre></div>
+<p>如果此变量非零，则表示用户计划仅使用全局缩写。这告诉定义特定模式缩写的命令改为定义全局缩写。该变量不会改变本节中函数的行为；  他们的来电者会检查它。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="37.3_在文件中保存缩写.html">在文件中保存缩写</a>, Previous: <a href="37.1_缩略表.html">缩略表</a>, Up: <a href="37_缩写和缩写扩展.html">缩写和缩写扩展.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

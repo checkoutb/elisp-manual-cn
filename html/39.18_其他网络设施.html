@@ -1,0 +1,102 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>39.18 其他网络设施</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">39.18 其他网络设施</h2>
+<div class="nav-panel"><p>Next: <a href="39.19_与串口通信.html">与串口通信</a>, Previous: <a href="39.17.3_测试网络功能的可用性.html">测试网络功能的可用性</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这些附加功能对于创建和操作网络连接很有用。请注意，它们仅在某些系统上受支持。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: network-interface-list &amp;optional full family ¶
+</pre></div>
+<p>此函数返回一个描述您正在使用的机器的网络接口的列表。该值是一个 alist，其元素的格式为 (ifname .address)。ifname 是一个命名接口的字符串，address 与 make-network-process 的 local-address 和 remote-address 参数形式相同，即整数向量。默认情况下，如果可能，会返回 IPv4 和 IPv6 地址。
+</p>
+<p>可选参数 full non-nil 表示改为返回表单中一个或多个元素的列表（ifname addr bcast netmask）。ifname 是一个命名接口的非唯一字符串。addr、bcast 和 netmask 是详细说明 IP 地址、广播地址和网络掩码的整数向量。
+</p>
+<p>指定为符号 ipv4 或 ipv6 的可选参数系列将返回的信息分别限制为 IPv4 和 IPv6 地址，与 full 的值无关。当 IPv6 支持不可用时指定 ipv6 将导致发出错误信号。
+</p>
+<p>一些例子：
+</p><div class="lisp">
+<pre class="lisp">
+
+(network-interface-list) ⇒
+(("vmnet8" .
+  [172 16 76 1 0])
+ ("vmnet1" .
+  [172 16 206 1 0])
+ ("lo0" .
+  [65152 0 0 0 0 0 0 1 0])
+ ("lo0" .
+  [0 0 0 0 0 0 0 1 0])
+ ("lo0" .
+  [127 0 0 1 0]))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">(network-interface-list t) ⇒
+(("vmnet8"
+  [172 16 76 1 0]
+  [172 16 76 255 0]
+  [255 255 255 0 0])
+ ("vmnet1"
+  [172 16 206 1 0]
+  [172 16 206 255 0]
+  [255 255 255 0 0])
+ ("lo0"
+  [65152 0 0 0 0 0 0 1 0]
+  [65152 0 0 0 65535 65535 65535 65535 0]
+  [65535 65535 65535 65535 0 0 0 0 0])
+ ("lo0"
+  [0 0 0 0 0 0 0 1 0]
+  [0 0 0 0 0 0 0 1 0]
+  [65535 65535 65535 65535 65535 65535 65535 65535 0])
+ ("lo0"
+  [127 0 0 1 0]
+  [127 255 255 255 0]
+  [255 0 0 0 0]))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: network-interface-info ifname ¶
+</pre></div>
+<p>此函数返回有关名为 ifname 的网络接口的信息。该值是一个形式的列表（addr bcast netmask hwaddr flags）。
+</p>
+<div class="lisp">
+<pre class="lisp">addr
+</pre></div>
+<p>Internet 协议地址。
+</p><div class="lisp">
+<pre class="lisp">bcast
+</pre></div>
+<p>广播地址。
+</p><div class="lisp">
+<pre class="lisp">netmask
+</pre></div>
+<p>网络掩码。
+</p><div class="lisp">
+<pre class="lisp">hwaddr
+</pre></div>
+<p>第 2 层地址（例如以太网 MAC 地址）。
+</p><div class="lisp">
+<pre class="lisp">flags
+</pre></div>
+<p>接口的当前标志。
+</p>
+<p>请注意，此函数仅返回 IPv4 信息。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: format-network-address address &amp;optional omit-port ¶
+</pre></div>
+<p>此函数将网络地址的 Lisp 表示形式转换为字符串。
+</p>
+<p>五元素向量 [abcdp] 表示 IPv4 地址 abcd 和端口号 p。format-network-address 将其转换为字符串 <code>abcd:p</code> 。
+</p>
+<p>九元素向量 [abcdefghp] 表示 IPv6 地址和端口号。format-network-address 将其转换为字符串 <code>[a:b:c:d:e:f:g:h]:p</code> 。
+</p>
+<p>如果向量不包括端口号 p，或者如果 omit-port 不为零，则结果不包括 :p 后缀。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: network-lookup-address-info name &amp;optional family ¶
+</pre></div>
+<p>此函数用于对名称执行主机名查找，该名称应为纯 ASCII 字符串，否则会发出错误信号。如果您希望查找国际化主机名，请先在名称上调用 puny-encode-domain。
+</p>
+<p>如果成功，则返回网络地址的 Lisp 表示列表，否则返回 nil。在后一种情况下，它还会显示错误消息，希望能解释出了什么问题。
+</p>
+<p>默认情况下，会尝试 IPv4 和 IPv6 查找。可选参数系列控制此行为，指定符号 ipv4 或 ipv6 将查找分别限制为 IPv4 和 IPv6。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="39.19_与串口通信.html">与串口通信</a>, Previous: <a href="39.17.3_测试网络功能的可用性.html">测试网络功能的可用性</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

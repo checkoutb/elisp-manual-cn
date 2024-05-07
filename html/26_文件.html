@@ -1,0 +1,10 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>26 文件</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h1 class="chapter">26 文件</h1>
+<div class="nav-panel"><p>Next: <a href="26.1_访问文件.html">访问文件</a>, Previous: <a href="25.7_文档组.html">文档组</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本章描述了用于查找、创建、查看、保存以及以其他方式处理文件和目录的 Emacs Lisp 函数和变量。缓冲区中描述了其他一些与文件相关的功能，备份和自动保存中描述了与备份和自动保存相关的功能。
+</p>
+<p>许多文件函数采用一个或多个作为文件名的参数。文件名是一个字符串。这些函数中的大多数使用函数 expand-file-name 扩展文件名参数，以便正确处理 ~ 以及相对文件名（包括 ../ 和空字符串）。请参阅扩展文件名的函数。
+</p>
+<p>此外，某些魔术文件名是经过特殊处理的。例如，当指定了远程文件名时，Emacs 通过适当的协议通过网络访问该文件。请参阅 GNU Emacs 手册中的远程文件。此处理在非常低的级别完成，因此您可以假设本章中描述的所有函数都接受魔术文件名作为文件名参数，除非另有说明。有关详细信息，请参阅使某些文件名 <code>神奇</code> 。
+</p>
+<p>当文件 I/O 函数发出 Lisp 错误信号时，它们通常使用条件文件错误（请参阅编写代码以处理错误）。在大多数情况下，错误消息是根据语言环境系统消息语言环境从操作系统获得的，并使用编码系统语言环境编码系统（请参阅语言环境）进行解码。
+</p>
+<div class="nav-panel"><p>Next: <a href="26.1_访问文件.html">访问文件</a>, Previous: <a href="25.7_文档组.html">文档组</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

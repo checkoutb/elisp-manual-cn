@@ -1,0 +1,70 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.12.8 基本面</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.12.8 基本面</h3>
+<div class="nav-panel"><p>Next: <a href="40.12.9_字体选择.html">字体选择</a>, Previous: <a href="40.12.7_自动面分配.html">自动面分配</a>, Up: <a href="40.12_面.html">面.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>如果您的 Emacs Lisp 程序需要为文本分配一些面，则使用某些现有面或从它们继承通常是一个好主意，而不是定义全新的面。这样，如果其他用户自定义了基本面以赋予 Emacs 某种外观，您的程序无需额外自定义即可适应。
+</p>
+<p>下面列出了 Emacs 中定义的一些基本面。除此之外，如果字体锁定模式尚未处理突出显示，或者某些字体锁定面未使用，您可能希望使用字体锁定面进行语法突出显示。请参见字体锁定的面。
+</p>
+<div class="lisp">
+<pre class="lisp">default
+</pre></div>
+<p>默认面，其属性全部指定。所有其他面都隐式继承自它：任何未指定的属性默认为该面上的属性（请参阅面属性）。
+</p><div class="lisp">
+<pre class="lisp">bold
+</pre></div>
+<div class="lisp">
+<pre class="lisp">italic
+</pre></div>
+<div class="lisp">
+<pre class="lisp">bold-italic
+</pre></div>
+<div class="lisp">
+<pre class="lisp">underline
+</pre></div>
+<div class="lisp">
+<pre class="lisp">fixed-pitch
+</pre></div>
+<div class="lisp">
+<pre class="lisp">fixed-pitch-serif
+</pre></div>
+<div class="lisp">
+<pre class="lisp">variable-pitch
+</pre></div>
+<p>它们具有由它们的名称指示的属性（例如，粗体具有粗体 :weight 属性），所有其他属性未指定（默认情况下如此）。
+</p><div class="lisp">
+<pre class="lisp">shadow
+</pre></div>
+<p>对于变暗的文本。例如，它用于 minibuffer 中文件名的被忽略部分（请参阅 The GNU Emacs Manual 中的 Minibuffers for File Names）。
+</p><div class="lisp">
+<pre class="lisp">link
+</pre></div>
+<div class="lisp">
+<pre class="lisp">link-visited
+</pre></div>
+<p>对于将用户发送到不同缓冲区或位置的可点击文本按钮。
+</p><div class="lisp">
+<pre class="lisp">highlight
+</pre></div>
+<p>对于应该暂时突出的文本段。例如，它通常分配给 mouse-face 属性以突出显示光标（请参阅具有特殊含义的属性）。
+</p><div class="lisp">
+<pre class="lisp">match
+</pre></div>
+<div class="lisp">
+<pre class="lisp">isearch
+</pre></div>
+<div class="lisp">
+<pre class="lisp">lazy-highlight
+</pre></div>
+<p>对于文本匹配（分别）永久搜索匹配、交互式搜索匹配和惰性突出显示当前交互式之外的其他匹配。
+</p><div class="lisp">
+<pre class="lisp">error
+</pre></div>
+<div class="lisp">
+<pre class="lisp">warning
+</pre></div>
+<div class="lisp">
+<pre class="lisp">success
+</pre></div>
+<p>有关错误、警告或成功的文本。例如，这些用于 <strong>Compilation</strong> 缓冲区中的消息。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.12.9_字体选择.html">字体选择</a>, Previous: <a href="40.12.7_自动面分配.html">自动面分配</a>, Up: <a href="40.12_面.html">面.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

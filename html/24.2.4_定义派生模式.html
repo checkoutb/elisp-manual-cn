@@ -1,0 +1,69 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.2.4 定义派生模式</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">24.2.4 定义派生模式</h3>
+<div class="nav-panel"><p>Next: <a href="24.2.5_基本主要模式.html">基本主要模式</a>, Previous: <a href="24.2.3_获取有关主要模式的帮助.html">获取有关主要模式的帮助</a>, Up: <a href="24.2_主要模式.html">主要模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>定义新的主要模式的推荐方法是使用 define-derived-mode 从现有的主要模式派生它。如果没有密切相关的模式，您应该从 text-mode、special-mode 或 prog-mode 继承。请参阅基本主要模式。如果这些都不合适，您可以从基本模式继承（请参阅主要模式）。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: define-derived-mode variant parent name docstring keyword-args… body… ¶
+</pre></div>
+<p>该宏将variant 定义为主要模式命令，使用name 作为模式名称的字符串形式。variant 和 parent 应该是不带引号的符号。
+</p>
+<p>新的命令变体被定义为调用函数 parent，然后覆盖该父模式的某些方面：
+</p>
+<p>新模式有自己的稀疏键映射，名为 variant-map。define-derived-mode 使父模式的键映射成为新映射的父映射，除非变体映射已经设置并且已经有一个父映射。
+新模式有自己的语法表，保存在变量 variant-syntax-table 中，除非您使用 :syntax-table 关键字覆盖它（见下文）。define-derived-mode 使父模式的语法表成为变体语法表的父模式，除非后者已经设置并且已经有一个不同于标准语法表的父模式。
+新模式有自己的缩写表，保存在变量 variant-abbrev-table 中，除非您使用 :abbrev-table 关键字覆盖它（见下文）。
+新模式有自己的模式挂钩，variant-hook。它运行这个钩子，在运行它的祖先模式的钩子之后，使用 run-mode-hooks，作为它做的最后一件事，除了运行它可能有的任何 :after-hook 形式。请参阅模式挂钩。
+</p>
+<p>此外，您可以指定如何使用 body 覆盖 parent 的其他方面。命令变体在设置所有通常的覆盖之后，就在运行模式挂钩之前评估正文中的表单。
+</p>
+<p>如果 parent 具有非 nil 模式类符号属性，则 define-derived-mode 将 variant 的模式类属性设置为相同的值。例如，这可以确保如果 parent 是特殊模式，则 variant 也是特殊模式（请参阅主要模式约定）。
+</p>
+<p>您还可以为父级指定 nil。这使新模式没有父模式。然后，define-derived-mode 的行为如上所述，但是，当然，省略了与 parent 相关的所有操作。
+</p>
+<p>参数 docstring 指定新模式的文档字符串。define-derived-mode 在此文档字符串的末尾添加一些有关模式挂钩的一般信息，然后是模式的键盘映射。如果省略 docstring，define-derived-mode 会生成一个文档字符串。
+</p>
+<p>关键字参数是关键字和值对。评估除 :after-hook 之外的值。当前支持以下关键字：
+</p>
+<div class="lisp">
+<pre class="lisp">:syntax-table
+</pre></div>
+<p>您可以使用它来显式指定新模式的语法表。如果指定 nil 值，则新模式使用与 parent 相同的语法表，如果 parent 为 nil，则使用标准语法表。（请注意，这不遵循用于非关键字参数的约定，即 nil 值等同于不指定参数。）
+</p><div class="lisp">
+<pre class="lisp">:abbrev-table
+</pre></div>
+<p>您可以使用它来明确指定新模式的缩写表。如果指定 nil 值，则新模式使用与父级相同的缩写表，如果父级为 nil，则使用基本模式缩写表。（同样，一个 nil 值不等同于不指定这个关键字。）
+</p><div class="lisp">
+<pre class="lisp">:interactive
+</pre></div>
+<p>默认情况下，模式是交互式命令。如果您指定 nil 值，则此处定义的模式将不是交互式的。这对于那些从不打算由用户手动激活但只应该在某些特殊格式的缓冲区中使用的模式很有用。
+</p><div class="lisp">
+<pre class="lisp">:group
+</pre></div>
+<p>如果指定了此项，则该值应该是此模式的自定义组。（并非所有主要模式都有一个。）customize-mode 命令使用它。define-derived-mode 不会自动定义指定的定制组。
+</p><div class="lisp">
+<pre class="lisp">:after-hook
+</pre></div>
+<p>这个可选的关键字指定了一个 Lisp 表单，在模式钩子运行之后，作为模式函数的最终动作进行评估。它不应该被引用。由于可能在模式函数终止后评估表单，因此它不应访问模式函数本地状态的任何元素。:after-hook 形式对于设置依赖于用户设置的模式方面很有用，而这些设置又可能在模式挂钩中被更改。
+</p>
+<p>这是一个假设的例子：
+</p>
+<div class="lisp">
+<pre class="lisp">(defvar hypertext-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map [down-mouse-3] 'do-hyper-link)
+    map))
+
+(define-derived-mode hypertext-mode
+  text-mode "Hypertext"
+  "Major mode for hypertext."
+  (setq-local case-fold-search nil))
+</pre></div>
+<p>不要在定义中编写交互式规范；  定义派生模式会自动执行此操作。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: derived-mode-p &amp;rest modes ¶
+</pre></div>
+<p>如果当前主模式派生自符号模式给出的任何主模式，则此函数返回非零。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="24.2.5_基本主要模式.html">基本主要模式</a>, Previous: <a href="24.2.3_获取有关主要模式的帮助.html">获取有关主要模式的帮助</a>, Up: <a href="24.2_主要模式.html">主要模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

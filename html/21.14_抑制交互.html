@@ -1,0 +1,18 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>21.14 抑制交互</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">21.14 抑制交互</h2>
+<div class="nav-panel"><p>Next: <a href="21.15_小缓冲区杂记.html">小缓冲区杂记</a>, Previous: <a href="21.13_递归小缓冲区.html">递归小缓冲区</a>, Up: <a href="21_小缓冲区.html">小缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>有时能够将 Emacs 作为无头服务器进程运行以响应通过网络连接给出的命令是很有用的。然而，Emacs 主要是一个交互式使用的平台，因此在某些异常情况下，许多命令会提示用户进行反馈。这使得这个用例变得更加困难，因为服务器进程只会挂起等待用户输入。
+</p>
+<p>将禁止交互变量绑定到非 nil 的东西会使 Emacs 发出禁止交互错误而不是提示，然后服务器进程可以使用它来处理这些情况。
+</p>
+<p>这是一个典型的用例：
+</p><div class="lisp">
+<pre class="lisp">(let ((inhibit-interaction t))
+  (respond-to-client
+   (condition-case err
+       (my-client-handling-function)
+     (inhibited-interaction err))))
+</pre></div>
+<p>如果 my-client-handling-function 最终调用了向用户询问某事的内容（通过 y-or-np 或 read-from-minibuffer 等），则会发出禁止交互错误的信号。然后服务器代码捕获该错误并将其报告给客户端。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="21.15_小缓冲区杂记.html">小缓冲区杂记</a>, Previous: <a href="21.13_递归小缓冲区.html">递归小缓冲区</a>, Up: <a href="21_小缓冲区.html">小缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

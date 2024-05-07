@@ -1,0 +1,77 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>31.4 收窄</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">31.4 收窄</h2>
+<div class="nav-panel"><p>Next: <a href="32_标记.html">标记</a>, Previous: <a href="31.3_远足.html">远足</a>, Up: <a href="31_位置.html">位置.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>缩小意味着将 Emacs 编辑命令可寻址的文本限制在缓冲区中有限的字符范围内。保持可寻址的文本称为缓冲区的可访问部分。
+</p>
+<p>缩小是用两个缓冲区位置指定的，它们成为可访问部分的开始和结束。对于大多数编辑命令和原语，这些位置替换缓冲区的开头和结尾的值。当缩小生效时，可访问部分之外的文本不会显示，并且点不能移动到可访问部分之外。请注意，收窄不会改变实际的缓冲区位置（见点）；  它只确定哪些位置被认为是缓冲区的可访问部分。大多数函数拒绝对可访问部分之外的文本进行操作。
+</p>
+<p>保存缓冲区的命令不受变窄的影响；  他们保存整个缓冲区，而不管任何缩小。
+</p>
+<p>如果您需要在单个缓冲区中显示几种不同类型的文本，请考虑使用在两个缓冲区之间交换文本中描述的替代工具。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: narrow-to-region start end ¶
+</pre></div>
+<p>此函数将当前缓冲区的可访问部分设置为从 start 开始并在 end 结束。两个参数都应该是字符位置。
+</p>
+<p>在交互式调用中，开始和结束设置为当前区域的边界（点和标记，最小的在前）。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: narrow-to-page &amp;optional move-count ¶
+</pre></div>
+<p>此函数将当前缓冲区的可访问部分设置为仅包含当前页面。可选的第一个参数 move-count non-nil 表示向前或向后移动移动计数页，然后缩小到一页。变量 page-delimiter 指定页面的开始和结束位置（请参阅编辑中使用的标准正则表达式）。
+</p>
+<p>在交互式调用中，move-count 设置为数字前缀参数。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: widen ¶
+</pre></div>
+<p>此函数取消当前缓冲区中的任何缩小，以便可以访问整个内容。这称为加宽。它等价于以下表达式：
+</p>
+<div class="lisp">
+<pre class="lisp">(narrow-to-region 1 (1+ (buffer-size)))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: buffer-narrowed-p ¶
+</pre></div>
+<p>如果缓冲区变窄，此函数返回非 nil，否则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Special Form: save-restriction body… ¶
+</pre></div>
+<p>这种特殊形式保存了可访问部分的当前边界，评估了主体形式，最后恢复了保存的边界，从而恢复了以前有效的缩小（或不存在）的相同状态。即使在通过 throw 或 error 异常退出的情况下也会恢复收缩状态（请参阅非本地退出）。因此，此构造是一种临时缩小缓冲区的干净方法。
+</p>
+<p>save-restriction 返回的值是 body 中最后一个表单返回的值，如果没有给出 body 表单，则返回 nil。
+</p>
+<p>注意：使用 save-restriction 结构时很容易出错。在您尝试之前，请阅读此处的完整说明。
+</p>
+<p>如果 body 改变了当前缓冲区，save-restriction 仍然会恢复对原始缓冲区（保存限制的缓冲区）的限制，但不会恢复当前缓冲区的标识。
+</p>
+<p>保存限制不恢复点；  为此使用保存游览。如果同时使用 save-restriction 和 save-excursion，那么 save-excursion 应该放在第一位（在外面）。否则，将恢复旧的点值，但暂时变窄仍然有效。如果旧点值超出临时收窄的范围，则无法准确恢复。
+</p>
+<p>这是正确使用保存限制的简单示例：
+</p><div class="lisp">
+<pre class="lisp">
+
+---------- Buffer: foo ----------
+This is the contents of foo
+This is the contents of foo
+This is the contents of foo∗
+---------- Buffer: foo ----------
+
+
+(save-excursion
+  (save-restriction
+    (goto-char 1)
+    (forward-line 2)
+    (narrow-to-region 1 (point))
+    (goto-char (point-min))
+    (replace-string "foo" "bar")))
+
+---------- Buffer: foo ----------
+This is the contents of bar
+This is the contents of bar
+This is the contents of foo∗
+---------- Buffer: foo ----------
+</pre></div>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="32_标记.html">标记</a>, Previous: <a href="31.3_远足.html">远足</a>, Up: <a href="31_位置.html">位置.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

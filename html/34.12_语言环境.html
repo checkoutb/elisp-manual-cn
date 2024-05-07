@@ -1,0 +1,45 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>34.12 语言环境</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">34.12 语言环境</h2>
+<div class="nav-panel"><p>Next: <a href="35_搜索和匹配.html">搜索和匹配</a>, Previous: <a href="34.11_输入法.html">输入法</a>, Up: <a href="34_非ASCII字符.html">非ASCII字符.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在 POSIX 中，语言环境控制在与语言相关的功能中使用哪种语言。这些 Emacs 变量控制 Emacs 如何与这些功能交互。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: locale-coding-system ¶
+</pre></div>
+<p>此变量指定用于解码系统错误消息和（仅在 X Window 系统上）键盘输入、将批处理输出发送到标准输出和错误流、将格式参数编码为 format-time-string 以及解码格式时间字符串的返回值。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: system-messages-locale ¶
+</pre></div>
+<p>此变量指定用于生成系统错误消息的语言环境。更改区域设置可能会导致消息以不同的语言或不同的拼写形式出现。如果变量为 nil，则区域设置由环境变量以通常的 POSIX 方式指定。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: system-time-locale ¶
+</pre></div>
+<p>此变量指定用于格式化时间值的语言环境。更改区域设置可能会导致消息根据不同语言的约定显示。如果变量为 nil，则区域设置由环境变量以通常的 POSIX 方式指定。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: locale-info item ¶
+</pre></div>
+<p>如果可用，此函数返回当前 POSIX 语言环境的语言环境数据项。item 应该是以下符号之一：
+</p>
+<div class="lisp">
+<pre class="lisp">codeset
+</pre></div>
+<p>将字符集作为字符串返回（语言环境项 CODESET）。
+</p><div class="lisp">
+<pre class="lisp">days
+</pre></div>
+<p>返回日期名称的 7 元素向量（区域设置项 DAY<em>_1</em> 到 DAY<em>_7</em>）；
+</p><div class="lisp">
+<pre class="lisp">months
+</pre></div>
+<p>返回包含月份名称的 12 元素向量（区域设置项目 MON<em>_1</em> 到 MON<em>_12</em>）。
+</p><div class="lisp">
+<pre class="lisp">paper
+</pre></div>
+<p>返回一个包含 2 个整数的列表（宽度高度），默认纸张尺寸以毫米为单位（语言环境项目 _NL<em>_PAPER</em><em>_WIDTH</em> 和 _NL<em>_PAPER</em><em>_HEIGHT</em>）。
+</p>
+<p>如果系统无法提供请求的信息，或者 item 不是这些符号之一，则值为 nil。返回值中的所有字符串都使用语言环境编码系统进行解码。有关语言环境和语言环境项目的更多信息，请参阅 GNU Libc 手册中的语言环境。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="35_搜索和匹配.html">搜索和匹配</a>, Previous: <a href="34.11_输入法.html">输入法</a>, Up: <a href="34_非ASCII字符.html">非ASCII字符.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

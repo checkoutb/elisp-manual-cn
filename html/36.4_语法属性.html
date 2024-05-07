@@ -1,0 +1,42 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>36.4 语法属性</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">36.4 语法属性</h2>
+<div class="nav-panel"><p>Next: <a href="36.5_运动和句法.html">运动和句法</a>, Previous: <a href="36.3_语法表函数.html">语法表函数</a>, Up: <a href="36_语法表.html">语法表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当语法表不够灵活以指定语言的语法时，您可以通过应用语法表文本属性来覆盖缓冲区中特定字符出现的语法表。请参阅文本属性，了解如何应用文本属性。
+</p>
+<p>语法表文本属性的有效值为：
+</p>
+<div class="lisp">
+<pre class="lisp">syntax-table
+</pre></div>
+<p>如果属性值是语法表，则使用该表而不是当前缓冲区的语法表来确定基础文本字符的语法。
+</p><div class="lisp">
+<pre class="lisp">(syntax-code . matching-char)
+</pre></div>
+<p>这种格式的 cons 单元格是一个原始语法描述符（请参阅语法表内部），它直接指定底层文本字符的语法类。
+</p><div class="lisp">
+<pre class="lisp">nil
+</pre></div>
+<p>如果该属性为 nil，则字符的语法以通常的方式从当前语法表中确定。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: parse-sexp-lookup-properties ¶
+</pre></div>
+<p>如果这是非零，语法扫描函数，如 forward-sexp，注意语法表文本属性。否则他们只使用当前的语法表。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: syntax-propertize-function ¶
+</pre></div>
+<p>这个变量，如果非零，应该存储一个用于将语法表属性应用到指定文本段的函数。它旨在由主要模式用于安装以某种模式适当的方式应用语法表属性的功能。
+</p>
+<p>该函数由 syntax-ppss 调用（请参阅查找位置的解析状态），以及在语法字体化期间由字体锁定模式调用（请参阅语法字体锁定）。它用两个参数 start 和 end 调用，它们是它应该作用的文本的开始和结束位置。允许在起点和终点划定的区域内任意移动点；  这样的动作不需要使用保存游览（见游览）。也允许在 end 之前的任何位置调用 syntax-ppss，但是如果 Lisp 程序在某个位置调用 syntax-ppss 并随后在某个更早的位置修改缓冲区，那么调用 syntax-ppss-flush 是该程序的责任-cache 从缓存中刷新现在过时的信息。
+</p>
+<p>注意：当这个变量不为 nil 时，Emacs 会任意删除语法表文本属性，并依赖 syntax-properize-function 重新应用它们。因此，如果完全使用此工具，该函数必须应用主要模式使用的所有语法表文本属性。特别是，从 CC 模式模式派生的模式不得使用此变量，因为 CC 模式使用其他方式来应用和删除这些文本属性。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: syntax-propertize-extend-region-functions ¶
+</pre></div>
+<p>这个异常钩子是在调用 syntax-properize-function 之前由语法解析代码运行的。它的作用是帮助定位安全的开始和结束缓冲区位置，以便传递给 syntax-properize-function。例如，一个主要模式可以在这个钩子中添加一个函数来识别多行句法结构，并确保边界不会落在一个中间。
+</p>
+<p>这个钩子中的每个函数都应该接受两个参数，开始和结束。它应该返回两个调整过的缓冲区位置的 cons 单元格，(new-start . new-end)，如果不需要调整，则返回 nil。钩子函数依次重复运行，直到它们都返回 nil。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="36.5_运动和句法.html">运动和句法</a>, Previous: <a href="36.3_语法表函数.html">语法表函数</a>, Up: <a href="36_语法表.html">语法表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

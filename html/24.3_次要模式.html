@@ -1,0 +1,23 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.3 次要模式</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">24.3 次要模式</h2>
+<div class="nav-panel"><p>Next: <a href="24.3.1_编写次要模式的约定.html">编写次要模式的约定</a>, Previous: <a href="24.2.9_主要模式示例.html">主要模式示例</a>, Up: <a href="24_主要和次要模式.html">主要和次要模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>次要模式提供可选功能，用户可以独立于主要模式的选择启用或禁用这些功能。次要模式可以单独或组合启用。
+</p>
+<p>大多数次要模式实现独立于主要模式的功能，因此可以与大多数主要模式一起使用。例如，自动填充模式适用于任何允许文本插入的主要模式。然而，一些次要模式特定于特定的主要模式。例如，Diff Auto Refine 模式是一种次要模式，仅用于 Diff 模式。
+</p>
+<p>理想情况下，无论其他有效的次要模式如何，次要模式都应该具有其所需的效果。应该可以以任何顺序激活和停用次要模式。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: local-minor-modes ¶
+</pre></div>
+<p>此缓冲区局部变量列出了当前缓冲区中当前启用的次要模式，并且是符号列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: global-minor-modes ¶
+</pre></div>
+<p>此变量列出当前启用的全局次要模式，并且是符号列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: minor-mode-list ¶
+</pre></div>
+<p>此变量的值是所有次要模式命令的列表。
+</p>
+<div class="nav-panel"><p>Next: <a href="24.3.1_编写次要模式的约定.html">编写次要模式的约定</a>, Previous: <a href="24.2.9_主要模式示例.html">主要模式示例</a>, Up: <a href="24_主要和次要模式.html">主要和次要模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

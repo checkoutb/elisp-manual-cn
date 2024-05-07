@@ -1,0 +1,61 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>D.7 撰写注释的技巧</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">D.7 撰写注释的技巧</h2>
+<div class="nav-panel"><p>Next: <a href="0D.8_Emacs_库的常规头文件.html">Emacs_库的常规头文件</a>, Previous: <a href="0D.6_文档字符串提示.html">文档字符串提示</a>, Up: <a href="附录_D_提示和约定.html">D_提示和约定.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>我们建议使用以下约定进行注释：
+</p>
+<div class="lisp">
+<pre class="lisp">‘;’
+</pre></div>
+<p>以单个分号 <code>;</code> 开头的注释都应该与源代码右侧的同一列对齐。这样的注释通常解释了该行的代码是如何工作的。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">(setq base-version-list                 ; There was a base
+      (assoc (substring fn 0 start-vn)  ; version to which
+             file-version-assoc-list))  ; this looks like
+                                        ; a subversion.
+</pre></div>
+<div class="lisp">
+<pre class="lisp">‘;;’
+</pre></div>
+<p>以两个分号 <code>;;</code> 开头的注释应该与代码的缩进级别相同。此类注释通常描述以下行的目的或此时程序的状态。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">(prog1 (setq auto-fill-function
+             …
+             …
+  ;; Update mode line.
+  (force-mode-line-update)))
+</pre></div>
+<p>我们通常也使用两个分号来表示函数之外的注释。
+</p><div class="lisp">
+<pre class="lisp">;; This Lisp code is run in Emacs when it is to operate as
+;; a server for other processes.
+</pre></div>
+<p>如果一个函数没有文档字符串，它应该在函数之前有一个两个分号的注释，解释函数的作用以及如何正确调用它。准确解释每个参数的含义以及函数如何解释其可能值。不过，最好将此类注释转换为文档字符串。
+</p><div class="lisp">
+<pre class="lisp">‘;;;’
+</pre></div>
+<p>以三个（或更多）分号 <code>;;;</code> 开头的注释应该从左边距开始。我们将它们用于应被大纲次要模式视为标题的注释。默认情况下，以至少三个分号开头的注释（后跟一个空格和一个非空白字符）被视为节标题，以两个或更少开头的注释不是。
+</p>
+<p>（从历史上看，三分号注释也被用于注释掉函数中的行，但不鼓励使用这种用法，而是只使用两个分号。这也适用于注释掉整个函数；这样做时也使用两个分号。 )
+</p>
+<p>三个分号用于顶级部分，四个用于子部分，五个用于子子部分，依此类推。
+</p>
+<p>通常库至少有四个顶级部分。例如，当所有这些部分的主体都被隐藏时：
+</p><div class="lisp">
+<pre class="lisp">;;; backquote.el --- implement the ` Lisp construct...
+;;; Commentary:...
+;;; Code:...
+;;; backquote.el ends here
+</pre></div>
+<p>（从某种意义上说，最后一行不是节标题，因为它后面不能有任何文本；毕竟它标志着文件的结尾。）
+</p>
+<p>对于较长的库，建议将代码拆分为多个部分。这可以通过将 <code>代码：</code> 部分拆分为多个子部分来完成。尽管长期以来这是唯一推荐的方法，但许多人还是选择使用多个顶级代码段。您可以选择任何一种风格。
+</p>
+<p>使用多个顶级代码段的优点是可以避免引入额外的嵌套级别，但这也意味着名为 <code>代码</code> 的段不包含所有代码，这很尴尬。为避免这种情况，您不应该在该部分中放置任何代码；  这样，它可以被视为分隔符而不是节标题。
+</p>
+<p>最后，我们建议您不要以冒号或任何其他标点符号结束标题。由于历史原因， <code>代码：</code> 和 <code>注释：</code> 标题以冒号结尾，但我们建议您不要对其他标题执行相同操作。
+</p>
+<p>一般来说，M-；  (comment-dwim) 命令自动启动适当类型的注释；  或将现有注释缩进到正确的位置，具体取决于分号的数量。请参阅 GNU Emacs 手册中的操作注释。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="0D.8_Emacs_库的常规头文件.html">Emacs_库的常规头文件</a>, Previous: <a href="0D.6_文档字符串提示.html">文档字符串提示</a>, Up: <a href="附录_D_提示和约定.html">D_提示和约定.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

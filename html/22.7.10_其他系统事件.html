@@ -1,0 +1,89 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.7.10 其他系统事件</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">22.7.10 其他系统事件</h3>
+<div class="nav-panel"><p>Next: <a href="22.7.11_事件示例.html">事件示例</a>, Previous: <a href="22.7.9_焦点事件.html">焦点事件</a>, Up: <a href="22.7_输入事件.html">输入事件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>其他一些事件类型代表系统内的事件。
+</p>
+<div class="lisp">
+<pre class="lisp">(delete-frame (frame))
+</pre></div>
+<p>这种事件表明用户给窗口管理器一个命令来删除一个特定的窗口，这个窗口恰好是一个 Emacs 框架。
+</p>
+<p>删除帧事件的标准定义是删除帧。
+</p><div class="lisp">
+<pre class="lisp">(iconify-frame (frame))
+</pre></div>
+<p>这种事件表明用户使用窗口管理器图标化了框架。它的标准定义是忽略；  由于框架已经被图标化，Emacs 没有工作要做。此事件类型的目的是让您可以根据需要跟踪此类事件。
+</p><div class="lisp">
+<pre class="lisp">(make-frame-visible (frame))
+</pre></div>
+<p>这种事件表明用户使用窗口管理器取消了框架。它的标准定义是忽略；  由于框架已经可见，Emacs 没有工作要做。
+</p><div class="lisp">
+<pre class="lisp">(wheel-up position)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">(wheel-down position)
+</pre></div>
+<p>这些类型的事件是通过移动鼠标滚轮生成的。position 元素是一个鼠标位置列表（请参阅单击事件），指定事件发生时鼠标光标的位置。
+</p>
+<p>此类事件仅在某些类型的系统上生成。在某些系统上，改为使用 mouse-4 和 mouse-5。对于可移植代码，使用 mwheel.el 中定义的变量 mouse-wheel-up-event 和 mouse-wheel-down-event 来确定鼠标滚轮的预期事件类型。
+</p><div class="lisp">
+<pre class="lisp">(drag-n-drop position files)
+</pre></div>
+<p>当在 Emacs 外部的应用程序中选择一组文件，然后将其拖放到 Emacs 框架上时，会生成此类事件。
+</p>
+<p>元素位置是描述事件位置的列表，格式与鼠标单击事件中使用的格式相同（请参阅单击事件），文件是拖放的文件名列表。处理此事件的常用方法是访问这些文件。
+</p>
+<p>目前，仅在某些类型的系统上会生成此类事件。
+</p><div class="lisp">
+<pre class="lisp">help-echo
+</pre></div>
+<p>当鼠标指针移动到具有帮助回显文本属性的缓冲区文本部分时，会生成此类事件。生成的事件具有以下形式：
+</p>
+<div class="lisp">
+<pre class="lisp">(help-echo frame help window object pos)
+</pre></div>
+<p>事件参数的确切含义以及这些参数用于显示帮助回显文本的方式在 Text help-echo 中进行了描述。
+</p><div class="lisp">
+<pre class="lisp">sigusr1
+</pre></div>
+<div class="lisp">
+<pre class="lisp">sigusr2
+</pre></div>
+<p>这些事件是在 Emacs 进程收到信号 SIGUSR1 和 SIGUSR2 时生成的。它们不包含附加数据，因为信号不携带附加信息。它们对于调试很有用（请参阅在出现错误时进入调试器）。
+</p>
+<p>要捕获用户信号，请将相应的事件绑定到特殊事件映射中的交互式命令（请参阅控制活动键盘映射）。该命令在没有参数的情况下被调用，并且特定的信号事件在 last-input-event 中可用（请参阅 Miscellaneous Event Input Features。例如：
+</p><div class="lisp">
+<pre class="lisp">(defun sigusr-handler ()
+  (interactive)
+  (message "Caught signal %S" last-input-event))
+
+(define-key special-event-map [sigusr1] 'sigusr-handler)
+</pre></div>
+<p>要测试信号处理程序，您可以让 Emacs 向自身发送信号：
+</p><div class="lisp">
+<pre class="lisp">(signal-process (emacs-pid) 'sigusr1)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">language-change
+</pre></div>
+<p>当输入语言改变时，这种事件会在 MS-Windows 上生成。这通常意味着键盘按键将向 Emacs 发送不同语言的字符。生成的事件具有以下形式：
+</p>
+<div class="lisp">
+<pre class="lisp">(language-change frame codepage language-id)
+</pre></div>
+<p>这里的 frame 是输入语言改变时的当前帧；  codepage 是新的代码页编号；  language-id 是新输入语言的数字 ID。对应于代码页的编码系统（参见编码系统）是 cpcodepage 或 windows-codepage。要将语言 ID 转换为字符串（例如，将其用于各种与语言相关的功能，例如 set-language-environment），请使用 w32-get-locale-info 函数，如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">;; Get the abbreviated language name, such as "ENU" for English
+(w32-get-locale-info language-id)
+;; Get the full English name of the language,
+;; such as "English (United States)"
+(w32-get-locale-info language-id 4097)
+;; Get the full localized name of the language
+(w32-get-locale-info language-id t)
+</pre></div>
+<p>如果其中一个事件到达键序列的中间（即在前缀键之后），那么 Emacs 会重新排序这些事件，以便该事件出现在多事件键序列之前或之后，而不是在其中。
+</p>
+<p>其中一些特殊事件，例如 delete-frame，默认调用 Emacs 命令；  其他人不受约束。如果你想安排一个特殊事件来调用命令，你可以通过 special-event-map 来实现。然后，您绑定到该映射中的功能键的命令可以检查在 last-input-event 中调用它的完整事件。请参阅特别活动。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.7.11_事件示例.html">事件示例</a>, Previous: <a href="22.7.9_焦点事件.html">焦点事件</a>, Up: <a href="22.7_输入事件.html">输入事件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

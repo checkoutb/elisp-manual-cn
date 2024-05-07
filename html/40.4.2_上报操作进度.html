@@ -1,0 +1,91 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.4.2 上报操作进度</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.4.2 上报操作进度</h3>
+<div class="nav-panel"><p>Next: <a href="40.4.3_记录消息留言.html">记录消息留言</a>, Previous: <a href="40.4.1_在回显区显示消息.html">在回显区显示消息</a>, Up: <a href="40.4_回显区.html">回显区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当操作可能需要一段时间才能完成时，您应该通知用户它所取得的进展。这样用户可以估计剩余时间并清楚地看到 Emacs 正忙于工作，而不是挂起。一种方便的方法是使用进度报告器。
+</p>
+<p>这是一个没有任何用处的工作示例：
+</p>
+<div class="lisp">
+<pre class="lisp">
+
+(let ((progress-reporter
+       (make-progress-reporter "Collecting mana for Emacs..."
+                               0  500)))
+  (dotimes (k 500)
+    (sit-for 0.01)
+    (progress-reporter-update progress-reporter k))
+  (progress-reporter-done progress-reporter))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: make-progress-reporter message &amp;optional min-value max-value current-value min-change min-time ¶
+</pre></div>
+<p>此函数创建并返回一个进度报告器对象，您将使用它作为下面列出的其他函数的参数。这个想法是预先计算尽可能多的数据，以便非常快速地报告进度。
+</p>
+<p>当后续使用此进度报告器时，它将在回显区域显示消息，然后显示进度百分比。message 被视为一个简单的字符串。例如，如果您需要它依赖于文件名，请在调用此函数之前使用 format-message。
+</p>
+<p>参数 min-value 和 max-value 应该是代表操作的开始和最终状态的数字。例如，扫描缓冲区的操作应该将这些设置为相应的 point-min 和 point-max 的结果。最大值应该大于最小值。
+</p>
+<p>或者，您可以将 min-value 和 max-value 设置为 nil。在这种情况下，进度报告者不会报告进程百分比；  相反，它会显示一个 <code>微调器</code> ，每次更新进度报告器时都会旋转一个刻度。
+</p>
+<p>如果 min-value 和 max-value 是数字，您可以给参数 current-value 一个数值，指定初始进度；  如果省略，则默认为最小值。
+</p>
+<p>其余参数控制回显区域更新的速率。在打印下一条消息之前，进度报告者将等待至少 min-change more percents 的操作完成；  默认值为百分之一。min-time 指定连续打印之间通过的最短时间（以秒为单位）；  默认值为 0.2 秒。（在某些操作系统上，进度报告器可能会以不同的精度处理几分之一秒）。
+</p>
+<p>这个函数调用progress-reporter-update，所以第一条消息被立即打印出来。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: progress-reporter-update reporter &amp;optional value suffix ¶
+</pre></div>
+<p>此功能主要负责报告您的操作进度。它显示报告者的消息，后跟由值确定的进度百分比。如果百分比为零，或者根据 min-change 和 min-time 参数足够接近，则从输出中省略它。
+</p>
+<p>Reporter 必须是调用 make-progress-reporter 的结果。value 指定您的操作的当前状态，并且必须在传递给 make-progress-reporter 的 min-value 和 max-value（包括）之间。例如，如果您扫描缓冲区，则 value 应该是调用点的结果。
+</p>
+<p>可选参数后缀是要在记者的主要消息和进度文本之后显示的字符串。如果reporter 是一个非数值型的reporter，那么value 应该是nil，或者是一个字符串来代替suffix。
+</p>
+<p>此函数尊重传递给 make-progress-reporter 的 min-change 和 min-time ，因此不会在每次调用时输出新消息。因此它非常快，通常您不应尝试减少对其的调用次数：由此产生的开销很可能会抵消您的努力。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: progress-reporter-force-update reporter &amp;optional value new-message suffix ¶
+</pre></div>
+<p>这个函数类似于progress-reporter-update，只是它在回显区域无条件地打印一条消息。
+</p>
+<p>Reporter、value 和 suffix 与 progress-reporter-update 的含义相同。可选的新消息允许您更改报告者的消息。由于此功能始终更新回波区域，因此此类更改将立即呈现给用户。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: progress-reporter-done reporter ¶
+</pre></div>
+<p>操作完成时应调用此函数。它在回显区域打印记者的消息，然后是 <code>完成</code> 一词。
+</p>
+<p>您应该始终调用此函数，而不是希望 progress-reporter-update 打印 ’100%’。首先，它可能永远不会打印出来，这有很多很好的理由不会发生。其次， <code>完成</code> 更加明确。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: dotimes-with-progress-reporter (var count [result]) reporter-or-message body… ¶
+</pre></div>
+<p>这是一个便利宏，其工作方式与 dotimes 相同，但也使用上述函数报告循环进度。它可以让你节省一些打字。参数报告器或消息可以是字符串或进度报告器对象。
+</p>
+<p>您可以使用此宏重写本小节开头的示例，如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(dotimes-with-progress-reporter
+    (k 500)
+    "Collecting some mana for Emacs..."
+  (sit-for 0.01))
+</pre></div>
+<p>如果要在 make-progress-reporter 中指定可选参数，则使用报告器对象作为报告器或消息参数很有用。例如，您可以将前面的示例编写如下：
+</p><div class="lisp">
+<pre class="lisp">(dotimes-with-progress-reporter
+    (k 500)
+    (make-progress-reporter "Collecting some mana for Emacs..." 0 500 0 1 1.5)
+  (sit-for 0.01))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Macro: dolist-with-progress-reporter (var count [result]) reporter-or-message body… ¶
+</pre></div>
+<p>这是另一个便利宏，其工作方式与 dolist 相同，但也使用上述函数报告循环进度。与 dotimes-with-progress-reporter 一样，reporter-or-message 可以是进度报告器或字符串。您可以使用此宏重写前面的示例，如下所示：
+</p><div class="lisp">
+<pre class="lisp">(dolist-with-progress-reporter
+    (k (number-sequence 0 500))
+    "Collecting some mana for Emacs..."
+  (sit-for 0.01))
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.4.3_记录消息留言.html">记录消息留言</a>, Previous: <a href="40.4.1_在回显区显示消息.html">在回显区显示消息</a>, Up: <a href="40.4_回显区.html">回显区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

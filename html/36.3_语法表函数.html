@@ -1,0 +1,109 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>36.3 语法表函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">36.3 语法表函数</h2>
+<div class="nav-panel"><p>Next: <a href="36.4_语法属性.html">语法属性</a>, Previous: <a href="36.2.2_语法标志.html">语法标志</a>, Up: <a href="36_语法表.html">语法表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在本节中，我们将描述用于创建、访问和更改语法表的函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-syntax-table &amp;optional table ¶
+</pre></div>
+<p>此函数创建一个新的语法表。如果 table 不是 nil，则新语法表的父级是 table；  否则，父级是标准语法表。
+</p>
+<p>在新的语法表中，所有字符最初都被赋予 <code>继承</code> （’@’）语法类，即它们的语法是从父表继承的（参见语法类表）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: copy-syntax-table &amp;optional table ¶
+</pre></div>
+<p>此函数构造表的副本并将其返回。如果 table 被省略或为零，则返回标准语法表的副本。否则，如果 table 不是语法表，则会发出错误信号。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: modify-syntax-entry char syntax-descriptor &amp;optional table ¶
+</pre></div>
+<p>该函数根据 syntax-descriptor 设置 char 的语法条目。char 必须是一个字符，或形式为 (min . max) 的 cons 单元格；  在后一种情况下，该函数为 min 和 max 之间的所有字符设置语法条目，包括 min 和 max。
+</p>
+<p>仅更改 table 的语法，默认为当前缓冲区的语法表，而不是任何其他语法表。
+</p>
+<p>参数syntax-descriptor 是一个语法描述符，即一个字符串，它的第一个字符是一个语法类指示符，它的第二个和后续字符可选地指定一个匹配的字符和语法标志。请参阅语法描述符。如果 syntax-descriptor 不是有效的语法描述符，则会发出错误信号。
+</p>
+<p>这个函数总是返回 nil。表中该字符的旧语法信息将被丢弃。
+</p>
+<p>例子：
+</p><div class="lisp">
+<pre class="lisp">
+
+Examples:
+
+
+;; Put the space character in class whitespace.
+(modify-syntax-entry ?\s " ")
+     ⇒ nil
+
+
+;; Make ‘$’ an open parenthesis character,
+;;   with ‘^’ as its matching close.
+(modify-syntax-entry ?$ "(^")
+     ⇒ nil
+
+
+;; Make ‘^’ a close parenthesis character,
+;;   with ‘$’ as its matching open.
+(modify-syntax-entry ?^ ")$")
+     ⇒ nil
+
+
+;; Make ‘/’ a punctuation character,
+;;   the first character of a start-comment sequence,
+;;   and the second character of an end-comment sequence.
+;;   This is used in C mode.
+(modify-syntax-entry ?/ ". 14")
+     ⇒ nil
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: char-syntax character ¶
+</pre></div>
+<p>此函数返回字符的语法类，由其指示符表示（参见语法类表）。这仅返回类，而不是其匹配的字符或语法标志。
+</p>
+<p>以下示例适用于 C 模式。（我们使用字符串更容易看到 char 语法返回的字符。）
+</p><div class="lisp">
+<pre class="lisp">
+
+;; Space characters have whitespace syntax class.
+(string (char-syntax ?\s))
+     ⇒ " "
+
+
+;; Forward slash characters have punctuation syntax.
+;; Note that this char-syntax call does not reveal
+;; that it is also part of comment-start and -end sequences.
+(string (char-syntax ?/))
+     ⇒ "."
+
+
+;; Open parenthesis characters have open parenthesis syntax.
+;; Note that this char-syntax call does not reveal that
+;; it has a matching character, ‘)’.
+(string (char-syntax ?\())
+     ⇒ "("
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: set-syntax-table table ¶
+</pre></div>
+<p>此函数使 table 成为当前缓冲区的语法表。它返回表。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: syntax-table ¶
+</pre></div>
+<p>此函数返回当前语法表，即当前缓冲区的表。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: describe-syntax &amp;optional buffer ¶
+</pre></div>
+<p>此命令在帮助缓冲区中显示缓冲区（默认为当前缓冲区）的语法表的内容。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: with-syntax-table table body… ¶
+</pre></div>
+<p>此宏使用 table 作为当前语法表执行 body。在恢复旧的当前语法表后，它返回正文中最后一个表单的值。
+</p>
+<p>由于每个缓冲区都有自己的当前语法表，我们应该更准确地说：with-syntax-table 在宏执行开始时临时更改当前缓冲区的当前语法表。其他缓冲区不受影响。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="36.4_语法属性.html">语法属性</a>, Previous: <a href="36.2.2_语法标志.html">语法标志</a>, Up: <a href="36_语法表.html">语法表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

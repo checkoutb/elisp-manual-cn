@@ -1,0 +1,18 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>2.1 打印表示和读取语法</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">2.1 打印表示和读取语法</h2>
+<div class="nav-panel"><p>Next: <a href="02.2_特殊读语法.html">特殊读语法</a>, Previous: <a href="02_Lisp_数据类型.html">Lisp_数据类型</a>, Up: <a href="02_Lisp_数据类型.html">Lisp_数据类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>对象的打印表示是 Lisp 打印机（函数 prin1）为该对象生成的输出格式。每种数据类型都有唯一的打印表示。对象的读取语法是 Lisp 阅读器（函数 read）为该对象接受的输入格式。这不一定是唯一的；  许多种类的对象有不止一种语法。请参阅阅读和打印 Lisp 对象。
+</p>
+<p>在大多数情况下，对象的打印表示也是对象的读取语法。然而，有些类型没有读语法，因为在 Lisp 程序中将这些类型的对象作为常量输入是没有意义的。这些对象以散列符号打印，由字符 <code>#&lt;</code> 、描述性字符串（通常是类型名称后跟对象名称）和结束符号 <code>&gt;</code> 组成。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">(current-buffer)
+      ⇒ #&lt;buffer objects.texi&gt;
+</pre></div>
+<p>哈希表示法根本无法读取，因此 Lisp 阅读器在遇到 ’#&lt;’ 时会发出错误无效读取语法的信号。
+</p>
+<p>在其他语言中，表达式是文本；  它没有其他形式。在 Lisp 中，表达式主要是 Lisp 对象，其次是作为对象读取语法的文本。很多时候不需要强调这个区别，但是一定要放在脑后，不然偶尔会很迷茫。
+</p>
+<p>当您以交互方式评估表达式时，Lisp 解释器首先读取它的文本表示，生成一个 Lisp 对象，然后评估该对象（请参阅评估）。但是，评估和阅读是不同的活动。Reading 返回所读文本所代表的 Lisp 对象；  该对象以后可能会或可能不会被评估。有关读取的描述，请参阅输入函数，读取对象的基本函数。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="02.2_特殊读语法.html">特殊读语法</a>, Previous: <a href="02_Lisp_数据类型.html">Lisp_数据类型</a>, Up: <a href="02_Lisp_数据类型.html">Lisp_数据类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

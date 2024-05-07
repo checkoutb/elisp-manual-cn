@@ -1,0 +1,63 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>29.11 缓冲区和窗口</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">29.11 缓冲区和窗口</h2>
+<div class="nav-panel"><p>Next: <a href="29.12_切换到窗口中的缓冲区.html">切换到窗口中的缓冲区</a>, Previous: <a href="29.10_Windows的循环排序.html">Windows的循环排序</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍用于检查和设置窗口内容的低级函数。有关在窗口中显示特定缓冲区的高级函数，请参阅切换到窗口中的缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-buffer &amp;optional window ¶
+</pre></div>
+<p>此函数返回窗口正在显示的缓冲区。如果 window 被省略或 nil 它默认为选定的窗口。如果 window 是内部窗口，则此函数返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-window-buffer window buffer-or-name &amp;optional keep-margins ¶
+</pre></div>
+<p>此函数使窗口显示缓冲区或名称。窗口应该是一个活动窗口；  如果为零，则默认为选定的窗口。buffer-or-name 应该是一个缓冲区，或现有缓冲区的名称。此函数不会更改选择了哪个窗口，也不会直接更改当前缓冲区（请参阅当前缓冲区）。它的返回值为 nil。
+</p>
+<p>如果 window 专用于缓冲区并且 buffer-or-name 没有指定该缓冲区，则此函数会发出错误信号。请参阅专用窗口。
+</p>
+<p>默认情况下，此函数根据指定缓冲区中的局部变量重置窗口的位置、显示边距、边缘宽度和滚动条设置。但是，如果可选参数 keep-margins 不为 nil，它将单独保留窗口的显示边距、边缘和滚动条设置。
+</p>
+<p>在编写应用程序时，通常应该使用 display-buffer（请参阅选择用于显示缓冲区的窗口）或在窗口中切换到缓冲区中描述的更高级别的函数，而不是直接调用 set-window-buffer。
+</p>
+<p>这会运行 window-scroll-functions，然后是 window-configuration-change-hook。请参阅用于窗口滚动和更改的挂钩。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: buffer-display-count ¶
+</pre></div>
+<p>这个缓冲区局部变量记录缓冲区在窗口中显示的次数。每次为缓冲区调用 set-window-buffer 时，它都会递增。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: buffer-display-time ¶
+</pre></div>
+<p>这个缓冲区局部变量记录缓冲区最后一次显示在窗口中的时间。如果缓冲区从未显示过，则该值为 nil。每次为缓冲区调用 set-window-buffer 时都会更新它，其值由当前时间返回（请参阅时间）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: get-buffer-window &amp;optional buffer-or-name all-frames ¶
+</pre></div>
+<p>此函数以窗口的循环顺序返回第一个显示缓冲区或名称的窗口，从选定的窗口开始（请参阅 Windows 的循环排序）。如果不存在这样的窗口，则返回值为 nil。
+</p>
+<p>buffer-or-name 应该是一个缓冲区或缓冲区的名称；  如果省略或为零，则默认为当前缓冲区。可选参数 all-frames 指定要考虑的窗口：
+</p>
+<p>t 表示考虑所有现有 <code>帧</code> ( <code>frame</code> )上的窗口。
+可见意味着考虑所有可见 <code>帧</code> ( <code>frame</code> )上的窗口。
+0 表示考虑所有可见或图标化 <code>帧</code> ( <code>frame</code> )上的窗口。
+ <code>帧</code> ( <code>frame</code> )意味着仅考虑该 <code>帧</code> ( <code>frame</code> )上的窗口。
+任何其他值都意味着考虑选定 <code>帧</code> ( <code>frame</code> )上的窗口。
+</p>
+<p>请注意，这些含义与 next-window 的 all-frames 参数的含义略有不同（请参阅 Windows 的循环排序）。在 Emacs 的未来版本中可能会更改此功能以消除这种差异。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: get-buffer-window-list &amp;optional buffer-or-name minibuf all-frames ¶
+</pre></div>
+<p>此函数返回当前显示缓冲区或名称的所有窗口的列表。buffer-or-name 应该是一个缓冲区或现有缓冲区的名称。如果省略或为零，则默认为当前缓冲区。如果当前选择的窗口显示缓冲区或名称，它将是此函数返回的列表中的第一个。
+</p>
+<p>参数 minibuf 和 all-frames 与函数 next-window 中的含义相同（请参阅 Windows 的循环排序）。请注意，所有帧参数的行为与 get-buffer-window 中的行为不完全相同。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: replace-buffer-in-windows &amp;optional buffer-or-name ¶
+</pre></div>
+<p>此命令在显示它的所有窗口中将 buffer-or-name 替换为其他缓冲区。buffer-or-name 应该是一个缓冲区，或者是现有缓冲区的名称；  如果省略或为零，则默认为当前缓冲区。
+</p>
+<p>每个窗口中的替换缓冲区是通过 switch-to-prev-buffer 选择的（请参阅窗口历史记录）。除了侧窗（参见侧窗），如果可能，任何显示缓冲区或名称的专用窗口都会被删除（参见专用窗口）。如果这样的窗口是其 <code>帧</code> ( <code>frame</code> )上的唯一窗口，并且同一终端上还有其他 <code>帧</code> ( <code>frame</code> )，则该 <code>帧</code> ( <code>frame</code> )也将被删除。如果专用窗口是其终端上唯一 <code>帧</code> ( <code>frame</code> )上的唯一窗口，则无论如何都会替换缓冲区。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="29.12_切换到窗口中的缓冲区.html">切换到窗口中的缓冲区</a>, Previous: <a href="29.10_Windows的循环排序.html">Windows的循环排序</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.16 计数列</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">33.16 计数列</h2>
+<div class="nav-panel"><p>Next: <a href="33.17_缩进.html">缩进</a>, Previous: <a href="33.15_文本排序.html">文本排序</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>列函数在字符位置（从缓冲区开头计算字符）和列位置（从行首开始计算屏幕字符）之间进行转换。
+</p>
+<p>这些函数根据每个字符在屏幕上占据的列数对每个字符进行计数。这意味着控制字符计为占据 2 或 4 列，具体取决于 ctl-arrow 的值，而制表符计为占用的列数，具体取决于制表符宽度的值和制表符开始的列。请参阅通常的显示约定。
+</p>
+<p>列数计算忽略窗口的宽度和水平滚动量。因此，列值可以任意高。第一列（或最左边的）编号为 0。除了不可见性之外，它们还忽略叠加层和文本属性。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: current-column ¶
+</pre></div>
+<p>此函数返回点的水平位置，以列为单位，从左边距的 0 开始计数。列位置是当前行的开头和点之间所有显示的字符表示的宽度之和。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: move-to-column column &amp;optional force ¶
+</pre></div>
+<p>此函数将点移动到当前行中的列。列的计算考虑了行首和点之间字符的显示表示的宽度。
+</p>
+<p>当以交互方式调用时，column 是前缀数字参数的值。如果 column 不是整数，则会发出错误信号。
+</p>
+<p>如果由于它位于制表符等多列字符的中间而无法移动到列列，则点将移动到该字符的末尾。但是，如果 force 不为零，并且 column 位于制表符的中间，则 move-to-column 要么将制表符转换为空格（当 indent-tabs-mode 为 nil 时），要么在其之前插入足够的空格（否则)，因此该点可以精确地移动到列。尽管强制，其他多列字符可能会导致异常，因为无法拆分它们。
+</p>
+<p>如果行不够长到达 column column，则参数 force 也会产生影响；  如果是 t，则意味着在行尾添加空格以到达该列。
+</p>
+<p>返回值是实际移动到的列号。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.17_缩进.html">缩进</a>, Previous: <a href="33.15_文本排序.html">文本排序</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>34.9 字符翻译</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">34.9 字符翻译</h2>
+<div class="nav-panel"><p>Next: <a href="34.10_编码系统.html">编码系统</a>, Previous: <a href="34.8_扫描字符集.html">扫描字符集</a>, Up: <a href="34_非ASCII字符.html">非ASCII字符.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>转换表是一个字符表（参见 Char-Tables），它指定了字符到字符的映射。这些表用于编码和解码，以及用于其他目的。一些编码系统指定了自己的特定翻译表；  还有适用于所有其他编码系统的默认翻译表。
+</p>
+<p>一个翻译表有两个额外的插槽。第一个是 nil 或执行反向翻译的翻译表；  第二个是查找翻译字符序列的最大字符数（请参阅下面的 make-translation-table-from-alist 的描述）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-translation-table &amp;rest translations ¶
+</pre></div>
+<p>此函数根据参数翻译返回一个翻译表。翻译的每个元素都应该是表单元素的列表（从.到）；  这表示将字符从转换为到。
+</p>
+<p>每个参数中的参数和形式按顺序处理，如果先前的形式已经转换为其他字符，例如 to-alt，from 也将转换为 to-alt。
+</p>
+<p>在解码期间，翻译表的翻译应用于普通解码产生的字符。如果编码系统具有属性 :decode-translation-table，它指定要使用的转换表，或按顺序应用的转换表列表。（这是编码系统的属性，由 coding-system-get 返回，而不是作为编码系统名称的符号的属性。请参阅编码系统的基本概念。）最后，如果 standard-translation-table-for -decode 不为零，结果字符由该表翻译。
+</p>
+<p>在编码过程中，翻译表的翻译应用于缓冲区中的字符，翻译的结果实际上是编码的。如果编码系统具有属性 :encode-translation-table，则指定要使用的翻译表，或者要按顺序应用的翻译表列表。此外，如果变量standard-translation-table-for-encode 不为nil，它指定用于翻译结果的翻译表。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: standard-translation-table-for-decode ¶
+</pre></div>
+<p>这是解码的默认转换表。如果编码系统指定了它自己的转换表，那么作为该变量值的表（如果非零）将应用在它们之后。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: standard-translation-table-for-encode ¶
+</pre></div>
+<p>这是编码的默认转换表。如果编码系统指定了它自己的转换表，那么作为该变量值的表（如果非零）将应用在它们之后。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: translation-table-for-input ¶
+</pre></div>
+<p>自插入字符在插入之前通过此翻译表进行翻译。搜索命令还通过此表转换其输入，因此它们可以更可靠地与缓冲区中的内容进行比较。
+</p>
+<p>此变量在设置时自动变为缓冲区本地。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-translation-table-from-vector vec ¶
+</pre></div>
+<p>此函数返回一个由 vec 制成的转换表，它是一个包含 256 个元素的数组，用于将字节（值 0 到 #xFF）映射到字符。对于未翻译的字节，元素可能为零。返回的表在第一个额外槽中有一个用于反向映射的转换表，在第二个额外槽中具有值 1。
+</p>
+<p>此函数提供了一种简单的方法来创建将每个字节映射到特定字符的私有编码系统。您可以使用属性 :decode-translation-table 和 :encode-translation-table 分别在 define-coding-system 的 props 参数中指定返回表和反向转换表。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-translation-table-from-alist alist ¶
+</pre></div>
+<p>此函数类似于 make-translation-table 但返回一个复杂的转换表而不是简单的一对一映射。alist 的每个元素都采用 (from . to) 形式，其中 from 和 to 是指定字符序列的字符或向量。如果 from 是一个字符，则该字符被转换为 to（即，转换为一个字符或一个字符序列）。如果 from 是字符向量，则将该序列转换为 to。返回的表在第一个额外槽中有一个用于反向映射的转换表，以及第二个额外槽中所有 from 字符序列的最大长度。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="34.10_编码系统.html">编码系统</a>, Previous: <a href="34.8_扫描字符集.html">扫描字符集</a>, Up: <a href="34_非ASCII字符.html">非ASCII字符.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

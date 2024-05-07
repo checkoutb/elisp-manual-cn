@@ -1,0 +1,32 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>23.13 重映射命令</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">23.13 重映射命令</h2>
+<div class="nav-panel"><p>Next: <a href="23.14_用于翻译事件序列的键映射.html">用于翻译事件序列的键映射</a>, Previous: <a href="23.12_更改键绑定.html">更改键绑定</a>, Up: <a href="23_键盘映射.html">键盘映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>可以使用一种特殊的键绑定将一个命令重新映射到另一个命令，而不必参考绑定到原始命令的键序列。要使用此功能，请对以虚拟事件重映射开头的键序列进行键绑定，后跟要重映射的命令名称；  对于绑定，指定新定义（通常是命令名称，但可能是键绑定的任何其他有效定义）。
+</p>
+<p>例如，假设我的模式提供了一个特殊的命令 my-kill-line，应该调用它而不是 kill-line。为了确定这一点，它的模式键映射应包含以下重新映射：
+</p>
+<div class="lisp">
+<pre class="lisp">(define-key my-mode-map [remap kill-line] 'my-kill-line)
+</pre></div>
+<p>然后，每当 my-mode-map 处于活动状态时，如果用户键入 Ck（kill-line 的默认全局键序列），Emacs 将改为运行 my-kill-line。
+</p>
+<p>请注意，重新映射只能通过活动键盘映射进行；  例如，在像 ctl-x-map 这样的前缀键映射中重新映射通常没有效果，因为这样的键映射本身不是活动的。此外，重新映射只能通过一个级别进行；  在以下示例中，
+</p><div class="lisp">
+<pre class="lisp">(define-key my-mode-map [remap kill-line] 'my-kill-line)
+(define-key my-mode-map [remap my-kill-line] 'my-other-kill-line)
+</pre></div>
+<p>kill-line 不会重新映射到 my-other-kill-line。相反，如果一个普通的键绑定指定了 kill-line，它会重新映射到 my-kill-line；  如果普通绑定指定了 my-kill-line，它会重新映射到 my-other-kill-line。
+</p>
+<p>要撤消命令的重新映射，请将其重新映射为 nil；  例如，
+</p>
+<div class="lisp">
+<pre class="lisp">(define-key my-mode-map [remap kill-line] nil)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: command-remapping command &amp;optional position keymaps ¶
+</pre></div>
+<p>给定当前活动的键盘映射，此函数返回命令（符号）的重新映射。如果 command 没有重新映射（这是通常的情况），或者不是符号，则函数返回 nil。position 可以选择指定缓冲区位置或事件位置来确定要使用的键映射，如键绑定。
+</p>
+<p>如果可选参数 keymaps 不为零，则它指定要搜索的键盘映射列表。如果 position 不为零，则忽略此参数。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="23.14_用于翻译事件序列的键映射.html">用于翻译事件序列的键映射</a>, Previous: <a href="23.12_更改键绑定.html">更改键绑定</a>, Up: <a href="23_键盘映射.html">键盘映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

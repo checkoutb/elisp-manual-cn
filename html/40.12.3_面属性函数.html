@@ -1,0 +1,158 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.12.3 面属性函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.12.3 面属性函数</h3>
+<div class="nav-panel"><p>Next: <a href="40.12.4_显示面.html">显示面</a>, Previous: <a href="40.12.2_定义面.html">定义面</a>, Up: <a href="40.12_面.html">面.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍直接访问和修改命名面属性的函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: face-attribute face attribute &amp;optional frame inherit ¶
+</pre></div>
+<p>该函数返回帧上面的属性值。
+</p>
+<p>如果 frame 被省略或为零，则表示选定的帧（请参阅输入焦点）。如果 frame 为 t，此函数返回新创建的帧的指定属性的值，即在面的 defface 定义（参见定义面）中应用面规范或由面规范设置的规范之前的属性值放。这个属性的默认值通常是未指定的，除非您使用 set-face-attribute 指定了其他值；  见下文。
+</p>
+<p>如果inherit 为nil，则只考虑直接由face 定义的属性，因此返回值可能是未指定的，也可能是相对值。如果inherit 为非nil，则face 的属性定义与其:inherit 属性指定的面合并；  但是返回值可能仍然是未指定的或相对的。如果inherit 是一个面或面列表，则结果将进一步与该面（或多个面）合并，直到它成为指定的和绝对的。
+</p>
+<p>为确保返回值始终是指定且绝对的，请使用默认值作为继承；  这将通过与默认面（始终完全指定）合并来解决任何未指定或相对值。
+</p>
+<p>例如，
+</p><div class="lisp">
+<pre class="lisp">(face-attribute 'bold :weight)
+     ⇒ bold
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: face-attribute-relative-p attribute value ¶
+</pre></div>
+<p>如果值作为面属性属性的值是相对的，则此函数返回非零。这意味着它将修改，而不是完全覆盖，来自面列表中后续面或从另一个面继承的任何值。
+</p>
+<p>unspecified 是所有属性的相对值。对于 :height，浮点数和函数值也是相对的。
+</p>
+<p>例如：
+</p><div class="lisp">
+<pre class="lisp">(face-attribute-relative-p :height 2.0)
+     ⇒ t
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: face-all-attributes face &amp;optional frame ¶
+</pre></div>
+<p>此函数返回面属性列表。结果的元素是形式为 (attr-name . attr-value) 的名称-值对。可选参数 frame 指定要返回其面定义的框架；  如果省略或为零，则返回的值描述了新创建的帧的面默认属性，即这些属性在将面规范应用于面的 defface 定义或由 face-spec-set 设置的规范之前的值。这些属性的默认值通常是未指定的，除非您使用 set-face-attribute 指定了其他值；  见下文。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: merge-face-attribute attribute value1 value2 ¶
+</pre></div>
+<p>如果 value1 是面属性属性的相对值，则返回与基础值 value2 合并的值；  否则，如果 value1 是面属性属性的绝对值，则返回 value1 不变。
+</p>
+<p>通常，Emacs 使用每个面的面规格来自动计算每个帧上的属性（请参阅定义面）。函数 set-face-attribute 可以通过直接将属性分配给特定帧或所有帧的面来覆盖此计算。此功能主要供内部使用。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-face-attribute face frame &amp;rest arguments ¶
+</pre></div>
+<p>该函数为框架设置一个或多个面属性。以这种方式指定的属性会覆盖属于 face 的 face spec(s)。
+</p>
+<p>额外的参数参数指定要设置的属性以及它们的值。它们应该由交替的属性名称（例如 :family 或 :underline）和值组成。因此，
+</p><div class="lisp">
+<pre class="lisp">(set-face-attribute 'foo nil :weight 'bold :slant 'italic)
+</pre></div>
+<p>将属性 :weight 设置为粗体，将属性 :slant 设置为斜体。
+</p>
+<p>如果 frame 为 t，此函数为新创建的帧设置默认属性；  它们将有效地覆盖 defface 指定的属性值。如果 frame 为 nil，此函数设置所有现有框架的属性，以及新创建的框架。但是，如果您想以同样影响新创建的帧的方式将属性的值重置为未指定，则必须显式调用此函数，并将帧设置为 t 并将属性的值设置为未指定（不是 nil！），除了将 frame 设置为 nil 的调用。这是因为在创建新帧时，新创建的帧的默认属性会与 defface 中的面规范合并，因此在新帧的默认属性中未指定将无法覆盖 defface；  如上所述对这个函数的特殊调用将安排 deface 被覆盖。
+</p>
+<p>以下命令和函数主要提供与旧版本 Emacs 的兼容性。他们通过调用 set-face-attribute 来工作。其框架参数的 t 和 nil 值（或省略）的处理方式与 set-face-attribute 和 face-attribute 一样。如果以交互方式调用，这些命令使用 minibuffer 读取它们的参数。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: set-face-foreground face color &amp;optional frame ¶
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Command: set-face-background face color &amp;optional frame ¶
+</pre></div>
+<p>这些将 face 的 :foreground 属性（或 :background 属性）设置为颜色。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: set-face-stipple face pattern &amp;optional frame ¶
+</pre></div>
+<p>这会将 face 的 :stipple 属性设置为图案。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: set-face-font face font &amp;optional frame ¶
+</pre></div>
+<p>将 face 的字体相关属性更改为 font（字符串或字体对象）的属性。有关字体参数支持的格式，请参见 face-font-attribute。该函数设置面的 :font 属性，并间接设置字体定义的 :family、:foundry、:width、:height、:weight 和 :slant 属性。如果 frame 不为零，则仅更改指定框架上的属性。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-face-bold face bold-p &amp;optional frame ¶
+</pre></div>
+<p>这会将 face 的 :weight 属性设置为 normal 如果 bold-p 为 nil，否则设置为粗体。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-face-italic face italic-p &amp;optional frame ¶
+</pre></div>
+<p>如果 italic-p 为 nil，这会将 face 的 :slant 属性设置为 normal，否则设置为 italic。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: set-face-underline face underline &amp;optional frame ¶
+</pre></div>
+<p>这会将 face 的 :underline 属性设置为下划线。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: set-face-inverse-video face inverse-video-p &amp;optional frame ¶
+</pre></div>
+<p>这会将 face 的 :inverse-video 属性设置为 inverse-video-p。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: invert-face face &amp;optional frame ¶
+</pre></div>
+<p>这将交换面的前景色和背景色。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: set-face-extend face extend &amp;optional frame ¶
+</pre></div>
+<p>这会将 face 的 :extend 属性设置为扩展。
+</p>
+<p>以下函数检查面的属性。它们主要提供与旧版本 Emacs 的兼容性。如果您不指定框架，则它们指的是选定的框架；  t 指的是新帧的默认数据。如果面没有为该属性定义任何值，则它们返回未指定。如果inherit 为nil，则只返回由面直接定义的属性。如果inherit 为非nil，则也考虑由其:inherit 属性指定的任何面，如果inherit 是面或面列表，则它们也会被考虑，直到找到指定的属性。要确保始终指定返回值，请使用默认值作为继承。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: face-font face &amp;optional frame character ¶
+</pre></div>
+<p>该函数返回指定面所使用的字体名称。
+</p>
+<p>如果指定了可选参数框架，则返回该框架的字体名称；  如果它为 nil 或省略，则 frame 默认为选定的框架。如果 frame 是 t，该函数会报告要用于新帧的面字体默认值。
+</p>
+<p>默认情况下，返回的字体用于显示 ASCII 字符，但如果 frame 不是 t，并且提供了可选的第三个参数字符，则该函数返回 face 用于该字符的字体名称。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: face-foreground face &amp;optional frame inherit ¶
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: face-background face &amp;optional frame inherit ¶
+</pre></div>
+<p>这些函数以字符串的形式返回面的前景色（或背景色）。如果未指定颜色，则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: face-stipple face &amp;optional frame inherit ¶
+</pre></div>
+<p>此函数返回面背景点画图案的名称，如果没有则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: face-bold-p face &amp;optional frame inherit ¶
+</pre></div>
+<p>如果 face 的 :weight 属性比正常粗体（即半粗体、粗体、超粗体或超粗体之一），则此函数返回非零值。否则，它返回零。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: face-italic-p face &amp;optional frame inherit ¶
+</pre></div>
+<p>如果 face 的 :slant 属性是斜体或倾斜，则此函数返回非 nil 值，否则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: face-underline-p face &amp;optional frame inherit ¶
+</pre></div>
+<p>如果 face face 指定了非 nil :underline 属性，则此函数返回非 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: face-inverse-video-p face &amp;optional frame inherit ¶
+</pre></div>
+<p>如果 face face 指定了非 nil :inverse-video 属性，则此函数返回非 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: face-extend-p face &amp;optional frame inherit ¶
+</pre></div>
+<p>如果 face face 指定了非 nil :extend 属性，则此函数返回非 nil。继承参数被传递给 face-attribute。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.12.4_显示面.html">显示面</a>, Previous: <a href="40.12.2_定义面.html">定义面</a>, Up: <a href="40.12_面.html">面.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

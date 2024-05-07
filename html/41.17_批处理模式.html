@@ -1,0 +1,22 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>41.17 批处理模式</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">41.17 批处理模式</h2>
+<div class="nav-panel"><p>Next: <a href="41.18_会话管理.html">会话管理</a>, Previous: <a href="41.16_X11_Keysyms_上的操作.html">X11_Keysyms_上的操作</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>命令行选项 ’-batch’ 使 Emacs 以非交互方式运行。在这种模式下，Emacs 不会从终端读取命令，它不会改变终端模式，也不会期望输出到可擦除屏幕。这个想法是您指定要运行的 Lisp 程序；  完成后，Emacs 应该退出。指定要运行的程序的方法是使用’-l file’，它加载名为file 的库，或’-f function’，它调用不带参数的函数，或’–eval=form’。
+</p>
+<p>任何 Lisp 程序的输出，无论是使用消息，还是使用 prin1 等，以 t 作为流（请参阅输出流），在批处理模式下都会转到 Emacs 的标准描述符：消息写入标准错误描述符，而 prin1 和其他打印函数写入标准输出。类似地，通常来自 minibuffer 的输入是从标准输入描述符中读取的。因此，Emacs 的行为很像一个非交互式应用程序。（Emacs 本身通常生成的回显区域输出，例如命令回显，完全被抑制。）
+</p>
+<p>写入标准输出或错误描述符的非 ASCII 文本默认情况下使用 locale-coding-system（请参阅 Locales）进行编码，如果它是非零的话；  这可以通过将 coding-system-for-write 绑定到您选择的编码系统来覆盖（请参阅显式编码和解码）。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: noninteractive ¶
+</pre></div>
+<p>当 Emacs 以批处理模式运行时，此变量不为零。
+</p>
+<p>如果 Emacs 由于在批处理模式下发出错误信号而退出，则 Emacs 命令的退出状态为非零：
+</p>
+<div class="lisp">
+<pre class="lisp">$ emacs -Q --batch --eval '(error "foo")'; echo $?
+foo
+255
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="41.18_会话管理.html">会话管理</a>, Previous: <a href="41.16_X11_Keysyms_上的操作.html">X11_Keysyms_上的操作</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

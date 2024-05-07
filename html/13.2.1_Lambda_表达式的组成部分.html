@@ -1,0 +1,21 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>13.2.1 Lambda 表达式的组成部分</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">13.2.1 Lambda 表达式的组成部分</h3>
+<div class="nav-panel"><p>Next: <a href="13.2.2_一个简单的_Lambda_表达式示例.html">一个简单的_Lambda_表达式示例</a>, Previous: <a href="13.2_Lambda_表达式.html">Lambda_表达式</a>, Up: <a href="13.2_Lambda_表达式.html">Lambda_表达式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>lambda 表达式是一个如下所示的列表：
+</p><div class="lisp">
+<pre class="lisp">(lambda (arg-variables…)
+  [documentation-string]
+  [interactive-declaration]
+  body-forms…)
+</pre></div>
+<p>lambda 表达式的第一个元素始终是符号 lambda。这表明该列表表示一个函数。将函数定义为以 lambda 开头的原因是，其他用于其他用途的列表不会意外地作为函数有效。
+</p>
+<p>第二个元素是符号列表——参数变量名称（参见参数列表的特性）。这称为 lambda 列表。当调用 Lisp 函数时，参数值将与 lambda 列表中的变量进行匹配，这些变量具有提供的值的本地绑定。请参阅局部变量。
+</p>
+<p>文档字符串是放置在函数定义中的 Lisp 字符串对象，用于描述 Emacs 帮助工具的函数。请参阅函数的文档字符串。
+</p>
+<p>交互式声明是一个表单列表（交互式代码字符串）。如果以交互方式使用函数，这声明了如何提供参数。具有此声明的函数称为命令；  它们可以使用 Mx 调用或绑定到一个键。不打算以这种方式调用的函数不应具有交互式声明。请参阅定义命令，了解如何编写交互式声明。
+</p>
+<p>其余元素是函数的主体：完成函数工作的 Lisp 代码（或者，正如 Lisp 程序员所说， <code>要评估的 Lisp 表单列表</code> ）。函数返回的值是body最后一个元素的返回值。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="13.2.2_一个简单的_Lambda_表达式示例.html">一个简单的_Lambda_表达式示例</a>, Previous: <a href="13.2_Lambda_表达式.html">Lambda_表达式</a>, Up: <a href="13.2_Lambda_表达式.html">Lambda_表达式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

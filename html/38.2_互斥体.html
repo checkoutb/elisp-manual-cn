@@ -1,0 +1,38 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>38.2 互斥体</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">38.2 互斥体</h2>
+<div class="nav-panel"><p>Next: <a href="38.3_条件变量.html">条件变量</a>, Previous: <a href="38.1_基本线程函数.html">基本线程函数</a>, Up: <a href="38_线程.html">线程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>互斥锁是排他锁。在任何时候，零个或一个线程可能拥有一个互斥锁。如果一个线程试图获取一个互斥锁，并且该互斥锁已经被某个其他线程拥有，那么获取线程将阻塞，直到该互斥锁可用。
+</p>
+<p>Emacs Lisp 互斥体是一种称为递归的类型，这意味着线程可以重新获取它拥有的互斥体任意次数。互斥锁会记录它被获取的次数，并且每次获取互斥锁都必须与释放配对。互斥锁线程的最后一次释放会将其恢复为无主状态，从而可能允许另一个线程获取互斥锁。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: mutexp object ¶
+</pre></div>
+<p>如果 object 表示 Emacs 互斥体，则此函数返回 t，否则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-mutex &amp;optional name ¶
+</pre></div>
+<p>创建一个新的互斥体并返回它。如果指定了名称，则它是给互斥体的名称。它必须是一个字符串。该名称仅用于调试目的；  它对 Emacs 没有任何意义。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: mutex-name mutex ¶
+</pre></div>
+<p>返回互斥锁的名称，指定给 make-mutex。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: mutex-lock mutex ¶
+</pre></div>
+<p>这将阻塞，直到该线程获得互斥体，或者直到该线程使用线程信号发出信号。如果 mutex 已由该线程拥有，则返回。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: mutex-unlock mutex ¶
+</pre></div>
+<p>释放互斥锁。如果互斥锁不属于该线程，这将发出错误信号。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: with-mutex mutex body… ¶
+</pre></div>
+<p>这个宏是在持有互斥锁时评估表单的最简单和最安全的方法。它获取互斥体，调用主体，然后释放互斥体。它返回正文的结果。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="38.3_条件变量.html">条件变量</a>, Previous: <a href="38.1_基本线程函数.html">基本线程函数</a>, Up: <a href="38_线程.html">线程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

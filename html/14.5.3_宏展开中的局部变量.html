@@ -1,0 +1,41 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>14.5.3 宏展开中的局部变量</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">14.5.3 宏展开中的局部变量</h3>
+<div class="nav-panel"><p>Next: <a href="14.5.4_评估扩展中的宏观参数.html">评估扩展中的宏观参数</a>, Previous: <a href="14.5.2_反复评估宏参数.html">反复评估宏参数</a>, Up: <a href="14.5_使用宏的常见问题.html">使用宏的常见问题.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在上一节中，for 的定义被固定如下，以使扩展评估宏参数的正确次数：
+</p>
+<div class="lisp">
+<pre class="lisp">(defmacro for (var from init to final do &amp;rest body)
+  "Execute a simple for loop: (for i from 1 to 10 do (print i))."
+
+  `(let ((,var ,init)
+         (max ,final))
+     (while (&lt;= ,var max)
+       ,@body
+       (inc ,var))))
+</pre></div>
+<p>for 的新定义有一个新问题：它引入了一个名为 max 的局部变量，这是用户不希望的。这会导致以下示例中的问题：
+</p>
+<div class="lisp">
+<pre class="lisp">(let ((max 0))
+  (for x from 0 to 10 do
+    (let ((this (frob x)))
+      (if (&lt; max this)
+          (setq max this)))))
+</pre></div>
+<p>for 主体内对 max 的引用，应该是指用户对 max 的绑定，实际上访问了 for 的绑定。
+</p>
+<p>更正此问题的方法是使用非实习符号而不是 max（请参阅创建和实习符号）。uninterned 符号可以像任何其他符号一样被绑定和引用，但是由于它是由 for 创建的，因此我们知道它不可能已经出现在用户的程序中。由于它没有被实习，因此用户以后无法将其放入程序中。它永远不会出现在任何地方，除非放在 for 的地方。以下是这样工作的 for 的定义：
+</p>
+<div class="lisp">
+<pre class="lisp">(defmacro for (var from init to final do &amp;rest body)
+  "Execute a simple for loop: (for i from 1 to 10 do (print i))."
+  (let ((tempvar (make-symbol "max")))
+    `(let ((,var ,init)
+           (,tempvar ,final))
+       (while (&lt;= ,var ,tempvar)
+         ,@body
+         (inc ,var)))))
+</pre></div>
+<p>这将创建一个名为 max 的非驻留符号并将其放在展开式中，而不是通常出现在表达式中的常用驻留符号 max。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="14.5.4_评估扩展中的宏观参数.html">评估扩展中的宏观参数</a>, Previous: <a href="14.5.2_反复评估宏参数.html">反复评估宏参数</a>, Up: <a href="14.5_使用宏的常见问题.html">使用宏的常见问题.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

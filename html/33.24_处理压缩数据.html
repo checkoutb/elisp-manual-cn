@@ -1,0 +1,18 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.24 处理压缩数据</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">33.24 处理压缩数据</h2>
+<div class="nav-panel"><p>Next: <a href="33.25_Base_64_编码.html">Base_64_编码</a>, Previous: <a href="33.23_替换缓冲区文本.html">替换缓冲区文本</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>启用自动压缩模式后，Emacs 会在您访问压缩文件时自动解压缩它们，如果您更改并保存它们，则自动重新压缩它们。请参阅 GNU Emacs 手册中的压缩文件。
+</p>
+<p>上述功能通过调用外部可执行文件（例如 gzip）来工作。Emacs 也可以编译支持使用 zlib 库的内置解压缩，这比调用外部程序更快。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: replace-buffer-contents source &amp;optional max-secs max-costs ¶
+</pre></div>
+<p>如果内置 zlib 解压缩可用，此函数返回非 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: replace-region-contents beg end replace-fn &amp;optional max-secs max-costs ¶
+</pre></div>
+<p>此函数使用内置的 zlib 解压缩来解压缩 start 和 end 之间的区域。该区域应包含使用 gzip 或 zlib 压缩的数据。成功时，该函数将区域的内容替换为解压缩的数据。如果 allow-partial 为 nil 或省略，则在失败时，该函数保持区域不变并返回 nil。否则，它返回未解压缩的字节数，并用任何成功解压缩的数据替换区域文本。此函数只能在单字节缓冲区中调用。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.25_Base_64_编码.html">Base_64_编码</a>, Previous: <a href="33.23_替换缓冲区文本.html">替换缓冲区文本</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

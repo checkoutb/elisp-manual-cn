@@ -1,0 +1,19 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.12.7 自动面分配</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.12.7 自动面分配</h3>
+<div class="nav-panel"><p>Next: <a href="40.12.8_基本面.html">基本面</a>, Previous: <a href="40.12.6_处理面的函数.html">处理面的函数</a>, Up: <a href="40.12_面.html">面.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>该钩子用于自动将面分配给缓冲区中的文本。它是 Font-Lock 使用的 Jit-Lock 模式实现的一部分。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: fontification-functions ¶
+</pre></div>
+<p>这个变量保存了一个由 Emacs redisplay 根据需要调用的函数列表，就在 redisplay 之前。即使未启用字体锁定模式，也会调用它们。启用字体锁定模式时，此变量通常只包含一个函数，即 jit-lock-function。
+</p>
+<p>这些函数按列出的顺序调用，带有一个参数，一个缓冲区位置 pos。总的来说，他们应该尝试从 pos 开始将面分配给当前缓冲区中的文本。
+</p>
+<p>这些函数应该通过设置 face 属性记录它们分配的面。他们还应该为他们分配面的所有文本添加一个非零字体属性。该属性告诉 redisplay 已将面分配给该文本。
+</p>
+<p>如果 pos 之后的字符已经具有非 nil 字体化属性，则函数不执行任何操作可能是一个好主意，但这不是必需的。如果一个函数覆盖了前一个函数所做的分配，那么最后一个函数完成后的属性才是真正重要的。
+</p>
+<p>为了提高效率，我们建议编写这些函数，以便它们通常在每次调用时将面分配给大约 4​​00 到 600 个字符。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.12.8_基本面.html">基本面</a>, Previous: <a href="40.12.6_处理面的函数.html">处理面的函数</a>, Up: <a href="40.12_面.html">面.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

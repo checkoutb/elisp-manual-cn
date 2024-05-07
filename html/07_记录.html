@@ -1,0 +1,14 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>7 记录</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h1 class="chapter">7 记录</h1>
+<div class="nav-panel"><p>Next: <a href="07.1_记录功能.html">记录功能</a>, Previous: <a href="06.8_管理固定大小的对象环.html">管理固定大小的对象环</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>记录的目的是允许程序员创建具有未内置于 Emacs 中的新类型的对象。它们被用作 cl-defstruct 和 defclass 实例的底层表示。
+</p>
+<p>在内部，一个记录对象很像一个向量。它的插槽可以使用 aref 访问，并且可以使用复制序列进行复制。但是，第一个槽用于保存由 type-of 返回的类型。此外，在当前的实现中，记录最多可以有 4096 个插槽，而向量可以大得多。像数组一样，记录使用零源索引：第一个槽的索引为 0。
+</p>
+<p>类型槽应该是符号或类型描述符。如果是类型描述符，则返回命名其类型的符号；  类型描述符。任何其他类型的对象都按原样返回。
+</p>
+<p>记录的打印表示是~ #s~ ，后跟指定内容的列表。第一个列表元素必须是记录类型。以下元素是记录槽。
+</p>
+<p>为避免与其他类型名称冲突，定义新记录类型的 Lisp 程序通常应使用为类型名称引入这些记录类型的包的命名约定。请注意，在加载定义记录类型的包时，可能不知道可能发生冲突的类型的名称；  它们可以在未来的某个时间点加载。
+</p>
+<p>记录被认为是评估的常数：评估它的结果是相同的记录。这不会评估甚至检查插槽。请参阅自我评估表。
+</p>
+<div class="nav-panel"><p>Next: <a href="07.1_记录功能.html">记录功能</a>, Previous: <a href="06.8_管理固定大小的对象环.html">管理固定大小的对象环</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

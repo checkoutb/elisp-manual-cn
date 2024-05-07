@@ -1,0 +1,45 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>23.7 活动键盘映射</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">23.7 活动键盘映射</h2>
+<div class="nav-panel"><p>Next: <a href="23.8_搜索活动键盘映射.html">搜索活动键盘映射</a>, Previous: <a href="23.6_前缀键.html">前缀键</a>, Up: <a href="23_键盘映射.html">键盘映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 包含许多键盘映射，但在任何时候只有少数键盘映射处于活动状态。当 Emacs 接收到用户输入时，它会转换输入事件（请参阅 Keymaps 以了解转换事件序列），并在活动键盘映射中查找键绑定。
+</p>
+<p>通常，活动的键盘映射是：(i) 由 keymap 属性指定的键盘映射，(ii) 启用的次要模式的键盘映射，(iii) 当前缓冲区的本地键盘映射，以及 (iv) 全局键盘映射，按此顺序。Emacs 在所有这些键映射中搜索每个输入键序列。
+</p>
+<p>在这些常用的键映射中，优先级最高的键映射由点处的键映射文本或覆盖属性（如果有）指定。（对于鼠标输入事件，Emacs 使用事件位置而不是点；请参阅搜索活动键盘映射。）
+</p>
+<p>下一个优先级是由启用的次要模式指定的键盘映射。这些键映射（如果有）由变量 emulation-mode-map-alist、minor-mode-overriding-map-alist 和 minor-mode-map-alist 指定。请参阅控制活动键盘映射。
+</p>
+<p>下一个优先级是缓冲区的本地键映射，包含特定于缓冲区的键绑定。minibuffer 也有一个本地键映射（参见 Minibuffers 简介）。如果点有本地映射文本或覆盖属性，则指定要使用的本地键映射，以代替缓冲区的默认本地键映射。
+</p>
+<p>本地键映射通常由缓冲区的主模式设置，并且具有相同主模式的每个缓冲区共享相同的本地键映射。因此，如果您调用 local-set-key（请参阅绑定键的命令）来更改一个缓冲区中的本地键盘映射，这也会影响具有相同主要模式的其他缓冲区中的本地键盘映射。
+</p>
+<p>最后，全局键映射包含定义与当前缓冲区无关的键绑定，例如 Cf。它始终处于活动状态，并绑定到变量 global-map。
+</p>
+<p>除了上述常用的键盘映射外，Emacs 还为程序提供了特殊的方法来激活其他键盘映射。首先，变量overriding-local-map 指定了一个替换通常的活动键映射的键映射，除了全局键映射。其次，终端局部变量 overriding-terminal-local-map 指定优先于所有其他键映射（包括覆盖本地映射）的键映射；  这通常用于模态/瞬态键绑定（函数 set-transient-map 为此提供了一个方便的接口）。有关详细信息，请参阅控制活动键盘映射。
+</p>
+<p>激活键盘映射并不是使用它们的唯一方法。键映射也用于其他方式，例如用于翻译读取键序列中的事件。请参阅用于翻译事件序列的键映射。
+</p>
+<p>有关一些标准键盘映射的列表，请参阅标准键盘映射。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: current-active-maps &amp;optional olp position ¶
+</pre></div>
+<p>这将返回当前情况下命令循环将使用的活动键映射列表来查找键序列。通常它会忽略覆盖本地映射和覆盖终端本地映射，但如果 olp 不为零，那么它会注意它们。position 可以选择是 event-start 返回的事件位置或缓冲区位置，并且可以更改键映射描述的键绑定。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: key-binding key &amp;optional accept-defaults no-remap position ¶
+</pre></div>
+<p>此函数根据当前活动的键映射返回键的绑定。如果键映射中未定义键，则结果为零。
+</p>
+<p>参数accept-defaults 控制检查默认绑定，如lookup-key（请参阅Key Lookup 函数）。
+</p>
+<p>当命令被重新映射时（参见重新映射命令），键绑定通常会处理命令重新映射，以便返回实际执行的重新映射命令。但是，如果 no-remap 不为零，则键绑定会忽略重新映射并返回直接为键指定的绑定。
+</p>
+<p>如果键以鼠标事件开始（可能在前缀事件之后），则要查阅的地图是根据事件的位置确定的。否则，它们是根据点的值确定的。但是，您可以通过指定位置来覆盖它们中的任何一个。如果位置不是零，它应该是缓冲区位置或事件位置，如 event-start 的值。然后根据位置确定参考的地图。
+</p>
+<p>如果 key 不是字符串或向量，Emacs 会发出错误信号。
+</p><div class="lisp">
+<pre class="lisp">(key-binding "\C-x\C-f")
+    ⇒ find-file
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="23.8_搜索活动键盘映射.html">搜索活动键盘映射</a>, Previous: <a href="23.6_前缀键.html">前缀键</a>, Up: <a href="23_键盘映射.html">键盘映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

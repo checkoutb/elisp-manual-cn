@@ -1,0 +1,84 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.12 前缀命令参数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">22.12 前缀命令参数</h2>
+<div class="nav-panel"><p>Next: <a href="22.13_递归编辑.html">递归编辑</a>, Previous: <a href="22.11_退出.html">退出</a>, Up: <a href="22_命令循环.html">命令循环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>大多数 Emacs 命令可以使用前缀参数，即在命令本身之前指定的数字。（不要将前缀参数与前缀键混淆。）前缀参数始终由一个值表示，该值可能为 nil，这意味着当前没有前缀参数。每个命令都可以使用前缀参数或忽略它。
+</p>
+<p>前缀参数有两种表示形式：原始和数字。编辑器命令循环在内部使用原始表示，存储信息的 Lisp 变量也是如此，但命令可以请求任何一种表示。
+</p>
+<p>以下是原始前缀参数的可能值：
+</p>
+<p>nil，表示没有前缀参数。它的数值是 1，但许多命令都将 nil 和整数 1 区分开来。
+一个整数，代表它自己。
+一个元素的列表，它是一个整数。这种形式的前缀参数是由一个或一系列没有数字的 C-us 产生的。数值是列表中的整数，但有些命令会区分这样的列表和单独的整数。
+符号-。这表明输入了 M- 或 Cu -，没有后面的数字。等效的数值是 -1，但有些命令会区分整数 -1 和符号 -。
+</p>
+<p>我们通过使用各种前缀调用以下函数来说明这些可能性：
+</p><div class="lisp">
+<pre class="lisp">(defun display-prefix (arg)
+  "Display the value of the raw prefix arg."
+  (interactive "P")
+  (message "%s" arg))
+</pre></div>
+<p>以下是使用各种原始前缀参数调用 display-prefix 的结果：
+</p>
+<div class="lisp">
+<pre class="lisp">      M-x display-prefix  -| nil
+
+C-u     M-x display-prefix  -| (4)
+
+C-u C-u M-x display-prefix  -| (16)
+
+C-u 3   M-x display-prefix  -| 3
+
+M-3     M-x display-prefix  -| 3      ; (Same as C-u 3.)
+
+C-u -   M-x display-prefix  -| -
+
+M--     M-x display-prefix  -| -      ; (Same as C-u -.)
+
+C-u - 7 M-x display-prefix  -| -7
+
+M-- 7   M-x display-prefix  -| -7     ; (Same as C-u -7.)
+</pre></div>
+<p>Emacs 使用两个变量来存储前缀参数：prefix-arg 和 current-prefix-arg。为其他命令设置前缀参数的命令（例如通用参数）将它们存储在前缀参数中。相反， current-prefix-arg 将前缀参数传达给当前命令，因此设置它对未来命令的前缀参数没有影响。
+</p>
+<p>通常，命令在交互式规范中指定用于前缀参数的表示形式，无论是数字还是原始。（请参阅使用交互。）或者，函数可以直接在变量 current-prefix-arg 中查看前缀参数的值，但这不太干净。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: prefix-numeric-value arg ¶
+</pre></div>
+<p>此函数返回有效的原始前缀参数值 arg 的数值含义。参数可以是符号、数字或列表。如果为 nil，则返回值 1；  如果是-，则返回值-1；  如果是数字，则返回该数字；  如果它是一个列表，则返回该列表的 CAR（应该是一个数字）。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: current-prefix-arg ¶
+</pre></div>
+<p>此变量保存当前命令的原始前缀参数。命令可以直接检查它，但访问它的常用方法是使用（交互式 <code>P</code> ）。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: prefix-arg ¶
+</pre></div>
+<p>此变量的值是下一个编辑命令的原始前缀参数。为以下命令指定前缀参数的命令（例如通用参数）通过设置此变量来工作。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: last-prefix-arg ¶
+</pre></div>
+<p>上一个命令使用的原始前缀参数值。
+</p>
+<p>存在以下命令来为以下命令设置前缀参数。不要因为任何其他原因打电话给他们。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: universal-argument ¶
+</pre></div>
+<p>此命令读取输入并为以下命令指定前缀参数。除非您知道自己在做什么，否则不要自己调用此命令。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: digit-argument arg ¶
+</pre></div>
+<p>此命令添加到以下命令的前缀参数。参数 arg 是该命令之前的原始前缀参数；  它用于计算更新的前缀参数。除非您知道自己在做什么，否则不要自己调用此命令。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: negative-argument arg ¶
+</pre></div>
+<p>此命令添加到下一个命令的数字参数。参数 arg 是该命令之前的原始前缀参数；  它的值被否定以形成新的前缀参数。除非您知道自己在做什么，否则不要自己调用此命令。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.13_递归编辑.html">递归编辑</a>, Previous: <a href="22.11_退出.html">退出</a>, Up: <a href="22_命令循环.html">命令循环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

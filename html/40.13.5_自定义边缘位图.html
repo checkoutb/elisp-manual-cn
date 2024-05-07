@@ -1,0 +1,29 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.13.5 自定义边缘位图</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.13.5 自定义边缘位图</h3>
+<div class="nav-panel"><p>Next: <a href="40.13.6_叠加箭头.html">叠加箭头</a>, Previous: <a href="40.13.4_边缘位图.html">边缘位图</a>, Up: <a href="40.13_条纹.html">条纹.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><div class="lisp">
+<pre class="lisp">Function: define-fringe-bitmap bitmap bits &amp;optional height width align ¶
+</pre></div>
+<p>此函数将符号位图定义为新的边缘位图，或用该名称替换现有位图。
+</p>
+<p>参数 bits 指定要使用的图像。它应该是字符串或整数向量，其中每个元素（整数）对应于位图的一行。整数的每一位对应于位图的一个像素，其中低位对应于位图的最右边的像素。（请注意，此位顺序与 XBM 图像中的顺序相反；请参阅 XBM 图像。）
+</p>
+<p>高度通常是位的长度。但是，您可以使用非零高度指定不同的高度。宽度通常为 8，但您可以使用非零宽度指定不同的宽度。宽度必须是 1 到 16 之间的整数。
+</p>
+<p>参数 align 指定位图相对于使用它的行范围的定位；  默认值是使位图居中。允许的值为顶部、中心或底部。
+</p>
+<p>align 参数也可以是一个列表（定期对齐），其中 align 的解释如上所述。如果periodic 不是nil，它指定位中的行应该重复足够的次数以达到指定的高度。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: destroy-fringe-bitmap bitmap ¶
+</pre></div>
+<p>此函数破坏由位图标识的边缘位图。如果位图标识了标准边缘位图，它实际上恢复了该位图的标准定义，而不是完全消除它。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-fringe-bitmap-face bitmap &amp;optional face ¶
+</pre></div>
+<p>这将边缘位图位图的面设置为面。如果 face 为 nil，则选择边缘面。位图的面控制绘制它的颜色。
+</p>
+<p>face 与边缘面合并，因此通常 face 应仅指定前景色。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.13.6_叠加箭头.html">叠加箭头</a>, Previous: <a href="40.13.4_边缘位图.html">边缘位图</a>, Up: <a href="40.13_条纹.html">条纹.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

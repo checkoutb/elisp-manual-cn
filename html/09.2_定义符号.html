@@ -1,0 +1,18 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>9.2 定义符号</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">9.2 定义符号</h2>
+<div class="nav-panel"><p>Next: <a href="09.3_创建和嵌入符号.html">创建和嵌入符号</a>, Previous: <a href="09.1_符号组件.html">符号组件</a>, Up: <a href="09_符号.html">符号.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>定义是一种特殊的 Lisp 表达式，它表明您打算以特定方式使用符号。它通常为一种用途的符号指定一个值或含义，以及以这种方式使用时的含义的文档。因此，当您将符号定义为变量时，您可以为变量提供初始值，并为变量提供文档。
+</p>
+<p>defvar 和 defconst 是把符号定义为全局变量的特殊形式——一个可以在 Lisp 程序中的任何位置访问的变量。有关变量的详细信息，请参阅变量。要定义可自定义的变量，请使用 defcustom 宏，该宏也将 defvar 作为子例程调用（请参阅自定义设置）。
+</p>
+<p>原则上，您可以使用 setq 将变量值分配给任何符号，无论它是否首先被定义为变量。但是，您应该为要使用的每个全局变量编写一个变量定义；  否则，如果在启用词法作用域的情况下对其进行评估，您的 Lisp 程序可能无法正确运行（请参阅变量绑定的作用域规则）。
+</p>
+<p>defun 将符号定义为函数，创建一个 lambda 表达式并将其存储在符号的函数单元中。因此，这个 lambda 表达式成为符号的函数定义。（术语~ 函数定义~ ，意思是函数单元的内容，源于 defun 将符号定义为函数的想法。） defsubst 和 defalias 是定义函数的另外两种方式。请参阅函数。
+</p>
+<p>defmacro 将符号定义为宏。它创建一个宏对象并将其存储在符号的函数单元中。请注意，给定的符号可以是宏或函数，但不能同时是两者，因为宏和函数定义都保存在函数单元格中，并且该单元格在任何给定时间只能保存一个 Lisp 对象。请参阅宏。
+</p>
+<p>如前所述，Emacs Lisp 允许将相同的符号定义为变量（例如，使用 defvar）和函数或宏（例如，使用 defun）。这样的定义并不冲突。
+</p>
+<p>这些定义也可作为编程工具的指南。例如，Ch f 和 Ch v 命令创建包含指向相关变量、函数或宏定义的链接的帮助缓冲区。请参阅 GNU Emacs 手册中的名称帮助。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="09.3_创建和嵌入符号.html">创建和嵌入符号</a>, Previous: <a href="09.1_符号组件.html">符号组件</a>, Up: <a href="09_符号.html">符号.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

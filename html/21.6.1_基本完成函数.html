@@ -1,0 +1,117 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>21.6.1 基本完成函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">21.6.1 基本完成函数</h3>
+<div class="nav-panel"><p>Next: <a href="21.6.2_完成和小缓冲区.html">完成和小缓冲区</a>, Previous: <a href="21.6_完成.html">完成</a>, Up: <a href="21.6_完成.html">完成.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>以下完成函数本身与 minibuffers 无关。我们在这里对其进行描述是为了使它们接近使用 minibuffer 的更高级别的完成功能。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: try-completion string collection &amp;optional predicate ¶
+</pre></div>
+<p>此函数返回集合中所有可能的字符串完成的最长公共子字符串。
+</p>
+<p>集合称为完成表。它的值必须是字符串列表或 cons 单元格、obarray、哈希表或完成函数。
+</p>
+<p>try-completion 将 string 与完成表指定的每个允许完成进行比较。如果没有允许的完成匹配，则返回 nil。如果只有一个匹配完成，并且匹配是精确的，则返回 t。否则，它返回所有可能匹配完成共有的最长初始序列。
+</p>
+<p>如果 collection 是一个列表，则允许的补全由列表的元素指定，每个元素都应该是一个字符串，或者一个其 CAR 是字符串或符号的 cons 单元格（使用符号将符号转换为字符串-姓名）。如果列表包含任何其他类型的元素，则这些元素将被忽略。
+</p>
+<p>如果collection 是一个obarray（参见Creating and Interning Symbols），obarray 中所有符号的名称形成了一组允许的补全。
+</p>
+<p>如果集合是一个哈希表，那么作为字符串或符号的键是可能的补全。其他键被忽略。
+</p>
+<p>您还可以将函数用作集合。然后该函数单独负责执行完成；  尝试完成返回此函数返回的任何内容。该函数使用三个参数调用：字符串、谓词和 nil（第三个参数是为了使同一个函数可以在所有完成中使用，并在任何一种情况下都执行适当的操作）。请参阅程序完成。
+</p>
+<p>如果参数谓词非零，那么它必须是一个参数的函数，除非集合是一个哈希表，在这种情况下它应该是两个参数的函数。它用于测试每个可能的匹配，并且仅当谓词返回非零时才接受匹配。为 predicate 提供的参数是来自 alist 的字符串或 cons 单元格（其 CAR 是字符串），或者来自 obarray 的符号（不是符号名称）。如果 collection 是一个哈希表，则使用两个参数调用谓词，即字符串键和关联值。
+</p>
+<p>此外，为了被接受，补全还必须匹配completion-regexp-list 中的所有正则表达式。（除非 collection 是一个函数，在这种情况下，该函数必须自己处理 completion-regexp-list。）
+</p>
+<p>在下面的第一个示例中，字符串 ’foo’ 与三个 alist CAR 匹配。所有的匹配都以字符 ’fooba’ 开头，所以这就是结果。在第二个例子中，只有一个可能的匹配，而且是精确的，所以返回值为 t。
+</p><div class="lisp">
+<pre class="lisp">(try-completion
+ "foo"
+ '(("foobar1" 1) ("barfoo" 2) ("foobaz" 3) ("foobar2" 4)))
+     ⇒ "fooba"
+
+
+(try-completion "foo" '(("barfoo" 2) ("foo" 3)))
+     ⇒ t
+</pre></div>
+<p>在以下示例中，许多符号以字符 <code>forw</code> 开头，并且所有符号都以单词 <code>forward</code> 开头。在大多数符号中，这后面都带有一个 <code>-</code> ，但不是全部，所以最多只能完成 <code>前进</code> 。
+</p>
+<div class="lisp">
+<pre class="lisp">(try-completion "forw" obarray)
+     ⇒ "forward"
+</pre></div>
+<p>最后，在以下示例中，三个可能的匹配项中只有两个通过了谓词测试（字符串 ’foobaz’ 太短）。两者都以字符串 ’foobar’ 开头。
+</p><div class="lisp">
+<pre class="lisp">(defun test (s)
+  (&gt; (length (car s)) 6))
+     ⇒ test
+
+(try-completion
+ "foo"
+ '(("foobar1" 1) ("barfoo" 2) ("foobaz" 3) ("foobar2" 4))
+ 'test)
+     ⇒ "foobar"
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: all-completions string collection &amp;optional predicate ¶
+</pre></div>
+<p>此函数返回字符串的所有可能完成的列表。此函数的参数与 try-completion 的参数相同，它使用 completion-regexp-list 的方式与 try-completion 相同。
+</p>
+<p>如果collection是一个函数，它会用三个参数调用：字符串、谓词和t；  然后所有完成返回函数返回的任何内容。请参阅程序完成。
+</p>
+<p>这是一个示例，使用示例中显示的函数 test 进行尝试完成：
+</p><div class="lisp">
+<pre class="lisp">(defun test (s)
+  (&gt; (length (car s)) 6))
+     ⇒ test
+
+
+(all-completions
+ "foo"
+ '(("foobar1" 1) ("barfoo" 2) ("foobaz" 3) ("foobar2" 4))
+ 'test)
+     ⇒ ("foobar1" "foobar2")
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: test-completion string collection &amp;optional predicate ¶
+</pre></div>
+<p>如果 string 是由集合和谓词指定的有效完成替代项，则此函数返回非 nil。参数与 try-completion 中的参数相同。例如，如果集合是一个字符串列表，那么如果字符串出现在列表中并且满足谓词，则为真。
+</p>
+<p>此函数以与 try-completion 相同的方式使用 completion-regexp-list。
+</p>
+<p>如果谓词是非零并且如果集合包含多个彼此相等的字符串，由比较字符串根据完成忽略大小写确定，那么谓词应该接受全部或不接受。否则，测试完成的返回值本质上是不可预测的。
+</p>
+<p>如果 collection 是一个函数，则使用三个参数调用它，即字符串、谓词和 lambda 值；  无论它返回什么，测试完成都会依次返回。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: completion-boundaries string collection predicate suffix ¶
+</pre></div>
+<p>此函数返回集合将操作的字段的边界，假设字符串保存点之前的文本，后缀保存点之后的文本。
+</p>
+<p>通常完成对整个字符串进行操作，因此对于所有普通集合，这将始终返回 (0 . (length suffix))。但更复杂的完成，例如文件完成，一次完成一个字段。例如， <code>/usr/sh</code> 的完成将包括 <code>/usr/share/</code> 但不包括 <code>/usr/share/doc</code> ，即使 <code>/usr/share/doc</code> 存在。此外， <code>/usr/sh</code> 上的所有完成将不包括 <code>/usr/share/</code> ，而只包括 <code>share/</code> 。因此，如果字符串是 <code>/usr/sh</code> 且后缀是 <code>e/doc</code> ，完成边界将返回 (5 . 1)，这告诉我们该集合将仅返回与 <code>/usr/</code> 之后的区域相关的完成信息" 和 "/doc" 之前。尝试完成不受非平凡边界的影响；  例如， <code>/usr/sh</code> 上的尝试完成可能仍会返回 <code>/usr/share/</code> ，而不是 <code>share/</code> 。
+</p>
+<p>如果您将完成列表存储在变量中，您应该通过给它一个非零风险局部变量属性来将该变量标记为有风险的。请参阅文件局部变量。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: completion-ignore-case ¶
+</pre></div>
+<p>如果此变量的值不为 nil，则认为 case 在完成中不重要。在 read-file-name 中，此变量被 read-file-name-completion-ignore-case 覆盖（请参阅读取文件名）；  在 read-buffer 中，它被 read-buffer-completion-ignore-case 覆盖（请参阅高级完成函数）。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: completion-regexp-list ¶
+</pre></div>
+<p>这是一个正则表达式列表。补全函数仅在匹配此列表中的所有正则表达式时才考虑可接受的补全，并且 case-fold-search（请参阅搜索和案例）绑定到 completion-ignore-case 的值。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: lazy-completion-table var fun ¶
+</pre></div>
+<p>此宏提供了一种将变量 var 初始化为以惰性方式完成的集合的方法，在第一次需要它们之前不计算其实际内容。您可以使用此宏生成一个值，并将其存储在 var 中。正确值的实际计算是在您第一次使用 var 完成时完成的。这是通过不带参数调用 fun 来完成的。fun 返回的值成为 var 的永久值。
+</p>
+<p>这是一个例子：
+</p><div class="lisp">
+<pre class="lisp">(defvar foo (lazy-completion-table foo make-my-alist))
+</pre></div>
+<p>有几个函数采用现有的完成表并返回修改后的版本。完成表大小写折叠返回一个不区分大小写的表。completion-table-in-turn 和 completion-table-merge 以不同的方式组合多个输入表。完成表颠覆改变表以使用不同的初始前缀。completion-table-with-quoting 返回一个适合对引用文本进行操作的表。completion-table-with-predicate 过滤带有谓词函数的表。completion-table-with-terminator 添加一个终止字符串。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="21.6.2_完成和小缓冲区.html">完成和小缓冲区</a>, Previous: <a href="21.6_完成.html">完成</a>, Up: <a href="21.6_完成.html">完成.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

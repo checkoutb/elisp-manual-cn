@@ -1,0 +1,62 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>41.1.4 命令行参数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">41.1.4 命令行参数</h3>
+<div class="nav-panel"><p>Next: <a href="41.2_退出_Emacs.html">退出_Emacs</a>, Previous: <a href="41.1.3_终端特定初始化.html">终端特定初始化</a>, Up: <a href="41.1_启动_Emacs.html">启动_Emacs.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当您启动 Emacs 时，您可以使用命令行参数来请求各种操作。请注意，使用 Emacs 的推荐方法是在登录后只启动一次，然后在同一个 Emacs 会话中进行所有编辑（请​​参阅 The GNU Emacs Manual 中的 Entering Emacs）。出于这个原因，您可能不会经常使用命令行参数。尽管如此，在从会话脚本调用 Emacs 或调试 Emacs 时，它们还是很有用的。本节描述 Emacs 如何处理命令行参数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: command-line ¶
+</pre></div>
+<p>该函数解析调用 Emacs 的命令行，对其进行处理，并且（除其他外）加载用户的 init 文件并显示启动消息。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: command-line-processed ¶
+</pre></div>
+<p>一旦处理了命令行，此变量的值就是 t。
+</p>
+<p>如果您通过调用 dump-emacs（请参阅 Building Emacs）来转储 Emacs，您可能希望首先将此变量设置为 nil，以便使新转储的 Emacs 处理其新的命令行参数。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: command-switch-alist ¶
+</pre></div>
+<p>此变量是用户定义的命令行选项和相关处理函数的列表。默认情况下它是空的，但您可以根据需要添加元素。
+</p>
+<p>命令行选项是命令行上的一个参数，其形式为：
+</p>
+<div class="lisp">
+<pre class="lisp">-option
+</pre></div>
+<p>command-switch-alist 的元素如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(option . handler-function)
+</pre></div>
+<p>CAR 选项是一个字符串，是命令行选项的名称（包括初始连字符）。调用处理函数来处理选项，并接收选项名称作为其唯一参数。
+</p>
+<p>在某些情况下，该选项在命令行中后跟一个参数。在这些情况下，处理函数可以在变量 command-line-args-left 中找到所有剩余的命令行参数（见下文）。（命令行参数的完整列表在命令行参数中。）
+</p>
+<p>请注意，command-switch-alist 的处理不会专门处理选项中的等号。也就是说，如果命令行上有类似 –name=value 的选项，那么只有 car 字面为 –name=value 的 command-switch-alist 成员才会匹配此选项。如果要解析此类选项，则需要改用命令行函数（见下文）。
+</p>
+<p>命令行参数由 startup.el 文件中的 command-line-1 函数解析。另请参阅 GNU Emacs 手册中的 Emacs 调用的命令行参数。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: command-line-args ¶
+</pre></div>
+<p>这个变量的值是传递给 Emacs 的命令行参数列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: command-line-args-left ¶
+</pre></div>
+<p>此变量的值是尚未处理的命令行参数列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: command-line-functions ¶
+</pre></div>
+<p>此变量的值是用于处理无法识别的命令行参数的函数列表。每次要处理的下一个参数没有特殊含义时，都会按照出现的顺序调用此列表中的函数，直到其中一个返回非零值。
+</p>
+<p>这些函数在没有参数的情况下被调用。他们可以通过此时临时绑定的变量 argi 访问正在考虑的命令行参数。其余参数（不包括当前参数）在变量 command-line-args-left 中。
+</p>
+<p>当一个函数识别并处理 argi 中的参数时，它应该返回一个非零值来表示它已经处理了该参数。如果它还处理了以下一些参数，则可以通过从 command-line-args-left 中删除它们来表明这一点。
+</p>
+<p>如果所有这些函数都返回 nil，则将参数视为要访问的文件名。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="41.2_退出_Emacs.html">退出_Emacs</a>, Previous: <a href="41.1.3_终端特定初始化.html">终端特定初始化</a>, Up: <a href="41.1_启动_Emacs.html">启动_Emacs.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

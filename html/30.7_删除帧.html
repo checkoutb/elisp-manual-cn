@@ -1,0 +1,31 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>30.7 删除帧</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">30.7 删除帧</h2>
+<div class="nav-panel"><p>Next: <a href="30.8_查找所有帧.html">查找所有帧</a>, Previous: <a href="30.6_帧标题.html">帧标题</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>实时帧是尚未删除的帧。当一个帧被删除时，它会从它的终端显示中移除，尽管它可能会继续作为一个 Lisp 对象存在，直到不再有对它的引用。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: delete-frame &amp;optional frame force ¶
+</pre></div>
+<p>此功能删除帧帧。参数帧必须指定一个实时帧（见下文）并默认为选定的帧。
+</p>
+<p>它首先删除帧的任何子帧（参见子帧）和任何其删除前帧参数（参见帧交互参数）指定帧的帧。所有此类删除都是递归执行的；  所以这一步确保不存在其他以 frame 为祖先的帧。然后，除非 frame 指定了工具提示，否则此函数会在实际终止 frame 之前运行钩子 delete-frame-functions（每个函数获取一个参数，frame）。在实际杀死帧并从帧列表中删除帧后，delete-frame 运行 after-delete-frame-functions。
+</p>
+<p>请注意，只要它的 minibuffer 充当另一个帧的代理 minibuffer，就不能删除一个帧（请参阅 Minibuffers 和 Frames）。通常，如果所有其他帧都不可见，则无法删除帧，但如果 force 不为零，则允许您这样做。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: frame-live-p frame ¶
+</pre></div>
+<p>如果帧帧没有被删除，此函数返回非零。可能的非零返回值类似于 framep。请参阅帧。
+</p>
+<p>一些窗口管理器提供删除窗口的命令。它们通过向操作窗口的程序发送特殊消息来工作。当 Emacs 获得这些命令之一时，它会生成一个 delete-frame 事件，其正常定义是调用函数 delete-frame 的命令。请参阅其他系统事件。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: delete-other-frames &amp;optional frame iconify ¶
+</pre></div>
+<p>此命令删除帧终端上的所有帧，帧除外。如果 frame 使用另一个 frame 的 minibuffer，则该 minibuffer 帧保持不变。参数帧必须指定一个实时帧并默认为选定的帧。在内部，此命令通过调用 delete-frame 和 force nil 来处理所有应删除的帧。
+</p>
+<p>此函数不会删除任何帧的子帧（请参阅子帧）。如果 frame 是子帧，它只删除帧的兄弟。
+</p>
+<p>使用前缀参数 iconify，帧被图标化而不是被删除。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="30.8_查找所有帧.html">查找所有帧</a>, Previous: <a href="30.6_帧标题.html">帧标题</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

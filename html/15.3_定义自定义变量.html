@@ -1,0 +1,132 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>15.3 定义自定义变量</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">15.3 定义自定义变量</h2>
+<div class="nav-panel"><p>Next: <a href="15.4_自定义类型.html">自定义类型</a>, Previous: <a href="15.2_定义自定义组.html">定义自定义组</a>, Up: <a href="15_自定义设置.html">自定义设置.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>可自定义变量，也称为用户选项，是全局 Lisp 变量，其值可以通过自定义界面设置。与其他使用 defvar 定义的全局变量不同（请参阅定义全局变量），可自定义变量是使用 defcustom 宏定义的。除了作为子例程调用 defvar 之外，defcustom 还说明了变量应该如何在自定义界面中显示，允许取的值等。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: defcustom option standard doc [keyword value]… ¶
+</pre></div>
+<p>该宏将选项声明为用户选项（即，可自定义的变量）。你不应该引用选项。
+</p>
+<p>参数标准是一个表达式，它指定选项的标准值。评估 defcustom 表单评估标准，但不一定将选项绑定到该值。如果 option 已经有默认值，则保持不变。如果用户已经保存了选项的自定义，则将用户的自定义值安装为默认值。否则，评估标准的结果被安装为默认值。
+</p>
+<p>与 defvar 一样，此宏将选项标记为特殊变量，这意味着它应该始终是动态绑定的。如果 option 已经被词法绑定，则该词法绑定保持有效，直到绑定构造退出。请参阅变量绑定的范围规则。
+</p>
+<p>表达式标准也可以在其他各种时间进行评估——只要定制工具需要知道选项的标准值。因此，请务必使用无害的表达式随时进行评估。
+</p>
+<p>参数 doc 指定变量的文档字符串。
+</p>
+<p>如果 defcustom 未指定任何 :group，则将使用同一文件中使用 defgroup 定义的最后一个组。这样，大多数 defcustom 不需要显式的 :group。
+</p>
+<p>当您在 Emacs Lisp 模式 (eval-defun) 中使用 CMx 评估 defcustom 表单时，eval-defun 的一个特殊功能安排无条件设置变量，而不测试其值是否为 void。（同样的特性也适用于 defvar，参见定义全局变量。）在已经定义的 defcustom 上使用 eval-defun 调用 :set 函数（见下文），如果有的话。
+</p>
+<p>如果您将 defcustom 放入预加载的 Emacs Lisp 文件（请参阅构建 Emacs），则在转储时安装的标准值可能不正确，例如，因为它所依赖的另一个变量尚未分配正确的值。在这种情况下，使用下面描述的 custom-reevaluate-setting 在 Emacs 启动后重新评估标准值。
+</p>
+<p>除了通用项关键字中列出的关键字之外，此宏还接受以下关键字：
+</p>
+<div class="lisp">
+<pre class="lisp">:type type
+</pre></div>
+<p>使用 type 作为该选项的数据类型。它指定哪些值是合法的，以及如何显示该值（请参阅自定义类型）。每个 defcustom 都应该为此关键字指定一个值。
+</p><div class="lisp">
+<pre class="lisp">:options value-list ¶
+</pre></div>
+<p>指定在此选项中使用的合理值列表。用户不限于仅使用这些值，而是将它们作为方便的替代方案提供。
+</p>
+<p>这仅对某些类型有意义，目前包括 hook、plist 和 alist。有关如何使用 :options 的说明，请参见各个类型的定义。
+</p>
+<p>使用不同的 :options 值重新评估 defcustom 表单不会清除先前评估添加的值，或通过调用 custom-add-frequent-value 添加的值（见下文）。
+</p><div class="lisp">
+<pre class="lisp">:set setfunction ¶
+</pre></div>
+<p>使用自定义界面时，将 setfunction 指定为更改此选项值的方式。函数 setfunction 应该有两个参数，一个符号（选项名称）和新值，并且应该做任何必要的事情来正确更新这个选项的值（这可能并不意味着简单地将选项设置为 Lisp 变量）；  不过，最好不要破坏性地修改其 value 参数。setfunction 的默认值是 set-default。
+</p>
+<p>如果你指定这个关键字，变量的文档字符串应该描述如何在手写的 Lisp 代码中做同样的工作。
+</p><div class="lisp">
+<pre class="lisp">:get getfunction ¶
+</pre></div>
+<p>指定 getfunction 作为提取此选项值的方法。函数 getfunction 应该接受一个参数，一个符号，并且应该返回任何自定义应该用作该符号的当前值（不必是符号的 Lisp 值）。默认值为默认值。
+</p>
+<p>您必须真正了解 Custom 的工作原理才能正确使用 :get。它适用于在 Custom 中被视为变量但实际上并未存储在 Lisp 变量中的值。为真正存储在 Lisp 变量中的值指定 getfunction 几乎肯定是错误的。
+</p><div class="lisp">
+<pre class="lisp">:initialize function ¶
+</pre></div>
+<p>function 应该是在评估 defcustom 时用于初始化变量的函数。它应该有两个参数，选项名称（一个符号）和值。以下是一些旨在以这种方式使用的预定义函数：
+</p>
+<div class="lisp">
+<pre class="lisp">custom-initialize-set
+</pre></div>
+<p>使用变量的 :set 函数来初始化变量，但如果它已经是非 void，则不要重新初始化它。
+</p><div class="lisp">
+<pre class="lisp">custom-initialize-default
+</pre></div>
+<p>与 custom-initialize-set 类似，但使用函数 set-default 来设置变量，而不是变量的 :set 函数。这是 :set 函数启用或禁用次要模式的变量的通常选择；  使用这种选择，定义变量将不会调用次要模式函数，但自定义变量会这样做。
+</p><div class="lisp">
+<pre class="lisp">custom-initialize-reset
+</pre></div>
+<p>始终使用 :set 函数来初始化变量。如果变量已经是非 void，则通过使用当前值（由 :get 方法返回）调用 :set 函数来重置它。这是默认的 :initialize 函数。
+</p><div class="lisp">
+<pre class="lisp">custom-initialize-changed
+</pre></div>
+<p>使用 :set 函数初始化变量，如果它已设置或已自定义；  否则，只需使用 set-default。
+</p><div class="lisp">
+<pre class="lisp">custom-initialize-delay
+</pre></div>
+<p>此函数的行为类似于 custom-initialize-set，但它会将实际初始化延迟到下一次 Emacs 启动。这应该在预加载的文件（或自动加载的变量）中使用，以便在运行时上下文而不是构建时上下文中完成初始化。这也具有使用 :set 函数执行（延迟）初始化的副作用。请参阅构建 Emacs。
+</p>
+<div class="lisp">
+<pre class="lisp">:local value ¶
+</pre></div>
+<p>如果值为 t，则将选项标记为自动缓冲区本地；  如果值是永久的，也将选项永久本地属性设置为 t。请参阅创建和删除缓冲区本地绑定。
+</p><div class="lisp">
+<pre class="lisp">:risky value ¶
+</pre></div>
+<p>将变量的 risky-local-variable 属性设置为 value（请参阅文件局部变量）。
+</p><div class="lisp">
+<pre class="lisp">:safe function ¶
+</pre></div>
+<p>将变量的安全局部变量属性设置为函数（请参阅文件局部变量）。
+</p><div class="lisp">
+<pre class="lisp">:set-after variables ¶
+</pre></div>
+<p>根据保存的自定义设置变量时，请确保在此之前设置变量变量；  即，延迟设置此变量，直到处理完其他变量。使用 :set-after 如果设置此变量将无法正常工作，除非那些其他变量已经具有它们的预期值。
+</p>
+<p>为打开某个功能的选项指定 :require 关键字很有用。这会导致 Emacs 加载该功能（如果尚未加载），只要设置了该选项。请参阅常用项关键字。这是一个例子：
+</p>
+<div class="lisp">
+<pre class="lisp">(defcustom frobnicate-automatically nil
+  "Non-nil means automatically frobnicate all buffers."
+  :type 'boolean
+  :require 'frobnicate-mode
+  :group 'frobnicate)
+</pre></div>
+<p>如果自定义项具有支持 :options 的类型（例如 hook 或 alist），则可以通过调用 custom-add-frequent-value 从 defcustom 声明之外向列表添加其他值。例如，如果您定义了一个旨在从 emacs-lisp-mode-hook 调用的函数 my-lisp-mode-initialization，您可能希望将其添加到 emacs-lisp-mode-hook 的合理值列表中，但是而不是通过编辑其定义。你可以这样做：
+</p>
+<div class="lisp">
+<pre class="lisp">(custom-add-frequent-value 'emacs-lisp-mode-hook
+   'my-lisp-mode-initialization)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: custom-add-frequent-value symbol value ¶
+</pre></div>
+<p>对于自定义选项符号，将值添加到合理值列表中。
+</p>
+<p>添加值的精确效果取决于符号的自定义类型。
+</p>
+<p>由于评估 defcustom 表单不会清除先前添加的值，Lisp 程序可以使用此函数为尚未定义的用户选项添加值。
+</p>
+<p>在内部，defcustom 使用符号属性 standard-value 来记录标准值的表达式，saved-value 来记录用户在自定义缓冲区中保存的值，customized-value 来记录用户设置的值和自定义值缓冲区，但未保存。请参阅符号属性。另外还有themed-value，用来记录一个主题设置的值（见自定义主题）。这些属性是列表，其中的 car 是一个计算值的表达式。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: custom-reevaluate-setting symbol ¶
+</pre></div>
+<p>此函数重新评估符号的标准值，它应该是通过 defcustom 声明的用户选项。如果变量是自定义的，则此函数会重新评估保存的值。然后它将用户选项设置为该值（如果已定义，则使用选项的 :set 属性）。
+</p>
+<p>这对于在正确计算其值之前定义的可自定义选项很有用。例如，在启动期间，Emacs 为一些在预加载的 Emacs Lisp 文件中定义的用户选项调用此函数，但其​​初始值取决于仅在运行时可用的信息。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: custom-variable-p arg ¶
+</pre></div>
+<p>如果 arg 是可自定义的变量，则此函数返回非 nil。可自定义变量是具有标准值或自定义自动加载属性的变量（通常意味着它是使用 defcustom 声明的），或者是另一个可自定义变量的别名。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="15.4_自定义类型.html">自定义类型</a>, Previous: <a href="15.2_定义自定义组.html">定义自定义组</a>, Up: <a href="15_自定义设置.html">自定义设置.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

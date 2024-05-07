@@ -1,0 +1,74 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>41.4 用户识别</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">41.4 用户识别</h2>
+<div class="nav-panel"><p>Next: <a href="41.5_时间.html">时间</a>, Previous: <a href="41.3_操作系统环境.html">操作系统环境</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><div class="lisp">
+<pre class="lisp">Variable: init-file-user ¶
+</pre></div>
+<p>这个变量表示 Emacs 应该使用哪个用户的 init 文件——如果没有，则为 nil。"" 代表最初登录的用户。该值反映了命令行选项，例如 <code>-q</code> 或 <code>-u 用户</code> 。
+</p>
+<p>加载自定义文件或任何其他类型的用户配置文件的 Lisp 包在决定在哪里找到它时应该遵循这个变量。他们应该加载在这个变量中找到的用户名的配置文件。如果 init-file-user 为 nil，意味着使用了 <code>-q</code> 、 <code>-Q</code> 或 <code>-batch</code> 选项，则 Lisp 包不应加载任何自定义文件或用户配置文件。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: user-mail-address ¶
+</pre></div>
+<p>这包含使用 Emacs 的用户的电子邮件地址。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: user-login-name &amp;optional uid ¶
+</pre></div>
+<p>此函数返回用户登录的名称。它使用环境变量 LOGNAME 或 USER（如果已设置）。否则，该值基于有效 UID，而不是真实 UID。
+</p>
+<p>如果指定 uid（一个数字），则结果是对应于 uid 的用户名，如果没有这样的用户，则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: user-real-login-name ¶
+</pre></div>
+<p>该函数返回 Emacs 的真实 UID 对应的用户名。这将忽略有效的 UID，以及环境变量 LOGNAME 和 USER。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: user-full-name &amp;optional uid ¶
+</pre></div>
+<p>此函数返回登录用户的全名，或者环境变量 NAME 的值（如果已设置）。
+</p>
+<p>如果 Emacs 进程的用户 ID 不对应于任何已知用户（并且未设置 NAME），则结果为 <code>未知</code> 。
+</p>
+<p>如果 uid 不是 nil，那么它应该是一个数字（一个用户 ID）或一个字符串（一个登录名）。然后 user-full-name 返回与该用户 ID 或登录名对应的全名。如果您指定未定义的用户 ID 或登录名，则返回 nil。
+</p>
+<p>符号 user-login-name、user-real-login-name 和 user-full-name 是变量和函数。这些函数返回与变量相同的值。这些变量允许您通过告诉函数返回什么来伪造 Emacs。这些变量对于构造框架标题也很有用（请参阅框架标题）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: user-real-uid ¶
+</pre></div>
+<p>此函数返回用户的真实 UID。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: user-uid ¶
+</pre></div>
+<p>该函数返回用户的有效 UID。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: group-gid ¶
+</pre></div>
+<p>该函数返回 Emacs 进程的有效 GID。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: group-real-gid ¶
+</pre></div>
+<p>该函数返回 Emacs 进程的真实 GID。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: system-users ¶
+</pre></div>
+<p>此函数返回字符串列表，列出系统上的用户名。如果 Emacs 无法检索此信息，则返回值是一个仅包含 user-real-login-name 值的列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: system-groups ¶
+</pre></div>
+<p>该函数返回一个字符串列表，列出系统上用户组的名称。如果 Emacs 无法检索此信息，则返回值为 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: group-name gid ¶
+</pre></div>
+<p>此函数返回与数字组 ID gid 对应的组名，如果没有这样的组，则返回 nil。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="41.5_时间.html">时间</a>, Previous: <a href="41.3_操作系统环境.html">操作系统环境</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

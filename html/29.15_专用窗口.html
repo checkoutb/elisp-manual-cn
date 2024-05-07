@@ -1,0 +1,26 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>29.15 专用窗口</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">29.15 专用窗口</h2>
+<div class="nav-panel"><p>Next: <a href="29.16_退出窗口.html">退出窗口</a>, Previous: <a href="29.14_窗口历史.html">窗口历史</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>通过将这些窗口标记为专用于它们的缓冲区，可以告诉用于显示缓冲区的函数不使用特定窗口。display-buffer（请参阅选择一个窗口来显示缓冲区）从不使用专用窗口来显示其中的另一个缓冲区。get-lru-window 和 get-largest-window（请参阅 Windows 的循环排序）在其专用参数为非零时不将专用窗口视为候选窗口。set-window-buffer（见缓冲区和窗口）相对于专用窗口的行为略有不同，见下文。
+</p>
+<p>当它们操作的窗口是专用的时，应该从窗口中删除缓冲区或从 <code>帧</code> ( <code>frame</code> )中删除窗口的函数可以表现得特别。我们将区分四种基本情况，即（1）窗口不是其 <code>帧</code> ( <code>frame</code> )上的唯一窗口，（2）窗口是其 <code>帧</code> ( <code>frame</code> )上的唯一窗口但在同一终端左侧还有其他 <code>帧</code> ( <code>frame</code> )，（3） window 是同一终端上唯一 <code>帧</code> ( <code>frame</code> )上的唯一窗口，并且 (4) 奉献的价值是 side（请参阅在 Side Windows 中显示缓冲区）。
+</p>
+<p>特别是，delete-windows-on（请参阅删除窗口）通过删除关联的 <code>帧</code> ( <code>frame</code> )来处理案例 (2)，并通过在该 <code>帧</code> ( <code>frame</code> )的唯一窗口中显示另一个缓冲区来处理案例 (3) 和 (4)。当缓冲区被杀死时调用的函数 replace-buffer-in-windows（请参阅缓冲区和 Windows），在情况（1）中删除窗口，否则行为类似于 delete-windows-on。
+</p>
+<p>当 bury-buffer（参见缓冲区列表）在选定的窗口（显示应被隐藏的缓冲区）上操作时，它通过调用 frame-auto-hide-function（参见退出窗口）来处理情况（2）来处理选定的 <code>帧</code> ( <code>frame</code> )。其他两种情况的处理方式与窗口中的替换缓冲区一样。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-dedicated-p &amp;optional window ¶
+</pre></div>
+<p>如果窗口专用于其缓冲区，则此函数返回非 nil，否则返回 nil。更准确地说，返回值是最后一次调用 set-window-dedicated-p 为 window 分配的值，如果从未以 window 作为参数调用该函数，则返回 nil。窗口的默认值是选定的窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-window-dedicated-p window flag ¶
+</pre></div>
+<p>如果 flag 为非 nil，则此函数将窗口标记为专用于其缓冲区，否则将其标记为非专用。
+</p>
+<p>作为一种特殊情况，如果 flag 为 t，则窗口变得强烈专用于其缓冲区。当它所作用的窗口高度专用于其缓冲区并且尚未显示它被要求显示的缓冲区时，set-window-buffer 会发出错误信号。其他函数不会将 t 与任何非 nil 值区别对待。
+</p>
+<p>您还可以通过提供合适的专用操作列表条目来告诉 display-buffer 将它创建的窗口标记为专用于其缓冲区（请参阅用于缓冲区显示的操作列表）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="29.16_退出窗口.html">退出窗口</a>, Previous: <a href="29.14_窗口历史.html">窗口历史</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

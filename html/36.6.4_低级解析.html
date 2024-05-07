@@ -1,0 +1,17 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>36.6.4 低级解析</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">36.6.4 低级解析</h3>
+<div class="nav-panel"><p>Next: <a href="36.6.5_控制解析的参数.html">控制解析的参数</a>, Previous: <a href="36.6.3_解析器状态.html">解析器状态</a>, Up: <a href="36.6_解析表达式.html">解析表达式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>使用表达式解析器最基本的方法是告诉它以特定状态从给定位置开始，并解析到指定的结束位置。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: parse-partial-sexp start limit &amp;optional target-depth stop-before state stop-comment ¶
+</pre></div>
+<p>此函数从 start 开始解析当前缓冲区中的 sexp，而不是扫描过去的限制。它在位置限制或满足以下描述的某些条件时停止，并设置指向解析停止的位置。它返回一个解析器状态，描述解析在它停止的点的状态。
+</p>
+<p>如果第三个参数 target-depth 不为零，则如果括号中的深度等于 target-depth，则解析停止。深度从 0 开始，或者从 state 中给出的任何值开始。
+</p>
+<p>如果第四个参数 stop-before 不为零，则解析会在任何开始 sexp 的字符时停止。如果 stop-comment 不为零，则解析会在未嵌套的注释开始后停止。如果 stop-comment 是符号语法表，则解析会在未嵌套的注释或字符串开始后停止，或者在未嵌套的注释或字符串结束后停止，以先到者为准。
+</p>
+<p>如果 state 为 nil，则假定 start 位于括号结构的顶层，例如函数定义的开头。或者，您可能希望在结构中间恢复解析。为此，您必须提供一个描述解析初始状态的状态参数。之前调用 parse-partial-sexp 返回的值会很好。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="36.6.5_控制解析的参数.html">控制解析的参数</a>, Previous: <a href="36.6.3_解析器状态.html">解析器状态</a>, Up: <a href="36.6_解析表达式.html">解析表达式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

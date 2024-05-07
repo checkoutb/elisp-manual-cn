@@ -1,0 +1,138 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.4.4 模式行中使用的变量</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">24.4.4 模式行中使用的变量</h3>
+<div class="nav-panel"><p>Next: <a href="24.4.5_%-_模式线中的构造.html">%-_模式线中的构造</a>, Previous: <a href="24.4.3_顶层模式线控制.html">顶层模式线控制</a>, Up: <a href="24.4_模式线格式.html">模式线格式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节描述由 mode-line-format 的标准值合并到模式行文本中的变量。这些变量本身并没有什么特别之处。如果将 mode-line-format 的值更改为使用它们，则任何其他变量都可能对模式行产生相同的影响。然而，Emacs 的各个部分设置这些变量的理解是它们将控制部分模式行；  因此，实际上，模式线必须使用它们。另请参阅 GNU Emacs 手册中的可选模式行。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: mode-line-mule-info ¶
+</pre></div>
+<p>此变量保存模式行构造的值，该构造显示有关语言环境、缓冲区编码系统和当前输入法的信息。请参阅非 ASCII 字符。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: mode-line-modified ¶
+</pre></div>
+<p>此变量保存显示当前缓冲区是否被修改的模式行构造的值。如果缓冲区被修改，它的默认值显示’<strong>*’，如果缓冲区未修改，则显示’–’，如果缓冲区是只读的，则显示’%%’，如果缓冲区是只读和修改的，则显示’%</strong>’。
+</p>
+<p>更改此变量不会强制更新模式行。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: mode-line-frame-identification ¶
+</pre></div>
+<p>此变量标识当前帧。如果您使用的是可以显示多帧的窗口系统，则其默认值显示 <code>~ ，或者在一次仅显示一帧的普通终端上显示 ~-%F</code> 。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: mode-line-buffer-identification ¶
+</pre></div>
+<p>此变量标识窗口中显示的缓冲区。它的默认值显示缓冲区名称，用空格填充至少 12 列。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: mode-line-position ¶
+</pre></div>
+<p>此变量指示缓冲区中的位置。它的默认值显示缓冲区百分比，以及可选的缓冲区大小、行号和列号。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: mode-line-percent-position ¶
+</pre></div>
+<p>此选项用于模式行位置。它的值指定要显示的缓冲区百分比（nil、 <code>%o</code> 、 <code>%p</code> 、 <code>%P</code> 或 <code>%q</code> 之一，请参阅模式行中的 %-Constructs）和空间填充的宽度或截断为。建议您使用自定义变量工具设置此选项。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: vc-mode ¶
+</pre></div>
+<p>每个缓冲区中的变量vc-mode，buffer-local，记录缓冲区访问的文件是否使用版本控制维护，如果是，是哪种。它的值是出现在模式行中的字符串，或者 nil 表示没有版本控制。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: mode-line-modes ¶
+</pre></div>
+<p>此变量显示缓冲区的主要和次要模式。其默认值还显示递归编辑级别、进程状态信息以及缩小是否生效。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: mode-line-remote ¶
+</pre></div>
+<p>此变量用于显示当前缓冲区的默认目录是否是远程的。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: mode-line-client ¶
+</pre></div>
+<p>此变量用于标识 emacsclient 帧。
+</p>
+<p>在 mode-line-modes 中使用了以下三个变量：
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: mode-name ¶
+</pre></div>
+<p>这个缓冲区局部变量保存了当前缓冲区主要模式的 <code>漂亮</code> 名称。每个主要模式都应设置此变量，以便模式名称将出现在模式行中。该值不必是字符串，但可以使用模式行构造中有效的任何数据类型（请参阅模式行的数据结构）。要计算将在模式行中标识模式名称的字符串，请使用 format-mode-line（请参阅模拟模式行格式）。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: mode-line-process ¶
+</pre></div>
+<p>此缓冲区局部变量包含有关用于与子进程通信的模式中的进程状态的模式行信息。它紧跟主要模式名称显示，中间没有空格。例如，它在 <strong>shell</strong> 缓冲区中的值为 (":%s")，它允许 shell 将其状态与主要模式一起显示为：’(<a href="run">run</a>)’。通常这个变量是零。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: mode-line-front-space ¶
+</pre></div>
+<p>此变量显示在模式行的前面。默认情况下，此结构显示在模式行的开头，除非有内存已满消息，否则首先显示。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: mode-line-end-spaces ¶
+</pre></div>
+<p>此变量显示在模式行的末尾。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: mode-line-misc-info ¶
+</pre></div>
+<p>用于杂项信息的模式线构造。默认情况下，这显示由 global-mode-string 指定的信息。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: mode-line-position-line-format ¶
+</pre></div>
+<p>当 line-number-mode（参见 GNU Emacs 手册中的 Optional Mode Line）打开时用于显示行号的格式。格式中的 ’%l’ 将被替换为行号。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: mode-line-position-column-format ¶
+</pre></div>
+<p>当 column-number-mode（参见 GNU Emacs 手册中的 Optional Mode Line）打开时用于显示列号的格式。格式中的 <code>%c</code> 将被替换为从零开始的列号， <code>%C</code> 将被替换为从一开始的列号。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: mode-line-position-column-line-format ¶
+</pre></div>
+<p>当 line-number-mode 和 column-number-mode 都打开时用于显示列号的格式。有关 <code>%l</code> 、 <code>%c</code> 和 <code>%C</code> 格式规范的含义，请参见前两个变量。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: minor-mode-alist ¶
+</pre></div>
+<p>此变量保存一个关联列表，其元素指定模式行应如何指示次要模式处于活动状态。minor-mode-alist 的每个元素都应该是一个包含两个元素的列表：
+</p>
+<div class="lisp">
+<pre class="lisp">(minor-mode-variable mode-line-string)
+</pre></div>
+<p>更一般地，模式线串可以是任何模式线结构。当 minor-mode-variable 的值为非 nil 时，它出现在模式行中，否则不出现。这些字符串应该以空格开头，这样它们就不会一起运行。通常，当激活该次要模式时，特定模式的次要模式变量设置为非零值。
+</p>
+<p>次要模式列表本身不是缓冲区本地的。如果可以在每个缓冲区中单独启用其次要模式，则 alist 中提到的每个变量都应该是缓冲区本地的。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: global-mode-string ¶
+</pre></div>
+<p>这个变量包含一个模式行结构，默认情况下，如果设置，它会出现在模式行中，紧跟在 which-function-mode 次要模式之后，否则在模式行模式之后。添加到此构造的元素通常应以空格结尾（以确保连续的全局模式字符串元素正确显示）。例如，命令 display-time 将 global-mode-string 设置为引用变量 display-time-string，该变量包含一个包含时间和负载信息的字符串。
+</p>
+<p>’%M’ 构造替换了 global-mode-string 的值，但这是过时的，因为该变量包含在 mode-line-format 的模式行中。
+</p>
+<p>这是 mode-line-format 的默认值的简化版本。真正的默认值还指定添加文本属性。
+</p>
+<div class="lisp">
+<pre class="lisp">("-"
+ mode-line-mule-info
+ mode-line-modified
+ mode-line-frame-identification
+ mode-line-buffer-identification
+
+ "   "
+ mode-line-position
+ (vc-mode vc-mode)
+ "   "
+
+ mode-line-modes
+ (which-function-mode ("" which-func-format "--"))
+ (global-mode-string ("--" global-mode-string))
+ "-%-")
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="24.4.5_%-_模式线中的构造.html">%-_模式线中的构造</a>, Previous: <a href="24.4.3_顶层模式线控制.html">顶层模式线控制</a>, Up: <a href="24.4_模式线格式.html">模式线格式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,15 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>39 进程</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h1 class="chapter">39 进程</h1>
+<div class="nav-panel"><p>Next: <a href="39.1_创建子进程的函数.html">创建子进程的函数</a>, Previous: <a href="38.4_线程列表.html">线程列表</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在操作系统的术语中，进程是程序可以执行的空间。Emacs 在一个进程中运行。Emacs Lisp 程序可以在自己的进程中调用其他程序。这些被称为 Emacs 进程的子进程或子进程，这是它们的父进程。
+</p>
+<p>Emacs 的子进程可能是同步的或异步的，这取决于它是如何创建的。当您创建同步子进程时，Lisp 程序会等待子进程终止，然后再继续执行。当您创建一个异步子进程时，它可以与 Lisp 程序并行运行。这种子进程在 Emacs 中由 Lisp 对象表示，该对象也称为 <code>进程</code> 。Lisp 程序可以使用这个对象与子进程通信或控制它。例如，您可以发送信号、获取状态信息、接收进程的输出或向其发送输入。
+</p>
+<p>除了运行程序的进程之外，Lisp 程序还可以打开多种类型的连接到在同一台机器或其他机器上运行的设备或进程。支持的连接类型有：TCP 和 UDP 网络连接、串口连接和管道连接。每个这样的连接也由一个过程对象表示。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: processp object ¶
+</pre></div>
+<p>如果 object 表示 Emacs 进程对象，则此函数返回 t，否则返回 nil。进程对象可以表示运行程序的子进程或任何受支持类型的连接。
+</p>
+<p>除了当前 Emacs 会话的子进程之外，您还可以访问在您的机器上运行的其他进程。请参阅访问其他进程。
+</p>
+<div class="nav-panel"><p>Next: <a href="39.1_创建子进程的函数.html">创建子进程的函数</a>, Previous: <a href="38.4_线程列表.html">线程列表</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.3 截断</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">40.3 截断</h2>
+<div class="nav-panel"><p>Next: <a href="40.4_回显区.html">回显区</a>, Previous: <a href="40.2_强制重新显示.html">强制重新显示</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当一行文本超出窗口的右边缘时，Emacs 可以继续该行（使其换行到下一个屏幕行），或截断该行（将其限制为一个屏幕行）。用于显示长文本行的附加屏幕行称为续行。延续不等于填充；  延续只发生在屏幕上，不在缓冲区内容中，它在右边距而不是在单词边界处断行。请参阅填充。
+</p>
+<p>在图形显示上，窗口边缘中的微小箭头图像表示截断和连续的线条（请参阅边缘）。在文本终端上，窗口最右列中的 <code>$</code> 表示截断；  最右边一列的 <code>\</code> 表示换行。（显示表可以指定用于此的替代字符；请参阅显示表）。
+</p>
+<p>由于文本的换行和截断相互矛盾，Emacs 在请求换行时关闭行截断，反之亦然。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: truncate-lines ¶
+</pre></div>
+<p>如果此缓冲区局部变量为非 nil，则超出窗口右边缘的行将被截断；  否则，它们将继续。作为一个特殊的例外，变量 truncate-partial-width-windows 在部分宽度窗口（即不占据整个框架宽度的窗口）中具有优先权。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: truncate-partial-width-windows ¶
+</pre></div>
+<p>此变量控制部分宽度窗口中的行截断。部分宽度窗口是不占据整个框架宽度的窗口（请参阅拆分窗口）。如果值为 nil，则行截断由变量 truncate-lines 确定（见上文）。如果该值为整数 n，则如果部分宽度窗口的列少于 n 列，则将截断行，而不管 truncate-lines 的值如何；  如果部分宽度窗口有 n 列或更多列，则行截断由 truncate-lines 确定。对于任何其他非 nil 值，无论 truncate-lines 的值如何，每个部分宽度窗口中的行都会被截断。
+</p>
+<p>在窗口中使用水平滚动（请参阅水平滚动）时，会强制截断。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: wrap-prefix ¶
+</pre></div>
+<p>如果这个缓冲区局部变量不是 nil，它定义了一个 wrap 前缀，Emacs 会在每个续行的开头显示该前缀。（如果行被截断，则从不使用 wrap-prefix。）它的值可以是字符串或图像（请参阅其他显示规范），或者是由 :width 或 :align-to 显示属性指定的一段空白（见指定空间）。该值的解释方式与显示文本属性相同。请参阅显示属性。
+</p>
+<p>也可以使用 wrap-prefix text 或 overlay 属性为文本区域指定换行前缀。这优先于 wrap-prefix 变量。请参阅具有特殊含义的属性。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: line-prefix ¶
+</pre></div>
+<p>如果这个缓冲区局部变量不是 nil，它定义了一个行前缀，Emacs 会在每个非连续行的开头显示该行前缀。它的值可以是字符串或图像（请参阅其他显示规范），或者是由 :width 或 :align-to 显示属性指定的一段空白（请参阅指定的空格）。该值的解释方式与显示文本属性相同。请参阅显示属性。
+</p>
+<p>也可以使用 line-prefix text 或 overlay 属性为文本区域指定行前缀。这优先于行前缀变量。请参阅具有特殊含义的属性。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.4_回显区.html">回显区</a>, Previous: <a href="40.2_强制重新显示.html">强制重新显示</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

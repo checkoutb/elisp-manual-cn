@@ -1,0 +1,143 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>19.2.16 调试选项</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">19.2.16 调试选项</h3>
+<div class="nav-panel"><p>Next: <a href="19.3_调试无效的_Lisp_语法.html">调试无效的_Lisp_语法</a>, Previous: <a href="19.2.15_调试和宏.html">调试和宏</a>, Up: <a href="19.2_调试.html">调试.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这些选项会影响 Edebug 的行为：
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: edebug-setup-hook ¶
+</pre></div>
+<p>在使用 Edebug 之前调用的函数。每次将其设置为新值时，Edebug 都会调用这些函数一次，然后将 edebug-setup-hook 重置为 nil。您可以使用它来加载与您正在使用的包关联的 Edebug 规范，但前提是您也使用 Edebug。请参阅 Edebug 检测。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: edebug-all-defs ¶
+</pre></div>
+<p>如果这是非零，则对定义形式（如 defun 和 defmacro）的正常评估会为 Edebug 提供工具。这适用于 eval-defun、eval-region、eval-buffer 和 eval-current-buffer。
+</p>
+<p>使用命令 Mx edebug-all-defs 切换此选项的值。请参阅 Edebug 检测。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: edebug-all-forms ¶
+</pre></div>
+<p>如果这不是 nil，则命令 eval-defun、eval-region、eval-buffer 和 eval-current-buffer 仪器所有形式，即使是那些没有定义任何东西的形式。这不适用于 minibuffer 中的加载或评估。
+</p>
+<p>使用命令 Mx edebug-all-forms 切换此选项的值。请参阅 Edebug 检测。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: edebug-eval-macro-args ¶
+</pre></div>
+<p>当这是非零时，所有宏参数都将在生成的代码中进行检测。对于任何宏，调试声明都会覆盖此选项。因此，要为某些已评估而有些未评估参数的宏指定异常，请使用调试声明指定 Edebug 表单规范。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: edebug-save-windows ¶
+</pre></div>
+<p>如果这是非零，Edebug 保存并恢复窗口配置。这需要一些时间，所以如果您的程序不关心窗口配置会发生什么，最好将此变量设置为 nil。
+</p>
+<p>如果该值为列表，则仅保存和恢复列出的窗口。
+</p>
+<p>您可以在 Edebug 中使用 W 命令以交互方式更改此变量。请参阅 Edebug 显示更新。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: edebug-save-displayed-buffer-points ¶
+</pre></div>
+<p>如果这是非零，Edebug 将保存并恢复所有显示缓冲区中的点。
+</p>
+<p>如果您正在调试更改显示在非选定窗口中的缓冲区的点的代码，则必须在其他缓冲区中保存和恢复点。如果 Edebug 或用户随后选择了窗口，则该缓冲区中的点将移动到窗口的点值。
+</p>
+<p>在所有缓冲区中保存和恢复点很昂贵，因为它需要选择每个窗口两次，所以只有在需要时才启用它。请参阅 Edebug 显示更新。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: edebug-initial-mode ¶
+</pre></div>
+<p>如果此变量非零，则它指定 Edebug 首次激活时的初始执行模式。可能的值是 step、next、go、Go-nonstop、trace、Trace-fast、continue 和 Continue-fast。
+</p>
+<p>默认值为步长。该变量可以通过 Cx Ca Cm 交互设置（edebug-set-initial-mode）。请参阅 Edebug 执行模式。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: edebug-trace ¶
+</pre></div>
+<p>如果这是非零，跟踪每个函数的进入和退出。跟踪输出显示在名为 <strong>edebug-trace</strong> 的缓冲区中，每行一个函数入口或出口，按递归级别缩进。
+</p>
+<p>另请参阅跟踪缓冲区中的 edebug-tracing。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: edebug-test-coverage ¶
+</pre></div>
+<p>如果非零，Edebug 测试所有被调试表达式的覆盖率。请参阅覆盖测试。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: edebug-continue-kbd-macro ¶
+</pre></div>
+<p>如果非零，则继续定义或执行在 Edebug 之外执行的任何键盘宏。谨慎使用它，因为它没有被调试。请参阅 Edebug 执行模式。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: edebug-print-length ¶
+</pre></div>
+<p>如果非 nil，则在 Edebug 中打印结果的默认值 print-length。请参阅影响输出的变量。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: edebug-print-level ¶
+</pre></div>
+<p>如果非 nil，则在 Edebug 中打印结果的默认值 print-level。请参阅影响输出的变量。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: edebug-print-circle ¶
+</pre></div>
+<p>如果非 nil，则在 Edebug 中打印结果的 print-circle 的默认值。请参阅影响输出的变量。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: edebug-unwrap-results ¶
+</pre></div>
+<p>如果非零，Edebug 会在显示表达式的结果时尝试删除它自己的任何检测。这在调试表达式的结果本身是检测表达式的宏时是相关的。作为一个非常人为的示例，假设示例函数 fac 已被检测，并考虑以下形式的宏：
+</p>
+<div class="lisp">
+<pre class="lisp">(defmacro test () "Edebug example."
+  (if (symbol-function 'fac)
+      …))
+</pre></div>
+<p>如果您对测试宏进行检测并单步执行，则默认情况下，符号函数调用的结果具有大量 edebug-after 和 edebug-before 形式，这可能会导致难以看到实际结果。如果 edebug-unwrap-results 不为零，Edebug 会尝试从结果中删除这些形式。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: edebug-on-error ¶
+</pre></div>
+<p>如果 debug-on-error 以前为 nil，则 Edebug 将 debug-on-error 绑定到此值。请参阅捕获错误。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: edebug-on-quit ¶
+</pre></div>
+<p>如果 debug-on-quit 以前为 nil，则 Edebug 将 debug-on-quit 绑定到此值。请参阅捕获错误。
+</p>
+<p>如果在 Edebug 处于活动状态时更改 edebug-on-error 或 edebug-on-quit 的值，则在下次通过新命令调用 Edebug 之前不会使用它们的值。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: edebug-global-break-condition ¶
+</pre></div>
+<p>如果非零，则在每个停止点测试的表达式。如果结果非零，则中断。错误被忽略。请参阅全局中断条件。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: edebug-sit-for-seconds ¶
+</pre></div>
+<p>到达断点且执行模式为跟踪或继续时暂停的秒数。请参阅 Edebug 执行模式。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: edebug-sit-on-break ¶
+</pre></div>
+<p>到达断点时是否暂停 edebug-sit-for-seconds。设置为 nil 以防止暂停，非 nil 以允许它。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: edebug-behavior-alist ¶
+</pre></div>
+<p>默认情况下，此列表包含一个带有键 edebug 的条目和一个包含三个函数的列表，这些函数是插入检测代码中的函数的默认实现：edebug-enter、edebug-before 和 edebug-after。要全局更改 Edebug 的行为，请修改默认条目。
+</p>
+<p>Edebug 的行为也可以通过在此列表中添加一个条目来基于每个定义进行更改，其中包含您选择的键和三个功能。然后将检测定义的 edebug-behavior 符号属性设置为新条目的键，Edebug 将为该定义调用新函数代替它自己的函数。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: edebug-new-definition-function ¶
+</pre></div>
+<p>在包装定义或闭包的主体后由 Edebug 运行的函数。在 Edebug 初始化它自己的数据之后，这个函数被调用一个参数，即与定义相关的符号，它可能是实际定义的符号或由 Edebug 生成的符号。此函数可用于设置由 Edebug 检测的每个定义的 edebug-behavior 符号属性。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: edebug-after-instrumentation-function ¶
+</pre></div>
+<p>要在使用之前检查或修改 Edebug 的检测，请将​​此变量设置为一个函数，该函数接受一个参数，一个检测的顶级表单，并返回相同或替换的表单，然后 Edebug 将使用它作为检测的最终结果.
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="19.3_调试无效的_Lisp_语法.html">调试无效的_Lisp_语法</a>, Previous: <a href="19.2.15_调试和宏.html">调试和宏</a>, Up: <a href="19.2_调试.html">调试.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

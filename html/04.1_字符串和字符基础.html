@@ -1,0 +1,20 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>4.1 字符串和字符基础</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">4.1 字符串和字符基础</h2>
+<div class="nav-panel"><p>Next: <a href="04.2_字符串谓词.html">字符串谓词</a>, Previous: <a href="04_字符串和字.html">字符串和字</a>, Up: <a href="04_字符串和字.html">字符串和字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>字符是一个 Lisp 对象，它表示文本的单个字符。在 Emacs Lisp 中，字符只是整数；  整数是否为字符仅取决于它的使用方式。有关 Emacs 中字符表示的详细信息，请参阅字符代码。
+</p>
+<p>字符串是固定的字符序列。它是一种称为数组的序列，这意味着它的长度是固定的，一旦创建就不能更改（请参阅序列、数组和向量）。与 C 不同，Emacs Lisp 字符串不以可区分的字符代码终止。
+</p>
+<p>由于字符串是数组，因此也是序列，您可以使用序列、数组和向量中记录的通用数组和序列函数对它们进行操作。例如，您可以使用函数 aref 访问字符串中的单个字符（请参阅对数组进行操作的函数）。
+</p>
+<p>Emacs 字符串（和缓冲区）中的非 ASCII 字符有两种文本表示：单字节和多字节。对于大多数 Lisp 编程，您不需要关心这两种表示。有关详细信息，请参阅文本表示。
+</p>
+<p>有时键序列表示为单字节字符串。当单字节字符串是键序列时，128 到 255 范围内的字符串元素表示元字符（它们是大整数）而不是 128 到 255 范围内的字符代码。字符串不能包含具有 hyper、super 或 alt 修饰符的字符;  它们可以保存 ASCII 控制字符，但不能保存其他控制字符。它们不区分 ASCII 控制字符的大小写。如果要将此类字符存储在序列中，例如键序列，则必须使用向量而不是字符串。有关键盘输入字符的更多信息，请参阅字符类型。
+</p>
+<p>字符串对于保存正则表达式很有用。您还可以使用 string-match 将正则表达式与字符串进行匹配（请参阅正则表达式搜索）。函数 match-string（请参阅简单匹配数据访问）和 replace-match（请参阅替换匹配的文本）对于在匹配正则表达式后分解和修改字符串很有用。
+</p>
+<p>像缓冲区一样，字符串可以包含其中字符的文本属性，以及字符本身。请参阅文本属性。所有将文本从字符串复制到缓冲区或其他字符串的 Lisp 原语也复制被复制字符的属性。
+</p>
+<p>有关显示字符串或将字符串复制到缓冲区的函数的信息，请参阅文本。有关字符和字符串的语法的信息，请参阅字符类型和字符串类型。有关在文本表示之间进行转换以及对字符代码进行编码和解码的函数，请参见非 ASCII 字符。另外，请注意，长度不应用于计算显示字符串的宽度；  请改用字符串宽度（请参阅显示文本的大小）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="04.2_字符串谓词.html">字符串谓词</a>, Previous: <a href="04_字符串和字.html">字符串和字</a>, Up: <a href="04_字符串和字.html">字符串和字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

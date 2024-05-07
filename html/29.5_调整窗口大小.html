@@ -1,0 +1,129 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>29.5 调整窗口大小</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">29.5 调整窗口大小</h2>
+<div class="nav-panel"><p>Next: <a href="29.6_保留窗口大小.html">保留窗口大小</a>, Previous: <a href="29.4_窗口大小.html">窗口大小</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节描述了在不改变 <code>帧</code> ( <code>frame</code> )大小的情况下调整窗口大小的函数。因为实时窗口不重叠，所以这些函数只对包含两个或更多窗口的帧有意义：调整窗口大小也会改变至少一个其他窗口的大小。如果 <code>帧</code> ( <code>frame</code> )上只有一个窗口，则只能通过调整 <code>帧</code> ( <code>frame</code> )大小来更改其大小（请参阅 <code>帧</code> ( <code>frame</code> )大小）。
+</p>
+<p>除非另有说明，这些函数还接受内部窗口作为参数。调整内部窗口的大小会导致其子窗口调整大小以适应相同的空间。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-resizable window delta &amp;optional horizontal ignore pixelwise ¶
+</pre></div>
+<p>如果窗口的大小可以通过增量线垂直更改，则此函数返回增量。如果可选参数水平非零，则如果窗口可以通过增量列水平调整大小，则返回增量。它实际上并没有改变窗口大小。
+</p>
+<p>如果 window 为 nil，则默认为选定的窗口。
+</p>
+<p>delta 为正值表示检查窗口是否可以放大该行数或列数；  delta 的负值表示检查窗口是否可以缩小那么多行或列。如果 delta 不为零，则返回值 0 表示无法调整窗口大小。
+</p>
+<p>通常，变量 window-min-height 和 window-min-width 指定允许的最小窗口大小（请参阅窗口大小）。但是，如果可选参数 ignore 不为 nil，则此函数将忽略 window-min-height 和 window-min-width，以及 window-size-fixed。相反，它将窗口的最小高度视为其顶部和底部装饰加上一行文本的总和；  它的最小宽度是它的左右装饰加上两列文本的总和。
+</p>
+<p>如果可选参数 pixelwise 为非零，则 delta 被解释为像素。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-resize window delta &amp;optional horizontal ignore pixelwise ¶
+</pre></div>
+<p>此函数按增量调整窗口大小。如果水平为 nil，它通过增量线改变高度；  否则，它会按增量列更改宽度。正 delta 表示扩大窗口，负 delta 表示缩小窗口。
+</p>
+<p>如果 window 为 nil，则默认为选定的窗口。如果窗口不能按要求调整大小，则会发出错误信号。
+</p>
+<p>可选参数 ignore 与上面的函数 window-resizable 具有相同的含义。
+</p>
+<p>如果可选参数 pixelwise 不为零，则 delta 将被解释为像素。
+</p>
+<p>该函数改变哪个窗口边缘的选择取决于选项 window-combination-resize 的值和所涉及窗口的组合限制；  在某些情况下，它可能会改变两个边缘。请参阅重新组合 Windows。要通过仅移动窗口的底部或右侧边缘来调整大小，请使用函数adjust-window-trailing-edge。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: adjust-window-trailing-edge window delta &amp;optional horizontal pixelwise ¶
+</pre></div>
+<p>此函数通过增量线移动窗口的底部边缘。如果可选参数水平非零，它改为将右边缘移动增量列。如果 window 为 nil，则默认为选定的窗口。
+</p>
+<p>如果可选参数 pixelwise 为非零，则 delta 被解释为像素。
+</p>
+<p>正 delta 使边缘向下或向右移动；  负增量将其向上或向左移动。如果边缘无法移动到 delta 指定的距离，则此函数将其移动到尽可能远，但不会发出错误信号。
+</p>
+<p>此函数尝试调整与移动边缘相邻的窗口大小。如果由于某种原因（例如，如果该相邻窗口是固定大小的）这是不可能的，它可能会调整其他窗口的大小。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: window-resize-pixelwise ¶
+</pre></div>
+<p>如果此选项的值为非零，Emacs 会以像素为单位调整窗口大小。这目前会影响拆分窗口（请参阅拆分窗口）、最大化窗口、最小化窗口、适合窗口到缓冲区、适合帧到缓冲区和缩小窗口如果大于缓冲区（全部列在下面）。
+</p>
+<p>请注意，当帧的像素大小不是其字符大小的倍数时，即使此选项为零，至少一个窗口可能会按像素调整大小。默认值为无。
+</p>
+<p>以下命令以更具体的方式调整窗口大小。当以交互方式调用时，它们作用于选定的窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: fit-window-to-buffer &amp;optional window max-height min-height max-width min-width preserve-size ¶
+</pre></div>
+<p>此命令调整窗口的高度或宽度以适合其中的文本。如果能够调整窗口大小，则返回非 nil，否则返回 nil。如果 window 被省略或为零，则默认为选定的窗口。否则，它应该是一个实时窗口。
+</p>
+<p>如果窗口是垂直组合的一部分，则此函数调整窗口的高度。新高度是根据其缓冲区可访问部分的实际高度计算的。可选参数 max-height，如果非零，指定此函数可以给窗口的最大总高度。可选参数 min-height，如果非 nil，指定它可以给出的最小总高度，它会覆盖变量 window-min-height。最大高度和最小高度都在行中指定，包括窗口的任何顶部或底部装饰。
+</p>
+<p>如果窗口是水平组合的一部分，并且选项 fit-window-to-buffer-horizo​​ntally （见下文）的值非零，则此函数调整窗口的宽度。窗口的新宽度是根据窗口当前起始位置之后的缓冲区行的最大长度计算的。可选参数 max-width 指定最大宽度，默认为窗口 <code>帧</code> ( <code>frame</code> )的宽度。可选参数 min-width 指定最小宽度，默认为 window-min-width。max-width 和 min-width 都在列中指定，并且包括窗口的任何左侧或右侧装饰。
+</p>
+<p>可选参数 preserve-size，如果非零，将安装一个参数以在将来的调整大小操作期间保留窗口的大小（请参阅保留窗口大小）。
+</p>
+<p>如果选项 fit-frame-to-buffer（见下文）不为 nil，则此函数将尝试通过调用 fit-frame-to-buffer（见下文）来调整窗口 <code>帧</code> ( <code>frame</code> )的大小以适应其内容。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: fit-window-to-buffer-horizontally ¶
+</pre></div>
+<p>如果这是非零，fit-window-to-buffer 可以水平调整窗口大小。如果这是 nil （默认） fit-window-to-buffer 从不水平调整窗口大小。如果仅此，它只能水平调整窗口大小。任何其他值意味着 fit-window-to-buffer 可以在两个维度上调整窗口大小。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: fit-frame-to-buffer ¶
+</pre></div>
+<p>如果此选项不为零，则 fit-window-to-buffer 可以将帧适合其缓冲区。当且仅当其根窗口是活动窗口并且此选项为非零时， <code>帧</code> ( <code>frame</code> )才适合。如果这是水平的，则 <code>帧</code> ( <code>frame</code> )仅水平适合。如果这是垂直的，则 <code>帧</code> ( <code>frame</code> )仅垂直适合。任何其他非零值意味着 <code>帧</code> ( <code>frame</code> )可以在两个维度上调整大小。
+</p>
+<p>如果您有一个只显示一个窗口的 <code>帧</code> ( <code>frame</code> )，您可以使用命令 fit-frame-to-buffer 将该 <code>帧</code> ( <code>frame</code> )适应其缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: fit-frame-to-buffer &amp;optional frame max-height min-height max-width min-width only ¶
+</pre></div>
+<p>此命令调整帧的大小以准确显示其缓冲区的内容。frame 可以是任何实时帧，默认为选定的帧。仅当 <code>帧</code> ( <code>frame</code> )的根窗口处于活动状态时才进行拟合。参数 max-height、min-height、max-width 和 min-width 指定 <code>帧</code> ( <code>frame</code> )根窗口的新总大小的界限。min-height 和 min-width 分别默认为 window-min-height 和 window-min-width 的值。
+</p>
+<p>如果可选参数仅是垂直的，则此函数只能垂直调整 <code>帧</code> ( <code>frame</code> )的大小。如果 only 是水平的，它可能只会水平调整 <code>帧</code> ( <code>frame</code> )的大小。
+</p>
+<p>可以借助下面列出的两个选项来控制 fit-frame-to-buffer 的行为。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: fit-frame-to-buffer-margins ¶
+</pre></div>
+<p>此选项可用于指定要通过 fit-frame-to-buffer 适应的帧周围的边距。例如，这样的边距对于避免调整大小的 <code>帧</code> ( <code>frame</code> )与任务栏或其父 <code>帧</code> ( <code>frame</code> )的一部分重叠可能很有用。
+</p>
+<p>它指定要在应适合的帧的左侧、上方、右侧和下方留出的像素数。默认为每个指定 nil，这意味着不使用边距。此处指定的值可以通过该帧的 fit-frame-to-buffer-margins 参数（如果存在）覆盖特定帧。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: fit-frame-to-buffer-sizes ¶
+</pre></div>
+<p>此选项指定 fit-frame-to-buffer 的大小边界。它指定应适合其缓冲区的任何帧的根窗口的总最大和最小行以及最大和最小列。如果这些值中的任何一个不是 nil，它会覆盖 fit-frame-to-buffer 的相应参数。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: shrink-window-if-larger-than-buffer &amp;optional window ¶
+</pre></div>
+<p>此命令尝试尽可能减少窗口的高度，同时仍显示其完整缓冲区，但不少于 window-min-height 行。如果调整了窗口大小，则返回值非 nil，否则返回 nil。如果 window 被省略或为零，则默认为选定的窗口。否则，它应该是一个实时窗口。
+</p>
+<p>如果窗口已经太短而无法显示其所有缓冲区，或者任何缓冲区滚动到屏幕外，或者窗口是其 <code>帧</code> ( <code>frame</code> )中唯一的活动窗口，则此命令不执行任何操作。
+</p>
+<p>该命令调用 fit-window-to-buffer（见上文）来完成它的工作。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: balance-windows &amp;optional window-or-frame ¶
+</pre></div>
+<p>此功能以一种为全宽和/或全高窗口提供更多空间的方式平衡窗口。如果 window-or-frame 指定一个 <code>帧</code> ( <code>frame</code> )，它会平衡该 <code>帧</code> ( <code>frame</code> )上的所有窗口。如果 window-or-frame 指定了一个窗口，它只平衡那个窗口和它的兄弟窗口（参见窗口和 <code>帧</code> ( <code>frame</code> )）。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: balance-windows-area ¶
+</pre></div>
+<p>此函数尝试为选定 <code>帧</code> ( <code>frame</code> )上的所有窗口提供大致相同的屏幕区域份额。全宽或全高窗口没有比其他窗口更多的空间。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: maximize-window &amp;optional window ¶
+</pre></div>
+<p>此函数尝试在两个维度上使窗口尽可能大，而不调整其 <code>帧</code> ( <code>frame</code> )大小或删除其他窗口。如果 window 被省略或为零，则默认为选定的窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: minimize-window &amp;optional window ¶
+</pre></div>
+<p>此函数尝试在两个维度上使窗口尽可能小，而不删除它或调整其 <code>帧</code> ( <code>frame</code> )的大小。如果 window 被省略或为零，则默认为选定的窗口。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="29.6_保留窗口大小.html">保留窗口大小</a>, Previous: <a href="29.4_窗口大小.html">窗口大小</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

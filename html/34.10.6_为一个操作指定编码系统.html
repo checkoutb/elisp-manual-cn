@@ -1,0 +1,56 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>34.10.6 为一个操作指定编码系统</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">34.10.6 为一个操作指定编码系统</h3>
+<div class="nav-panel"><p>Next: <a href="34.10.7_显式编码和解码.html">显式编码和解码</a>, Previous: <a href="34.10.5_默认编码系统.html">默认编码系统</a>, Up: <a href="34.10_编码系统.html">编码系统.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>您可以通过绑定变量 coding-system-for-read 和/或 coding-system-for-write 来指定特定操作的编码系统。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: coding-system-for-read ¶
+</pre></div>
+<p>如果此变量不为 nil，则它指定用于读取文件或来自同步子进程的输入的编码系统。
+</p>
+<p>它也适用于任何异步子进程或网络流，但方式不同：当您启动子进程或打开网络流时，coding-system-for-read 的值指定该子进程或网络流的输入解码方法。除非被覆盖，否则它会一直用于该子进程或网络流。
+</p>
+<p>使用此变量的正确方法是将其与 let 绑定以进行特定的 I/O 操作。它的全局值通常为 nil，您不应将其全局设置为任何其他值。这是使用变量的正确方法的示例：
+</p>
+<div class="lisp">
+<pre class="lisp">;; Read the file with no character code conversion.
+(let ((coding-system-for-read 'no-conversion))
+  (insert-file-contents filename))
+</pre></div>
+<p>当其值为非零时，此变量优先于所有其他指定用于输入的编码系统的方法，包括 file-coding-system-alist、process-coding-system-alist 和 network-coding-system-alist .
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: coding-system-for-write ¶
+</pre></div>
+<p>这很像coding-system-for-read，除了它适用于输出而不是输入。它影响对文件的写入，以及将输出发送到子进程和网络连接。它也适用于编码 Emacs 调用子进程的命令行参数。
+</p>
+<p>当单个操作同时进行输入和输出时，就像 call-process-region 和 start-process 一样，coding-system-for-read 和 coding-system-for-write 都会影响它。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: coding-system-require-warning ¶
+</pre></div>
+<p>将 coding-system-for-write 绑定到非 nil 值可防止输出原语调用 select-safe-coding-system-function 指定的函数（请参阅用户选择的编码系统）。这是因为 Cx RET c (universal-coding-system-argument) 通过绑定 coding-system-for-write 工作，Emacs 应该服从用户选择。如果 Lisp 程序将 coding-system-for-write 绑定到对要写入的文本进行编码可能不安全的值，它还可以将 coding-system-require-warning 绑定到非 nil 值，这将强制输出原语以通过调用 select-safe-coding-system-function 的值来检查编码，即使 coding-system-for-write 不为零。或者，在使用指定的编码之前显式调用 select-safe-coding-system。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: inhibit-eol-conversion ¶
+</pre></div>
+<p>当此变量为非零时，无论指定哪种编码系统，都不会进行行尾转换。这适用于所有 Emacs I/O 和子进程原语，以及显式编码和解码功能（请参阅显式编码和解码）。
+</p>
+<p>有时，您需要为某些操作选择多个编码系统，而不是修复一个。Emacs 允许您指定使用编码系统的优先顺序。这种排序会影响由 find-coding-systems-region 等函数返回的编码系统列表的排序（请参阅 Lisp 中的编码系统）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: coding-system-priority-list &amp;optional highestp ¶
+</pre></div>
+<p>此函数按当前优先级的顺序返回编码系统列表。可选参数highestp，如果非零，表示只返回最高优先级的编码系统。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-coding-system-priority &amp;rest coding-systems ¶
+</pre></div>
+<p>此功能将编码系统置于编码系统优先级列表的开头，从而使其优先级高于其他所有系统。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: with-coding-priority coding-systems &amp;rest body ¶
+</pre></div>
+<p>这个宏执行主体，就像 progn 一样（参见 progn），编码系统位于编码系统的优先级列表的前面。encoding-systems 应该是在执行主体期间首选的编码系统列表。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="34.10.7_显式编码和解码.html">显式编码和解码</a>, Previous: <a href="34.10.5_默认编码系统.html">默认编码系统</a>, Up: <a href="34.10_编码系统.html">编码系统.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

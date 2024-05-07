@@ -1,0 +1,117 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>12.3 局部变量</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">12.3 局部变量</h2>
+<div class="nav-panel"><p>Next: <a href="12.4_当变量为空时.html">当变量为空时</a>, Previous: <a href="12.2_永不改变的变量.html">永不改变的变量</a>, Up: <a href="12_变量.html">变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>全局变量的值一直持续到被新值明确取代。有时给变量一个局部值是有用的——这个值只在 Lisp 程序的特定部分内生效。当一个变量有一个局部值时，我们说它是局部绑定到那个值的，并且它是一个局部变量。
+</p>
+<p>例如，当一个函数被调用时，它的参数变量接收局部值，这是提供给函数调用的实际参数；  这些本地绑定在函数体内生效。再举一个例子，let 特殊形式显式地为特定变量建立局部绑定，这些绑定只在 let 形式的主体内生效。
+</p>
+<p>我们还谈到了全局绑定，这是（概念上）全局值被保存的地方。
+</p>
+<p>建立本地绑定可以保存变量的先前值（或缺少值）。我们说之前的值是阴影的。全局值和局部值都可能被遮蔽。如果本地绑定有效，则在本地变量上使用 setq 将指定的值存储在本地绑定中。当该本地绑定不再有效时，先前隐藏的值（或缺少值）会返回。
+</p>
+<p>一个变量一次可以有多个本地绑定（例如，如果有嵌套的 let 表单绑定该变量）。当前绑定是实际生效的本地绑定。它通过评估变量符号来确定返回的值，它是由 setq 作用的绑定。
+</p>
+<p>在大多数情况下，您可以将当前绑定视为最内部的本地绑定，如果没有本地绑定，则可以将其视为全局绑定。更准确地说，称为范围规则的规则确定本地绑定在程序中的哪个位置生效。Emacs Lisp 中的默认作用域规则称为动态作用域，它简单地说明在程序执行的任何给定点的当前绑定是仍然存在的该变量最近创建的绑定。有关动态范围的详细信息，以及称为词法范围的替代范围规则，请参阅变量绑定的范围规则。
+</p>
+<p>特殊形式 let 和 let* 用于创建本地绑定：
+</p>
+<div class="lisp">
+<pre class="lisp">Special Form: let (bindings…) forms… ¶
+</pre></div>
+<p>这种特殊形式为特定的一组变量设置本地绑定，由绑定指定，然后按文本顺序评估所有形式。它的返回值是表单中最后一个表单的值。let 设置的本地绑定仅在表单主体内有效。
+</p>
+<p>每个绑定都是 (i) 一个符号，在这种情况下，该符号在本地绑定到 nil；  或 (ii) 形式列表 (symbol value-form)，在这种情况下，符号本地绑定到评估 value-form 的结果。如果省略 value-form，则使用 nil。
+</p>
+<p>绑定中的所有值形式都按照它们出现的顺序在将任何符号绑定到它们之前进行评估。下面是一个例子：z 绑定到 y 的旧值，即 2，而不是 y 的新值，即 1。
+</p>
+<div class="lisp">
+<pre class="lisp">(setq y 2)
+     ⇒ 2
+
+
+(let ((y 1)
+      (z y))
+  (list y z))
+     ⇒ (1 2)
+</pre></div>
+<p>另一方面，绑定的顺序是未指定的：在以下示例中，可能会打印 1 或 2。
+</p>
+<div class="lisp">
+<pre class="lisp">(let ((x 1)
+      (x 2))
+  (print x))
+</pre></div>
+<p>因此，避免在一个 let 表单中多次绑定一个变量。 
+</p>
+<div class="lisp">
+<pre class="lisp">Special Form: let* (bindings…) forms… ¶
+</pre></div>
+<p>这种特殊形式与 let 类似，但它在计算其局部值之后立即绑定每个变量，然后再计算下一个变量的局部值。因此，绑定中的表达式可以引用以这种 let* 形式绑定的前面的符号。比较下面的例子和上面的 let 例子。
+</p>
+<div class="lisp">
+<pre class="lisp">(setq y 2)
+     ⇒ 2
+
+
+(let* ((y 1)
+       (z y))    ; Use the just-established value of y.
+  (list y z))
+     ⇒ (1 1)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Special Form: letrec (bindings…) forms… ¶
+</pre></div>
+<p>这种特殊形式类似于 let*，但在计算任何局部值之前绑定了所有变量。然后将这些值分配给本地绑定的变量。这仅在词法绑定生效时有用，并且您想要创建引用绑定的闭包，否则使用 let* 时这些绑定尚未生效。
+</p>
+<p>例如，这是一个在运行一次后将自身从钩子中移除的闭包：
+</p>
+<div class="lisp">
+<pre class="lisp">(letrec ((hookfun (lambda ()
+                    (message "Run once")
+                    (remove-hook 'post-command-hook hookfun))))
+  (add-hook 'post-command-hook hookfun))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Special Form: dlet (bindings…) forms… ¶
+</pre></div>
+<p>这种特殊的形式就像 let 一样，但是它动态地绑定了所有的变量。这很少有用——您通常希望以词法方式绑定普通变量，并动态绑定特殊变量（即用 defvar 定义的变量），而这正是 let 所做的。
+</p>
+<p>dlet 在与假定某些变量是动态绑定的旧代码交互时很有用（请参阅动态绑定），但对这些变量进行 defvar 是不切实际的。dlet 将临时使绑定变量特殊，执行表单，然后再次使变量非特殊。 
+</p>
+<div class="lisp">
+<pre class="lisp">Special Form: named-let name bindings &amp;rest body ¶
+</pre></div>
+<p>这种特殊形式是受 Scheme 语言启发的循环结构。和 let 类似：在 bindings 中绑定变量，然后计算 body。然而，named-let 也将 name 绑定到一个局部函数，其形式参数是绑定中的变量，其主体是 body。这允许 body 通过调用 name 递归调用自身，其中传递给 name 的参数用作递归调用中绑定变量的新值。
+</p>
+<p>对数字列表求和的循环示例：
+</p>
+<div class="lisp">
+<pre class="lisp">(named-let sum ((numbers '(1 2 3 4))
+                (running-sum 0))
+  (if numbers
+      (sum (cdr numbers) (+ running-sum (car numbers)))
+    running-sum))
+⇒ 10
+</pre></div>
+<p>在 body 的尾部位置对 name 的递归调用保证被优化为尾部调用，这意味着无论递归运行多深，它们都不会消耗任何额外的堆栈空间。这样的递归调用将有效地跳转到循环的顶部，并为变量提供新值。
+</p>
+<p>如果函数调用是最后完成的事情，则函数调用位于尾部位置，因此调用返回的值是 body 本身的值，就像上面对 sum 的递归调用中的情况一样。 
+</p>
+<p>以下是创建本地绑定的其他工具的完整列表：
+</p>
+<p>函数调用（参见函数）。
+宏调用（参见宏）。
+条件案例（见错误）。 
+</p>
+<p>变量也可以具有缓冲区局部绑定（请参阅缓冲区局部变量）；  一些变量具有终端本地绑定（请参阅多个终端）。这些类型的绑定有点像普通的本地绑定，但它们是本地化的，具体取决于您在 Emacs 中的位置。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: max-specpdl-size ¶
+</pre></div>
+<p>此变量定义了在 Emacs 发出错误信号（数据“变量绑定深度超过 max-specpdl-size”）之前允许的局部变量绑定和展开保护清理（请参阅从非本地退出清理）的总数限制。
+</p>
+<p>这个限制，以及当它被超过时的相关错误，是 Lisp 避免对定义不明确的函数进行无限递归的一种方式。max-lisp-eval-depth 提供了嵌套深度的另一个限制。见评估。
+</p>
+<p>默认值为 1600。进入 Lisp 调试器会增加该值，如果剩余空间很小，以确保调试器本身有执行空间。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="12.4_当变量为空时.html">当变量为空时</a>, Previous: <a href="12.2_永不改变的变量.html">永不改变的变量</a>, Up: <a href="12_变量.html">变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

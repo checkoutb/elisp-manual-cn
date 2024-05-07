@@ -1,0 +1,49 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>29.17.2 侧窗选项和功能</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">29.17.2 侧窗选项和功能</h3>
+<div class="nav-panel"><p>Next: <a href="29.17.3_带有侧窗的帧布局.html">带有侧窗的帧布局</a>, Previous: <a href="29.17.1_在侧窗中显示缓冲区.html">在侧窗中显示缓冲区</a>, Up: <a href="29.17_侧窗.html">侧窗.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>以下选项提供了对侧窗位置的额外控制。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: window-sides-vertical ¶
+</pre></div>
+<p>如果非零，则 <code>帧</code> ( <code>frame</code> )左侧和右侧的侧窗占据 <code>帧</code> ( <code>frame</code> )的全高。否则， <code>帧</code> ( <code>frame</code> )顶部和底部的侧窗将占据 <code>帧</code> ( <code>frame</code> )的整个宽度。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: window-sides-slots ¶
+</pre></div>
+<p>此选项指定 <code>帧</code> ( <code>frame</code> )每一侧的最大侧窗数量。该值是一个由四个元素组成的列表，用于指定（按此顺序）每个 <code>帧</code> ( <code>frame</code> )的左侧、顶部、右侧和底部的侧窗插槽数。如果一个元素是一个数字，则意味着在对应的一侧最多显示多少个窗口。如果元素为 nil，则表示该侧的插槽数没有限制。
+</p>
+<p>如果任何指定的值为零，则不能在相应的一侧创建窗口。在这种情况下，display-buffer-in-side-window 不会发出错误信号，但会返回 nil。如果指定的值只是禁止创建额外的侧窗，则重用该侧最合适的窗口，并且可能会相应地更改其 window-slot 参数。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: window-sides-reversed ¶
+</pre></div>
+<p>此选项指定顶部/底部窗口是否应以相反的顺序显示。当它为 nil 时， <code>帧</code> ( <code>frame</code> )顶部和底部的侧窗总是从左到右绘制，并且槽值增加。当这是 t 时，绘制顺序颠倒， <code>帧</code> ( <code>frame</code> )顶部和底部的侧窗从右到左绘制，槽值增加。
+</p>
+<p>当这是双向时，当且仅当双向段落方向（请参阅双向显示）的值在此主窗口区域内最近选择的窗口中显示的缓冲区中从右到左时，绘制顺序才会反转 <code>帧</code> ( <code>frame</code> )。有时该窗口可能很难找到，因此使用启发式方法来避免在选择另一个窗口时无意中更改绘图顺序。
+</p>
+<p><code>帧</code> ( <code>frame</code> )左侧或右侧的侧窗布局不受此变量值的影响。
+</p>
+<p>当 <code>帧</code> ( <code>frame</code> )有侧窗时，以下函数返回该 <code>帧</code> ( <code>frame</code> )的主窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-main-window &amp;optional frame ¶
+</pre></div>
+<p>该函数返回指定 <code>帧</code> ( <code>frame</code> )的主窗口。可选参数 <code>帧</code> ( <code>frame</code> )必须是活动 <code>帧</code> ( <code>frame</code> )，并且默认为选定的 <code>帧</code> ( <code>frame</code> )。
+</p>
+<p>如果 <code>帧</code> ( <code>frame</code> )没有侧窗，则返回 <code>帧</code> ( <code>frame</code> )的根窗口。否则，它返回一个内部非侧窗口，以便 <code>帧</code> ( <code>frame</code> )上的所有其他非侧窗口从它下降，或者返回 <code>帧</code> ( <code>frame</code> )的单个活动非侧窗口。请注意， <code>帧</code> ( <code>frame</code> )的主窗口不能通过 delete-window 删除。
+</p>
+<p>以下命令可以方便地切换指定 <code>帧</code> ( <code>frame</code> )上所有侧窗的外观。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: window-toggle-side-windows &amp;optional frame ¶
+</pre></div>
+<p>此命令在指定 <code>帧</code> ( <code>frame</code> )上切换侧窗。可选参数 <code>帧</code> ( <code>frame</code> )必须是活动 <code>帧</code> ( <code>frame</code> )，并且默认为选定的 <code>帧</code> ( <code>frame</code> )。
+</p>
+<p>如果 <code>帧</code> ( <code>frame</code> )至少有一个侧窗，该命令将 <code>帧</code> ( <code>frame</code> )的根窗口的状态保存在 <code>帧</code> ( <code>frame</code> )的窗口状态 <code>帧</code> ( <code>frame</code> )参数中，然后删除 <code>帧</code> ( <code>frame</code> )上的所有侧窗。
+</p>
+<p>如果 <code>帧</code> ( <code>frame</code> )没有侧窗，但有一个窗口状态参数，则此命令使用该参数的值来恢复 <code>帧</code> ( <code>frame</code> )上的侧窗，而只保留 <code>帧</code> ( <code>frame</code> )的主窗口。
+</p>
+<p>如果 <code>帧</code> ( <code>frame</code> )没有侧窗并且没有找到它的保存状态，则会发出错误信号。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="29.17.3_带有侧窗的帧布局.html">带有侧窗的帧布局</a>, Previous: <a href="29.17.1_在侧窗中显示缓冲区.html">在侧窗中显示缓冲区</a>, Up: <a href="29.17_侧窗.html">侧窗.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

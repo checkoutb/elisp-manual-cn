@@ -1,0 +1,47 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.19.1 按钮属性</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.19.1 按钮属性</h3>
+<div class="nav-panel"><p>Next: <a href="40.19.2_按钮类型.html">按钮类型</a>, Previous: <a href="40.19_按钮.html">按钮</a>, Up: <a href="40.19_按钮.html">按钮.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>每个按钮都有一个相关的属性列表，定义其外观和行为，其他任意属性可用于特定应用目的。以下属性对 Button 包具有特殊意义：
+</p>
+<div class="lisp">
+<pre class="lisp">action ¶
+</pre></div>
+<p>当用户调用按钮时调用的函数，该函数被传递给单个参数按钮。默认情况下，这是忽略，它什么都不做。
+</p><div class="lisp">
+<pre class="lisp">mouse-action ¶
+</pre></div>
+<p>这类似于动作，并且当存在时，将用于代替由鼠标单击引起的按钮调用的动作（而不是用户点击 RET）。如果不存在，则鼠标单击将使用操作。
+</p><div class="lisp">
+<pre class="lisp">face ¶
+</pre></div>
+<p>这是一个 Emacs 界面，用于控制此类按钮的显示方式；  默认情况下，这是按钮面。
+</p><div class="lisp">
+<pre class="lisp">mouse-face ¶
+</pre></div>
+<p>这是在鼠标悬停期间控制外观的附加面（与通常的按钮面合并）；  默认情况下，这是通常的 Emacs 高亮面。
+</p><div class="lisp">
+<pre class="lisp">keymap ¶
+</pre></div>
+<p>按钮的键盘映射，定义在按钮区域内活动的绑定。默认情况下，这是通常的按钮区域键盘映射，存储在变量 button-map 中，它定义了 RET 和 mouse-2 来调用按钮。
+</p><div class="lisp">
+<pre class="lisp">type ¶
+</pre></div>
+<p>按钮类型。请参阅按钮类型。
+</p><div class="lisp">
+<pre class="lisp">help-echo ¶
+</pre></div>
+<p>Emacs 工具提示帮助系统显示的字符串；  默认情况下， <code>鼠标 2，RET：按下此按钮</code> 。或者，返回要显示的字符串或 nil 的函数或计算结果的表单。有关详细信息，请参阅文本帮助回显。
+</p>
+<p>该函数使用三个参数调用，window、object 和 pos。第二个参数 object 是具有属性的覆盖（对于覆盖按钮），或者是包含按钮的缓冲区（对于文本属性按钮）。其他参数与特殊文本属性 help-echo 的含义相同。
+</p><div class="lisp">
+<pre class="lisp">follow-link ¶
+</pre></div>
+<p>follow-link 属性，定义鼠标 1 单击在此按钮上的行为方式，请参阅定义可单击文本。
+</p><div class="lisp">
+<pre class="lisp">button ¶
+</pre></div>
+<p>所有按钮都有一个非零按钮属性，这可能有助于查找包含按钮的文本区域（这是标准按钮功能所做的）。
+</p>
+<p>还为按钮中的文本区域定义了其他属性，但这些属性通常对典型用途并不感兴趣。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.19.2_按钮类型.html">按钮类型</a>, Previous: <a href="40.19_按钮.html">按钮</a>, Up: <a href="40.19_按钮.html">按钮.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

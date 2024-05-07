@@ -1,0 +1,128 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>20.6 影响输出的变量</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">20.6 影响输出的变量</h2>
+<div class="nav-panel"><p>Next: <a href="21_小缓冲区.html">小缓冲区</a>, Previous: <a href="20.5_输出函数.html">输出函数</a>, Up: <a href="20_阅读和打印_Lisp_对象.html">阅读和打印_Lisp_对象.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><div class="lisp">
+<pre class="lisp">Variable: standard-output ¶
+</pre></div>
+<p>此变量的值是默认输出流——当流参数为 nil 时打印函数使用的流。默认为 t，表示在回显区域显示。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: print-quoted ¶
+</pre></div>
+<p>如果这是非零，这意味着使用缩写的阅读器语法打印引用的形式，例如，(quote foo) 打印为 ’foo，并且 (function foo) 打印为 #’foo。默认值为 t。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: print-escape-newlines ¶
+</pre></div>
+<p>如果此变量不为 nil，则字符串中的换行符将打印为 ”，而换页符将打印为 ”。通常这些字符打印为实际的换行符和换页符。
+</p>
+<p>此变量影响打印函数 prin1 和 print 带引号的打印。它不影响princ。下面是一个使用prin1的例子：
+</p>
+<div class="lisp">
+<pre class="lisp">(prin1 "a\nb")
+     -| "a
+     -| b"
+     ⇒ "a
+b"
+
+
+(let ((print-escape-newlines t))
+  (prin1 "a\nb"))
+     -| "a\nb"
+     ⇒ "a
+b"
+</pre></div>
+<p>在第二个表达式中，print-escape-newlines 的本地绑定在调用 prin1 期间有效，但在打印结果期间无效。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: print-escape-control-characters ¶
+</pre></div>
+<p>如果此变量为非零，则字符串中的控制字符将由打印函数 prin1 打印为反斜杠序列，并打印带有引号的打印。如果此变量和 print-escape-newlines 都不是 nil，则后者优先于换行符和换页符。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: print-escape-nonascii ¶
+</pre></div>
+<p>如果此变量为非零，则字符串中的单字节非 ASCII 字符将由打印函数 prin1 无条件地打印为反斜杠序列，并打印带引号的打印。
+</p>
+<p>当输出流是多字节缓冲区或指向缓冲区的标记时，这些函数还对单字节非 ASCII 字符使用反斜杠序列，无论此变量的值如何。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: print-escape-multibyte ¶
+</pre></div>
+<p>如果此变量为非零，则字符串中的多字节非 ASCII 字符将由打印函数 prin1 无条件地打印为反斜杠序列，并打印带引号的打印。
+</p>
+<p>当输出流是单字节缓冲区或指向缓冲区的标记时，这些函数还对多字节非 ASCII 字符使用反斜杠序列，而不管此变量的值。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: print-charset-text-property ¶
+</pre></div>
+<p>此变量控制打印字符串时 <code>charset</code> 文本属性的打印。该值应为 nil、t 或默认值。
+</p>
+<p>如果值为 nil，则永远不会打印字符集文本属性。如果 t，它们总是被打印出来。
+</p>
+<p>如果值为默认值，则仅在存在 <code>意外</code> 字符集属性时才打印字符集文本属性。对于 ascii 字符，所有字符集都被认为是 <code>预期的</code> 。否则，字符的预期 charset 属性由 char-charset 给出。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: print-length ¶
+</pre></div>
+<p>此变量的值是要在任何列表、向量或布尔向量中打印的最大元素数。如果要打印的对象的元素多于这么多，则用省略号缩写。
+</p>
+<p>如果该值为 nil（默认值），则没有限制。
+</p><div class="lisp">
+<pre class="lisp">(setq print-length 2)
+     ⇒ 2
+
+(print '(1 2 3 4 5))
+     -| (1 2 ...)
+     ⇒ (1 2 ...)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Variable: print-level ¶
+</pre></div>
+<p>此变量的值是打印时括号和括号的最大嵌套深度。深度超过此限制的任何列表或向量都用省略号缩写。nil 值（默认值）表示没有限制。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: eval-expression-print-length ¶
+</pre></div>
+<div class="lisp">
+<pre class="lisp">User Option: eval-expression-print-level ¶
+</pre></div>
+<p>这些是 eval-expression 使用的 print-length 和 print-level 的值，因此间接地被许多交互式评估命令所使用（请参阅 The GNU Emacs Manual 中的 Evaluating Emacs Lisp Expressions）。
+</p>
+<p>这些变量用于检测和报告循环和共享结构：
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: print-circle ¶
+</pre></div>
+<p>如果非零，则此变量可以检测打印中的循环和共享结构。请参阅循环对象的读取语法。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: print-gensym ¶
+</pre></div>
+<p>如果非零，则此变量启用在打印中检测非驻留符号（请参阅创建和驻留符号）。启用此功能后，非驻留符号会以前缀 ’#:’ 打印，这会告诉 Lisp 阅读器生成一个非驻留符号。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: print-continuous-numbering ¶
+</pre></div>
+<p>如果非零，这意味着在打印调用中连续编号。这会影响为 <code>#n=</code> 标签和 <code>#m#</code> 引用打印的数字。不要用 setq 设置这个变量；  你应该只用 let 将它临时绑定到 t。当你这样做时，你还应该将 print-number-table 绑定到 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: print-number-table ¶
+</pre></div>
+<p>这个变量保存了一个打印内部使用的向量，以实现打印圈功能。除非在绑定 print-continuous-numbering 时将其绑定到 nil，否则不应使用它。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: float-output-format ¶
+</pre></div>
+<p>此变量指定如何打印浮点数。默认值为 nil，这意味着使用代表数字的最短输出而不会丢失信息。
+</p>
+<p>要更精确地控制输出格式，您可以在此变量中放置一个字符串。该字符串应包含要在 C 函数 sprintf 中使用的 <code>%</code> 规范。有关您可以使用的更多限制，请参阅变量的文档字符串。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: print-integers-as-characters ¶
+</pre></div>
+<p>当此变量为非零时，表示图形基本字符的整数将使用 Lisp 字符语法打印（请参阅基本字符语法）。其他数字以通常的方式打印。例如，列表 (4 65 -1 10) 将打印为 ’(4 ?A -1 ?)’。
+</p>
+<p>更准确地说，以字符语法打印的值是那些表示属于 Unicode 通用类别字母、数字、标点符号、符号和私人使用的字符的值（请参阅字符属性），以及具有自己的转义语法的控制字符，例如换行符。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="21_小缓冲区.html">小缓冲区</a>, Previous: <a href="20.5_输出函数.html">输出函数</a>, Up: <a href="20_阅读和打印_Lisp_对象.html">阅读和打印_Lisp_对象.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

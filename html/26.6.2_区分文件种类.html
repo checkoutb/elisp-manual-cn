@@ -1,0 +1,69 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>26.6.2 区分文件种类</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">26.6.2 区分文件种类</h3>
+<div class="nav-panel"><p>Next: <a href="26.6.3_真名.html">真名</a>, Previous: <a href="26.6.1_测试可访问性.html">测试可访问性</a>, Up: <a href="26.6_文件信息.html">文件信息.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍如何区分各种文件，例如目录、符号链接和普通文件。
+</p>
+<p>符号链接通常出现在它们出现的任何地方。例如，为了解释文件名 a/b/c，a、a/b 和 a/b/c 中的任何一个都可以是被跟随的符号链接，如果链接目标本身就是符号链接，则可能是递归的。但是，一些函数不跟随文件名末尾的符号链接（本例中为 a/b/c）。据说这样的函数不遵循符号链接。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-symlink-p filename ¶
+</pre></div>
+<p>如果文件 filename 是符号链接，则此函数不跟随它，而是将其链接目标作为字符串返回。（链接目标字符串不一定是目标的完整绝对文件名；确定链接指向的完整文件名很重要，见下文。）
+</p>
+<p>如果文件 filename 不是符号链接，或者不存在，或者无法确定它是否是符号链接，则 file-symlink-p 返回 nil。
+</p>
+<p>以下是使用此功能的几个示例：
+</p><div class="lisp">
+<pre class="lisp">(file-symlink-p "not-a-symlink")
+     ⇒ nil
+
+(file-symlink-p "sym-link")
+     ⇒ "not-a-symlink"
+
+(file-symlink-p "sym-link2")
+     ⇒ "sym-link"
+
+(file-symlink-p "/bin")
+     ⇒ "/pub/bin"
+</pre></div>
+<p>请注意，在第三个示例中，该函数返回了符号链接，但没有继续解析它，尽管该文件本身就是一个符号链接。这是因为此函数不遵循符号链接——遵循符号链接的过程不适用于文件名的最后一个组成部分。
+</p>
+<p>该函数返回的字符串是符号链接中记录的内容；  它可能包含也可能不包含任何主要目录。此函数不会扩展链接目标以生成完全限定的文件名，特别是如果链接目标不是绝对文件名，则不使用文件名参数的前导目录（如果有）。这是一个例子：
+</p>
+<div class="lisp">
+<pre class="lisp">(file-symlink-p "/foo/bar/baz")
+     ⇒ "some-file"
+</pre></div>
+<p>在这里，虽然 /foo/bar/baz 作为完全限定的文件名给出，但结果不是，实际上根本没有任何前导目录。并且由于 some-file 本身可能是一个符号链接，因此您不能简单地为其添加前导目录，甚至不能天真地使用 expand-file-name（请参阅扩展文件名的函数）来生成其绝对文件名。
+</p>
+<p>出于这个原因，如果您需要确定的不仅仅是文件是或不是符号链接的事实，那么这个函数很少有用。如果您确实需要链接目标的文件名，请使用 file-chase-links 或 file-truename，如 Truenames 中所述。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-directory-p filename ¶
+</pre></div>
+<p>如果 filename 是现有目录的名称，则此函数返回 t。如果 filename 没有命名目录，或者无法确定它是否是目录，则返回 nil。此函数遵循符号链接。
+</p><div class="lisp">
+<pre class="lisp">
+
+(file-directory-p "~rms")
+     ⇒ t
+
+(file-directory-p "~rms/lewis/files.texi")
+     ⇒ nil
+
+(file-directory-p "~rms/lewis/no-such-file")
+     ⇒ nil
+
+(file-directory-p "$HOME")
+     ⇒ nil
+
+(file-directory-p
+ (substitute-in-file-name "$HOME"))
+     ⇒ t
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: file-regular-p filename ¶
+</pre></div>
+<p>如果文件 filename 存在并且是常规文件（不是目录、命名管道、终端或其他 I/O 设备），则此函数返回 t。如果文件名不存在或不是常规文件，或者无法确定它是否是常规文件，则返回 nil。此函数遵循符号链接。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="26.6.3_真名.html">真名</a>, Previous: <a href="26.6.1_测试可访问性.html">测试可访问性</a>, Up: <a href="26.6_文件信息.html">文件信息.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

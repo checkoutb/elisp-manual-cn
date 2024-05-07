@@ -1,0 +1,36 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>21.12 小缓冲区内容</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">21.12 小缓冲区内容</h2>
+<div class="nav-panel"><p>Next: <a href="21.13_递归小缓冲区.html">递归小缓冲区</a>, Previous: <a href="21.11_小缓冲窗口.html">小缓冲窗口</a>, Up: <a href="21_小缓冲区.html">小缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这些函数访问 minibuffer 提示和内容。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: minibuffer-prompt ¶
+</pre></div>
+<p>此函数返回当前活动的 minibuffer 的提示字符串。如果没有 minibuffer 处于活动状态，则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: minibuffer-prompt-end ¶
+</pre></div>
+<p>如果 minibuffer 是当前的，则此函数返回 minibuffer 提示结束的当前位置。否则，它返回最小的有效缓冲区位置。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: minibuffer-prompt-width ¶
+</pre></div>
+<p>如果 minibuffer 是当前的，则此函数返回 minibuffer 提示的当前显示宽度。否则，它返回零。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: minibuffer-contents ¶
+</pre></div>
+<p>如果 minibuffer 是当前的，则此函数将 minibuffer 的可编辑内容（即除了提示符之外的所有内容）作为字符串返回。否则，它返回当前缓冲区的全部内容。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: minibuffer-contents-no-properties ¶
+</pre></div>
+<p>这类似于 minibuffer-contents，只是它不复制文本属性，只是复制字符本身。请参阅文本属性。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: delete-minibuffer-contents ¶
+</pre></div>
+<p>如果 minibuffer 是当前的，此命令将擦除 minibuffer 的可编辑内容（即除了提示符之外的所有内容）。否则，它会擦除​​整个当前缓冲区。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="21.13_递归小缓冲区.html">递归小缓冲区</a>, Previous: <a href="21.11_小缓冲窗口.html">小缓冲窗口</a>, Up: <a href="21_小缓冲区.html">小缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

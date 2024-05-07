@@ -1,0 +1,55 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>26.9.3 目录名称</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">26.9.3 目录名称</h3>
+<div class="nav-panel"><p>Next: <a href="26.9.4_扩展文件名的函数.html">扩展文件名的函数</a>, Previous: <a href="26.9.2_绝对和相对文件名.html">绝对和相对文件名</a>, Up: <a href="26.9_文件名.html">文件名.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>目录名称是一个字符串，如果它命名任何文件，则必须命名一个目录。目录实际上是一种文件，它有一个文件名（称为目录文件名），它与目录名相关但通常不相同。（这与通常的 POSIX 术语不太一样。）同一实体的这两个名称通过句法转换相关联。在 GNU 和其他类似 POSIX 的系统上，这很简单：要获得目录名，请将 <code>/</code> 附加到尚未以 <code>/</code> 结尾的目录文件名。在 MS-DOS 上，这种关系更为复杂。
+</p>
+<p>目录名和目录文件名之间的区别是微妙但至关重要的。当 Emacs 变量或函数参数被描述为目录名时，目录文件名是不可接受的。当 file-name-directory 返回一个字符串时，它始终是一个目录名。
+</p>
+<p>以下两个函数在目录名和目录文件名之间进行转换。它们对环境变量替换（例如’$HOME’）和结构’~’、’.’没有什么特别的作用。和 ’..’。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-name-as-directory filename ¶
+</pre></div>
+<p>此函数以操作系统将解释为目录名称（目录名称）的形式返回表示文件名的字符串。在大多数系统上，这意味着在字符串上附加一个斜杠（如果它还没有以一个结尾）。
+</p>
+<div class="lisp">
+<pre class="lisp">(file-name-as-directory "~rms/lewis")
+     ⇒ "~rms/lewis/"
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: directory-name-p filename ¶
+</pre></div>
+<p>如果文件名以目录分隔符结尾，则此函数返回非 nil。这是 GNU 和其他类似 POSIX 的系统上的正斜杠 <code>/</code> ；  MS-Windows 和 MS-DOS 将正斜杠和反斜杠 ’\’ 识别为目录分隔符。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: directory-file-name dirname ¶
+</pre></div>
+<p>此函数以操作系统将解释为文件名（目录文件名）的形式返回表示 dirname 的字符串。在大多数系统上，这意味着从字符串中删除最终的目录分隔符，除非字符串完全由目录分隔符组成。
+</p>
+<div class="lisp">
+<pre class="lisp">(directory-file-name "~lewis/")
+     ⇒ "~lewis"
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: file-name-concat directory &amp;rest components ¶
+</pre></div>
+<p>将组件连接到目录，如果目录或前面的组件没有以斜杠结尾，则在组件之前插入一个斜杠。
+</p>
+<div class="lisp">
+<pre class="lisp">(file-name-concat "/tmp" "foo")
+     ⇒ "/tmp/foo"
+</pre></div>
+<p>nil 或空字符串的目录或组件将被忽略——它们首先被过滤掉，不会以任何方式影响结果。
+</p>
+<p>这与使用 concat 几乎相同，但 dirname（和非最终组件）可能以斜杠字符结尾，也可能不以斜杠字符结尾，并且此函数不会将这些字符加倍。
+</p>
+<p>要将目录名称转换为其缩写，请使用此函数：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: abbreviate-file-name filename ¶
+</pre></div>
+<p>此函数返回文件名的缩写形式。它应用 directory-abbrev-alist 中指定的缩写（参见 GNU Emacs 手册中的文件别名），然后如果参数命名主目录或其子目录之一中的文件，则用 <code>~</code> 代替用户的主目录。如果主目录是根目录，则不会将其替换为 <code>~</code> ，因为这不会使许多系统上的结果更短。
+</p>
+<p>您可以将此函数用于目录名和文件名，因为它甚至可以将缩写识别为名称的一部分。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="26.9.4_扩展文件名的函数.html">扩展文件名的函数</a>, Previous: <a href="26.9.2_绝对和相对文件名.html">绝对和相对文件名</a>, Up: <a href="26.9_文件名.html">文件名.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

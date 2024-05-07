@@ -1,0 +1,73 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>12.17.2 定义新的 setf 形式</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">12.17.2 定义新的 setf 形式</h3>
+<div class="nav-panel"><p>Next: <a href="13_函数.html">函数</a>, Previous: <a href="12.17.1_setf_宏.html">setf_宏</a>, Up: <a href="12.17_广义变量.html">广义变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍如何定义 setf 可以操作的新表单。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: gv-define-simple-setter name setter &amp;optional fix-return ¶
+</pre></div>
+<p>此宏使您可以轻松地为简单的情况定义 setf 方法。name 是函数、宏或特殊形式的名称。只要 name 有一个直接对应的 setter 函数来更新它，您就可以使用这个宏，例如 (gv-define-simple-setter car setcar)。
+</p>
+<p>这个宏翻译表单的调用
+</p>
+<div class="lisp">
+<pre class="lisp">(setf (name args…) value)
+</pre></div>
+<p>进入
+</p><div class="lisp">
+<pre class="lisp">(setter args… value)
+</pre></div>
+<p>这样的 setf 调用被记录为返回值。这对例如 car 和 setcar 没有问题，因为 setcar 返回它设置的值。如果您的 setter 函数不返回值，请为 gv-define-simple-setter 的 fix-return 参数使用非零值。这扩展为等效于
+</p>
+<div class="lisp">
+<pre class="lisp">(let ((temp value))
+  (setter args… temp)
+  temp)
+</pre></div>
+<p>因此确保它返回正确的结果。 
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: gv-define-setter name arglist &amp;rest body ¶
+</pre></div>
+<p>这个宏允许比以前的形式更复杂的 setf 扩展。您可能需要使用这种形式，例如，如果没有要调用的简单 setter 函数，或者如果有一个但它需要与 place 形式不同的参数。
+</p>
+<p>这个宏扩展了形式(setf(name args…) value)，首先根据arglist绑定setf参数形式(value args…)，然后执行body。body 应该返回一个执行赋值的 Lisp 表单，最后返回设置的值。使用这个宏的一个例子是：
+</p>
+<div class="lisp">
+<pre class="lisp">(gv-define-setter caar (val x) `(setcar (car ,x) ,val))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Macro: gv-define-expander name handler ¶
+</pre></div>
+<p>为了更好地控制扩展，可以使用 gv-define-expander 宏。例如，一个可设置的子字符串可以这样实现：
+</p><div class="lisp">
+<pre class="lisp">(gv-define-expander substring
+  (lambda (do place from &amp;optional to)
+    (gv-letplace (getter setter) place
+      (macroexp-let2* nil ((start from) (end to))
+        (funcall do `(substring ,getter ,start ,end)
+                 (lambda (v)
+                   (macroexp-let2 nil v v
+                     `(progn
+                        ,(funcall setter `(cl--set-substring
+                                           ,getter ,start ,end ,v))
+                        ,v))))))))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Macro: gv-letplace (getter setter) place &amp;rest body ¶
+</pre></div>
+<p>宏 gv-letplace 在定义执行类似于 setf 的宏时很有用；  例如，Common Lisp 的 incf 宏可以这样实现：
+</p>
+<div class="lisp">
+<pre class="lisp">(defmacro incf (place &amp;optional n)
+  (gv-letplace (getter setter) place
+    (macroexp-let2 nil v (or n 1)
+      (funcall setter `(+ ,v ,getter)))))
+</pre></div>
+<p>getter 将绑定到返回 place 值的可复制表达式。setter 将绑定到一个函数，该函数接受一个表达式 v 并返回一个将 place 设置为 v 的新表达式。body 应该返回一个 Emacs Lisp 表达式，通过 getter 和 setter 操作 place。 
+</p>
+<p>有关详细信息，请参阅源文件 gv.el。
+</p>
+<p>Common Lisp 注释：Common Lisp 定义了另一种方式来指定函数的 setf 行为，即 setf 函数，其名称是列表（setf 名称）而不是符号。例如，(defun (setf foo) …) 定义了 setf 应用于 foo 时使用的函数。Emacs 不支持这个。在尚未定义适当扩展的表单上使用 setf 是编译时错误。在 Common Lisp 中，这不是错误，因为函数 (setf func) 可能会在以后定义。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="13_函数.html">函数</a>, Previous: <a href="12.17.1_setf_宏.html">setf_宏</a>, Up: <a href="12.17_广义变量.html">广义变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

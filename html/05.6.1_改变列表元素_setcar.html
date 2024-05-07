@@ -1,0 +1,85 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>5.6.1 改变列表元素 setcar</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">5.6.1 改变列表元素 setcar</h3>
+<div class="nav-panel"><p>Next: <a href="05.6.2_更改列表的_CDR.html">更改列表的_CDR</a>, Previous: <a href="05.6_修改现有列表结构.html">修改现有列表结构</a>, Up: <a href="05.6_修改现有列表结构.html">修改现有列表结构.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>使用 setcar 更改 cons 单元的 CAR。当用于列表时，setcar 将列表中的一个元素替换为不同的元素。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: setcar cons object
+</pre></div>
+<p>此函数将对象存储为 cons 的新 CAR，替换其先前的 CAR。换句话说，它改变了 cons 的 CAR slot 来引用 object。它返回值对象。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">(setq x (list 1 2))
+     ⇒ (1 2)
+
+(setcar x 4)
+     ⇒ 4
+
+x
+     ⇒ (4 2)
+</pre></div>
+<p>当一个 cons 单元是多个列表的共享结构的一部分时，将一个新的 CAR 存储到 cons 中会更改每个列表的一个元素。这是一个例子：
+</p>
+<div class="lisp">
+<pre class="lisp">
+
+;; Create two lists that are partly shared.
+(setq x1 (list 'a 'b 'c))
+     ⇒ (a b c)
+(setq x2 (cons 'z (cdr x1)))
+     ⇒ (z b c)
+
+
+;; Replace the CAR of a shared link.
+(setcar (cdr x1) 'foo)
+     ⇒ foo
+x1                           ; Both lists are changed.
+     ⇒ (a foo c)
+x2
+     ⇒ (z foo c)
+
+
+;; Replace the CAR of a link that is not shared.
+(setcar x1 'baz)
+     ⇒ baz
+x1                           ; Only one list is changed.
+     ⇒ (baz foo c)
+x2
+     ⇒ (z foo c)
+
+</pre></div>
+<p>这是变量 x1 和 x2 中两个列表的共享结构的图形描述，显示了为什么替换 b 会改变它们：
+</p>
+<div class="lisp">
+<pre class="lisp">        --- ---        --- ---      --- ---
+x1---&gt; |   |   |----&gt; |   |   |--&gt; |   |   |--&gt; nil
+        --- ---        --- ---      --- ---
+         |        --&gt;   |            |
+         |       |      |            |
+          --&gt; a  |       --&gt; b        --&gt; c
+                 |
+       --- ---   |
+x2--&gt; |   |   |--
+       --- ---
+        |
+        |
+         --&gt; z
+</pre></div>
+<p>这是箱形图的另一种形式，显示了相同的关系：
+</p>
+<div class="lisp">
+<pre class="lisp">x1:
+ --------------       --------------       --------------
+| car   | cdr  |     | car   | cdr  |     | car   | cdr  |
+|   a   |   o-------&gt;|   b   |   o-------&gt;|   c   |  nil |
+|       |      |  --&gt;|       |      |     |       |      |
+ --------------  |    --------------       --------------
+                 |
+x2:              |
+ --------------  |
+| car   | cdr  | |
+|   z   |   o----
+|       |      |
+ --------------
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="05.6.2_更改列表的_CDR.html">更改列表的_CDR</a>, Previous: <a href="05.6_修改现有列表结构.html">修改现有列表结构</a>, Up: <a href="05.6_修改现有列表结构.html">修改现有列表结构.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,10 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>2.3 注释</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">2.3 注释</h2>
+<div class="nav-panel"><p>Next: <a href="02.4_编程类型.html">编程类型</a>, Previous: <a href="02.2_特殊读语法.html">特殊读语法</a>, Up: <a href="02_Lisp_数据类型.html">Lisp_数据类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>注释是写在程序中的文本，仅供阅读程序的人使用，对程序的含义没有影响。在 Lisp 中，如果未转义的分号 (’;’) 不在字符串或字符常量内，则它会开始注释。注释继续到行尾。Lisp 阅读器会丢弃注释；  它们不会成为 Lisp 对象的一部分，这些对象代表 Lisp 系统中的程序。
+</p>
+<p>’#@count’ 结构会跳过下一个 count 字符，对于程序生成的包含二进制数据的注释很有用。Emacs Lisp 字节编译器在其输出文件中使用它（参见字节编译）。但是，它不适用于源文件。
+</p>
+<p>有关格式化评论的约定，请参阅撰写评论的技巧。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="02.4_编程类型.html">编程类型</a>, Previous: <a href="02.2_特殊读语法.html">特殊读语法</a>, Up: <a href="02_Lisp_数据类型.html">Lisp_数据类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

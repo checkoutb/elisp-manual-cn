@@ -1,0 +1,80 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>34.1 文本表示</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">34.1 文本表示</h2>
+<div class="nav-panel"><p>Next: <a href="34.2_禁用多字节字符.html">禁用多字节字符</a>, Previous: <a href="34_非ASCII字符.html">非ASCII字符</a>, Up: <a href="34_非ASCII字符.html">非ASCII字符.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 缓冲区和字符串支持来自许多不同脚本的大量字符，允许用户以几乎任何已知的书面语言键入和显示文本。
+</p>
+<p>为了支持大量字符和脚本，Emacs 严格遵循 Unicode 标准。Unicode 标准为每个字符分配一个唯一编号，称为代码点。由 Unicode 或 Unicode 代码空间定义的代码点范围是 0..#x10FFFF（十六进制表示法），包括 0..#x10FFFF。Emacs 使用 #x110000..#x3FFFFF 范围内的代码点扩展了这个范围，它用于表示与 Unicode 不统一的字符和无法解释为字符的原始 8 位字节。因此，Emacs 中的字符代码点是一个 22 位整数。
+</p>
+<p>为了节省内存，Emacs 不保存固定长度的 22 位数字，这些数字是缓冲区和字符串中文本字符的代码点。相反，Emacs 使用可变长度的字符内部表示，将每个字符存储为 1 到 5 个 8 位字节的序列，具体取决于其代码点的大小19。例如，任何 ASCII 字符只占用 1 个字节，一个 Latin-1 字符占用 2 个字节，等等。我们称这种文本表示为多字节。
+</p>
+<p>在 Emacs 之外，字符可以用许多不同的编码表示，例如 ISO-8859-1、GB-2312、Big-5 等。当 Emacs 将文本读入一个缓冲区或字符串，或者当它将文本写入磁盘文件或将其传递给其他进程时。
+</p>
+<p>有时，Emacs 需要在其缓冲区或字符串中保存和操作编码文本或二进制非文本数据。例如，当 Emacs 访问一个文件时，它首先将文件的文本逐字读取到缓冲区中，然后才将其转换为内部表示。在转换之前，缓冲区保存编码文本。
+</p>
+<p>就 Emacs 而言，编码文本并不是真正的文本，而是一个原始的 8 位字节序列。我们将保存编码文本单字节缓冲区和字符串的缓冲区和字符串称为缓冲区和字符串，因为 Emacs 将它们视为单个字节的序列。通常，Emacs 将单字节缓冲区和字符串显示为八进制代码，例如 \237。我们建议您不要使用单字节缓冲区和字符串，除非是处理编码文本或二进制非文本数据。
+</p>
+<p>在缓冲区中，变量 enable-multibyte-characters 的缓冲区本地值指定使用的表示。字符串的表示是在构造字符串时确定并记录在字符串中的。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: enable-multibyte-characters ¶
+</pre></div>
+<p>此变量指定当前缓冲区的文本表示。如果为非零，则缓冲区包含多字节文本；  否则，它包含单字节编码文本或二进制非文本数据。
+</p>
+<p>您不能直接设置此变量；  相反，使用函数 set-buffer-multibyte 来更改缓冲区的表示。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: position-bytes position ¶
+</pre></div>
+<p>缓冲区位置以字符为单位测量。该函数返回当前缓冲区中缓冲区位置位置对应的字节位置。这是缓冲区开始时的 1，并以字节为单位向上计数。如果位置超出范围，则值为 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: byte-to-position byte-position ¶
+</pre></div>
+<p>返回与当前缓冲区中给定字节位置相对应的缓冲区位置（以字符为单位）。如果字节位置超出范围，则值为 nil。在多字节缓冲区中，字节位置的任意值可以不在字符边界，而是在表示单个字符的多字节序列内；  在这种情况下，该函数返回多字节序列中包含字节位置的字符的缓冲区位置。换句话说，对于属于同一字符的所有字节位置，该值不会改变。
+</p>
+<p>当 Lisp 程序需要将缓冲区位置映射到缓冲区访问的文件中的字节偏移量时，以下两个函数很有用。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: bufferpos-to-filepos position &amp;optional quality coding-system ¶
+</pre></div>
+<p>此函数类似于 position-bytes，但它不是返回当前缓冲区中的字节位置，而是返回与缓冲区中给定字符位置相对应的字节从当前缓冲区文件开头的偏移量。转换需要知道文本在缓冲区文件中的编码方式；  这就是 coding-system 参数的用途，默认为 buffer-file-coding-system 的值。可选参数 quality 指定结果应该有多准确；  它应该是以下之一：
+</p>
+<div class="lisp">
+<pre class="lisp">exact
+</pre></div>
+<p>结果必须准确。该函数可能需要对大部分缓冲区进行编码和解码，这很昂贵并且可能很慢。
+</p><div class="lisp">
+<pre class="lisp">approximate
+</pre></div>
+<p>该值可以是近似值。该函数可以避免昂贵的处理并返回不精确的结果。
+</p><div class="lisp">
+<pre class="lisp">nil
+</pre></div>
+<p>如果确切的结果需要昂贵的处理，该函数将返回 nil 而不是近似值。如果参数被省略，这是默认值。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: filepos-to-bufferpos byte &amp;optional quality coding-system ¶
+</pre></div>
+<p>此函数返回与 byte 指定的文件位置相对应的缓冲区位置，该位置是从文件开头的零基字节偏移量。该函数执行与 bufferpos-to-filepos 所做的相反的转换。可选参数 quality 和 coding-system 与 bufferpos-to-filepos 具有相同的含义和值。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: multibyte-string-p string ¶
+</pre></div>
+<p>如果 string 是多字节字符串，则返回 t，否则返回 nil。如果 string 是字符串以外的某个对象，此函数也返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: string-bytes string ¶
+</pre></div>
+<p>此函数返回字符串中的字节数。如果 string 是多字节字符串，则可以大于 (length string)。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: unibyte-string &amp;rest bytes ¶
+</pre></div>
+<p>此函数连接其所有参数字节并使结果成为单字节字符串。
+</p>
+<p>脚注
+(19)
+</p>
+<p>此内部表示基于 Unicode 标准定义的编码之一，称为 UTF-8，用于表示任何 Unicode 代码点，但 Emacs 扩展了 UTF-8 以表示它用于原始 8 位字节和未统一字符的附加代码点与 Unicode。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="34.2_禁用多字节字符.html">禁用多字节字符</a>, Previous: <a href="34_非ASCII字符.html">非ASCII字符</a>, Up: <a href="34_非ASCII字符.html">非ASCII字符.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

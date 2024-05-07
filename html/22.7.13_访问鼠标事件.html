@@ -1,0 +1,118 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.7.13 访问鼠标事件</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">22.7.13 访问鼠标事件</h3>
+<div class="nav-panel"><p>Next: <a href="22.7.14_访问滚动条事件.html">访问滚动条事件</a>, Previous: <a href="22.7.12_分类事件.html">分类事件</a>, Up: <a href="22.7_输入事件.html">输入事件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍用于访问鼠标按钮或运动事件中的数据的便捷函数。可以使用相同的函数访问键盘事件数据，但不适用于键盘事件的数据元素为零或零。
+</p>
+<p>以下两个函数返回鼠标位置列表（请参阅单击事件），指定鼠标事件的位置。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: event-start event ¶
+</pre></div>
+<p>这将返回事件的起始位置。
+</p>
+<p>如果 event 是单击或按钮按下事件，则返回事件的位置。如果 event 是一个拖动事件，则返回拖动的起始位置。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: event-end event ¶
+</pre></div>
+<p>这将返回事件的结束位置。
+</p>
+<p>如果 event 是一个拖动事件，则返回用户释放鼠标按钮的位置。如果 event 是单击或按钮按下事件，则该值实际上是起始位置，这是此类事件的唯一位置。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: posnp object ¶
+</pre></div>
+<p>如果 object 是鼠标位置列表，则此函数返回非 nil，格式为 Click Events 中记录的格式）；  否则为零。
+</p>
+<p>这些函数将鼠标位置列表作为参数，并返回它的各个部分：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: posn-window position ¶
+</pre></div>
+<p>返回该位置所在的窗口。如果位置表示事件启动的框架之外的位置，则返回该框架。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: posn-area position ¶
+</pre></div>
+<p>返回记录在位置上的窗口区域。当事件发生在窗口的文本区域时，它返回 nil；  否则，它是标识事件发生区域的符号。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: posn-point position ¶
+</pre></div>
+<p>返回位置中的缓冲区位置。当事件发生在窗口的文本区域、边缘区域或边缘时，这是一个指定缓冲区位置的整数。否则，该值未定义。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: posn-x-y position ¶
+</pre></div>
+<p>返回位置中基于像素的 x 和 y 坐标，作为 cons 单元格 (x . y)。这些坐标相对于 posn-window 给出的窗口。
+</p>
+<p>此示例显示如何将窗口文本区域中的窗口相对坐标转换为帧相对坐标：
+</p><div class="lisp">
+<pre class="lisp">(defun frame-relative-coordinates (position)
+  "Return frame-relative coordinates from POSITION.
+POSITION is assumed to lie in a window text area."
+  (let* ((x-y (posn-x-y position))
+         (window (posn-window position))
+         (edges (window-inside-pixel-edges window)))
+    (cons (+ (car x-y) (car edges))
+          (+ (cdr x-y) (cadr edges)))))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: posn-col-row position ¶
+</pre></div>
+<p>此函数返回一个 cons 单元格 (col.row)，其中包含与位置描述的缓冲区位置相对应的估计列和行。返回值以框架的默认字符宽度和默认行高（包括间距）为单位，由对应于位置的 x 和 y 值计算得出。（因此，如果实际字符具有非默认大小，则实际行和列可能与这些计算值不同。）
+</p>
+<p>请注意，行从文本区域的顶部开始计算。如果位置给定的窗口具有标题行（请参阅窗口标题行）或制表符行，则它们不包括在行数中。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: posn-actual-col-row position ¶
+</pre></div>
+<p>返回实际的行和列的位置，作为一个 cons 单元格（col.row）。这些值是位置给定的窗口中的实际行号和列号。有关详细信息，请参阅单击事件。如果 position 不包含实际位置值，该函数返回 nil；  在这种情况下，可以使用 posn-col-row 来获取近似值。
+</p>
+<p>请注意，此函数不考虑显示字符的视觉宽度，例如制表符或图像占用的视觉列数。如果您需要规范字符单位的坐标，请改用 posn-col-row。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: posn-string position ¶
+</pre></div>
+<p>返回由位置描述的字符串对象，可以是 nil（这意味着位置描述缓冲区文本），或者是一个 cons 单元格（string .string-pos）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: posn-image position ¶
+</pre></div>
+<p>返回位置中的图像对象，可以是 nil（如果该位置没有图像），也可以是图像规范（图像 …）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: posn-object position ¶
+</pre></div>
+<p>返回由位置描述的图像或字符串对象，可以是 nil（这意味着位置描述缓冲区文本）、图像（图像 …）或 cons 单元格（字符串 .string-pos）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: posn-object-x-y position ¶
+</pre></div>
+<p>返回相对于位置描述的对象左上角的基于像素的 x 和 y 坐标，作为 cons 单元格 (dx . dy)。如果该位置描述了缓冲区文本，则返回最接近该位置的缓冲区文本字符的相对坐标。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: posn-object-width-height position ¶
+</pre></div>
+<p>返回由位置描述的对象的像素宽度和高度，作为一个 cons 单元格（宽度。高度）。如果该位置描述了一个缓冲区位置，则返回该位置的字符大小。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: posn-timestamp position ¶
+</pre></div>
+<p>返回位置的时间戳。这是事件发生的时间，以毫秒为单位。
+</p>
+<p>这些函数计算给定特定缓冲区位置或屏幕位置的位置列表。您可以使用上述功能访问此职位列表中的数据。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: posn-at-point &amp;optional pos window ¶
+</pre></div>
+<p>此函数返回窗口中位置 pos 的位置列表。pos 默认指向窗口；  窗口默认为选定的窗口。
+</p>
+<p>如果 pos 在窗口中不可见，则 posn-at-point 返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: posn-at-x-y x y &amp;optional frame-or-window whole ¶
+</pre></div>
+<p>该函数返回指定的frame或window，frame-or-window中像素坐标x和y对应的位置信息，默认为选中的窗口。坐标 x 和 y 相对于所选窗口的文本区域。如果整体不为零，则 x 坐标相对于整个窗口区域，包括滚动条、边距和边缘。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.7.14_访问滚动条事件.html">访问滚动条事件</a>, Previous: <a href="22.7.12_分类事件.html">分类事件</a>, Up: <a href="22.7_输入事件.html">输入事件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

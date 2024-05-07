@@ -1,0 +1,96 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>26.10 目录的内容</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">26.10 目录的内容</h2>
+<div class="nav-panel"><p>Next: <a href="26.11_创建、复制和删除目录.html">创建、复制和删除目录</a>, Previous: <a href="26.9.7_标准文件名.html">标准文件名</a>, Up: <a href="26_文件.html">文件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>目录是一种文件，其中包含以各种名称输入的其他文件。目录是文件系统的一个特征。
+</p>
+<p>Emacs 可以将目录中文件的名称作为 Lisp 列表列出，或者使用 ls shell 命令在缓冲区中显示名称。在后一种情况下，它可以选择显示有关每个文件的信息，具体取决于传递给 ls 命令的选项。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: directory-files directory &amp;optional full-name match-regexp nosort count ¶
+</pre></div>
+<p>此函数返回目录目录中文件的名称列表。默认情况下，列表按字母顺序排列。
+</p>
+<p>如果 full-name 不为零，则该函数返回文件的绝对文件名。否则，它返回相对于指定目录的名称。
+</p>
+<p>如果 match-regexp 不为 nil，则此函数仅返回那些其非目录部分包含与该正则表达式匹配的文件名——其他文件名将从列表中排除。在不区分大小写的文件系统上，正则表达式匹配不区分大小写。
+</p>
+<p>如果 nosort 不为零，则 directory-files 不会对列表进行排序，因此您可以不按特定顺序获取文件名。如果您想要尽可能快的速度并且不关心文件的处理顺序，请使用此选项。如果处理顺序对用户可见，那么如果您对名称进行排序，用户可能会更开心。
+</p>
+<p>如果 count 不为零，则该函数将返回第一个 count 个文件的名称，或所有文件的名称，以先发生者为准。count 必须是大于零的整数。
+</p>
+<div class="lisp">
+<pre class="lisp">(directory-files "~lewis")
+     ⇒ ("#foo#" "#foo.el#" "." ".."
+         "dired-mods.el" "files.texi"
+         "files.texi.~1~")
+
+</pre></div>
+<p>如果目录不是可以读取的目录的名称，则会发出错误信号。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: directory-empty-p directory ¶
+</pre></div>
+<p>如果给定的目录是可访问的目录并且它不包含任何文件，则此实用程序函数返回 t，即，它是一个空目录。它将忽略 <code>。</code>   和 <code>..</code> 在将它们作为目录中的文件返回的系统上。
+</p>
+<p>指向目录的符号链接算作目录。请参阅 file-symlink-p 以区分符号链接。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: directory-files-recursively directory regexp &amp;optional include-directories predicate follow-symlinks ¶
+</pre></div>
+<p>返回目录下名称与正则表达式匹配的所有文件。此函数递归搜索指定目录及其子目录，查找其基本名称（即没有前导目录）与指定正则表达式匹配的文件，并返回匹配文件的绝对文件名列表（参见绝对文件名） .  文件名以深度优先顺序返回，这意味着某些子目录中的文件在其父目录中的文件之前返回。此外，在每个子目录中找到的匹配文件按其基本名称的字母顺序排序。默认情况下，名称与正则表达式匹配的目录会从列表中省略，但如果可选参数 include-directories 不为 nil，则它们会被包括在内。
+</p>
+<p>默认情况下，所有子目录都下降到。如果谓词是 t，则尝试进入子目录时的错误（例如，如果该用户不可读）将被忽略。如果它既不是 nil 也不是 t，它应该是一个带有一个参数（子目录名称）的函数，并且如果要下降到目录，它应该返回非 nil。
+</p>
+<p>默认情况下不遵循指向子目录的符号链接，但如果 follow-symlinks 不为 nil，则会遵循它们。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: locate-dominating-file file name ¶
+</pre></div>
+<p>从文件开始，沿着目录树层次结构查找存在名称（字符串）的第一个目录，然后返回该目录。如果 file 是一个文件，它的目录将作为搜索的起点；  否则文件应该是一个开始的目录。该函数在起始目录中查找，然后在其父目录中查找，然后在其父目录的父目录中查找，等等，直到找到具有名称的目录或到达文件系统的根目录而没有找到名称——在后一种情况下，函数返回 nil .
+</p>
+<p>参数名称也可以是谓词函数。谓词为函数检查的每个目录调用，从文件开始（即使文件不是目录）。它使用一个参数（文件或目录）调用，如果该目录是它要查找的目录，则应返回非零。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: directory-files-and-attributes directory &amp;optional full-name match-regexp nosort id-format count ¶
+</pre></div>
+<p>在决定报告哪些文件以及如何报告它们的名称时，这类似于目录文件。但是，它不是返回文件名列表，而是为每个文件返回一个列表（文件名.属性），其中属性是文件属性为该文件返回的内容。可选参数 id-format 与文件属性的相应参数具有相同的含义（请参阅文件属性的定义）。
+</p>
+<div class="lisp">
+<pre class="lisp">Constant: directory-files-no-dot-files-regexp ¶
+</pre></div>
+<p>此正则表达式匹配除 ’.’ 以外的任何文件名 和 ’..’。更准确地说，它匹配除这两个之外的任何非空字符串的部分。它作为目录文件和目录文件和属性的 match-regexp 参数很有用：
+</p><div class="lisp">
+<pre class="lisp">(directory-files "/foo" nil directory-files-no-dot-files-regexp)
+</pre></div>
+<p>如果目录 ’/foo’ 为空，则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-expand-wildcards pattern &amp;optional full ¶
+</pre></div>
+<p>此函数扩展通配符模式模式，返回与其匹配的文件名列表。
+</p>
+<p>如果模式被写为绝对文件名，则值也是绝对的。
+</p>
+<p>如果 pattern 被写为相对文件名，则相对于当前默认目录进行解释。返回的文件名通常也与当前默认目录相关。但是，如果 full 不为零，则它们是绝对的。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: insert-directory file switches &amp;optional wildcard full-directory-p ¶
+</pre></div>
+<p>此函数插入​​（在当前缓冲区中）目录文件的目录列表，根据开关用 ls 格式化。它在插入的文本之后留下点。开关可以是一串选项，也可以是代表单个选项的字符串列表。
+</p>
+<p>参数文件可以是目录或包含通配符的文件规范。如果通配符不为零，则意味着将文件视为带有通配符的文件规范。
+</p>
+<p>如果 full-directory-p 不为零，则表示目录列表应显示目录的全部内容。当文件是目录并且开关不包含 <code>-d</code> 时，您应该指定 t。（ls 的 <code>-d</code> 选项表示将目录本身描述为文件，而不是显示其内容。）
+</p>
+<p>在大多数系统上，此功能通过运行一个目录列表程序来工作，该程序的名称在变量 insert-directory-program 中。如果通配符不为 nil，它还会运行由 shell-file-name 指定的 shell，以扩展通配符。
+</p>
+<p>MS-DOS 和 MS-Windows 系统通常缺少标准的 Unix 程序 ls，所以这个函数用 Lisp 代码模拟标准的 Unix 程序 ls。
+</p>
+<p>作为一个技术细节，当 switch 包含 long ’–dired’ 选项时，insert-directory 会对其进行特殊处理，以便 dired。但是，通常等效的短 <code>-D</code> 选项只是传递给插入目录程序，就像任何其他选项一样。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: insert-directory-program ¶
+</pre></div>
+<p>该变量的值是为函数插入目录生成目录列表而运行的程序。它在使用 Lisp 代码生成列表的系统上被忽略。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="26.11_创建、复制和删除目录.html">创建、复制和删除目录</a>, Previous: <a href="26.9.7_标准文件名.html">标准文件名</a>, Up: <a href="26_文件.html">文件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

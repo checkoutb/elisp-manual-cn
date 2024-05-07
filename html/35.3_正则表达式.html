@@ -1,0 +1,8 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>35.3 正则表达式</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">35.3 正则表达式</h2>
+<div class="nav-panel"><p>Next: <a href="35.3.1_正则表达式的语法.html">正则表达式的语法</a>, Previous: <a href="35.2_搜索和案例.html">搜索和案例</a>, Up: <a href="35_搜索和匹配.html">搜索和匹配.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>正则表达式，或简称 regexp，是表示一组（可能是无限的）字符串的模式。搜索正则表达式的匹配项是一项非常强大的操作。本节介绍如何编写正则表达式；  以下部分说明如何搜索它们。
+</p>
+<p>对于正则表达式的交互式开发，可以使用 Mx re-builder 命令。它通过在单独的缓冲区中提供即时视觉反馈，为创建正则表达式提供了一个方便的界面。当您编辑正则表达式时，它在目标缓冲区中的所有匹配项都会突出显示。正则表达式的每个带括号的子表达式都以不同的面显示，这使得即使是非常复杂的正则表达式也更容易验证。
+</p>
+<p>请注意，默认情况下 Emacs 搜索忽略大小写（请参阅搜索和大小写）。要启用区分大小写的正则表达式搜索和匹配，请将 case-fold-search 绑定到 nil 您希望区分大小写的代码周围。
+</p>
+<div class="nav-panel"><p>Next: <a href="35.3.1_正则表达式的语法.html">正则表达式的语法</a>, Previous: <a href="35.2_搜索和案例.html">搜索和案例</a>, Up: <a href="35_搜索和匹配.html">搜索和匹配.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

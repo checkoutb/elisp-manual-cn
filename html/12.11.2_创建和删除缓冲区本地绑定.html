@@ -1,0 +1,153 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>12.11.2 创建和删除缓冲区本地绑定</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">12.11.2 创建和删除缓冲区本地绑定</h3>
+<div class="nav-panel"><p>Next: <a href="12.11.3_缓冲区局部变量的默认值.html">缓冲区局部变量的默认值</a>, Previous: <a href="12.11.1_缓冲区局部变量简介.html">缓冲区局部变量简介</a>, Up: <a href="12.11_缓冲区局部变量.html">缓冲区局部变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><div class="lisp">
+<pre class="lisp">Command: make-local-variable variable ¶
+</pre></div>
+<p>此函数在当前缓冲区中为变量（符号）创建缓冲区本地绑定。其他缓冲区不受影响。返回的值是可变的。
+</p>
+<p>变量的缓冲区局部值与以前的值变量相同。如果变量是无效的，它仍然是无效的。
+</p>
+<div class="lisp">
+<pre class="lisp">
+
+;; In buffer ‘b1’:
+(setq foo 5)                ; Affects all buffers.
+     ⇒ 5
+
+(make-local-variable 'foo)  ; Now it is local in ‘b1’.
+     ⇒ foo
+
+foo                         ; That did not change
+     ⇒ 5                   ;   the value.
+
+(setq foo 6)                ; Change the value
+     ⇒ 6                   ;   in ‘b1’.
+
+foo
+     ⇒ 6
+
+
+;; In buffer ‘b2’, the value hasn’t changed.
+(with-current-buffer "b2"
+  foo)
+     ⇒ 5
+</pre></div>
+<p>在该变量的 let 绑定中使变量局部缓冲区无法可靠地工作，除非您执行此操作的缓冲区在进入或退出 let 时不是当前的。这是因为 let 不区分不同类型的绑定；  它只知道绑定是针对哪个变量的。
+</p>
+<p>将常量或只读变量设置为缓冲区本地是错误的。请参阅永不改变的变量。
+</p>
+<p>如果变量是终端本地的（请参阅多个终端），则此函数会发出错误信号。此类变量也不能具有缓冲区本地绑定。
+</p>
+<p>警告：不要对钩子变量使用 make-local-variable。如果您使用本地参数来添加挂钩或删除挂钩，则挂钩变量会根据需要自动设置为缓冲区本地。 
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: setq-local &amp;rest pairs ¶
+</pre></div>
+<p>对是变量和值对的列表。这个宏在当前缓冲区中为每个变量创建一个缓冲区局部绑定，并给它们一个缓冲区局部值。这相当于为每个变量调用 make-local-variable 后跟 setq。变量应该是不带引号的符号。
+</p>
+<div class="lisp">
+<pre class="lisp">(setq-local var1 "value1"
+            var2 "value2")
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Command: make-variable-buffer-local variable ¶
+</pre></div>
+<p>此函数自动将变量（符号）标记为缓冲区本地，以便任何后续设置它的尝试都将使其成为当时当前缓冲区的本地。与经常混淆的 make-local-variable 不同，这无法撤消，并且会影响变量在所有缓冲区中的行为。
+</p>
+<p>此功能的一个特殊问题是绑定变量（使用 let 或其他绑定结构）不会为其创建缓冲区本地绑定。仅设置变量（使用 set 或 setq），而变量没有在当前缓冲区中创建的 let 样式绑定，这样做。
+</p>
+<p>如果变量没有默认值，则调用此命令将给它一个默认值 nil。如果变量已经具有默认值，则该值保持不变。随后在变量上调用 makunbound 将产生一个 void 缓冲区局部值，并且不影响默认值。
+</p>
+<p>返回的值是可变的。
+</p>
+<p>将常量或只读变量设置为缓冲区本地是错误的。请参阅永不改变的变量。
+</p>
+<p>警告：不要假设您应该对用户选项变量使用 make-variable-buffer-local，因为用户可能希望在不同的缓冲区中以不同的方式自定义它们。用户可以根据需要将任何变量设为本地变量。最好把选择权留给他们。
+</p>
+<p>使用 make-variable-buffer-local 的时候，关键是没有两个缓冲区共享相同的绑定。例如，当一个变量在 Lisp 程序中用于内部目的时，它依赖于在单独的缓冲区中具有单独的值，那么使用 make-variable-buffer-local 可能是最好的解决方案。 
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: defvar-local variable value &amp;optional docstring ¶
+</pre></div>
+<p>该宏将变量定义为具有初始值和文档字符串的变量，并将其标记为自动缓冲区本地。它相当于调用 defvar 后跟 make-variable-buffer-local。变量应该是一个不带引号的符号。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: local-variable-p variable &amp;optional buffer ¶
+</pre></div>
+<p>如果变量在缓冲区缓冲区（默认为当前缓冲区）中是缓冲区局部变量，则返回 t；  否则，无。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: local-variable-if-set-p variable &amp;optional buffer ¶
+</pre></div>
+<p>如果变量在缓冲区缓冲区中具有缓冲区本地值，或者自动为缓冲区本地，则返回 t。否则，它返回零。如果省略或为零，则缓冲区默认为当前缓冲区。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: buffer-local-value variable buffer ¶
+</pre></div>
+<p>此函数返回缓冲区缓冲区中变量（符号）的缓冲区本地绑定。如果变量在缓冲区缓冲区中没有缓冲区局部绑定，则返回变量的默认值（请参阅缓冲区局部变量的默认值）。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: buffer-local-boundp variable buffer ¶
+</pre></div>
+<p>如果缓冲区缓冲区中存在变量（符号）的缓冲区局部绑定，或者变量具有全局绑定，则返回非零。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: buffer-local-variables &amp;optional buffer ¶
+</pre></div>
+<p>此函数返回一个列表，描述缓冲区缓冲区中的缓冲区局部变量。（如果省略 buffer，则使用当前缓冲区。）通常，每个列表元素的格式为 (sym . val)，其中 sym 是缓冲区局部变量（符号），val 是其缓冲区局部值。但是当一个变量在缓冲区中的缓冲区局部绑定为 void 时，它的列表元素就是 sym。
+</p><div class="lisp">
+<pre class="lisp">(make-local-variable 'foobar)
+(makunbound 'foobar)
+(make-local-variable 'bind-me)
+(setq bind-me 69)
+
+(setq lcl (buffer-local-variables))
+    ;; First, built-in variables local in all buffers:
+⇒ ((mark-active . nil)
+    (buffer-undo-list . nil)
+    (mode-name . "Fundamental")
+    …
+
+    ;; Next, non-built-in buffer-local variables.
+    ;; This one is buffer-local and void:
+    foobar
+    ;; This one is buffer-local and nonvoid:
+    (bind-me . 69))
+</pre></div>
+<p>请注意，将新值存储到此列表中 cons 单元的 CDR 中不会更改变量的缓冲区本地值。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: kill-local-variable variable ¶
+</pre></div>
+<p>此函数删除当前缓冲区中变量（符号）的缓冲区本地绑定（如果有）。结果，变量的默认绑定在此缓冲区中变得可见。这通常会导致变量的值发生变化，因为默认值通常与刚刚消除的缓冲区局部值不同。
+</p>
+<p>如果你杀死一个变量的缓冲区本地绑定，该绑定在设置时会自动变为缓冲区本地，这会使默认值在当前缓冲区中可见。但是，如果您再次设置该变量，则会再次为其创建缓冲区本地绑定。
+</p>
+<p>kill-local-variable 返回变量。
+</p>
+<p>这个函数是一个命令，因为有时交互式地杀死一个缓冲区局部变量很有用，就像交互式地创建缓冲区局部变量一样有用。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: kill-all-local-variables ¶
+</pre></div>
+<p>此函数消除了当前缓冲区的所有缓冲区局部变量绑定，除了标记为永久的变量和具有非零永久局部钩子属性的局部钩子函数（请参阅设置钩子）。结果，缓冲区将看到大多数变量的默认值。
+</p>
+<p>此函数还重置与缓冲区有关的某些其他信息：它将本地键映射设置为 nil，将语法表设置为 (standard-syntax-table) 的值，将案例表设置为 (standard-case-table)，并将缩写table 到 basic-mode-abbrev-table 的值。
+</p>
+<p>这个函数做的第一件事就是运行普通的钩子 change-major-mode-hook（见下文）。
+</p>
+<p>每个主模式命令都以调用此函数开始，该函数具有切换到基本模式的效果，并擦除之前主模式的大部分效果。为确保其发挥作用，不应将主要模式设置的变量标记为永久。
+</p>
+<p>kill-all-local-variables 返回 nil。 
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: change-major-mode-hook ¶
+</pre></div>
+<p>函数 kill-all-local-variables 在执行其他任何操作之前运行这个普通的钩子。如果用户切换到不同的主要模式，这为主要模式提供了一种安排特殊操作的方法。如果用户更改主要模式，它对于应该忘记的缓冲区特定的次要模式也很有用。
+</p>
+<p>为获得最佳效果，请将此变量设置为缓冲区本地，以便在完成工作后它会消失，并且不会干扰后续的主要模式。请参阅挂钩。 
+</p>
+<p>如果变量名（符号）具有非 nil 的永久局部属性，则缓冲区局部变量是永久的。这些变量不受 kill-all-local-variables 的影响，因此它们的本地绑定不会通过更改主要模式来清除。永久本地变量适用于与文件来自何处或如何保存文件有关的数据，而不是与如何编辑内容有关的数据。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="12.11.3_缓冲区局部变量的默认值.html">缓冲区局部变量的默认值</a>, Previous: <a href="12.11.1_缓冲区局部变量简介.html">缓冲区局部变量简介</a>, Up: <a href="12.11_缓冲区局部变量.html">缓冲区局部变量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

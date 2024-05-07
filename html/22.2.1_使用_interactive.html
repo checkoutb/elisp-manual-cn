@@ -1,0 +1,71 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.2.1 使用 interactive</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">22.2.1 使用 interactive</h3>
+<div class="nav-panel"><p>Next: <a href="22.2.2_代码字符_interactive.html">代码字符_interactive</a>, Previous: <a href="22.2_定义命令.html">定义命令</a>, Up: <a href="22.2_定义命令.html">定义命令.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍如何编写使 Lisp 函数成为交互式可调用命令的交互式表单，以及如何检查命令的交互式表单。
+</p>
+<div class="lisp">
+<pre class="lisp">Special Form: interactive &amp;optional arg-descriptor &amp;rest modes ¶
+</pre></div>
+<p>这种特殊形式声明一个函数是一个命令，因此可以交互调用它（通过 Mx 或通过输入绑定到它的键序列）。参数 arg-descriptor 声明了在交互调用命令时如何计算命令的参数。
+</p>
+<p>一个命令可以像任何其他函数一样从 Lisp 程序中调用，但是调用者提供了参数并且 arg-descriptor 没有任何效果。
+</p>
+<p>交互式表单必须位于函数体的顶层，或函数符号的交互式表单属性中（请参阅符号属性）。它之所以有效果，是因为命令循环在调用函数之前会查找它（请参阅交互式调用）。一旦函数被调用，它的所有主体形式都会被执行；  此时，如果交互形式出现在正文中，则该形式直接返回 nil，甚至不计算其参数。
+</p>
+<p>模式列表允许指定该命令要使用的模式。有关指定模式的效果以及何时使用它的更多详细信息，请参阅为命令指定模式。
+</p>
+<p>按照惯例，您应该将交互表单放在函数体中，作为第一个顶级表单。如果交互形式符号属性和函数体中都存在交互形式，则前者优先。交互式表单符号属性可用于将交互式表单添加到现有函数，或更改其参数的交互式处理方式，而无需重新定义函数。
+</p>
+<p>参数 arg-descriptor 有三种可能性：
+</p>
+<p>它可以省略或为零；  然后调用不带参数的命令。如果命令需要一个或多个参数，这会很快导致错误。
+它可能是一个字符串；  它的内容是由换行符分隔的一系列元素，每个参数一个。每个元素都包含一个代码字符（请参阅交互式代码字符），可选地后跟一个提示（一些代码字符使用而一些忽略）。这是一个例子：
+</p>
+<div class="lisp">
+<pre class="lisp">(interactive "P\nbFrobnicate buffer: ")
+</pre></div>
+<p>代码字母 <code>P</code> 将命令的第一个参数设置为原始命令前缀（请参阅前缀命令参数）。’bFrobnicate buffer:’ 提示用户使用 ’Frobnicate buffer:’ 输入现有缓冲区的名称，该名称将成为第二个也是最后一个参数。
+</p>
+<p>提示字符串可以使用 ’%’ 在提示中包含以前的参数值（从第一个参数开始）。这是使用 format-message 完成的（请参阅格式化字符串）。例如，您可以通过以下方式读取现有缓冲区的名称，然后为该缓冲区提供新名称：
+</p>
+<div class="lisp">
+<pre class="lisp">(interactive "bBuffer to rename: \nsRename buffer %s to: ")
+</pre></div>
+<p>如果 ’*’ 出现在字符串的开头，则如果缓冲区是只读的，则会发出错误信号。
+</p>
+<p>如果 ’@’ 出现在字符串的开头，并且如果用于调用命令的键序列包括任何鼠标事件，则在运行命令之前选择与这些事件中的第一个事件关联的窗口。
+</p>
+<p>如果 ’^’ 出现在字符串的开头，并且如果命令是通过 shift-translation 调用的，则在命令运行之前设置标记并临时激活该区域，或者扩展一个已经激活的区域。如果在没有移位转换的情况下调用了该命令，并且该区域暂时处于活动状态，请在运行该命令之前停用该区域。Shift-translation 由 shift-select-mode 在用户级别控制；  请参阅 GNU Emacs 手册中的 Shift 选择。
+</p>
+<p>您可以同时使用 <code>*</code> 、 <code>@</code> 和 ^；  顺序无关紧要。参数的实际读取由提示字符串的其余部分控制（从不是 <code>*</code> 、 <code>@</code> 或 <code>^</code> 的第一个字符开始）。
+它可能是一个不是字符串的 Lisp 表达式；  那么它应该是一个经过评估以获取要传递给命令的参数列表的表单。通常这种形式会调用各种函数来读取用户的输入，最常见的是通过 minibuffer（参见 Minibuffers）或直接从键盘（参见 Reading Input）。
+</p>
+<p>提供点或标记作为参数值也很常见，但如果您这样做并读取输入（无论是否使用迷你缓冲区），请务必在读取后获取点或标记的整数值。当前缓冲区可能正在接收子进程输出；  如果在命令等待输入时子进程输出到达，它可以重新定位点和标记。
+</p>
+<p>下面是一个不该做什么的例子：
+</p><div class="lisp">
+<pre class="lisp">(interactive
+ (list (region-beginning) (region-end)
+       (read-string "Foo: " nil 'my-history)))
+</pre></div>
+<p>以下是如何避免该问题，通过在读取键盘输入后检查点和​​标记：
+</p><div class="lisp">
+<pre class="lisp">(interactive
+ (let ((string (read-string "Foo: " nil 'my-history)))
+   (list (region-beginning) (region-end) string)))
+</pre></div>
+<p>警告：参数值不应包含任何无法打印然后读取的数据类型。一些工具将命令历史保存在一个文件中，以便在后续会话中读取；  如果命令的参数包含使用 ’#&lt;…&gt;’ 语法打印的数据类型，则这些工具将不起作用。
+</p>
+<p>然而，也有一些例外：可以使用一组有限的表达式，例如 (point)、(mark)、(region-beginning) 和 (region-end)，因为 Emacs 会特别识别它们并将表达式（而不是它的值）到命令历史记录中。要查看您编写的表达式是否是这些异常之一，请运行命令，然后检查 (car command-history)。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: interactive-form function ¶
+</pre></div>
+<p>该函数返回函数的交互形式。如果 function 是一个交互式可调用函数（请参阅交互式调用），则该值是命令的交互式形式（交互式规范），它指定如何计算其参数。否则，该值为 nil。如果 function 是一个符号，则使用其函数定义。
+</p>
+<p>脚注
+(14)
+</p>
+<p>有些元素实际上提供了两个参数。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.2.2_代码字符_interactive.html">代码字符_interactive</a>, Previous: <a href="22.2_定义命令.html">定义命令</a>, Up: <a href="22.2_定义命令.html">定义命令.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

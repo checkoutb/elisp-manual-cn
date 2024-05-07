@@ -1,0 +1,21 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>30.4.4 几何</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">30.4.4 几何</h3>
+<div class="nav-panel"><p>Next: <a href="30.5_终端参数.html">终端参数</a>, Previous: <a href="30.4.3_窗框参数.html">窗框参数</a>, Up: <a href="30.4_帧参数.html">帧参数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>以下是如何检查 X 样式窗口几何规范中的数据：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: x-parse-geometry geom ¶
+</pre></div>
+<p>函数 x-parse-geometry 将标准 X 窗口几何字符串转换为 alist，您可以将其用作 make-frame 参数的一部分。
+</p>
+<p>alist 描述了在 geom 中指定了哪些参数，并给出了为它们指定的值。每个元素看起来像（参数。值）。可能的参数值是 left、top、width 和 height。
+</p>
+<p>对于大小参数，值必须是整数。位置参数名称 left 和 top 并不完全准确，因为某些值指示的是右边缘或下边缘的位置。位置参数的取值可能是：整数、列表（+ pos）或列表（- pos）；  如前所述（参见位置参数）。
+</p>
+<p>这是一个例子：
+</p><div class="lisp">
+<pre class="lisp">(x-parse-geometry "35x70+0-0")
+     ⇒ ((height . 70) (width . 35)
+         (top - 0) (left . 0))
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="30.5_终端参数.html">终端参数</a>, Previous: <a href="30.4.3_窗框参数.html">窗框参数</a>, Up: <a href="30.4_帧参数.html">帧参数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

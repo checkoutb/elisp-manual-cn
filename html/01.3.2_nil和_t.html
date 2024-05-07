@@ -1,0 +1,23 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>1.3.2 nil和 t</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">1.3.2 nil和 t</h3>
+<div class="nav-panel"><p>Next: <a href="01.3.3_评估符号.html">评估符号</a>, Previous: <a href="01.3.1_一些条款.html">一些条款</a>, Up: <a href="01.3_约定.html">约定.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在 Emacs Lisp 中，符号 <code>nil</code> 具有三种不同的含义：它是一个名称为 <code>nil</code> 的符号； 是逻辑真值假； 它是一个空列表——零元素的列表。 当用作变量时， <code>nil</code> 始终具有 <code>nil</code> 值。
+</p>
+<p>就 Lisp 阅读器而言， <code>()</code>  和 <code>nil</code> 是相同的：它们代表同一个对象，符号 <code>nil</code> 。书写符号的不同方式完全适用于人类读者。在 Lisp 阅读器读取 <code>()</code> 或 <code>nil</code> 之后，无法确定程序员实际编写的表示形式。
+</p>
+<p>在本手册中，当我们想强调它表示空列表时，我们写 <code>()</code> ，当我们想强调它表示真值 <code>false</code> 时，我们写 <code>nil</code> 。这也是在 Lisp 程序中使用的一个很好的约定。
+</p>
+<div class="lisp">
+<pre class="lisp">(cons 'foo ())                ; Emphasize the empty list
+(setq foo-flag nil)           ; Emphasize the truth value false
+</pre></div>
+<p>在期望真值的情况下，任何非零值都被认为是真值。但是， <code>t</code> 是表示真值 <code>true</code> 的首选方式。当你需要选择一个代表真实的值，并且没有其他选择依据时，使用 <code>t</code> 。符号 <code>t</code> 始终具有值 <code>t</code> 。
+</p>
+<p>在 Emacs Lisp 中， <code>nil</code> 和 <code>t</code> 是特殊符号，它们总是对自己求值。这样您就不需要引用它们来将它们用作程序中的常量。尝试更改它们的值会导致设置常量错误。请参阅永不改变的变量。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: booleanp object
+</pre></div>
+<p>如果 object 是两个规范布尔值 <code>t</code> 或 <code>nil</code> 之一，则返回非 <code>nil</code> 。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="01.3.3_评估符号.html">评估符号</a>, Previous: <a href="01.3.1_一些条款.html">一些条款</a>, Up: <a href="01.3_约定.html">约定.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

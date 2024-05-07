@@ -1,0 +1,41 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>23.17.4 菜单示例</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">23.17.4 菜单示例</h3>
+<div class="nav-panel"><p>Next: <a href="23.17.5_菜单栏.html">菜单栏</a>, Previous: <a href="23.17.3_菜单和键盘.html">菜单和键盘</a>, Up: <a href="23.17_菜单键映射.html">菜单键映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这是定义菜单键映射的完整示例。它是菜单栏 <code>编辑</code> 菜单中 <code>替换</code> 子菜单的定义，它使用扩展菜单项格式（见扩展菜单项）。首先我们创建keymap，并给它一个名字：
+</p>
+<div class="lisp">
+<pre class="lisp">(defvar menu-bar-replace-menu (make-sparse-keymap "Replace"))
+</pre></div>
+<p>接下来我们定义菜单项：
+</p><div class="lisp">
+<pre class="lisp">(define-key menu-bar-replace-menu [tags-repl-continue]
+  '(menu-item "Continue Replace" multifile-continue
+              :help "Continue last tags replace operation"))
+(define-key menu-bar-replace-menu [tags-repl]
+  '(menu-item "Replace in tagged files" tags-query-replace
+              :help "Interactively replace a regexp in all tagged files"))
+(define-key menu-bar-replace-menu [separator-replace-tags]
+  '(menu-item "--"))
+;; …
+</pre></div>
+<p>注意绑定的符号；  这些出现在方括号内，在定义的键序列中。在某些情况下，此符号与命令名称相同；  有时它是不同的。这些符号被视为功能键，但它们不是键盘上的真正功能键。它们不影响菜单本身的功能，但当用户从菜单中选择时，它们会在回显区域中回显，并出现在 where-is 和 apropos 的输出中。
+</p>
+<p>此示例中的菜单旨在与鼠标一起使用。如果菜单打算与键盘一起使用，也就是说，如果它绑定到以键盘事件结尾的键序列，那么菜单项应该绑定到可以用键盘键入的字符或实际功能键。
+</p>
+<p>定义为 ("–") 的绑定是分隔线。与真正的菜单项一样，分隔符有一个键符号，在本例中为 separator-replace-tags。如果一个菜单有两个分隔符，它们必须有两个不同的键符号。
+</p>
+<p>下面是我们如何让这个菜单在父菜单中显示为一个项目：
+</p>
+<div class="lisp">
+<pre class="lisp">(define-key menu-bar-edit-menu [replace]
+  (list 'menu-item "Replace" menu-bar-replace-menu))
+</pre></div>
+<p>请注意，这包含子菜单键映射，它是变量 menu-bar-replace-menu 的值，而不是符号 menu-bar-replace-menu 本身。在父菜单项中使用该符号将毫无意义，因为 menu-bar-replace-menu 不是命令。
+</p>
+<p>如果您想将相同的替换菜单附加到鼠标单击上，您可以这样做：
+</p>
+<div class="lisp">
+<pre class="lisp">(define-key global-map [C-S-down-mouse-1]
+   menu-bar-replace-menu)
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="23.17.5_菜单栏.html">菜单栏</a>, Previous: <a href="23.17.3_菜单和键盘.html">菜单和键盘</a>, Up: <a href="23.17_菜单键映射.html">菜单键映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

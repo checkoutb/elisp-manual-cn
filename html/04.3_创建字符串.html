@@ -1,0 +1,220 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>4.3 创建字符串</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">4.3 创建字符串</h2>
+<div class="nav-panel"><p>Next: <a href="04.4_修改字符串.html">修改字符串</a>, Previous: <a href="04.2_字符串谓词.html">字符串谓词</a>, Up: <a href="04_字符串和字.html">字符串和字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>以下函数创建字符串，可以从头开始，也可以将字符串放在一起，或者将它们分开。（对于根据其他字符串的修改内容创建字符串的函数，如 string-replace 和 replace-regexp-in-string，请参阅搜索和替换。）
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-string count character &amp;optional multibyte
+</pre></div>
+<p>此函数返回一个由 count 重复字符组成的字符串。如果计数为负，则发出错误信号。
+</p>
+<div class="lisp">
+<pre class="lisp">(make-string 5 ?x)
+     ⇒ "xxxxx"
+(make-string 0 ?x)
+     ⇒ ""
+</pre></div>
+<p>通常，如果字符是 ASCII 字符，则结果是单字节字符串。但是，如果可选参数 multibyte 不为 nil，则该函数将生成一个多字节字符串。当您稍后需要将结果与非 ASCII 字符串连接或用非 ASCII 字符替换其中的一些字符时，这很有用。
+</p>
+<p>与此比较的其他函数包括 make-vector（请参阅 Vectors）和 make-list（请参阅 Building Cons Cells and Lists）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: string &amp;rest characters
+</pre></div>
+<p>这将返回一个包含字符的字符串。
+</p>
+<div class="lisp">
+<pre class="lisp">(string ?a ?b ?c)
+     ⇒ "abc"
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: substring string &amp;optional start end
+</pre></div>
+<p>此函数返回一个新字符串，该字符串由字符串中的那些字符组成，范围从（并包括）索引开始处的字符到（但不包括）索引结束处的字符。第一个字符位于索引零处。有一个参数，这个函数只是复制字符串。
+</p>
+<div class="lisp">
+<pre class="lisp">(substring "abcdefg" 0 3)
+     ⇒ "abc"
+</pre></div>
+<p>在上面的例子中，’a’ 的索引是 0，’b’ 的索引是 1，’c’ 的索引是 2。索引 3（字符串中的第四个字符）标记了字符位置子字符串被复制到的位置。因此， <code>abc</code> 是从字符串 <code>abcdefg</code> 复制而来的。
+</p>
+<p>负数从字符串末尾开始计数，因此 -1 表示字符串最后一个字符的索引。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">(substring "abcdefg" -3 -1)
+     ⇒ "ef"
+</pre></div>
+<p>在此示例中， <code>e</code> 的索引为 -3， <code>f</code> 的索引为 -2， <code>g</code> 的索引为 -1。因此， <code>e</code> 和 <code>f</code> 被包括在内， <code>g</code> 被排除在外。
+</p>
+<p>当 nil 用于 end 时，它代表字符串的长度。因此，
+</p>
+<div class="lisp">
+<pre class="lisp">(substring "abcdefg" -3 nil)
+     ⇒ "efg"
+</pre></div>
+<p>省略参数 end 等效于指定 nil。随之而来的是 (substring string 0) 返回所有字符串的副本。
+</p>
+<div class="lisp">
+<pre class="lisp">(substring "abcdefg" 0)
+     ⇒ "abcdefg"
+</pre></div>
+<p>但我们建议为此目的使用复制序列（请参阅序列）。
+</p>
+<p>如果从字符串复制的字符具有文本属性，则这些属性也会复制到新字符串中。请参阅文本属性。
+</p>
+<p>substring 还接受第一个参数的向量。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">(substring [a b (c) "d"] 1 3)
+     ⇒ [b (c)]
+</pre></div>
+<p>如果 start 不是整数或 end 既不是整数也不是 nil，则会发出错误类型参数错误的信号。如果 start 指示字符跟在 end 之后，或者任何一个整数超出字符串的范围，则会发出 args-out-of-range 错误信号。
+</p>
+<p>将此函数与 buffer-substring 进行对比（请参阅检查缓冲区内容），后者返回一个字符串，其中包含当前缓冲区中的部分文本。字符串的开头是索引 0，但缓冲区的开头是索引 1。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: substring-no-properties string &amp;optional start end
+</pre></div>
+<p>这类似于子字符串，但会丢弃值中的所有文本属性。此外， start 可以省略或 nil，相当于 0。因此，(substring-no-properties string) 返回字符串的副本，删除所有文本属性。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: concat &amp;rest sequences
+</pre></div>
+<p>此函数返回一个字符串，该字符串由传递给它的参数中的字符组成（以及它们的文本属性，如果有的话）。参数可以是字符串、数字列表或数字向量；  他们自己并没有改变。如果 concat 没有接收到参数，它会返回一个空字符串。
+</p>
+<div class="lisp">
+<pre class="lisp">(concat "abc" "-def")
+     ⇒ "abc-def"
+(concat "abc" (list 120 121) [122])
+     ⇒ "abcxyz"
+;; nil is an empty sequence.
+(concat "abc" nil "-def")
+     ⇒ "abc-def"
+(concat "The " "quick brown " "fox.")
+     ⇒ "The quick brown fox."
+(concat)
+     ⇒ ""
+</pre></div>
+<p>这个函数并不总是分配一个新的字符串。建议调用者不要依赖结果是一个新字符串，也不要依赖它是现有字符串的 eq。
+</p>
+<p>特别是，改变返回值可能会无意中更改另一个字符串，更改程序中的常量字符串，甚至引发错误。要获得可以安全地变异的字符串，请对结果使用复制序列。
+</p>
+<p>有关其他连接函数的信息，请参见 Mapping Functions 中的 mapconcat 的描述，Vectors 中的 vconcat 以及 Building Cons Cells and Lists 中的 append。要将单个命令行参数连接成一个字符串以用作 shell 命令，请参阅 combine-and-quote-strings。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: split-string string &amp;optional separators omit-nulls trim
+</pre></div>
+<p>此函数根据正则表达式分隔符将字符串拆分为子字符串（请参阅正则表达式）。分隔符的每个匹配定义一个拆分点；  将分割点之间的子串做成一个列表，并返回。
+</p>
+<p>如果 separators 为 nil（或省略），则默认值为 split-string-default-separators 的值，并且该函数的行为就像 omit-nulls 为 t。
+</p>
+<p>如果 omit-nulls 为 nil（或省略），则只要有两个连续的分隔符匹配，或者匹配与字符串的开头或结尾相邻，结果就会包含空字符串。如果 omit-nulls 为 t，则从结果中省略这些空字符串。
+</p>
+<p>如果可选参数 trim 不是 nil，它应该是一个正则表达式来匹配要从每个子字符串的开头和结尾修剪的文本。如果修剪使子字符串为空，则将其视为 null。
+</p>
+<p>如果您需要将字符串拆分为适合调用进程或启动进程的单个命令行参数列表，请参阅 split-string-and-unquote。
+</p>
+<p>例子：
+</p>
+<div class="lisp">
+<pre class="lisp">(split-string "  two words ")
+     ⇒ ("two" "words")
+</pre></div>
+<p>结果不是 ("" "two" "words" "")，它很少有用。如果您需要这样的结果，请为分隔符使用显式值：
+</p>
+<div class="lisp">
+<pre class="lisp">(split-string "  two words "
+              split-string-default-separators)
+     ⇒ ("" "two" "words" "")
+</pre></div>
+<div class="lisp">
+<pre class="lisp">(split-string "Soup is good food" "o")
+     ⇒ ("S" "up is g" "" "d f" "" "d")
+(split-string "Soup is good food" "o" t)
+     ⇒ ("S" "up is g" "d f" "d")
+(split-string "Soup is good food" "o+")
+     ⇒ ("S" "up is g" "d f" "d")
+</pre></div>
+<p>空匹配确实计数，除了当 split-string 已经使用非空匹配到达字符串末尾或字符串为空时，它不会寻找最终的空匹配：
+</p>
+<div class="lisp">
+<pre class="lisp">(split-string "aooob" "o*")
+     ⇒ ("" "a" "" "b" "")
+(split-string "ooaboo" "o*")
+     ⇒ ("" "" "a" "b" "")
+(split-string "" "")
+     ⇒ ("")
+</pre></div>
+<p>但是，当分隔符可以匹配空字符串时，省略空值通常为 t，因此前面三个示例中的微妙之处很少相关：
+</p>
+<div class="lisp">
+<pre class="lisp">(split-string "Soup is good food" "o*" t)
+     ⇒ ("S" "u" "p" " " "i" "s" " " "g" "d" " " "f" "d")
+(split-string "Nice doggy!" "" t)
+     ⇒ ("N" "i" "c" "e" " " "d" "o" "g" "g" "y" "!")
+(split-string "" "" t)
+     ⇒ nil
+
+</pre></div>
+<p>对于某些 <code>非贪婪</code> 分隔符值，可能会出现一些奇怪但可预测的行为，这些分隔符可能更喜欢空匹配而不是非空匹配。同样，这样的值在实践中很少出现：
+</p><div class="lisp">
+<pre class="lisp">(split-string "ooo" "o*" t)
+     ⇒ nil
+(split-string "ooo" "\\|o+" t)
+     ⇒ ("o" "o" "o")
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Variable: split-string-default-separators
+</pre></div>
+<p>split-string 的分隔符的默认值。它的通常值为 <code>[ \f\t\n\r\v]+</code> 。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: string-clean-whitespace string
+</pre></div>
+<p>通过将一段空格折叠为单个空格字符，以及从字符串的开头和结尾删除所有空格来清理字符串中的空格。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: string-trim-left string &amp;optional regexp
+</pre></div>
+<p>从字符串中删除与正则表达式匹配的前导文本。正则表达式默认为 ’[ ]+’。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: string-trim-right string &amp;optional regexp
+</pre></div>
+<p>从字符串中删除匹配正则表达式的尾随文本。正则表达式默认为 ’[ ]+’。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: string-trim string &amp;optional trim-left trim-right
+</pre></div>
+<p>从字符串中删除匹配 trim-left 的前导文本和匹配 trim-right 的尾随文本。两个正则表达式都默认为 ’[ ]+’。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: string-fill string length
+</pre></div>
+<p>尝试对字符串进行自动换行，以便没有行长于长度。填充仅在空白边界上完成。如果有个别词长于长度，这些将不会被缩短。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: string-limit string length &amp;optional end coding-system
+</pre></div>
+<p>如果 string 比 length 个字符短，则按原样返回 string。否则，返回由第一个长度字符组成的字符串子串。如果给出了可选的 end 参数，则返回一个长度为最后一个字符的字符串。
+</p>
+<p>如果coding-system 不为零，则在限制之前对字符串进行编码，结果将是一个比长度字节短的单字节字符串。如果字符串包含被编码为多个字节的字符（例如，使用 utf-8 时），则生成的单字节字符串永远不会在字符表示的中间被截断。
+</p>
+<p>此函数以字符或字节为单位测量字符串长度，因此如果您需要缩短字符串以进行显示，通常不适合；  请改用 truncate-string-to-width 或 window-text-pixel-size（请参阅显示文本的大小）。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: string-lines string &amp;optional omit-nulls
+</pre></div>
+<p>将字符串拆分为换行符边界上的字符串列表。如果省略空值，则从结果中删除空行。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: string-pad string length &amp;optional padding start
+</pre></div>
+<p>使用 padding 作为填充字符（默认为空格字符）将字符串填充到长度。如果字符串短于长度，则不进行填充。如果 start 为 nil（或不存在），则填充到字符串的末尾，如果它不是 nil，则填充到字符串的开头。 
+</p>
+<div class="lisp">
+<pre class="lisp">Function: string-chop-newline string
+</pre></div>
+<p>从字符串中删除最后的换行符（如果有）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="04.4_修改字符串.html">修改字符串</a>, Previous: <a href="04.2_字符串谓词.html">字符串谓词</a>, Up: <a href="04_字符串和字.html">字符串和字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

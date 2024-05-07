@@ -1,0 +1,30 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>35.6.4 保存和恢复匹配数据</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">35.6.4 保存和恢复匹配数据</h3>
+<div class="nav-panel"><p>Next: <a href="35.7_搜索和替换.html">搜索和替换</a>, Previous: <a href="35.6.3_访问整个比赛数据.html">访问整个比赛数据</a>, Up: <a href="35.6_匹配数据.html">匹配数据.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当您调用可能搜索的函数时，如果您想保留先前搜索的匹配数据以供以后使用，则可能需要保存和恢复该调用周围的匹配数据。这是一个示例，显示了如果未能保存匹配数据会出现的问题：
+</p>
+<div class="lisp">
+<pre class="lisp">(re-search-forward "The \\(cat \\)")
+     ⇒ 48
+(foo)                   ; foo does more searching.
+(match-end 0)
+     ⇒ 61              ; Unexpected result—not 48!
+</pre></div>
+<p>您可以使用 save-match-data 保存和恢复匹配数据：
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: save-match-data body… ¶
+</pre></div>
+<p>这个宏执行主体，保存和恢复它周围的匹配数据。返回值是正文中最后一个表单的值。
+</p>
+<p>您可以使用 set-match-data 和 match-data 来模仿特殊形式 save-match-data 的效果。方法如下：
+</p>
+<div class="lisp">
+<pre class="lisp">(let ((data (match-data)))
+  (unwind-protect
+      …   ; Ok to change the original match data.
+    (set-match-data data)))
+</pre></div>
+<p>Emacs 在运行进程过滤函数（参见进程过滤函数）和进程哨兵（参见哨兵：检测进程状态更改）时会自动保存和恢复匹配数据。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="35.7_搜索和替换.html">搜索和替换</a>, Previous: <a href="35.6.3_访问整个比赛数据.html">访问整个比赛数据</a>, Up: <a href="35.6_匹配数据.html">匹配数据.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

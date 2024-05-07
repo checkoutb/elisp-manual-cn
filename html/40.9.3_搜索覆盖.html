@@ -1,0 +1,48 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.9.3 搜索覆盖</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.9.3 搜索覆盖</h3>
+<div class="nav-panel"><p>Next: <a href="40.10_显示文本的大小.html">显示文本的大小</a>, Previous: <a href="40.9.2_覆盖属性.html">覆盖属性</a>, Up: <a href="40.9_叠加.html">叠加.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><div class="lisp">
+<pre class="lisp">Function: overlays-at pos &amp;optional sorted ¶
+</pre></div>
+<p>此函数返回覆盖当前缓冲区中位置 pos 处的字符的所有叠加层的列表。如果 sorted 不为零，则列表按优先级降序排列，否则没有特定顺序。覆盖包含位置 pos，如果它开始于 pos 或在 pos 之前，并在 pos 之后结束。
+</p>
+<p>为了说明用法，这里有一个 Lisp 函数，它返回一个覆盖层列表，这些覆盖层为点处的字符指定属性 prop：
+</p><div class="lisp">
+<pre class="lisp">(defun find-overlays-specifying (prop)
+  (let ((overlays (overlays-at (point)))
+        found)
+    (while overlays
+      (let ((overlay (car overlays)))
+        (if (overlay-get overlay prop)
+            (setq found (cons overlay found))))
+      (setq overlays (cdr overlays)))
+    found))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: overlays-in beg end ¶
+</pre></div>
+<p>这个函数返回一个覆盖区域的覆盖列表。如果覆盖在区域中包含一个或多个字符，则覆盖与区域重叠；  空覆盖（参见空覆盖）重叠，如果它们在 beg，严格在 beg 和 end 之间，或者在 end 表示缓冲区可访问部分末尾的位置时。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: next-overlay-change pos ¶
+</pre></div>
+<p>此函数在 pos 之后返回覆盖的下一个开始或结束的缓冲区位置。如果没有，则返回 (point-max)。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: previous-overlay-change pos ¶
+</pre></div>
+<p>此函数在 pos 之前返回覆盖的前一个开始或结束的缓冲区位置。如果没有，则返回 (point-min)。
+</p>
+<p>例如，这是原始函数 next-single-char-property-change 的简化（且效率低下）版本（请参阅文本属性搜索函数）。它从位置 pos 向前搜索下一个位置，从覆盖或文本属性获得的给定属性 prop 的值发生变化。
+</p><div class="lisp">
+<pre class="lisp">(defun next-single-char-property-change (position prop)
+  (save-excursion
+    (goto-char position)
+    (let ((propval (get-char-property (point) prop)))
+      (while (and (not (eobp))
+                  (eq (get-char-property (point) prop) propval))
+        (goto-char (min (next-overlay-change (point))
+                        (next-single-property-change (point) prop)))))
+    (point)))
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.10_显示文本的大小.html">显示文本的大小</a>, Previous: <a href="40.9.2_覆盖属性.html">覆盖属性</a>, Up: <a href="40.9_叠加.html">叠加.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

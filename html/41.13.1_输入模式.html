@@ -1,0 +1,41 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>41.13.1 输入模式</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">41.13.1 输入模式</h3>
+<div class="nav-panel"><p>Next: <a href="41.13.2_录音输入.html">录音输入</a>, Previous: <a href="41.13_终端输入.html">终端输入</a>, Up: <a href="41.13_终端输入.html">终端输入.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><div class="lisp">
+<pre class="lisp">Function: set-input-mode interrupt flow meta &amp;optional quit-char ¶
+</pre></div>
+<p>该函数设置读取键盘输入的模式。如果中断是非零，那么 Emacs 使用输入中断。如果为 nil，则使用 CBREAK 模式。默认设置取决于系统。无论指定什么，某些系统总是使用 CBREAK 模式。
+</p>
+<p>当 Emacs 直接与 X 通信时，它会忽略此参数并使用中断（如果这是它知道如何通信的方式）。
+</p>
+<p>如果 flow 不是 nil，那么 Emacs 使用 XON/XOFF (Cq, Cs) 流控制来输出到终端。除了 CBREAK 模式外，这没有任何影响。
+</p>
+<p>参数 meta 控制对 127 以上的输入字符代码的支持。如果 meta 为 t，Emacs 将设置第 8 位的字符转换为 Meta 字符，然后根据需要对它们进行解码（请参阅终端 I/O 编码）。如果 meta 为 nil，Emacs 忽略第 8 位；  当终端将其用作奇偶校验位时，这是必需的。如果 meta 是编码的符号，Emacs 首先使用每个字节的所有 8 位对字符进行解码，然后将解码后的单字节字符转换为 Meta 字符（如果设置了第 8 位）。最后，如果 meta 既不是 t 也不是 nil 也不是编码的，Emacs 使用所有 8 位输入不变，无论是在解码之前还是之后。这对于使用 8 位字符集并且不将 Meta 修饰符编码为第八位的终端非常有用。
+</p>
+<p>如果 quit-char 不为 nil，它指定用于退出的字符。通常这个角色是Cg。请参阅退出。
+</p>
+<p>current-input-mode 函数返回 Emacs 当前使用的输入模式设置。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: current-input-mode ¶
+</pre></div>
+<p>此函数返回读取键盘输入的当前模式。它返回一个列表，对应于 set-input-mode 的参数，形式为（中断流元退出），其中：
+</p>
+<div class="lisp">
+<pre class="lisp">interrupt
+</pre></div>
+<p>当 Emacs 使用中断驱动输入时为非零。如果为零，则 Emacs 使用 CBREAK 模式。
+</p><div class="lisp">
+<pre class="lisp">flow
+</pre></div>
+<p>如果 Emacs 使用 XON/XOFF (Cq, Cs) 流控制输出到终端，则为非零。该值仅在中断为 nil 时才有意义。
+</p><div class="lisp">
+<pre class="lisp">meta
+</pre></div>
+<p>如果 Emacs 将输入字符的第 8 位视为解码输入之前的 Meta 位，则为 t；  如果 Emacs 将解码后的单字节字符的第 8 位视为 Meta 位，则进行编码；  如果 Emacs 清除每个输入字符的第 8 位，则为 nil；  任何其他值意味着 Emacs 使用所有八位作为基本字符代码。
+</p><div class="lisp">
+<pre class="lisp">quit
+</pre></div>
+<p>是 Emacs 当前用于退出的字符，通常是 Cg。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="41.13.2_录音输入.html">录音输入</a>, Previous: <a href="41.13_终端输入.html">终端输入</a>, Up: <a href="41.13_终端输入.html">终端输入.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

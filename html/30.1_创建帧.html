@@ -1,0 +1,41 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>30.1 创建帧</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">30.1 创建帧</h2>
+<div class="nav-panel"><p>Next: <a href="30.2_多终端.html">多终端</a>, Previous: <a href="30_帧.html">帧</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>要创建一个新帧，请调用函数 make-frame。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: make-frame &amp;optional parameters ¶
+</pre></div>
+<p>此函数创建并返回一个新帧，显示当前缓冲区。
+</p>
+<p>parameters 参数是一个列表，它为新帧指定帧参数。请参见帧参数。如果您在参数中指定终端参数，则会在该终端上创建新帧。否则，如果您在参数中指定窗口系统帧参数，则确定帧应显示在文本终端还是图形终端上。请参阅窗系统。如果两者都没有指定，则在与选定帧相同的终端中创建新帧。
+</p>
+<p>参数中未提及的任何参数默认为 alist default-frame-alist 中的值（参见初始帧参数）；  此处未指定的参数默认来自 X 资源或操作系统上的等效资源（请参阅 GNU Emacs 手册中的 X 资源）。创建帧后，此函数应用在 frame-inherited-parameters 中指定的任何参数（见下文），它尚未分配，从调用 make-frame 时选择的帧中获取值。
+</p>
+<p>请注意，在多显示器显示器（请参阅多个终端）上，窗口管理器可能会以不同于参数中位置参数指定的方式定位帧（请参阅位置参数）。例如，一些窗口管理器的策略是在包含窗口最大部分的监视器上显示帧（也称为主监视器）。
+</p>
+<p>此函数本身不会使新帧成为选定帧。请参阅输入焦点。先前选择的帧保持选中状态。然而，在图形终端上，窗口系统可能会出于自己的原因选择新帧。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: before-make-frame-hook ¶
+</pre></div>
+<p>在创建帧之前由 make-frame 运行的普通钩子。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: after-make-frame-functions ¶
+</pre></div>
+<p>make-frame 创建帧后运行的异常钩子。after-make-frame-functions 中的每个函数都接收一个参数，即刚刚创建的帧。
+</p>
+<p>请注意，由初始文件添加到这些钩子的任何函数通常不会针对初始帧运行，因为 Emacs 仅在创建该帧后才会读取初始文件。但是，如果初始帧被指定为使用单独的 minibuffer 帧（请参阅 Minibuffers 和 Frames），则函数将为无 minibuffer-less 和 minibuffer 帧运行。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: frame-inherited-parameters ¶
+</pre></div>
+<p>此变量指定新创建的帧从当前选定的帧继承的帧参数列表。对于作为此列表中的元素且在处理构建帧时之前未分配的每个参数（符号），该函数将创建的帧中该参数的值设置为其在选定帧中的值。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: server-after-make-frame-hook ¶
+</pre></div>
+<p>当 Emacs 服务器创建一个客户端帧时，一个正常的钩子运行。当这个钩子被调用时，创建的帧是被选中的。请参阅 GNU Emacs 手册中的 Emacs 服务器。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="30.2_多终端.html">多终端</a>, Previous: <a href="30_帧.html">帧</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

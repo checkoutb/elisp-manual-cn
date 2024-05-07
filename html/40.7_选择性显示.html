@@ -1,0 +1,70 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.7 选择性显示</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">40.7 选择性显示</h2>
+<div class="nav-panel"><p>Next: <a href="40.8_临时展示.html">临时展示</a>, Previous: <a href="40.6_不可见文本.html">不可见文本</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>选择性显示是指在屏幕上隐藏某些行的一对相关功能。
+</p>
+<p>第一个变体，显式选择性显示，设计用于 Lisp 程序：它通过更改文本来控制隐藏哪些行。这种隐藏现在已经过时和弃用了；  相反，您应该使用不可见属性（请参阅不可见文本）来获得相同的效果。
+</p>
+<p>在第二个变体中，根据缩进自动选择要隐藏的行。此变体旨在成为用户级功能。
+</p>
+<p>控制显式选择性显示的方法是将换行符 (control-j) 替换为回车符 (control-m)。以前是该换行符之后的一行的文本现在被隐藏了。严格来说，它暂时不再是一行，因为只有换行才能分隔行；  它现在是前一行的一部分。
+</p>
+<p>选择性显示不直接影响编辑命令。例如，Cf (forward-char) 毫不犹豫地将点移动到隐藏文本中。但是，用回车符替换换行符会影响一些编辑命令。例如，下一行跳过隐藏行，因为它只搜索换行符。使用选择性显示的模式还可以定义考虑换行符的命令，或者控制隐藏文本的哪些部分。
+</p>
+<p>当您将选择性显示的缓冲区写入文件时，所有 control-m 都作为换行符输出。这意味着当您下次读取文件时，它看起来还不错，没有任何隐藏。选择性显示效果仅在 Emacs 中可见。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: selective-display ¶
+</pre></div>
+<p>此缓冲区局部变量启用选择性显示。这意味着可以隐藏线条或线条的一部分。
+</p>
+<p>如果selective-display的值为t，则字符control-m标记隐藏文本的开始；  不显示 control-m 及其后的其余行。这是明确的选择性显示。
+如果selective-display 的值是一个正整数，则不显示以多于那么多缩进列开始的行。
+</p>
+<p>当缓冲区的某些部分被隐藏时，垂直移动命令就像该部分不存在一样运行，从而允许单个下一行命令跳过任意数量的隐藏行。但是，字符移动命令（例如 forward-char）不会跳过隐藏部分，并且可以（如果棘手）在隐藏部分中插入或删除文本。
+</p>
+<p>在下面的例子中，我们展示了缓冲区 foo 的显示外观，它随着选择性显示的值而变化。缓冲区的内容不会改变。
+</p><div class="lisp">
+<pre class="lisp">
+
+(setq selective-display nil)
+     ⇒ nil
+
+---------- Buffer: foo ----------
+1 on this column
+ 2on this column
+  3n this column
+  3n this column
+ 2on this column
+1 on this column
+---------- Buffer: foo ----------
+
+
+(setq selective-display 2)
+     ⇒ 2
+
+---------- Buffer: foo ----------
+1 on this column
+ 2on this column
+ 2on this column
+1 on this column
+---------- Buffer: foo ----------
+</pre></div>
+<div class="lisp">
+<pre class="lisp">User Option: selective-display-ellipses ¶
+</pre></div>
+<p>如果这个缓冲区局部变量不为 nil，那么 Emacs 会在行尾显示 <code>...</code> ，然后是隐藏文本。这个例子是前一个例子的延续。
+</p><div class="lisp">
+<pre class="lisp">(setq selective-display-ellipses t)
+     ⇒ t
+
+---------- Buffer: foo ----------
+1 on this column
+ 2on this column ...
+ 2on this column
+1 on this column
+---------- Buffer: foo ----------
+</pre></div>
+<p>您可以使用显示表来替换省略号 (’…’) 的其他文本。请参阅显示表格。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.8_临时展示.html">临时展示</a>, Previous: <a href="40.6_不可见文本.html">不可见文本</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

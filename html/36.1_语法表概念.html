@@ -1,0 +1,24 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>36.1 语法表概念</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">36.1 语法表概念</h2>
+<div class="nav-panel"><p>Next: <a href="36.2_语法描述符.html">语法描述符</a>, Previous: <a href="36_语法表.html">语法表</a>, Up: <a href="36_语法表.html">语法表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>语法表是一种数据结构，可用于查找每个字符的语法类和其他语法属性。Lisp 程序使用语法表来扫描和移动文本。
+</p>
+<p>在内部，语法表是一个字符表（请参阅字符表）。索引 c 处的元素描述了代码为 c 的字符；  它的值是一个 cons 单元格，它指定所讨论字符的语法。有关详细信息，请参阅语法表内部结构。但是，您通常应该使用高级函数 char-syntax 和 modify-syntax-entry，而不是使用 aset 和 aref 来修改和检查语法表内容，这些函数在语法表函数中进行了描述。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: syntax-table-p object ¶
+</pre></div>
+<p>如果 object 是语法表，则此函数返回 t。
+</p>
+<p>每个缓冲区都有自己的主模式，每个主模式对各种字符的语法类都有自己的想法。例如，在 Lisp 模式中，字符 ’;’  开始注释，但在 C 模式下，它终止语句。为了支持这些变化，语法表对于每个缓冲区都是本地的。通常，每个主要模式都有自己的语法表，它安装在使用该模式的所有缓冲区中。例如，变量 emacs-lisp-mode-syntax-table 保存了 Emacs Lisp 模式使用的语法表，而 c-mode-syntax-table 保存了 C 模式使用的语法表。更改主要模式的语法表会更改该模式的所有缓冲区以及随后置于该模式的任何缓冲区中的语法。有时，几个相似的模式共享一个语法表。有关如何设置语法表的示例，请参阅主要模式示例。
+</p>
+<p>一个语法表可以继承自另一个语法表，称为其父语法表。语法表可以不指定某些字符的语法类，方法是给它们 <code>继承</code> 语法类；  然后这样的字符获取父语法表指定的语法类（参见语法类表）。Emacs 定义了一个标准的语法表，它是默认的父语法表，也是 Fundamental 模式使用的语法表。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: standard-syntax-table ¶
+</pre></div>
+<p>该函数返回标准语法表，即基本模式下使用的语法表。
+</p>
+<p>Emacs Lisp 阅读器不使用语法表，它有自己的内置语法规则，无法更改。（一些 Lisp 系统提供了重新定义读取语法的方法，但为了简单起见，我们决定将这个特性从 Emacs Lisp 中排除。）
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="36.2_语法描述符.html">语法描述符</a>, Previous: <a href="36_语法表.html">语法表</a>, Up: <a href="36_语法表.html">语法表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

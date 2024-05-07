@@ -1,0 +1,32 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.2 主要模式</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">24.2 主要模式</h2>
+<div class="nav-panel"><p>Next: <a href="24.2.1_主要模式约定.html">主要模式约定</a>, Previous: <a href="24.1.2_设置挂钩.html">设置挂钩</a>, Up: <a href="24_主要和次要模式.html">主要和次要模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>主要模式专门用于 Emacs 编辑或与特定类型的文本交互。每个缓冲区一次只有一个主要模式。每个主要模式都与一个主要模式命令相关联，其名称应以 <code>-mode</code> 结尾。该命令通过设置各种缓冲区局部变量（例如本地键盘映射）来处理在当前缓冲区中切换到该模式。请参阅主要模式约定。请注意，与次要模式不同，无法 <code>关闭</code> 主要模式，而是必须将缓冲区切换到不同的模式。但是，您可以暂时暂停主要模式，然后再恢复暂停模式，见下文。
+</p>
+<p>最不专业的主要模式称为基本模式，它没有特定于模式的定义或变量设置。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: fundamental-mode ¶
+</pre></div>
+<p>这是基本模式的主要模式命令。与其他模式命令不同，它不运行任何模式挂钩（请参阅主要模式约定），因为您不应该自定义此模式。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: major-mode-suspend ¶
+</pre></div>
+<p>这个函数像基本模式一样工作，因为它会杀死所有缓冲区局部变量，但它也会记录有效的主模式，以便随后可以恢复它。当您需要将缓冲区置于 Emacs 自动为其选择的模式之外的某个特定模式下时（请参阅 Emacs 如何选择主模式），此功能和主模式恢复（接下来将描述）很有用，但也想成为以后可以切换回原来的模式。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: major-mode-restore &amp;optional avoided-modes ¶
+</pre></div>
+<p>该函数恢复major-mode-suspend记录的主模式。如果没有记录主要模式，则此函数调用正常模式（请参阅正常模式），但如果该参数为非零，则尝试强制它不在避免模式中选择任何模式。
+</p>
+<p>编写主模式最简单的方法是使用宏定义派生模式，它将新模式设置为现有主模式的变体。请参阅定义派生模式。即使新模式不是另一种模式的明显派生，我们也建议使用 define-derived-mode，因为它会自动为您强制执行许多编码约定。有关派生的常见模式，请参阅基本主要模式。
+</p>
+<p>标准的 GNU Emacs Lisp 目录树包含几个主要模式的代码，在 text-mode.el、texinfo.el、lisp-mode.el 和 rmail.el 等文件中。您可以研究这些库以了解模式是如何编写的。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: major-mode ¶
+</pre></div>
+<p>此变量的缓冲区本地值保存当前主要模式的符号。它的默认值保存新缓冲区的默认主模式。标准默认值是基本模式。
+</p>
+<p>如果默认值为 nil，那么每当 Emacs 通过诸如 Cx b (switch-to-buffer) 之类的命令创建一个新缓冲区时，新缓冲区就会被置于先前当前缓冲区的主模式。作为一个例外，如果前一个缓冲区的主模式具有一个具有特殊值的模式类符号属性，则新缓冲区将置于基本模式（请参阅主模式约定）。
+</p>
+<div class="nav-panel"><p>Next: <a href="24.2.1_主要模式约定.html">主要模式约定</a>, Previous: <a href="24.1.2_设置挂钩.html">设置挂钩</a>, Up: <a href="24_主要和次要模式.html">主要和次要模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,216 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>41.3 操作系统环境</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">41.3 操作系统环境</h2>
+<div class="nav-panel"><p>Next: <a href="41.4_用户识别.html">用户识别</a>, Previous: <a href="41.2.2_挂起_Emacs.html">挂起_Emacs</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 通过各种函数提供对操作系统环境中变量的访问。这些变量包括系统名称、用户的 UID 等。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: system-configuration ¶
+</pre></div>
+<p>此变量以字符串形式保存系统硬件/软件配置的标准 GNU 配置名称。例如，64 位 GNU/Linux 系统的典型值为 ’"x86<em>_64</em>-unknown-linux-gnu"’。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: system-type ¶
+</pre></div>
+<p>这个变量的值是一个符号，表示 Emacs 正在运行的操作系统的类型。可能的值是：
+</p>
+<div class="lisp">
+<pre class="lisp">aix
+</pre></div>
+<p>IBM 的 AIX。
+</p><div class="lisp">
+<pre class="lisp">berkeley-unix
+</pre></div>
+<p>伯克利 BSD 及其变体。
+</p><div class="lisp">
+<pre class="lisp">cygwin
+</pre></div>
+<p>Cygwin，MS-Windows 之上的 POSIX 层。
+</p><div class="lisp">
+<pre class="lisp">darwin
+</pre></div>
+<p>达尔文 (macOS)。
+</p><div class="lisp">
+<pre class="lisp">gnu
+</pre></div>
+<p>GNU 系统（使用 GNU 内核，由 HURD 和 Mach 组成）。
+</p><div class="lisp">
+<pre class="lisp">gnu/linux
+</pre></div>
+<p>GNU/Linux 系统——即使用 Linux 内核的变体 GNU 系统。（这些系统就是人们常说的 <code>Linux</code> ，但实际上 Linux 只是内核，而不是整个系统。）
+</p><div class="lisp">
+<pre class="lisp">gnu/kfreebsd
+</pre></div>
+<p>具有 FreeBSD 内核的 GNU（基于 glibc）系统。
+</p><div class="lisp">
+<pre class="lisp">hpux
+</pre></div>
+<p>惠普 HPUX 操作系统。
+</p><div class="lisp">
+<pre class="lisp">nacl
+</pre></div>
+<p>Google Native Client (NaCl) 沙盒系统。
+</p><div class="lisp">
+<pre class="lisp">ms-dos
+</pre></div>
+<p>微软的 DOS。使用 DJGPP 为 MS-DOS 编译的 Emacs 将系统类型绑定到 ms-dos，即使您在 MS-Windows 上运行它也是如此。
+</p><div class="lisp">
+<pre class="lisp">usg-unix-v
+</pre></div>
+<p>AT&amp;T Unix System V.
+</p><div class="lisp">
+<pre class="lisp">windows-nt
+</pre></div>
+<p>Microsoft Windows NT、9X 及更高版本。system-type 的值始终为 windows-nt，例如，即使在 Windows 10 上也是如此。
+</p>
+<p>除非绝对必要，否则我们不希望添加新符号来进行更精细的区分！  事实上，我们希望在未来消除其中的一些替代方案。如果您需要比系统类型允许的更精细的区分，您可以测试系统配置，例如，针对正则表达式。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: system-name ¶
+</pre></div>
+<p>此函数以字符串形式返回您正在运行的机器的名称。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: mail-host-address ¶
+</pre></div>
+<p>如果此变量不为 nil，则使用它代替 system-name 来生成电子邮件地址。例如，在构造用户邮件地址的默认值时使用。请参阅用户标识。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: getenv var &amp;optional frame ¶
+</pre></div>
+<p>此函数以字符串形式返回环境变量 var 的值。var 应该是一个字符串。如果环境中未定义 var，则 getenv 返回 nil。如果设置了 var 但为 null，则返回 ’""’。在 Emacs 中，环境变量及其值的列表保存在变量 process-environment 中。
+</p>
+<div class="lisp">
+<pre class="lisp">(getenv "USER")
+     ⇒ "lewis"
+</pre></div>
+<p>shell 命令 printenv 打印全部或部分环境：
+</p><div class="lisp">
+<pre class="lisp">bash$ printenv
+PATH=/usr/local/bin:/usr/bin:/bin
+USER=lewis
+
+TERM=xterm
+SHELL=/bin/bash
+HOME=/home/lewis
+
+…
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Command: setenv variable &amp;optional value substitute ¶
+</pre></div>
+<p>此命令将名为 variable 的环境变量的值设置为 value。变量应该是一个字符串。在内部，Emacs Lisp 可以处理任何字符串。但是，通常变量应该是有效的外壳标识符，即字母、数字和下划线的序列，以字母或下划线开头。否则，如果 Emacs 的子进程尝试访问变量的值，可能会出现错误。如果 value 被省略或 nil （或者，交互地，使用前缀参数）， setenv 从环境中删除变量。否则，值应该是一个字符串。
+</p>
+<p>如果可选参数替代非零，Emacs 调用函数替代环境变量来扩展任何环境变量的值。
+</p>
+<p>setenv 通过修改进程环境来工作；  将该变量与 let 绑定也是合理的做法。
+</p>
+<p>setenv 返回变量的新值，如果从环境中删除变量，则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: with-environment-variables variables body… ¶
+</pre></div>
+<p>该宏在执行body时临时根据变量设置环境变量。表单完成后将恢复以前的值。参数变量应该是格式为 (var value) 的字符串对列表，其中 var 是环境变量的名称，value 是该变量的值。
+</p>
+<div class="lisp">
+<pre class="lisp">(with-environment-variables (("LANG" "C")
+                             ("LANGUAGE" "en_US:en"))
+  (call-process "ls" nil t))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Variable: process-environment ¶
+</pre></div>
+<p>该变量是一个字符串列表，每个字符串描述一个环境变量。函数 getenv 和 setenv 通过这个变量工作。
+</p>
+<div class="lisp">
+<pre class="lisp">
+
+process-environment
+⇒ ("PATH=/usr/local/bin:/usr/bin:/bin"
+    "USER=lewis"
+
+    "TERM=xterm"
+    "SHELL=/bin/bash"
+    "HOME=/home/lewis"
+    …)
+</pre></div>
+<p>如果 process-environment 包含多个指定相同环境变量的元素，则这些元素中的第一个指定变量，而其他元素将被忽略。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: initial-environment ¶
+</pre></div>
+<p>此变量保存 Emacs 启动时从其父进程继承的环境变量列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: path-separator ¶
+</pre></div>
+<p>此变量包含一个字符串，该字符串表示搜索路径中的哪个字符分隔目录（如在环境变量中找到的那样）。对于 Unix 和 GNU 系统，它的值是 <code>:</code> ，而 <code>;</code>   用于 MS 系统。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: path-separator ¶
+</pre></div>
+<p>此函数返回变量路径分隔符的连接局部值。那是 ~ ;~   对于 MS 系统和本地默认目录， <code>：</code> 对于 Unix 和 GNU 系统，或远程默认目录。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: parse-colon-path path ¶
+</pre></div>
+<p>此函数采用搜索路径字符串（例如 PATH 环境变量的值），并在分隔符处将其拆分，返回目录列表。此列表中的 nil 表示当前目录。虽然函数的名称是 <code>冒号</code> ，但它实际上使用了变量路径分隔符的值。
+</p>
+<div class="lisp">
+<pre class="lisp">(parse-colon-path ":/foo:/bar")
+     ⇒ (nil "/foo/" "/bar/")
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Variable: invocation-name ¶
+</pre></div>
+<p>此变量保存调用 Emacs 的程序名称。该值是一个字符串，并且不包括目录名称。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: invocation-directory ¶
+</pre></div>
+<p>此变量保存 Emacs 可执行文件在运行时所在的目录，如果无法确定该目录，则为 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: installation-directory ¶
+</pre></div>
+<p>如果非零，这是一个目录，可以在其中查找 lib-src 和 etc 子目录。在已安装的 Emacs 中，它通常为 nil。当 Emacs 无法在其标准安装位置找到这些目录，但可以在与包含 Emacs 可执行文件的目录（即调用目录）相关的目录中找到它们时，它是非零的。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: load-average &amp;optional use-float ¶
+</pre></div>
+<p>此函数以列表的形式返回当前 1 分钟、5 分钟和 15 分钟的系统负载平均值。平均负载表示试图在系统上运行的进程数。
+</p>
+<p>默认情况下，这些值是系统负载平均值的 100 倍的整数，但如果 use-float 不为零，则它们将作为浮点数返回，而不乘以 100。
+</p>
+<p>如果无法获得负载平均值，则此函数会发出错误信号。在某些平台上，访问平均负载需要将 Emacs 安装为 setuid 或 setgid，以便它可以读取内核信息，这通常是不可取的。
+</p>
+<p>如果 1 分钟负载平均值可用，但 5 或 15 分钟平均值不可用，则此函数返回包含可用平均值的缩短列表。
+</p><div class="lisp">
+<pre class="lisp">(load-average)
+     ⇒ (169 48 36)
+
+(load-average t)
+     ⇒ (1.69 0.48 0.36)
+</pre></div>
+<p>shell 命令 uptime 返回类似的信息。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: emacs-pid ¶
+</pre></div>
+<p>此函数以整数形式返回 Emacs 进程的进程 ID。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: tty-erase-char ¶
+</pre></div>
+<p>此变量保存在 Emacs 启动之前在系统终端驱动程序中选择的擦除字符。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: null-device ¶
+</pre></div>
+<p>此变量保存系统空设备。对于 Unix 和 GNU 系统，其值为 <code>/dev/null</code> ，对于 MS 系统，其值为 <code>NUL</code> 。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: null-device ¶
+</pre></div>
+<p>此函数返回变量 null-device 的连接本地值。对于 MS 系统和本地默认目录是 <code>NUL</code> ，对于 Unix 和 GNU 系统是 <code>/dev/null</code> ，或者是远程默认目录。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="41.4_用户识别.html">用户识别</a>, Previous: <a href="41.2.2_挂起_Emacs.html">挂起_Emacs</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

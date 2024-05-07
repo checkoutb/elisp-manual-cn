@@ -1,0 +1,67 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>5.6.3 重新排列列表的函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">5.6.3 重新排列列表的函数</h3>
+<div class="nav-panel"><p>Next: <a href="05.7_使用列表作为集合.html">使用列表作为集合</a>, Previous: <a href="05.6.2_更改列表的_CDR.html">更改列表的_CDR</a>, Up: <a href="05.6_修改现有列表结构.html">修改现有列表结构.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>以下是一些通过修改其组件 cons 单元格的 CDR 来破坏性地重新排列列表的函数。这些函数具有破坏性，因为它们会破坏作为参数传递给它们的原始列表，重新链接它们的 cons 单元以形成一个作为返回值的新列表。
+</p>
+<p>有关修改 cons 单元格的另一个函数，请参见使用列表作为集合中的 delq。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: nconc &amp;rest lists
+</pre></div>
+<p>此函数返回一个包含列表所有元素的列表。与 append 不同（参见 Building Cons Cells and Lists），列表不会被复制。而是将每个列表的最后一个 CDR 更改为引用以下列表。最后一个列表没有改变。例如：
+</p>
+<div class="lisp">
+<pre class="lisp">(setq x (list 1 2 3))
+     ⇒ (1 2 3)
+
+(nconc x '(4 5))
+     ⇒ (1 2 3 4 5)
+
+x
+     ⇒ (1 2 3 4 5)
+
+</pre></div>
+<p>由于 nconc 的最后一个参数本身没有被修改，因此使用常量列表是合理的，例如 ’(4 5)，如上例所示。出于同样的原因，最后一个参数不必是列表：
+</p>
+<div class="lisp">
+<pre class="lisp">
+
+(setq x (list 1 2 3))
+     ⇒ (1 2 3)
+
+(nconc x 'z)
+     ⇒ (1 2 3 . z)
+
+x
+     ⇒ (1 2 3 . z)
+</pre></div>
+<p>但是，其他参数（除了最后一个）应该是可变列表。
+</p>
+<p>一个常见的陷阱是使用常量列表作为 nconc 的非最后一个参数。如果您这样做，则结果行为是未定义的（请参阅自我评估表格）。您的程序可能会在每次运行时发生变化！  以下是可能发生的情况（尽管不保证会发生）：
+</p>
+<div class="lisp">
+<pre class="lisp">
+
+(defun add-foo (x)            ; We want this function to add
+  (nconc '(foo) x))           ;   foo to the front of its arg.
+
+
+(symbol-function 'add-foo)
+     ⇒ (lambda (x) (nconc '(foo) x))
+
+
+(setq xx (add-foo '(1 2)))    ; It seems to work.
+     ⇒ (foo 1 2)
+
+(setq xy (add-foo '(3 4)))    ; What happened?
+     ⇒ (foo 1 2 3 4)
+
+(eq xx xy)
+     ⇒ t
+
+
+(symbol-function 'add-foo)
+     ⇒ (lambda (x) (nconc '(foo 1 2 3 4) x))
+
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="05.7_使用列表作为集合.html">使用列表作为集合</a>, Previous: <a href="05.6.2_更改列表的_CDR.html">更改列表的_CDR</a>, Up: <a href="05.6_修改现有列表结构.html">修改现有列表结构.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

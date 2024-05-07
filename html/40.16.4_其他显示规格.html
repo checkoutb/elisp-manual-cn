@@ -1,0 +1,74 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.16.4 其他显示规格</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.16.4 其他显示规格</h3>
+<div class="nav-panel"><p>Next: <a href="40.16.5_在边缘显示.html">在边缘显示</a>, Previous: <a href="40.16.3_空间的像素规范.html">空间的像素规范</a>, Up: <a href="40.16_display财产.html">display财产.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>以下是您可以在显示文本属性中使用的其他类型的显示规范。
+</p>
+<div class="lisp">
+<pre class="lisp">string
+</pre></div>
+<p>显示字符串而不是具有此属性的文本。
+</p>
+<p>不支持递归显示规范——不使用字符串的显示属性（如果有）。
+</p><div class="lisp">
+<pre class="lisp">(image . image-props)
+</pre></div>
+<p>这种显示规范是一个图像描述符（请参阅图像描述符）。当用作显示规范时，表示显示图像而不是具有显示规范的文本。
+</p><div class="lisp">
+<pre class="lisp">(slice x y width height)
+</pre></div>
+<p>该规范与图像一起指定要显示的图像的切片（部分区域）。元素 y 和 x 指定图像内切片的左上角；  width 和 height 指定切片的宽度和高度。整数是像素数。0.0–1.0 范围内的浮点数代表整个图像的宽度或高度的一部分。
+</p><div class="lisp">
+<pre class="lisp">((margin nil) string)
+</pre></div>
+<p>这种形式的显示规范意味着在与该文本相同的位置显示字符串而不是具有显示规范的文本。它相当于只使用字符串，但它是作为边缘显示的一种特殊情况完成的（请参阅在边缘显示）。
+</p><div class="lisp">
+<pre class="lisp">(left-fringe bitmap [face])
+</pre></div>
+<div class="lisp">
+<pre class="lisp">(right-fringe bitmap [face])
+</pre></div>
+<p>对文本行的任何字符的此显示规范导致指定的位图显示在该行的左边缘或右边缘，而不是具有显示规范的字符。可选面指定其颜色将用于位图显示的面。有关详细信息，请参阅边缘位图。
+</p><div class="lisp">
+<pre class="lisp">(space-width factor)
+</pre></div>
+<p>此显示规范影响具有该规范的文本中的所有空格字符。它显示所有这些空间因子倍的正常宽度。元素因子应该是整数或浮点数。空格以外的字符完全不受影响；  特别是，这对制表符没有影响。
+</p><div class="lisp">
+<pre class="lisp">(height height)
+</pre></div>
+<p>此显示规范使文本更高或更短。以下是身高的可能性：
+</p>
+<div class="lisp">
+<pre class="lisp">(+ n)
+</pre></div>
+<p>这意味着使用大 n 步的字体。一个步骤由一组可用字体定义——具体来说，那些与为该文本指定的字体相匹配的字体，在除高度之外的所有属性中。可以使用合适字体的每个尺寸都算作另一个步骤。n 应该是一个整数。
+</p><div class="lisp">
+<pre class="lisp">(- n)
+</pre></div>
+<p>这意味着使用小 n 步的字体。
+</p><div class="lisp">
+<pre class="lisp">a number, factor
+</pre></div>
+<p>一个数字，即因子，表示使用的字体是默认字体的因子倍高。
+</p><div class="lisp">
+<pre class="lisp">a symbol, function
+</pre></div>
+<p>符号是计算高度的函数。它以当前高度作为参数调用，并应返回要使用的新高度。
+</p><div class="lisp">
+<pre class="lisp">anything else, form
+</pre></div>
+<p>如果高度值不符合前面的可能性，则它是一种形式。Emacs 评估它以获得新的高度，符号高度绑定到当前指定的字体高度。
+</p>
+<div class="lisp">
+<pre class="lisp">(raise factor)
+</pre></div>
+<p>这种显示规范相对于行的基线升高或降低它所应用的文本。它主要是为了支持下标和上标的显示。
+</p>
+<p>该因子必须是一个数字，它被解释为受影响文本高度的倍数。如果它是肯定的，那意味着显示被提升的字符。如果它是负数，则意味着将它们显示在下方。
+</p>
+<p>请注意，如果文本还具有高度显示规范，该规范在提升之前（即左侧）指定，后者将影响提升或降低的像素量，因为这是基于被提升的文本的高度.  因此，如果要显示小于正常文本高度的下标或上标，请考虑在高度之前指定 raise。
+</p>
+<p>您可以使任何显示规范成为有条件的。为此，请将其打包在表单的另一个列表中（当条件为 .spec 时）。然后规范规范仅在条件评估为非零值时适用。在评估期间，对象被绑定到具有条件显示属性的字符串或缓冲区。position 和 buffer-position 分别绑定到 object 内的位置和找到 display 属性的缓冲区位置。当对象是字符串时，这两个位置可以不同。
+</p>
+<p>请注意，仅当重新显示检查此显示规范所在的文本时才会评估条件，因此此功能最适合相对稳定的条件，即，对于每个特定的缓冲区位置，每次评估都会产生相同的结果。如果相同文本位置的结果发生变化，例如，如果结果取决于点的位置，那么条件规范可能不会做你想要的，因为重新显示只检查缓冲区文本中它有理由假设某事的那些部分自上次显示周期以来发生变化。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.16.5_在边缘显示.html">在边缘显示</a>, Previous: <a href="40.16.3_空间的像素规范.html">空间的像素规范</a>, Up: <a href="40.16_display财产.html">display财产.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,18 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>28.13 缓冲间隙</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">28.13 缓冲间隙</h2>
+<div class="nav-panel"><p>Next: <a href="29_窗口.html">窗口</a>, Previous: <a href="28.12_在两个缓冲区之间交换文本.html">在两个缓冲区之间交换文本</a>, Up: <a href="28_缓冲区.html">缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 缓冲区是使用一个不可见的间隙来实现的，以使插入和删除更快。插入通过填充部分间隙来起作用，而删除则增加间隙。当然，这意味着必须首先将间隙移动到插入或删除的位点。仅当您尝试插入或删除时，Emacs 才会移动间隙。这就是为什么你在一个大缓冲区的一个部分中的第一个编辑命令，在之前在另一个很远的部分进行编辑之后，有时会出现明显的延迟。
+</p>
+<p>这种机制是不可见的，Lisp 代码永远不会受到间隙当前位置的影响，但这些函数可用于获取有关间隙状态的信息。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: gap-position ¶
+</pre></div>
+<p>此函数返回当前缓冲区中的当前间隙位置。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: gap-size ¶
+</pre></div>
+<p>此函数返回当前缓冲区的当前间隙大小。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="29_窗口.html">窗口</a>, Previous: <a href="28.12_在两个缓冲区之间交换文本.html">在两个缓冲区之间交换文本</a>, Up: <a href="28_缓冲区.html">缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

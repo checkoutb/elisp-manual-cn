@@ -1,0 +1,30 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.1 命令循环概述</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">22.1 命令循环概述</h2>
+<div class="nav-panel"><p>Next: <a href="22.2_定义命令.html">定义命令</a>, Previous: <a href="22_命令循环.html">命令循环</a>, Up: <a href="22_命令循环.html">命令循环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>命令循环必须做的第一件事是读取一个键序列，这是一个转换为命令的输入事件序列。它通过调用函数 read-key-sequence 来做到这一点。Lisp 程序也可以调用这个函数（参见按键序列输入）。他们还可以使用 read-key 或 read-event 读取较低级别的输入（请参阅Reading One Event），或使用discard-input 丢弃待处理的输入（请参阅Miscellaneous Event Input Features）。
+</p>
+<p>键序列通过当前活动的键映射转换为命令。有关如何完成此操作的信息，请参阅 Key Lookup。结果应该是键盘宏或交互式可调用函数。如果键是 Mx，那么它会读取另一个命令的名称，然后调用它。这是通过命令 execute-extended-command 完成的（请参阅交互式调用）。
+</p>
+<p>在执行命令之前，Emacs 会运行 undo-boundary 来创建一个 undo 边界。请参阅维护撤消列表。
+</p>
+<p>为了执行一个命令，Emacs 首先通过调用 command-execute 来读取它的参数（参见交互式调用）。对于用 Lisp 编写的命令，交互式规范说明了如何读取参数。这可以使用前缀参数（参见前缀命令参数）或者可以在小缓冲区中读取提示（参见小缓冲区）。例如，命令 find-file 有一个交互式规范，它说使用 minibuffer 读取文件名。find-file 的函数体不使用 minibuffer，所以如果你从 Lisp 代码中调用 find-file 作为一个函数，你必须提供文件名字符串作为一个普通的 Lisp 函数参数。
+</p>
+<p>如果命令是键盘宏（即，字符串或向量），Emacs 使用 execute-kbd-macro 执行它（请参阅键盘宏）。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: pre-command-hook ¶
+</pre></div>
+<p>这个普通的钩子在执行每个命令之前由编辑器命令循环运行。此时，this-command 包含即将运行的命令，last-command 描述了上一条命令。请参阅命令循环中的信息。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: post-command-hook ¶
+</pre></div>
+<p>这个正常的钩子由编辑器命令循环在执行每个命令后运行（包括由于退出或错误而提前终止的命令）。此时this-command指的是刚刚运行的命令，last-command指的是之前的命令。
+</p>
+<p>当 Emacs 第一次进入命令循环时（此时 this-command 和 last-command 都是 nil），这个钩子也会运行。
+</p>
+<p>运行 pre-command-hook 和 post-command-hook 时会抑制退出。如果在执行这些钩子之一时发生错误，它不会终止钩子的执行；  取而代之的是，错误被静音，并且发生错误的函数被从钩子中删除。
+</p>
+<p>进入 Emacs 服务器的请求（参见 GNU Emacs 手册中的 Emacs 服务器）运行这两个钩子，就像键盘命令一样。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.2_定义命令.html">定义命令</a>, Previous: <a href="22_命令循环.html">命令循环</a>, Up: <a href="22_命令循环.html">命令循环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>16.9 卸载</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">16.9 卸载</h2>
+<div class="nav-panel"><p>Next: <a href="16.10_装载钩子.html">装载钩子</a>, Previous: <a href="16.8_哪个文件定义了某个符号.html">哪个文件定义了某个符号</a>, Up: <a href="16_加载.html">加载.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>您可以丢弃库加载的函数和变量，为其他 Lisp 对象回收内存。为此，请使用函数 unload-feature：
+</p>
+<div class="lisp">
+<pre class="lisp">Command: unload-feature feature &amp;optional force ¶
+</pre></div>
+<p>此命令卸载提供功能特性的库。它使用 defun、defalias、defsubst、defmacro、defconst、defvar 和 defcustom 取消定义该库中定义的所有函数、宏和变量。然后它会恢复以前与这些符号关联的任何自动加载。（加载会将这些保存在符号的自动加载属性中。）
+</p>
+<p>在恢复之前的定义之前，unload-feature 运行 remove-hook 以从某些挂钩中删除库定义的函数。这些钩子包括名称以 <code>-hook</code> （或已弃用的后缀 <code>-hooks</code> ）结尾的变量，以及 unload-feature-special-hooks 和 auto-mode-alist 中列出的变量。这是为了防止 Emacs 停止运行，因为重要的钩子引用了不再定义的函数。
+</p>
+<p>标准卸载活动还撤消该库中函数的 ELP 分析，取消提供该库提供的任何功能，并取消保存在该库定义的变量中的计时器。
+</p>
+<p>如果这些措施不足以防止故障，库可以定义一个名为 feature-unload-function 的显式卸载程序。如果该符号被定义为函数，则 unload-feature 在执行任何其他操作之前不带参数调用它。它可以做任何适当的事情来卸载库。如果它返回 nil，则 unload-feature 继续执行正常的卸载操作。否则它认为工作已经完成。
+</p>
+<p>通常， unload-feature 拒绝卸载其他已加载库所依赖的库。（如果 a 包含对 b 的要求，则库 a 依赖于库 b。）如果可选参数 force 不为零，则忽略依赖关系，您可以卸载任何库。
+</p>
+<p>unload-feature 函数是用 Lisp 编写的；  它的动作基于可变负载历史。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: unload-feature-special-hooks ¶
+</pre></div>
+<p>此变量保存在卸载库之前要扫描的挂钩列表，以删除库中定义的函数。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="16.10_装载钩子.html">装载钩子</a>, Previous: <a href="16.8_哪个文件定义了某个符号.html">哪个文件定义了某个符号</a>, Up: <a href="16_加载.html">加载.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

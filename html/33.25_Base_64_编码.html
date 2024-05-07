@@ -1,0 +1,57 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.25 Base 64 编码</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">33.25 Base 64 编码</h2>
+<div class="nav-panel"><p>Next: <a href="33.26_校验和哈希.html">校验和哈希</a>, Previous: <a href="33.24_处理压缩数据.html">处理压缩数据</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Base 64 代码在电子邮件中用于将 8 位字节序列编码为更长的 ASCII 图形字符序列。它在 Internet RFC182045 和 RFC 4648 中定义。本节描述了与此代码相互转换的功能。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: base64-encode-region beg end &amp;optional no-line-break ¶
+</pre></div>
+<p>此函数将区域从 beg 转换为 end 为 base 64 代码。它返回编码文本的长度。如果区域中的字符是多字节的，则会发出错误信号，即在多字节缓冲区中，区域必须只包含来自字符集 ascii、八位控制和八位图形的字符。
+</p>
+<p>通常，此函数会在编码文本中插入换行符，以避免行过长。但是，如果可选参数 no-line-break 不为零，则不会添加这些换行符，因此输出只是一个长行。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: base64url-encode-region beg end &amp;optional no-pad ¶
+</pre></div>
+<p>此函数类似于 base64-encode-region，但它根据 RFC 4648 实现了 base 64 编码的 URL 变体，并且它不会在编码文本中插入换行符，因此输出只是一个长行。
+</p>
+<p>如果可选参数 no-pad 不为零，则此函数不会生成填充 (=)。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: base64-encode-string string &amp;optional no-line-break ¶
+</pre></div>
+<p>此函数将字符串 string 转换为 base 64 代码。它返回一个包含编码文本的字符串。对于 base64-encode-region，如果字符串中的字符是多字节的，则会发出错误信号。
+</p>
+<p>通常，此函数会在编码文本中插入换行符，以避免行过长。但是，如果可选参数 no-line-break 不为 nil，则不会添加这些换行符，因此结果字符串只是一个长行。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: base64url-encode-string string &amp;optional no-pad ¶
+</pre></div>
+<p>与 base64-encode-string 类似，但生成 base 64 的 URL 变体，并且不会在编码文本中插入换行符，因此结果只是一长行。
+</p>
+<p>如果可选参数 no-pad 不为零，则此函数不会生成填充。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: base64-decode-region beg end &amp;optional base64url ¶
+</pre></div>
+<p>此函数将区域从 beg 到 end 从 base 64 代码转换为相应的解码文本。它返回解码文本的长度。
+</p>
+<p>解码函数忽略编码文本中的换行符。
+</p>
+<p>如果可选参数 base64url 不为零，则填充是可选的，并且使用 base 64 编码的 URL 变体。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: base64-decode-string string &amp;optional base64url ¶
+</pre></div>
+<p>此函数将字符串 string 从 base 64 代码转换为相应的解码文本。它返回一个包含解码文本的单字节字符串。
+</p>
+<p>解码函数忽略编码文本中的换行符。
+</p>
+<p>如果可选参数 base64url 不为零，则填充是可选的，并且使用 base 64 编码的 URL 变体。
+</p>
+<p>脚注
+(18)
+</p>
+<p>RFC 是 Request for Comments 的首字母缩写词，是描述标准的编号 Internet 信息文档。RFC 通常由技术专家主动编写，并且传统上以务实、经验驱动的方式编写。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.26_校验和哈希.html">校验和哈希</a>, Previous: <a href="33.24_处理压缩数据.html">处理压缩数据</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

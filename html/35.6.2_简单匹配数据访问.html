@@ -1,0 +1,93 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>35.6.2 简单匹配数据访问</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">35.6.2 简单匹配数据访问</h3>
+<div class="nav-panel"><p>Next: <a href="35.6.3_访问整个比赛数据.html">访问整个比赛数据</a>, Previous: <a href="35.6.1_替换匹配的文本.html">替换匹配的文本</a>, Up: <a href="35.6_匹配数据.html">匹配数据.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节说明如何使用匹配数据找出上次搜索或匹配操作匹配的内容（如果成功）。
+</p>
+<p>您可以询问整个匹配文本，或正则表达式的特定括号子表达式。下面函数中的 count 参数指定了哪个。如果计数为零，则您正在询问整个比赛。如果 count 是正数，它指定你想要的子表达式。
+</p>
+<p>回想一下，正则表达式的子表达式是那些用转义括号 <code>\(...\)</code> 分组的表达式。通过从整个正则表达式的开头计算 ’\(’ 的出现次数来找到第 count 个子表达式。第一个子表达式编号为 1，第二个子表达式编号为 2，依此类推。只有正则表达式可以有子表达式——在简单的字符串搜索之后，唯一可用的信息是关于整场比赛的信息。
+</p>
+<p>每次成功的搜索都会设置匹配数据。因此，您应该在搜索后立即查询匹配数据，然后再调用可能执行另一次搜索的任何其他函数。或者，您可以在调用可以执行另一个搜索的函数时保存和恢复匹配数据（请参阅保存和恢复匹配数据）。或者使用明确不修改匹配数据的函数；  例如，字符串匹配-p。
+</p>
+<p>失败的搜索可能会也可能不会改变匹配数据。在当前的实现中，它没有，但我们将来可能会改变它。不要试图在搜索失败后依赖匹配数据的值。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: match-string count &amp;optional in-string ¶
+</pre></div>
+<p>此函数以字符串形式返回在上次搜索或匹配操作中匹配的文本。如果 count 为零，则返回整个文本，如果 count 为正，则返回与第 count 个括号子表达式相对应的部分。
+</p>
+<p>如果最后一次这样的操作是针对带有字符串匹配的字符串执行的，那么您应该传递与字符串中的参数相同的字符串。在缓冲区搜索或匹配之后，您应该省略 in-string 或为其传递 nil；  但是您应该确保调用 match-string 时的当前缓冲区是您进行搜索或匹配的缓冲区。不遵循此建议将导致错误的结果。
+</p>
+<p>如果 count 超出范围，或者对于 ’\|’ 内的子表达式，则值为 nil  未使用的替代方法或重复零次的重复。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: match-string-no-properties count &amp;optional in-string ¶
+</pre></div>
+<p>此函数类似于匹配字符串，只是结果没有文本属性。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: match-beginning count ¶
+</pre></div>
+<p>如果最后一次正则表达式搜索找到匹配项，则此函数返回匹配文本或其子表达式的开始位置。
+</p>
+<p>如果 count 为零，则该值是整个匹配的开始位置。否则，count 指定正则表达式中的子表达式，函数的值是该子表达式匹配的起始位置。
+</p>
+<p>’\|’ 中的子表达式的值为 nil  未使用的替代方法或重复零次的重复。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: match-end count ¶
+</pre></div>
+<p>此函数类似于 match-beginning，只是它返回匹配结束的位置，而不是开始的位置。
+</p>
+<p>以下是使用匹配数据的示例，并带有显示文本中位置的注释：
+</p><div class="lisp">
+<pre class="lisp">
+
+(string-match "\\(qu\\)\\(ick\\)"
+              "The quick fox jumped quickly.")
+              ;0123456789
+     ⇒ 4
+
+
+(match-string 0 "The quick fox jumped quickly.")
+     ⇒ "quick"
+(match-string 1 "The quick fox jumped quickly.")
+     ⇒ "qu"
+(match-string 2 "The quick fox jumped quickly.")
+     ⇒ "ick"
+
+
+(match-beginning 1)       ; The beginning of the match
+     ⇒ 4                 ;   with ‘qu’ is at index 4.
+
+
+(match-beginning 2)       ; The beginning of the match
+     ⇒ 6                 ;   with ‘ick’ is at index 6.
+
+
+(match-end 1)             ; The end of the match
+     ⇒ 6                 ;   with ‘qu’ is at index 6.
+
+(match-end 2)             ; The end of the match
+     ⇒ 9                 ;   with ‘ick’ is at index 9.
+</pre></div>
+<p>这是另一个例子。点最初位于线的开头。搜索移动指向空格和单词’in’之间。整个匹配的开始在缓冲区的第 9 个字符 (’T’)，第一个子表达式的匹配开始在第 13 个字符 (’c’)。
+</p><div class="lisp">
+<pre class="lisp">
+
+(list
+  (re-search-forward "The \\(cat \\)")
+  (match-beginning 0)
+  (match-beginning 1))
+    ⇒ (17 9 13)
+
+
+---------- Buffer: foo ----------
+I read "The cat ∗in the hat comes back" twice.
+        ^   ^
+        9  13
+---------- Buffer: foo ----------
+</pre></div>
+<p>（在这种情况下，返回的索引是一个缓冲区位置；缓冲区的第一个字符计为 1。）
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="35.6.3_访问整个比赛数据.html">访问整个比赛数据</a>, Previous: <a href="35.6.1_替换匹配的文本.html">替换匹配的文本</a>, Up: <a href="35.6_匹配数据.html">匹配数据.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,11 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.7 输入事件</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">22.7 输入事件</h2>
+<div class="nav-panel"><p>Next: <a href="22.7.1_键盘事件.html">键盘事件</a>, Previous: <a href="22.6_指令后点调整.html">指令后点调整</a>, Up: <a href="22_命令循环.html">命令循环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 命令循环读取代表键盘或鼠标活动的输入事件序列，或发送到 Emacs 的系统事件。键盘活动的事件是字符或符号；  其他事件始终是列表。本节详细描述输入事件的表示和含义。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: eventp object ¶
+</pre></div>
+<p>如果 object 是输入事件或事件类型，则此函数返回非 nil。
+</p>
+<p>请注意，任何非零符号都可能用作事件或事件类型；  eventp 无法区分 Lisp 代码是否打算将符号用作事件。
+</p>
+<div class="nav-panel"><p>Next: <a href="22.7.1_键盘事件.html">键盘事件</a>, Previous: <a href="22.6_指令后点调整.html">指令后点调整</a>, Up: <a href="22_命令循环.html">命令循环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

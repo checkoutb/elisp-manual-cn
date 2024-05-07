@@ -1,0 +1,26 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.23 哔哔声</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">40.23 哔哔声</h2>
+<div class="nav-panel"><p>Next: <a href="40.24_窗户系统.html">窗户系统</a>, Previous: <a href="40.22.5_无字形字符显示.html">无字形字符显示</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍如何使 Emacs 响铃（或闪烁屏幕）以吸引用户的注意力。对您执行此操作的频率保持保守；  频繁的铃声会变得烦人。还要注意不要在发出错误信号时只使用哔哔声（请参阅错误）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ding &amp;optional do-not-terminate ¶
+</pre></div>
+<p>此功能会发出哔哔声或使屏幕闪烁（请参见下面的可视铃）。它还会终止当前正在执行的任何键盘宏，除非 do-not-terminate 为非 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: beep &amp;optional do-not-terminate ¶
+</pre></div>
+<p>这是丁的同义词。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: visible-bell ¶
+</pre></div>
+<p>这个变量决定了 Emacs 是否应该让屏幕闪烁来代表一个铃声。非零表示是，零表示否。这在图形显示和文本终端上有效，前提是终端的 Termcap 条目定义了可视铃铛功能 (’vb’)。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: ring-bell-function ¶
+</pre></div>
+<p>如果这是非零，它指定 Emacs 应该如何响铃。它的值应该是一个没有参数的函数。如果这是非零，它优先于可见钟变量。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.24_窗户系统.html">窗户系统</a>, Previous: <a href="40.22.5_无字形字符显示.html">无字形字符显示</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

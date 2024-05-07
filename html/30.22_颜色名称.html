@@ -1,0 +1,62 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>30.22 颜色名称</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">30.22 颜色名称</h2>
+<div class="nav-panel"><p>Next: <a href="30.23_文本终端颜色.html">文本终端颜色</a>, Previous: <a href="30.21_拖放.html">拖放</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>颜色名称是指定颜色的文本（通常在字符串中）。允许使用 <code>黑色</code> 、 <code>白色</code> 、 <code>红色</code> 等符号名称；  使用 Mx list-colors-display 查看已定义名称的列表。您还可以以数字形式指定颜色，例如 ’#rgb’ 和 ’RGB:r/g/b’，其中 r 指定红色级别，g 指定绿色级别，b 指定蓝色级别。r 可以使用一个、两个、三个或四个十六进制数字；  那么您也必须对所有 g 和 b 使用相同数量的十六进制数字，总共 3、6、9 或 12 个十六进制数字。（有关颜色的数字 RGB 规范的更多详细信息，请参阅 X Window 系统的文档。）
+</p>
+<p>这些函数提供了一种方法来确定哪些颜色名称是有效的，以及它们的外观。在某些情况下，该值取决于所选帧，如下所述；  有关术语 <code>选定帧</code> 的含义，请参见输入焦点。
+</p>
+<p>要完整读取用户输入的颜色名称，请使用 read-color（请参阅 read-color）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: color-defined-p color &amp;optional frame ¶
+</pre></div>
+<p>此函数报告颜色名称是否有意义。如果是，则返回 t；  否则，无。参数帧说明要询问哪个帧的显示；  如果 frame 被省略或为零，则使用选定的帧。
+</p>
+<p>请注意，这并不能告诉您您使用的显示器是否真的支持该颜色。使用 X 时，您可以在任何类型的显示器上请求任何定义的颜色，并且您会得到一些结果——通常是它所能做的最接近的结果。要确定一个帧是否真的可以显示某种颜色，请使用 color-supported-p （见下文）。
+</p>
+<p>该函数以前称为 x-color-defined-p，并且该名称仍被支持作为别名。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: defined-colors &amp;optional frame ¶
+</pre></div>
+<p>此函数返回在帧帧（默认为选定帧）上定义和支持的颜色名称列表。如果 frame 不支持颜色，则值为 nil。
+</p>
+<p>该函数以前称为 x-defined-colors，并且该名称仍被支持作为别名。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: color-supported-p color &amp;optional frame background-p ¶
+</pre></div>
+<p>如果 frame 真的可以显示颜色颜色（或至少接近它的颜色），则返回 t。如果帧被省略或为零，则问题适用于所选帧。
+</p>
+<p>一些终端支持一组不同的前景和背景颜色。如果 background-p 不为零，则表示您在询问是否可以将颜色用作背景；  否则你在问它是否可以用作前景。
+</p>
+<p>参数颜色必须是有效的颜色名称。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: color-gray-p color &amp;optional frame ¶
+</pre></div>
+<p>如果颜色是灰色阴影，则返回 t，如帧的显示所定义。如果帧被省略或为零，则问题适用于所选帧。如果 color 不是有效的颜色名称，则此函数返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: color-values color &amp;optional frame ¶
+</pre></div>
+<p>此函数返回一个值，该值描述了帧上理想的颜色。如果定义了颜色，则该值是三个整数的列表，它们给出了红色的数量、绿色的数量和蓝色的数量。每个整数范围原则上从 0 到 65535，但有些显示器可能不会使用全范围。这个三元素列表称为颜色的 rgb 值。
+</p>
+<p>如果未定义颜色，则值为 nil。
+</p><div class="lisp">
+<pre class="lisp">(color-values "black")
+     ⇒ (0 0 0)
+(color-values "white")
+     ⇒ (65535 65535 65535)
+(color-values "red")
+     ⇒ (65535 0 0)
+(color-values "pink")
+     ⇒ (65535 49344 52171)
+(color-values "hungry")
+     ⇒ nil
+</pre></div>
+<p>为帧的显示返回颜色值。如果 frame 被省略或为零，则返回所选帧显示的信息。如果帧不能显示颜色，则值为 nil。
+</p>
+<p>此函数过去称为 x-color-values，并且该名称仍支持作为别名。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="30.23_文本终端颜色.html">文本终端颜色</a>, Previous: <a href="30.21_拖放.html">拖放</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

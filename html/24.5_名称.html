@@ -1,0 +1,129 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.5 名称</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">24.5 名称</h2>
+<div class="nav-panel"><p>Next: <a href="24.6_字体锁定模式.html">字体锁定模式</a>, Previous: <a href="24.4.8_模拟模式行格式.html">模拟模式行格式</a>, Up: <a href="24_主要和次要模式.html">主要和次要模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Imenu 是一项功能，它允许用户从列出所有定义或部分的菜单中选择缓冲区中的定义或部分，以直接转到缓冲区中的该位置。Imenu 通过构造一个缓冲区索引来工作，该索引列出了定义的名称和缓冲区位置，或缓冲区的其他命名部分；  然后用户可以选择其中一个并将点移动到它。主要模式可以使用 imenu-add-to-menubar 添加菜单栏项以使用 Imenu。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: imenu-add-to-menubar name ¶
+</pre></div>
+<p>该函数定义了一个名为 name 的本地菜单栏项来运行 Imenu。
+</p>
+<p>Emacs 手册中描述了使用 Imenu 的用户级命令（请参阅 Emacs 手册中的 Imenu）。本节说明如何自定义 Imenu 查找特定主要模式的定义或缓冲区部分的方法。
+</p>
+<p>通常和最简单的方法是设置变量 imenu-generic-expression：
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: imenu-generic-expression ¶
+</pre></div>
+<p>此变量，如果非零，是一个列表，指定用于查找 Imenu 定义的正则表达式。imenu-generic-expression 的简单元素如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(menu-title regexp index)
+</pre></div>
+<p>这里，如果 menu-title 不为 nil，则表示该元素的匹配项应该放在缓冲区索引的子菜单中；  menu-title 本身指定子菜单的名称。如果 menu-title 为 nil，则此元素的匹配项直接进入缓冲区索引的顶层。
+</p>
+<p>列表中的第二项 regexp 是正则表达式（请参阅正则表达式）；  缓冲区中与它匹配的任何内容都被视为定义，需要在缓冲区索引中提及。第三项 index 是一个非负整数，指示 regexp 中的哪个子表达式与定义的名称匹配。
+</p>
+<p>一个元素也可以是这样的：
+</p>
+<div class="lisp">
+<pre class="lisp">(menu-title regexp index function arguments…)
+</pre></div>
+<p>（菜单标题正则表达式索引函数参数…）
+</p>
+<p>此元素的每个匹配项都会创建一个索引项，当用户选择索引项时，它会调用函数，其参数由项目名称、缓冲区位置和参数组成。
+</p>
+<p>对于 Emacs Lisp 模式，imenu-generic-expression 可能如下所示：
+</p><div class="lisp">
+<pre class="lisp">
+
+((nil "^\\s-*(def\\(un\\|subst\\|macro\\|advice\\)\
+\\s-+\\([-A-Za-z0-9+]+\\)" 2)
+
+ ("*Vars*" "^\\s-*(def\\(var\\|const\\)\
+\\s-+\\([-A-Za-z0-9+]+\\)" 2)
+
+ ("*Types*"
+  "^\\s-*\
+(def\\(type\\|struct\\|class\\|ine-condition\\)\
+\\s-+\\([-A-Za-z0-9+]+\\)" 2))
+</pre></div>
+<p>设置此变量使其在当前缓冲区中成为局部缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: imenu-case-fold-search ¶
+</pre></div>
+<p>此变量控制匹配 imenu-generic-expression 值中的正则表达式是否区分大小写：t，默认值，表示匹配应忽略大小写。
+</p>
+<p>设置此变量使其在当前缓冲区中成为局部缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: imenu-syntax-alist ¶
+</pre></div>
+<p>此变量是处理 imenu-generic-expression 时使用的语法表修饰符列表，用于覆盖当前缓冲区的语法表。每个元素都应具有以下形式：
+</p>
+<div class="lisp">
+<pre class="lisp">(characters . syntax-description)
+</pre></div>
+<p>CAR，characters，可以是字符或字符串。该元素表示为该字符提供由 syntax-description 指定的语法，该语法被传递给 modify-syntax-entry（请参阅语法表函数）。
+</p>
+<p>此功能通常用于为通常具有符号语法的字符提供单词语法，从而简化 imenu-generic-expression 并加快匹配速度。例如，Fortran 模式以这种方式使用它：
+</p>
+<div class="lisp">
+<pre class="lisp">(setq imenu-syntax-alist '(("_$" . "w")))
+</pre></div>
+<p>imenu-generic-expression 正则表达式可以使用 ’\+’ 而不是 ’\+’。请注意，当模式需要将名称的初始字符限制为小于名称其余部分所允许的字符集时，此技术可能不方便。
+</p>
+<p>设置此变量使其在当前缓冲区中成为局部缓冲区。
+</p>
+<p>为主要模式自定义 Imenu 的另一种方法是设置变量 imenu-prev-index-position-function 和 imenu-extract-index-name-function：
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: imenu-prev-index-position-function ¶
+</pre></div>
+<p>如果这个变量不是 nil，它的值应该是一个函数，它找到下一个定义放入缓冲区索引，从点向后扫描缓冲区。如果在 point 之前没有找到另一个定义，它应该返回 nil。否则它应该在找到定义的地方留下点并返回任何非零值。
+</p>
+<p>设置此变量使其在当前缓冲区中成为局部缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: imenu-extract-index-name-function ¶
+</pre></div>
+<p>如果这个变量不是零，它的值应该是一个返回定义名称的函数，假设点在那个定义中，因为 imenu-prev-index-position-function 函数会离开它。
+</p>
+<p>设置此变量使其在当前缓冲区中成为局部缓冲区。
+</p>
+<p>为主要模式自定义 Imenu 的最后一种方法是设置变量 imenu-create-index-function：
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: imenu-create-index-function ¶
+</pre></div>
+<p>此变量指定用于创建缓冲区索引的函数。该函数不应接受任何参数，并返回当前缓冲区的索引列表。它在 save-excursion 中被调用，所以它离开点的位置没有区别。
+</p>
+<p>索引 alist 可以具有三种类型的元素。简单元素如下所示：
+</p><div class="lisp">
+<pre class="lisp">(index-name . index-position)
+</pre></div>
+<p>选择一个简单元素的效果是移动到缓冲区中的 index-position 位置。特殊元素如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(index-name index-position function arguments…)
+
+</pre></div>
+<p>选择一个特殊元素执行：
+</p>
+<div class="lisp">
+<pre class="lisp">(funcall function
+         index-name index-position arguments…)
+</pre></div>
+<p>嵌套的 sub-alist 元素如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(menu-title . sub-alist)
+</pre></div>
+<p>它创建由 sub-alist 指定的子菜单菜单标题。
+</p>
+<p>imenu-create-index-function 的默认值为 imenu-default-create-index-function。此函数调用 imenu-prev-index-position-function 的值和 imenu-extract-index-name-function 的值来生成索引 alist。但是，如果这两个变量中的任何一个为 nil，则默认函数将使用 imenu-generic-expression 代替。
+</p>
+<p>设置此变量使其在当前缓冲区中成为局部缓冲区。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="24.6_字体锁定模式.html">字体锁定模式</a>, Previous: <a href="24.4.8_模拟模式行格式.html">模拟模式行格式</a>, Up: <a href="24_主要和次要模式.html">主要和次要模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

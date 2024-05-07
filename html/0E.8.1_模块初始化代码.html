@@ -1,0 +1,68 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>E.8.1 模块初始化代码</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">E.8.1 模块初始化代码</h3>
+<div class="nav-panel"><p>Next: <a href="0E.8.2_编写模块函数.html">编写模块函数</a>, Previous: <a href="0E.8_编写动态加载的模块.html">编写动态加载的模块</a>, Up: <a href="0E.8_编写动态加载的模块.html">编写动态加载的模块.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>通过包含头文件 emacs-module.h 并定义 GPL 兼容性符号来开始您的模块：
+</p><div class="lisp">
+<pre class="lisp">#include &lt;emacs-module.h&gt;
+
+int plugin_is_GPL_compatible;
+</pre></div>
+<p>emacs-module.h 文件作为 Emacs 安装的一部分安装到系统的包含树中。或者，您可以在 Emacs 源代码树中找到它。
+</p>
+<p>接下来，为模块编写一个初始化函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: int emacs_module_init (struct emacs_runtime *runtime) ¶
+</pre></div>
+<p>Emacs 在加载模块时调用此函数。如果模块没有导出名为 emacs_module_init 的函数，则尝试加载模块将发出错误信号。如果初始化成功，初始化函数应该返回零，否则返回非零。在后一种情况下，Emacs 将发出错误信号，并且模块的加载将失败。如果用户在初始化过程中按下 Cg，Emacs 会忽略初始化函数的返回值并退出（参见 Quitting）。（如果需要，您可以在初始化函数中捕获用户退出，请参阅 should_quit。）
+</p>
+<p>参数 runtime 是指向包含 2 个公共字段的 C 结构的指针： size，提供结构的大小（以字节为单位）；  和 get_environment，它提供了一个指向函数的指针，该函数允许模块初始化函数访问 Emacs 环境对象及其接口。
+</p>
+<p>初始化函数应该执行模块所需的任何初始化。此外，它还可以执行以下任务：
+</p>
+<ul>
+<li>
+兼容性验证
+
+<p>模块可以通过将运行时结构的 size 成员与编译到模块中的值进行比较来验证加载模块的 Emacs 可执行文件是否与模块兼容：
+</p><div class="lisp">
+<pre class="lisp">int
+emacs_module_init (struct emacs_runtime *runtime)
+{
+  if (runtime-&gt;size &lt; sizeof (*runtime))
+    return 1;
+}
+</pre></div>
+<p>如果传递给模块的运行时对象的大小小于它的预期大小，这意味着该模块是为比尝试加载它的版本更新（晚）的 Emacs 版本编译的，即该模块可能与 Emacs 不兼容二进制。
+</p>
+<p>此外，模块可以验证模块 API 与模块期望的兼容性。以下示例代码假定它是上面显示的 emacs_module_init 函数的一部分：
+</p>
+<div class="lisp">
+<pre class="lisp">emacs_env *env = runtime-&gt;get_environment (runtime);
+ if (env-&gt;size &lt; sizeof (*env))
+   return 2;
+</pre></div>
+<p>这使用运行时结构中提供的指针调用 get_environment 函数来检索指向 API 环境的指针，这是一个 C 结构，它还有一个 size 字段，以字节为单位保存结构的大小。
+</p>
+<p>最后，您可以通过将 Emacs 传递的环境大小与已知大小进行比较，编写一个适用于旧版本 Emacs 的模块，如下所示：
+</p><div class="lisp">
+<pre class="lisp">emacs_env *env = runtime-&gt;get_environment (runtime);
+if (env-&gt;size &gt;= sizeof (struct emacs_env_26))
+  emacs_version = 26;  /* Emacs 26 or later.  */
+else if (env-&gt;size &gt;= sizeof (struct emacs_env_25))
+  emacs_version = 25;
+else
+  return 2; /* Unknown or unsupported version.  */
+</pre></div>
+<p>这是可行的，因为后来的 Emacs 版本总是向环境中添加成员，从不删除任何成员，因此大小只能随着​​ Emacs 新版本的增加而增长。给定 Emacs 的版本，该模块只能使用该版本中存在的模块 API 的部分，因为这些部分在以后的版本中是相同的。
+</p>
+<p>emacs-module.h 定义了一个预处理器宏 EMACS_MAJOR_VERSION。它扩展为一个整数文字，这是标题支持的 Emacs 的最新主要版本。请参阅版本信息。请注意，EMACS_MAJOR_VERSION 的值是编译时常量，并不代表当前正在运行并已加载您的模块的 Emacs 版本。如果你希望你的模块兼容各种版本的 emacs-module.h 以及各种版本的 Emacs，你可以使用基于 EMACS_MAJOR_VERSION 的条件编译。
+</p>
+<p>我们建议模块始终执行兼容性验证，除非它们完全在初始化函数中完成它们的工作，并且不要访问任何 Lisp 对象或使用任何可通过环境结构访问的 Emacs 函数。
+</p>
+</li><li>
+将模块函数绑定到 Lisp 符号
+
+<p>这给了模块函数名称，以便 Lisp 代码可以使用该名称调用它。我们在下面的编写模块函数中描述了如何做到这一点。
+</p></li></ul>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="0E.8.2_编写模块函数.html">编写模块函数</a>, Previous: <a href="0E.8_编写动态加载的模块.html">编写动态加载的模块</a>, Up: <a href="0E.8_编写动态加载的模块.html">编写动态加载的模块.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

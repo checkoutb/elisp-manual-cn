@@ -1,0 +1,82 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>25.3 替换文档中的键绑定</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">25.3 替换文档中的键绑定</h2>
+<div class="nav-panel"><p>Next: <a href="25.4_文本引用样式.html">文本引用样式</a>, Previous: <a href="25.2_访问文档字符串.html">访问文档字符串</a>, Up: <a href="25_文档.html">文档.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当文档字符串引用键序列时，它们应该使用当前的实际键绑定。他们可以使用下面描述的某些特殊文本序列来做到这一点。以通常的方式访问文档字符串会将当前的键绑定信息替换为这些特殊序列。这通过调用替代命令键来工作。您也可以自己调用该函数。
+</p>
+<p>以下是特殊序列的列表及其含义：
+</p>
+<div class="lisp">
+<pre class="lisp">\[command]
+</pre></div>
+<p>代表将调用命令的键序列，如果命令没有键绑定，则表示 <code>Mx 命令</code> 。
+</p><div class="lisp">
+<pre class="lisp">\{mapvar}
+</pre></div>
+<p>代表 keymap 的摘要，它是变量 mapvar 的值。使用 describe-bindings 进行摘要。
+</p><div class="lisp">
+<pre class="lisp">\&lt;mapvar&gt;
+</pre></div>
+<p>代表没有文本本身。它仅用于副作用：它指定 mapvar 的值作为此文档字符串中任何后续 ’\[command]’ 序列的键映射。
+</p><div class="lisp">
+<pre class="lisp">`
+</pre></div>
+<p>（重音）代表左引号。这会根据 text-quoting-style 的值生成左单引号、撇号或重音符。请参阅文本引用样式。
+</p><div class="lisp">
+<pre class="lisp">'
+</pre></div>
+<p>（撇号）代表正确的引用。这会根据 text-quoting-style 的值生成右单引号或撇号。
+</p><div class="lisp">
+<pre class="lisp">\=
+</pre></div>
+<p>引用以下字符并被丢弃；  因此，’\=‘’ 将 ’‘’ 放入输出，’\=\[’ 将 ’\[’ 放入输出，而 ’\=\=’ 将 ’\=’ 放入输出。
+</p>
+<p>请注意：在 Emacs Lisp 中写入字符串时，每个 ’\’ 必须加倍。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: text-quoting-style ¶
+</pre></div>
+<p>这个变量的值是一个符号，它指定 Emacs 应该在帮助和消息的措辞中为单引号使用的样式。如果变量的值为curve，则样式为带有弯曲单引号的 <code>like this</code> 。如果值为直，则样式为带有直撇号的 <code>like this</code> 。如果值是严重的，则不翻译引号并且样式是带有重音和撇号的 <code>like this</code> ，这是 Emacs 版本 25 之前的标准样式。如果弯曲的单引号似乎是可显示的，则默认值 nil 的作用类似于曲线，并且喜欢否则严重。
+</p>
+<p>此选项在存在弯引号问题的平台上很有用。您可以根据个人喜好自由定制。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: substitute-command-keys string &amp;optional no-face ¶
+</pre></div>
+<p>此函数扫描字符串以查找上述特殊序列并将其替换为它们所代表的内容，并将结果作为字符串返回。这允许显示准确引用用户自己定制的键绑定的文档。默认情况下，键绑定被赋予一个特殊的面帮助键绑定，但如果可选参数 no-face 为非零，则该函数不会将此面添加到生成的字符串中。
+</p>
+<p>如果一个命令有多个绑定，这个函数通常使用它找到的第一个。您可以通过将 :advertised-binding 符号属性分配给命令来指定一个特定的键绑定，如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(put 'undo :advertised-binding [?\C-/])
+</pre></div>
+<p>:advertised-binding 属性也会影响菜单项中显示的绑定（参见菜单栏）。如果该属性指定了命令实际上没有的键绑定，则该属性将被忽略。
+</p>
+<p>以下是特殊序列的示例：
+</p><div class="lisp">
+<pre class="lisp">(substitute-command-keys
+   "To abort recursive edit, type `\\[abort-recursive-edit]'.")
+⇒ "To abort recursive edit, type ‘C-]’."
+
+
+(substitute-command-keys
+   "The keys that are defined for the minibuffer here are:
+  \\{minibuffer-local-must-match-map}")
+⇒ "The keys that are defined for the minibuffer here are:
+
+
+?               minibuffer-completion-help
+SPC             minibuffer-complete-word
+TAB             minibuffer-complete
+C-j             minibuffer-complete-and-exit
+RET             minibuffer-complete-and-exit
+C-g             abort-recursive-edit
+"
+
+(substitute-command-keys
+   "To abort a recursive edit from the minibuffer, type \
+`\\&lt;minibuffer-local-must-match-map&gt;\\[abort-recursive-edit]'.")
+⇒ "To abort a recursive edit from the minibuffer, type ‘C-g’."
+</pre></div>
+<p>文档字符串中的文本还有其他特殊约定——例如，您可以参考本手册的函数、变量和部分。有关详细信息，请参阅文档字符串提示。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="25.4_文本引用样式.html">文本引用样式</a>, Previous: <a href="25.2_访问文档字符串.html">访问文档字符串</a>, Up: <a href="25_文档.html">文档.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

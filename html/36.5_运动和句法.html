@@ -1,0 +1,29 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>36.5 运动和句法</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">36.5 运动和句法</h2>
+<div class="nav-panel"><p>Next: <a href="36.6_解析表达式.html">解析表达式</a>, Previous: <a href="36.4_语法属性.html">语法属性</a>, Up: <a href="36_语法表.html">语法表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍用于在具有特定语法类别的字符之间移动的函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: skip-syntax-forward syntaxes &amp;optional limit ¶
+</pre></div>
+<p>此函数在具有语法中提到的语法类别的字符（语法类别字符的字符串）之间向前移动。它在遇到缓冲区末尾、位置限制（如果指定）或不应该跳过的字符时停止。
+</p>
+<p>如果语法以 ’^’ 开头，则函数会跳过语法不在语法中的字符。
+</p>
+<p>返回值是行进的距离，是一个非负整数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: skip-syntax-backward syntaxes &amp;optional limit ¶
+</pre></div>
+<p>此函数在语法中提到语法类别的字符之间向后移动点。当遇到缓冲区的开头、位置限制（如果指定）或不应该跳过的字符时，它会停止。
+</p>
+<p>如果语法以 ’^’ 开头，则函数会跳过语法不在语法中的字符。
+</p>
+<p>返回值表示行进的距离。它是一个小于或等于 0 的整数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: backward-prefix-chars ¶
+</pre></div>
+<p>此函数使用表达式前缀语法将点向后移动任意数量的字符。这包括表达式前缀语法类中的字符和带有 <code>p</code> 标志的字符。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="36.6_解析表达式.html">解析表达式</a>, Previous: <a href="36.4_语法属性.html">语法属性</a>, Up: <a href="36_语法表.html">语法表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

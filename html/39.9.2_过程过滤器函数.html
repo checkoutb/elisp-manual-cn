@@ -1,0 +1,81 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>39.9.2 过程过滤器函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">39.9.2 过程过滤器函数</h3>
+<div class="nav-panel"><p>Next: <a href="39.9.3_解码过程输出.html">解码过程输出</a>, Previous: <a href="39.9.1_进程缓冲区.html">进程缓冲区</a>, Up: <a href="39.9_接收进程的输出.html">接收进程的输出.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>进程过滤器函数是从相关进程接收标准输出的函数。该过程的所有输出都传递给过滤器。默认过滤器只是直接输出到进程缓冲区。
+</p>
+<p>默认情况下，进程的错误输出（如果有）也会传递给过滤器函数，除非在创建进程时将进程的标准错误流的目标与标准输出分开。Emacs 只会在某些函数调用期间调用过滤器函数。请参阅接收进程的输出。请注意，如果过滤器调用了这些函数中的任何一个，则过滤器可能会被递归调用。
+</p>
+<p>过滤器函数必须接受两个参数：关联的进程和一个字符串，它是刚刚从它接收到的输出。然后，该函数可以自由地对输出进行任何选择。
+</p>
+<p>退出通常在过滤器函数中被禁止——否则，在命令级别键入  <code>C-g</code>  或退出用户命令的效果将是不可预测的。如果您想允许在过滤器函数内退出，请将禁止退出绑定到 nil。在大多数情况下，正确的方法是使用 with-local-quit 宏。请参阅退出。
+</p>
+<p>如果在过滤器函数执行期间发生错误，它会被自动捕获，因此它不会停止过滤器函数启动时正在运行的任何程序的执行。但是，如果 debug-on-error 不为零，则不会捕获错误。这使得使用 Lisp 调试器来调试过滤器函数成为可能。请参阅 Lisp 调试器。
+</p>
+<p>许多过滤器函数有时（或总是）将输出插入进程的缓冲区，模仿默认过滤器的操作。此类过滤器函数需要确保它们保存当前缓冲区，在插入输出之前选择正确的缓冲区（如果不同），然后恢复原始缓冲区。他们还应该检查缓冲区是否还活着，更新进程标记，在某些情况下更新点的值。以下是如何执行这些操作：
+</p>
+<div class="lisp">
+<pre class="lisp">(defun ordinary-insertion-filter (proc string)
+  (when (buffer-live-p (process-buffer proc))
+    (with-current-buffer (process-buffer proc)
+      (let ((moving (= (point) (process-mark proc))))
+
+        (save-excursion
+          ;; Insert the text, advancing the process marker.
+          (goto-char (process-mark proc))
+          (insert string)
+          (set-marker (process-mark proc) (point)))
+        (if moving (goto-char (process-mark proc)))))))
+
+</pre></div>
+<p>为了使过滤器在新文本到达时强制进程缓冲区可见，您可以在 with-current-buffer 构造之前插入如下行：
+</p>
+<div class="lisp">
+<pre class="lisp">(display-buffer (process-buffer proc))
+</pre></div>
+<p>要强制指向新输出的末尾，无论它以前在哪里，消除从示例中移动的变量并无条件调用 goto-char。请注意，这不一定会移动窗口点。默认过滤器实际上使用 insert-before-markers 来移动所有标记，包括窗口点。这可能会移动不相关的标记，因此通常最好显式移动窗口点，或者将其插入类型设置为 t（请参阅窗口和点）。
+</p>
+<p>请注意，Emacs 在执行过滤器功能时会自动保存和恢复匹配数据。请参阅匹配数据。
+</p>
+<p>过滤器的输出可以是任何大小的块。连续两次产生相同输出的程序可能一次发送一批 200 个字符，下一次发送五批 40 个字符。如果过滤器在子流程输出中查找某些文本字符串，请确保处理其中一个字符串被拆分为两批或多批输出的情况；  一种方法是将接收到的文本插入到临时缓冲区中，然后可以对其进行搜索。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-process-filter process filter ¶
+</pre></div>
+<p>该函数给出处理过滤函数filter。如果 filter 为 nil，它为进程提供默认过滤器，它将进程输出插入到进程缓冲区中。如果 filter 为 t，Emacs 将停止接受来自该进程的输出，除非它是一个网络服务器进程来监听传入的连接。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: process-filter process ¶
+</pre></div>
+<p>该函数返回进程的过滤函数。
+</p>
+<p>如果流程的输出需要传递给多个过滤器，您可以使用 add-function 将现有过滤器与新过滤器组合。请参阅建议 Emacs Lisp 函数。
+</p>
+<p>以下是使用过滤器功能的示例：
+</p><div class="lisp">
+<pre class="lisp">
+
+(defun keep-output (process output)
+   (setq kept (cons output kept)))
+     ⇒ keep-output
+
+(setq kept nil)
+     ⇒ nil
+
+(set-process-filter (get-process "shell") 'keep-output)
+     ⇒ keep-output
+
+(process-send-string "shell" "ls ~/other\n")
+     ⇒ nil
+kept
+     ⇒ ("lewis@slug:$ "
+
+"FINAL-W87-SHORT.MSS    backup.otl              kolstad.mss~
+address.txt             backup.psf              kolstad.psf
+backup.bib~             david.mss               resume-Dec-86.mss~
+backup.err              david.psf               resume-Dec.psf
+backup.mss              dland                   syllabus.mss
+"
+"#backups.mss#          backup.mss~             kolstad.mss
+")
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="39.9.3_解码过程输出.html">解码过程输出</a>, Previous: <a href="39.9.1_进程缓冲区.html">进程缓冲区</a>, Up: <a href="39.9_接收进程的输出.html">接收进程的输出.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

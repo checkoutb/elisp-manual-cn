@@ -1,0 +1,120 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.4.5 %- 模式线中的构造</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">24.4.5 %- 模式线中的构造</h3>
+<div class="nav-panel"><p>Next: <a href="24.4.6_模式行中的属性.html">模式行中的属性</a>, Previous: <a href="24.4.4_模式行中使用的变量.html">模式行中使用的变量</a>, Up: <a href="24.4_模式线格式.html">模式线格式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>用作模式线构造的字符串可以使用某些 %-构造来替换各种数据。以下是定义的 %-constructs 的列表，以及它们的含义。
+</p>
+<p>在除 ’%%’ 之外的任何构造中，您可以在 ’%’ 之后添加一个十进制整数来指定最小字段宽度。如果宽度更小，则将该字段填充到该宽度。纯数字结构（’c’、’i’、’I’ 和 ’l’）通过在左侧插入空格来填充，而其他结构通过在右侧插入空格来填充。
+</p>
+<div class="lisp">
+<pre class="lisp">%b
+</pre></div>
+<p>当前缓冲区名称，通过 buffer-name 函数获得。请参阅缓冲区名称。
+</p><div class="lisp">
+<pre class="lisp">%c
+</pre></div>
+<p>点的当前列数，从窗口的左边距开始从零开始计数。
+</p><div class="lisp">
+<pre class="lisp">%C
+</pre></div>
+<p>点的当前列数，从窗口的左边距开始计数。
+</p><div class="lisp">
+<pre class="lisp">%e
+</pre></div>
+<p>当 Emacs 几乎没有 Lisp 对象的内存时，一条简短的消息说明了这一点。否则，这是空的。
+</p><div class="lisp">
+<pre class="lisp">%f
+</pre></div>
+<p>被访问的文件名，通过 buffer-file-name 函数获得。请参阅缓冲区文件名。
+</p><div class="lisp">
+<pre class="lisp">%F
+</pre></div>
+<p>标题（仅在窗口系统上）或所选框架的名称。请参阅基本参数。
+</p><div class="lisp">
+<pre class="lisp">%i
+</pre></div>
+<p>当前缓冲区的可访问部分的大小；  基本上 (- (point-max) (point-min))。
+</p><div class="lisp">
+<pre class="lisp">%I
+</pre></div>
+<p>与 ’%i’ 类似，但使用 ’k’ 表示 10<em>^3</em>、’M’ 表示 10<em>^6</em>、’G’ 表示 10<em>^9</em> 等以更易读的方式打印大小。
+</p><div class="lisp">
+<pre class="lisp">%l
+</pre></div>
+<p>点的当前行数，在缓冲区的可访问部分内计数。
+</p><div class="lisp">
+<pre class="lisp">%n
+</pre></div>
+<p>收窄生效时为 <code>收窄</code> ；  没有别的（参见 Narrowing 中的narrow-to-region）。
+</p><div class="lisp">
+<pre class="lisp">%o
+</pre></div>
+<p>窗口通过缓冲区（的可见部分）的移动程度，即窗口顶部上方的文本大小，表示为窗口外所有文本的百分比，或 <code>顶部</code> 、 <code>底部</code> 或’全部’。
+</p><div class="lisp">
+<pre class="lisp">%p
+</pre></div>
+<p>窗口顶部上方的缓冲区文本的百分比，或 <code>顶部</code> 、 <code>底部</code> 或 <code>全部</code> 。请注意，默认模式行构造会将其截断为三个字符。
+</p><div class="lisp">
+<pre class="lisp">%P
+</pre></div>
+<p>窗口底部上方的缓冲区文本的百分比（包括窗口中可见的文本以及顶部上方的文本），如果缓冲区顶部在屏幕上可见，则加上 <code>顶部</code> ；  或 <code>底部</code> 或 <code>全部</code> 。
+</p><div class="lisp">
+<pre class="lisp">%q
+</pre></div>
+<p>窗口顶部和底部上方的文本百分比，以 <code>-</code> 或 <code>全部</code> 分隔。
+</p><div class="lisp">
+<pre class="lisp">%s
+</pre></div>
+<p>属于当前缓冲区的子进程的状态，通过 process-status 获得。请参阅过程信息。
+</p><div class="lisp">
+<pre class="lisp">%z
+</pre></div>
+<p>键盘、终端和缓冲区编码系统的助记符。
+</p><div class="lisp">
+<pre class="lisp">%Z
+</pre></div>
+<p>与 ’%z’ 类似，但包括行尾格式。
+</p><div class="lisp">
+<pre class="lisp">%*
+</pre></div>
+<p>’%’ 如果缓冲区是只读的（请参阅缓冲区只读）；
+’*’ 如果缓冲区被修改（参见 buffer-modified-p）；
+’-’ 除此以外。请参阅缓冲区修改。
+</p><div class="lisp">
+<pre class="lisp">%+
+</pre></div>
+<p>’*’ 如果缓冲区被修改（参见 buffer-modified-p）；
+’%’ 如果缓冲区是只读的（请参阅缓冲区只读）；
+’-’ 除此以外。这与 ’%*’ 的不同之处仅在于修改后的只读缓冲区。请参阅缓冲区修改。
+</p><div class="lisp">
+<pre class="lisp">%&amp;
+</pre></div>
+<p>如果缓冲区被修改，则为 <code>*</code> ，否则为 <code>-</code> 。
+</p><div class="lisp">
+<pre class="lisp">%@
+</pre></div>
+<p>如果缓冲区的默认目录（请参阅扩展文件名的函数）在远程计算机上，则为 <code>@</code> ，否则为 <code>-</code> 。
+</p><div class="lisp">
+<pre class="lisp">%[
+</pre></div>
+<p>递归编辑级别深度的指示（不包括小缓冲区级别）：每个编辑级别一个 <code>[</code> 。请参阅递归编辑。
+</p><div class="lisp">
+<pre class="lisp">%]
+</pre></div>
+<p>每个递归编辑级别都有一个 <code>]</code> （不包括迷你缓冲区级别）。
+</p><div class="lisp">
+<pre class="lisp">%-
+</pre></div>
+<p>短划线足以填充模式线的其余部分。
+</p><div class="lisp">
+<pre class="lisp">%%
+</pre></div>
+<p>字符 ’%’ - 这是如何在允许 %-constructs 的字符串中包含文字 ’%’。
+</p>
+<p>以下 %-construct 仍受支持，但已过时，因为您可以使用变量 mode-name 获得相同的结果。
+</p>
+<div class="lisp">
+<pre class="lisp">%m
+</pre></div>
+<p>模式名称的值。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="24.4.6_模式行中的属性.html">模式行中的属性</a>, Previous: <a href="24.4.4_模式行中使用的变量.html">模式行中使用的变量</a>, Up: <a href="24.4_模式线格式.html">模式线格式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

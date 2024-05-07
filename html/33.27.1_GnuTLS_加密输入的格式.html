@@ -1,0 +1,29 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.27.1 GnuTLS 加密输入的格式</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">33.27.1 GnuTLS 加密输入的格式</h3>
+<div class="nav-panel"><p>Next: <a href="33.27.2_GnuTLS_加密函数.html">GnuTLS_加密函数</a>, Previous: <a href="33.27_GnuTLS_密码学.html">GnuTLS_密码学</a>, Up: <a href="33.27_GnuTLS_密码学.html">GnuTLS_密码学.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>GnuTLS 加密函数的输入可以通过多种方式指定，既可以作为原始 Emacs Lisp 类型，也可以作为列表。
+</p>
+<p>列表形式目前类似于 md5 和 secure-hash 的操作方式。
+</p>
+<div class="lisp">
+<pre class="lisp">buffer
+</pre></div>
+<p>简单地将缓冲区作为输入传递意味着应该使用整个缓冲区。
+</p><div class="lisp">
+<pre class="lisp">string
+</pre></div>
+<p>将直接使用字符串作为输入。它可以由函数修改（与大多数其他 Emacs Lisp 函数不同）以减少在函数完成工作后暴露敏感数据的机会。
+</p><div class="lisp">
+<pre class="lisp">(buffer-or-string start end coding-system noerror)
+</pre></div>
+<p>如上所述，这指定了缓冲区或字符串，但可以使用 start 和 end 指定可选范围。
+</p>
+<p>此外，如果需要，可以指定可选的编码系统。
+</p>
+<p>最后一个可选项 noerror 在无法使用指定或选择的编码系统对文本进行编码时覆盖正常错误。当 noerror 为非 nil 时，此函数会静默地使用原始文本编码。
+</p><div class="lisp">
+<pre class="lisp">(iv-auto length)
+</pre></div>
+<p>这会生成指定长度的随机 IV（初始化向量）并将其传递给函数。这确保了 IV 是不可预测的，并且不太可能在同一会话中重用。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.27.2_GnuTLS_加密函数.html">GnuTLS_加密函数</a>, Previous: <a href="33.27_GnuTLS_密码学.html">GnuTLS_密码学</a>, Up: <a href="33.27_GnuTLS_密码学.html">GnuTLS_密码学.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

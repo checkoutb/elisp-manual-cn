@@ -1,0 +1,19 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>11.4 模式匹配条件</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">11.4 模式匹配条件</h2>
+<div class="nav-panel"><p>Next: <a href="11.4.1_pcase宏.html">pcase宏</a>, Previous: <a href="11.3_组合条件的构造.html">组合条件的构造</a>, Up: <a href="11_控制结构.html">控制结构.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>除了四种基本的条件形式之外，Emacs Lisp 还有一个模式匹配条件形式，pcase 宏，是 cond 和 cl-case 的混合体（参见 Common Lisp Extensions 中的条件），它克服了它们的限制并引入了模式匹配编程风格.  pcase 克服的限制是：
+</p>
+<p>cond 形式通过评估其每个子句的谓词条件来在备选方案中进行选择（请参阅条件）。主要限制是条件中的变量对子句的主体形式不可用。
+</p>
+<p>另一个烦恼（与其说是限制，不如说是不便）是，当一系列条件谓词实现相等测试时，会出现大量重复代码。（cl-case 解决了这个不便。）
+cl-case 宏通过评估其第一个参数与一组特定值的相等性来在备选方案中进行选择。
+</p>
+<p>它的局限性有两个：
+    相等性测试使用 eql。
+    这些值必须事先知道并写入。 
+</p>
+<p>这些使 cl-case 不适用于字符串或复合数据结构（例如，列表或向量）。（cond 没有这些限制，但它有其他限制，见上文。） 
+</p>
+<p>从概念上讲，pcase 宏借用了 cl-case 的 first-arg 焦点和 cond 的子句处理流程，将 condition 替换为作为模式匹配变体的等式测试的泛化，并添加了设施，以便您可以简洁地表达子句的谓词，并安排在子句的谓词和正文形式之间共享 let 绑定。
+</p>
+<p>谓词的简洁表达称为模式。当调用第一个参数的值的谓词返回非零时，我们说 <code>模式匹配值</code> （或有时 <code>值匹配模式</code> ）。
+</p>
+<div class="nav-panel"><p>Next: <a href="11.4.1_pcase宏.html">pcase宏</a>, Previous: <a href="11.3_组合条件的构造.html">组合条件的构造</a>, Up: <a href="11_控制结构.html">控制结构.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

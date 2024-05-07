@@ -1,0 +1,14 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>18 Lisp编译成Native代码</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h1 class="chapter">18 Lisp编译成Native代码</h1>
+<div class="nav-panel"><p>Next: <a href="18.1_本机编译函数.html">本机编译函数</a>, Previous: <a href="17.8_反汇编字节码.html">反汇编字节码</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>除了上一章中描述的字节编译之外，Emacs 还可以选择性地将 Lisp 函数定义编译成真正的编译代码，称为本地代码。此功能使用 libgccjit 库，它是 GCC 发行版的一部分，并且要求构建 Emacs 时支持使用该库。它还需要在您的系统上安装 GCC 和 Binutils（汇编器和链接器），以便您能够本地编译 Lisp 代码。
+</p>
+<p>要确定当前 Emacs 进程是否可以生成和加载本机编译的 Lisp 代码，请调用 native-comp-available-p（请参阅 Native-Compilation Functions）。
+</p>
+<p>与字节编译的代码不同，本机编译的 Lisp 代码直接由机器硬件执行，因此以主机 CPU 可以提供的全速运行。最终的加速通常取决于 Lisp 代码的作用，但通常比相应的字节编译代码快 2.5 到 5 倍。
+</p>
+<p>由于本机代码通常在不同系统之间不兼容，本机编译的代码不能从一台机器传输到另一台机器，它只能在产生它的同一台机器上或非常相似的机器上使用（具有相同的 CPU 和运行时间图书馆）。本机编译代码的可传输性与共享库（.so 或 .dll 文件）的可传输性相同。
+</p>
+<p>本机编译代码的库包括对 Emacs Lisp 原语的关键依赖项（请参阅什么是函数？）及其调用约定，因此 Emacs 通常不会加载由早期或更高版本的 Emacs 生成的本机编译代码；  不同 Emacs 版本对相同 Lisp 代码的本地编译通常会以唯一文件名生成一个本地编译库，只有该版本的 Emacs 才能加载该库。然而，使用唯一文件名允许在同一个目录中拥有由几个不同版本的 Emacs 本地编译的同一个 Lisp 库的多个版本。
+</p>
+<p>no-byte-compile 的非 nil 文件局部变量绑定（请参阅字节编译）也会禁用该文件的本机编译。此外，类似的变量 no-native-compile 仅禁用文件的本机编译。如果同时指定了 no-byte-compile 和 no-native-compile，则前者优先。
+</p>
+<div class="nav-panel"><p>Next: <a href="18.1_本机编译函数.html">本机编译函数</a>, Previous: <a href="17.8_反汇编字节码.html">反汇编字节码</a>, Up: <a href="00_content.htm">content</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

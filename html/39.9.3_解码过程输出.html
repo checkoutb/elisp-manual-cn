@@ -1,0 +1,12 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>39.9.3 解码过程输出</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">39.9.3 解码过程输出</h3>
+<div class="nav-panel"><p>Next: <a href="39.9.4_接受进程的输出.html">接受进程的输出</a>, Previous: <a href="39.9.2_过程过滤器函数.html">过程过滤器函数</a>, Up: <a href="39.9_接收进程的输出.html">接收进程的输出.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当 Emacs 将进程输出直接写入多字节缓冲区时，它会根据进程输出编码系统对输出进行解码。如果编码系统是原始文本或无转换，Emacs 使用字符串到多字节将单字节输出转换为多字节，并插入生成的多字节文本。
+</p>
+<p>您可以使用 set-process-coding-system 指定要使用的编码系统（请参阅流程信息）。否则，编码系统来自coding-system-for-read，如果不是零的话；  或者来自默认机制（请参阅默认编码系统）。如果进程输出的文本包含空字节，Emacs 默认使用 no-conversion ；  有关如何控制此行为的信息，请参见禁止空字节检测。
+</p>
+<p>警告：编码系统，如 undecided，根据数据确定编码系统，不能完全可靠地处理异步子进程输出。这是因为 Emacs 必须在异步子流程输出到达时分批处理它。Emacs 必须尝试一次从一批中检测正确的编码系统，但这并不总是有效。因此，如果可能，请指定一个编码系统，该系统同时确定字符代码转换和行尾转换——即类似于 latin-1-unix 的编码系统，而不是 undecided 或 latin-1。
+</p>
+<p>当 Emacs 调用进程过滤器函数时，它会根据进程的过滤器编码系统将进程输出作为多字节字符串或单字节字符串提供。Emacs 根据进程输出编码系统对输出进行解码，通常会产生多字节字符串，但二进制和原始文本等编码系统除外。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="39.9.4_接受进程的输出.html">接受进程的输出</a>, Previous: <a href="39.9.2_过程过滤器函数.html">过程过滤器函数</a>, Up: <a href="39.9_接收进程的输出.html">接收进程的输出.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

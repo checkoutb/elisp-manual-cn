@@ -1,0 +1,38 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>29.22 垂直小数滚动</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">29.22 垂直小数滚动</h2>
+<div class="nav-panel"><p>Next: <a href="29.23_水平滚动.html">水平滚动</a>, Previous: <a href="29.21_文本滚动.html">文本滚动</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>垂直小数滚动意味着将窗口中的文本向上或向下移动指定的倍数或行的分数。例如，Emacs 在比窗口高的图像和屏幕行上使用它。每个窗口都有一个垂直滚动位置，它是一个数字，从不小于零。它指定在显示窗口内容时将其提升多远。提高窗口内容通常会使某些行的全部或部分从顶部消失，而其他某些行的全部或部分会出现在底部。通常的值为零。
+</p>
+<p>垂直滚动位置以正常行高为单位，即默认字体的高度。因此，如果值为 .5，则意味着窗口内容将向上滚动到正常行高的一半。如果它是 3.3，则意味着窗口内容向上滚动到正常行高的三倍以上。
+</p>
+<p>垂直滚动覆盖一行的哪一部分，或多少行，取决于这些行包含什么。0.5 的值可以滚动一条高度非常短的线离开屏幕，而 3.3 的值可以只滚动一条高线或图像的一部分。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-vscroll &amp;optional window pixels-p ¶
+</pre></div>
+<p>该函数返回当前窗口的垂直滚动位置。窗口的默认值是选定的窗口。如果pixels-p 不为零，则返回值以像素为单位，而不是以法线高度为单位。
+</p><div class="lisp">
+<pre class="lisp">(window-vscroll)
+     ⇒ 0
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: set-window-vscroll window lines &amp;optional pixels-p ¶
+</pre></div>
+<p>此函数将窗口的垂直滚动位置设置为行。如果 window 为 nil，则使用选定的窗口。参数行应该为零或正数；  如果不是，则将其视为零。
+</p>
+<p>实际的垂直滚动位置必须始终对应于整数个像素，因此您指定的值会相应地四舍五入。
+</p>
+<p>返回值是此四舍五入的结果。
+</p>
+<div class="lisp">
+<pre class="lisp">(set-window-vscroll (selected-window) 1.2)
+     ⇒ 1.13
+</pre></div>
+<p>如果pixels-p 不为零，则lines 指定像素数。在这种情况下，返回值是行。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: auto-window-vscroll ¶
+</pre></div>
+<p>如果此变量不为 nil，则 line-move、scroll-up 和 scroll-down 函数将自动修改垂直滚动位置以滚动显示高于窗口高度的行，例如在存在大图像。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="29.23_水平滚动.html">水平滚动</a>, Previous: <a href="29.21_文本滚动.html">文本滚动</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

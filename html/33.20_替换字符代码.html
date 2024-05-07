@@ -1,0 +1,43 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.20 替换字符代码</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">33.20 替换字符代码</h2>
+<div class="nav-panel"><p>Next: <a href="33.21_寄存器.html">寄存器</a>, Previous: <a href="33.19.10_为什么文本属性不是区间.html">为什么文本属性不是区间</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>以下函数根据字符代码替换指定区域内的字符。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: subst-char-in-region start end old-char new-char &amp;optional noundo ¶
+</pre></div>
+<p>此函数用由 start 和 end 定义的当前缓冲区区域中的字符 new-char 替换所有出现的字符 old-char。两个字符的多字节形式的长度必须相同。
+</p>
+<p>如果 noundo 为非 nil，则 subst-char-in-region 不会记录 undo 的更改并且不会将缓冲区标记为已修改。这对于控制旧的选择性显示功能很有用（请参阅选择性显示）。
+</p>
+<p>subst-char-in-region 不移动点并返回 nil。
+</p><div class="lisp">
+<pre class="lisp">
+
+---------- Buffer: foo ----------
+This is the contents of the buffer before.
+---------- Buffer: foo ----------
+
+
+(subst-char-in-region 1 20 ?i ?X)
+     ⇒ nil
+
+---------- Buffer: foo ----------
+ThXs Xs the contents of the buffer before.
+---------- Buffer: foo ----------
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: subst-char-in-string fromchar tochar string &amp;optional inplace ¶
+</pre></div>
+<p>此函数将字符串中出现的所有字符 fromchar 替换为 tochar。默认情况下，替换发生在字符串的副本中，但如果可选参数 inplace 不为 nil，则函数会修改字符串本身。在任何情况下，该函数都会返回结果字符串。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: translate-region start end table ¶
+</pre></div>
+<p>此函数将转换表应用于缓冲区中位置 start 和 end 之间的字符。
+</p>
+<p>翻译表table是字符串或char-table；  (aref table ochar) 给出 ochar 对应的翻译字符。如果 table 是一个字符串，任何代码大于 table 长度的字符都不会被翻译改变。
+</p>
+<p>translate-region 的返回值是翻译实际更改的字符数。这不计算在转换表中映射到自身的字符。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.21_寄存器.html">寄存器</a>, Previous: <a href="33.19.10_为什么文本属性不是区间.html">为什么文本属性不是区间</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

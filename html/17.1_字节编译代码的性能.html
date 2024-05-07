@@ -1,0 +1,28 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>17.1 字节编译代码的性能</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">17.1 字节编译代码的性能</h2>
+<div class="nav-panel"><p>Next: <a href="17.2_字节编译函数.html">字节编译函数</a>, Previous: <a href="17_字节编译.html">字节编译</a>, Up: <a href="17_字节编译.html">字节编译.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>字节编译函数不如用 C 编写的原始函数高效，但运行速度比用 Lisp 编写的版本快得多。这是一个例子：
+</p><div class="lisp">
+<pre class="lisp">(defun silly-loop (n)
+  "Return the time, in seconds, to run N iterations of a loop."
+  (let ((t1 (float-time)))
+    (while (&gt; (setq n (1- n)) 0))
+    (- (float-time) t1)))
+⇒ silly-loop
+
+
+(silly-loop 50000000)
+⇒ 10.235304117202759
+
+
+(byte-compile 'silly-loop)
+⇒ [Compiled code not shown]
+
+
+(silly-loop 50000000)
+⇒ 3.705854892730713
+
+</pre></div>
+<p>在此示例中，解释代码需要 10 秒才能运行，而字节编译代码需要不到 4 秒。这些结果具有代表性，但实际结果可能会有所不同。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="17.2_字节编译函数.html">字节编译函数</a>, Previous: <a href="17_字节编译.html">字节编译</a>, Up: <a href="17_字节编译.html">字节编译.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

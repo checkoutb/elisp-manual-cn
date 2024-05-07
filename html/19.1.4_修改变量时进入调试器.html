@@ -1,0 +1,18 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>19.1.4 修改变量时进入调试器</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">19.1.4 修改变量时进入调试器</h3>
+<div class="nav-panel"><p>Next: <a href="19.1.5_显式进入调试器.html">显式进入调试器</a>, Previous: <a href="19.1.3_在函数调用中进入调试器.html">在函数调用中进入调试器</a>, Up: <a href="19.1_Lisp_调试器.html">Lisp_调试器.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>有时，函数的问题是由于变量设置错误造成的。将调试器设置为在变量更改时触发是一种快速查找设置来源的方法。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: debug-on-variable-change variable ¶
+</pre></div>
+<p>此函数安排在修改变量时调用调试器。
+</p>
+<p>它是使用watchpoint机制实现的，因此继承了相同的特点和局限性：变量的所有别名都将被一起监视，只能监视动态变量，并且不会检测到变量引用的对象的变化。有关详细信息，请参阅在变量更改时运行函数。。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: cancel-debug-on-variable-change &amp;optional variable ¶
+</pre></div>
+<p>此函数撤消 debug-on-variable-change 对变量的影响。当以交互方式调用时，它会提示输入 minibuffer 中的变量。如果变量被省略或为零，它将取消所有变量的更改中断。调用 cancel-debug-on-variable-change 对当前未设置为在更改时中断的变量没有任何作用。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="19.1.5_显式进入调试器.html">显式进入调试器</a>, Previous: <a href="19.1.3_在函数调用中进入调试器.html">在函数调用中进入调试器</a>, Up: <a href="19.1_Lisp_调试器.html">Lisp_调试器.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

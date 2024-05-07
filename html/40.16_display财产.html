@@ -1,0 +1,10 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.16 display财产</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">40.16 display财产</h2>
+<div class="nav-panel"><p>Next: <a href="40.16.1_替换文本的显示规范.html">替换文本的显示规范</a>, Previous: <a href="40.15_窗口分隔线.html">窗口分隔线</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>显示文本属性（或覆盖属性）用于将图像插入到文本中，并控制文本显示方式的其他方面。display 属性的值应该是一个显示规范，或者是一个包含多个显示规范的列表或向量。相同显示属性值中的显示规范通常与它们所涵盖的文本同时应用。
+</p>
+<p>如果多个源（覆盖和/或文本属性）为显示属性指定值，则只有一个值生效，遵循 get-char-property 规则。请参阅检查文本属性。
+</p>
+<p>一些显示规范允许包含在显示时评估的 Lisp 表单。这在某些情况下可能是不安全的，例如，当显示规范是由某个外部程序/代理生成时。将显示规范包装在以特殊符号 disable-eval 开头的列表中，如 (’disable-eval spec) 中所示，将禁用对规范中任何 Lisp 的评估，同时仍支持所有其他显示属性功能。
+</p>
+<p>本节的其余部分描述了几种显示规格及其含义。
+</p>
+<div class="nav-panel"><p>Next: <a href="40.16.1_替换文本的显示规范.html">替换文本的显示规范</a>, Previous: <a href="40.15_窗口分隔线.html">窗口分隔线</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

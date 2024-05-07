@@ -1,0 +1,41 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>14.6 缩进宏</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">14.6 缩进宏</h2>
+<div class="nav-panel"><p>Next: <a href="15_自定义设置.html">自定义设置</a>, Previous: <a href="14.5.5_宏扩展了多少次？.html">宏扩展了多少次？</a>, Up: <a href="14_宏.html">宏.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在宏定义中，您可以使用声明形式（请参阅定义宏）来指定 TAB 应如何缩进对宏的调用。缩进规范是这样写的：
+</p>
+<div class="lisp">
+<pre class="lisp">(declare (indent indent-spec))
+</pre></div>
+<p>这导致在宏名称上设置 lisp-indent-function 属性。
+</p>
+<p>以下是缩进规范的可能性：
+</p>
+<div class="lisp">
+<pre class="lisp">nil
+</pre></div>
+<p>这与无属性相同——使用标准缩进模式。
+</p><div class="lisp">
+<pre class="lisp">defun
+</pre></div>
+<p>像处理 <code>def</code> 结构一样处理这个函数：将第二行视为正文的开始。
+</p><div class="lisp">
+<pre class="lisp">an integer, number
+</pre></div>
+<p>函数的第一个参数是区分参数；  其余的被认为是表达式的主体。表达式中的一行根据其上的第一个参数是否被区分而缩进。如果参数是正文的一部分，则该行缩进 lisp-body-indent 列比开始包含表达式的左括号多。如果参数被区分并且是第一个或第二个参数，则缩进两倍的额外列。如果参数被区分而不是第一个或第二个参数，则该行使用标准模式。
+</p><div class="lisp">
+<pre class="lisp">a symbol, symbol
+</pre></div>
+<p>symbol 应该是函数名；  调用该函数来计算此表达式中行的缩进。该函数接收两个参数：
+</p>
+<div class="lisp">
+<pre class="lisp">pos
+</pre></div>
+<p>缩进行开始的位置。
+</p><div class="lisp">
+<pre class="lisp">state
+</pre></div>
+<p>parse-partial-sexp（一种用于缩进和嵌套计算的 Lisp 原语）在解析到此行开头时返回的值。
+</p>
+<p>它应该返回一个数字，即该行的缩进列数，或者一个列表，其 car 是这样的数字。返回数字和返回列表的区别在于，数字表示同一嵌套级别的所有后续行都应该像这个一样缩进；  一个列表说以下几行可能需要不同的缩进。当缩进由 CMq 计算时，这会有所不同；  如果该值是一个数字，CMq 不需要重新计算以下行的缩进，直到列表末尾。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="15_自定义设置.html">自定义设置</a>, Previous: <a href="14.5.5_宏扩展了多少次？.html">宏扩展了多少次？</a>, Up: <a href="14_宏.html">宏.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

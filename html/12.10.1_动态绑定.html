@@ -1,0 +1,49 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>12.10.1 动态绑定</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">12.10.1 动态绑定</h3>
+<div class="nav-panel"><p>Next: <a href="12.10.2_正确使用动态绑定.html">正确使用动态绑定</a>, Previous: <a href="12.10_变量绑定的作用域规则.html">变量绑定的作用域规则</a>, Up: <a href="12.10_变量绑定的作用域规则.html">变量绑定的作用域规则.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>默认情况下，Emacs 进行的局部变量绑定是动态绑定。当一个变量被动态绑定时，它在 Lisp 程序执行中的任何时候的当前绑定只是该符号最近创建的动态局部绑定，或者如果没有这样的局部绑定，则为全局绑定。
+</p>
+<p>动态绑定具有动态范围和范围，如以下示例所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(defvar x -99)  ; x receives an initial value of -99.
+
+(defun getx ()
+  x)            ; x is used free in this function.
+
+(let ((x 1))    ; x is dynamically bound.
+  (getx))
+     ⇒ 1
+
+;; After the let form finishes, x reverts to its
+;; previous value, which is -99.
+
+(getx)
+     ⇒ -99
+</pre></div>
+<p>函数 getx 引用 x。这是一个自由引用，因为在该 defun 构造本身中没有对 x 的绑定。当我们在 x 被（动态）绑定的 let 形式中调用 getx 时，它会检索本地值（即 1）。但是当我们在 let 表单之外调用 getx 时，它会检索全局值（即 -99）。
+</p>
+<p>这是另一个示例，它说明了使用 setq 设置动态绑定变量：
+</p>
+<div class="lisp">
+<pre class="lisp">(defvar x -99)      ; x receives an initial value of -99.
+
+(defun addx ()
+  (setq x (1+ x)))  ; Add 1 to x and return its new value.
+
+(let ((x 1))
+  (addx)
+  (addx))
+     ⇒ 3           ; The two addx calls add to x twice.
+
+;; After the let form finishes, x reverts to its
+;; previous value, which is -99.
+
+(addx)
+     ⇒ -98
+</pre></div>
+<p>动态绑定在 Emacs Lisp 中以一种简单的方式实现。每个符号都有一个值单元格，它指定了它的当前动态值（或没有值）。请参阅符号组件。当一个符号被赋予动态本地绑定时，Emacs 将值单元的内容（或不存在）记录在堆栈中，并将新的本地值存储在值单元中。当绑定结构完成执行时，Emacs 将旧值从堆栈中弹出，并将其放入值单元格中。
+</p>
+<p>请注意，当使用动态绑定的代码被本地编译时，本地编译器将不会执行任何 Lisp 特定的优化。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="12.10.2_正确使用动态绑定.html">正确使用动态绑定</a>, Previous: <a href="12.10_变量绑定的作用域规则.html">变量绑定的作用域规则</a>, Up: <a href="12.10_变量绑定的作用域规则.html">变量绑定的作用域规则.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

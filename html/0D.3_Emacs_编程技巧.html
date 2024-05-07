@@ -1,0 +1,74 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>D.3 Emacs 编程技巧</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">D.3 Emacs 编程技巧</h2>
+<div class="nav-panel"><p>Next: <a href="0D.4_快速编译代码的技巧.html">快速编译代码的技巧</a>, Previous: <a href="0D.2_键绑定约定.html">键绑定约定</a>, Up: <a href="附录_D_提示和约定.html">D_提示和约定.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>遵循这些约定将使您的程序在运行时更适合 Emacs。
+</p>
+<ul>
+<li>
+不要在程序中使用下一行或上一行；  几乎总是，前线更方便、更可预测和更稳健。请参阅按文本行移动。
+</li><li>
+不要调用设置标记的函数，除非设置标记是程序的预期功能之一。标记是用户级别的功能，因此更改标记是不正确的，除非为用户的利益提供一个值。见标记。
+
+</li><li>
+特别是，不要使用以下任何功能：
+<div class="lisp">
+<pre class="lisp">beginning-of-buffer, end-of-buffer
+replace-string, replace-regexp
+insert-file, insert-buffer
+</pre></div>
+</li><li>
+如果你只是想移动点，或者替换某个字符串，或者插入一个文件或缓冲区的内容，而没有为交互式用户准备的任何其他功能，你可以用一两行简单的 Lisp 代码来替换这些功能。
+</li><li>
+使用列表而不是向量，除非有特殊原因使用向量。与向量相比，Lisp 具有更多操作列表的功能，并且使用列表通常更方便。
+
+</li><li>
+如果不需要插入或删除元素（只有列表允许），向量对于大小很大并且以随机顺序访问（不从前到后搜索）的表来说是有利的。
+</li><li>
+在回显区域显示消息的推荐方法是使用消息功能，而不是 princ。见回声区。
+</li><li>
+当您遇到错误情况时，调用函数错误（或信号）。函数错误不返回。请参阅如何发出错误信号。
+
+</li><li>
+不要使用 message、throw、sleep-for 或 beep 来报告错误。
+</li><li>
+错误消息应以大写字母开头，但不应以句点或其他标点符号结尾。
+
+</li><li>
+即使 debug-on-error 为 nil，告诉用户错误的来源有时也很有用。在这种情况下，可以在错误消息前添加一个小写的 Lisp 符号。例如，错误消息 <code>Invalid input</code> 可以扩展为 <code>some-function: Invalid input</code> 。
+</li><li>
+在 minibuffer 中用 yes-or-no-p 或 y-or-np 提出的问题应该以大写字母开头并以 ’?’ 结尾。
+</li><li>
+当您在 minibuffer 提示中提及默认值时，请将其和 <code>默认</code> 一词放在括号内。它应该如下所示：
+
+<div class="lisp">
+<pre class="lisp">Enter the answer (default 42):
+</pre></div>
+</li><li>
+在交互式中，如果您使用 Lisp 表达式来生成参数列表，请不要尝试为区域或位置参数提供正确的默认值。相反，如果未指定这些参数，则为这些参数提供 nil，并在参数为 nil 时让函数体计算默认值。例如，这样写：
+<div class="lisp">
+<pre class="lisp">(defun foo (pos)
+  (interactive
+   (list (if specified specified-pos)))
+  (unless pos (setq pos default-pos))
+  ...)
+</pre></div>
+</li><li>
+而不是这个：
+<div class="lisp">
+<pre class="lisp">(defun foo (pos)
+  (interactive
+   (list (if specified specified-pos
+             default-pos)))
+  ...)
+</pre></div>
+</li><li>
+这样，命令的重复将根据当前情况重新计算这些默认值。
+
+</li><li>
+当您使用交互式规范 <code>d</code> 、 <code>m</code> 和 <code>r</code> 时，您无需采取此类预防措施，因为它们会在重复命令时重新计算参数值。
+</li><li>
+许多需要很长时间才能执行的命令在开始时会显示类似 <code>正在运行...</code> 的消息，并在完成时将其更改为 <code>正在运行...完成</code> 。请保持这些消息的样式统一：省略号周围没有空格， <code>完成</code> 后没有句点。有关生成此类消息的简单方法，请参阅报告操作进度。
+</li><li>
+尽量避免使用递归编辑。相反，做 Rmail e 命令所做的事情：使用一个新的本地键盘映射，其中包含一个定义为切换回旧本地键盘映射的命令。或者干脆切换到另一个缓冲区，让用户随意切换回来。请参阅递归编辑。
+</li></ul>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="0D.4_快速编译代码的技巧.html">快速编译代码的技巧</a>, Previous: <a href="0D.2_键绑定约定.html">键绑定约定</a>, Up: <a href="附录_D_提示和约定.html">D_提示和约定.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.4 插入文本</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">33.4 插入文本</h2>
+<div class="nav-panel"><p>Next: <a href="33.5_用户级插入命令.html">用户级插入命令</a>, Previous: <a href="33.3_比较文本.html">比较文本</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>插入意味着将新文本添加到缓冲区。插入的文本位于点之前的字符和点之后的字符之间。一些插入函数将点放在插入的文本之前，而其他函数将其放在之后。我们称前者在点之后插入，后者在点之前插入。
+</p>
+<p>插入移动位于插入点之后位置的标记，以便它们与周围的文本保持一致（请参阅标记）。当标记指向插入位置时，插入可能会也可能不会重新定位标记，具体取决于标记的插入类型（请参阅标记插入类型）。某些特殊功能（例如 insert-before-markers）将所有此类标记重新定位到插入文本之后，而不管标记的插入类型如何。
+</p>
+<p>如果当前缓冲区是只读的（请参阅只读缓冲区）或插入到只读文本中（请参阅具有特殊含义的属性），插入函数会发出错误信号。
+</p>
+<p>这些函数从字符串和缓冲区复制文本字符及其属性。插入的字符与复制它们的字符具有完全相同的属性。相比之下，指定为单独参数的字符（不是字符串或缓冲区的一部分）从相邻文本继承其文本属性。
+</p>
+<p>插入函数将文本从单字节转换为多字节，以便插入多字节缓冲区，反之亦然——如果文本来自字符串或缓冲区。但是，它们不会将单字节字符代码 128 到 255 转换为多字节字符，即使当前缓冲区是多字节缓冲区也是如此。请参阅转换文本表示。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: insert &amp;rest args ¶
+</pre></div>
+<p>此函数将字符串和/或字符 args 插入当前缓冲区，点，向前移动点。换句话说，它在点之前插入文本。除非所有参数都是字符串或字符，否则会发出错误信号。该值为零。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: insert-before-markers &amp;rest args ¶
+</pre></div>
+<p>此函数将字符串和/或字符 args 插入当前缓冲区，点，向前移动点。除非所有参数都是字符串或字符，否则会发出错误信号。该值为零。
+</p>
+<p>此函数与其他插入函数的不同之处在于它将最初指向插入点的标记重新定位到插入文本之后。如果覆盖从插入点开始，则插入的文本位于覆盖之外；  如果非空覆盖在插入点处结束，则插入的文本将落在该覆盖内。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: insert-char character &amp;optional count inherit ¶
+</pre></div>
+<p>此命令将 count 个字符实例插入到当前缓冲区中的点之前。参数 count 必须是整数，并且 character 必须是字符。
+</p>
+<p>如果以交互方式调用，此命令会使用其 Unicode 名称或其代码点提示输入字符。请参阅 GNU Emacs 手册中的插入文本。
+</p>
+<p>此函数不会将单字节字符代码 128 到 255 转换为多字节字符，即使当前缓冲区是多字节缓冲区也是如此。请参阅转换文本表示。
+</p>
+<p>如果 inherit 不为零，则插入的字符会从插入点前后的两个字符继承粘性文本属性。请参阅文本属性的粘性。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: insert-buffer-substring from-buffer-or-name &amp;optional start end ¶
+</pre></div>
+<p>此函数将缓冲区 from-buffer-or-name 的一部分插入到当前缓冲区中之前的点。插入的文本是开始（包括）和结束（不包括）之间的区域。（这些参数默认为该缓冲区可访问部分的开头和结尾。）此函数返回 nil。
+</p>
+<p>在此示例中，执行表单时使用缓冲区 <code>bar</code> 作为当前缓冲区。我们假设缓冲区 <code>bar</code> 最初是空的。
+</p><div class="lisp">
+<pre class="lisp">
+
+---------- Buffer: foo ----------
+We hold these truths to be self-evident, that all
+---------- Buffer: foo ----------
+
+
+(insert-buffer-substring "foo" 1 20)
+     ⇒ nil
+
+---------- Buffer: bar ----------
+We hold these truth∗
+---------- Buffer: bar ----------
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: insert-buffer-substring-no-properties from-buffer-or-name &amp;optional start end ¶
+</pre></div>
+<p>这类似于插入缓冲区子字符串，只是它不复制任何文本属性。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: insert-into-buffer to-buffer &amp;optional start end ¶
+</pre></div>
+<p>这类似于插入缓冲区子字符串，但方向相反：文本从当前缓冲区复制到目标缓冲区。文本块被复制到缓冲区中的当前点，并且点（在该缓冲区中）被推进到复制文本结束之后。如果开始/结束为 nil，则复制当前缓冲区中的整个文本。
+</p>
+<p>有关从附近文本继承文本属性以及插入文本的其他插入函数，请参阅文本属性的粘性。缩进函数插入的空格也继承了文本属性。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.5_用户级插入命令.html">用户级插入命令</a>, Previous: <a href="33.3_比较文本.html">比较文本</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

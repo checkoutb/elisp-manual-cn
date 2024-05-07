@@ -1,0 +1,26 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.5.3 警告选项</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.5.3 警告选项</h3>
+<div class="nav-panel"><p>Next: <a href="40.5.4_延迟警告.html">延迟警告</a>, Previous: <a href="40.5.2_警告变量.html">警告变量</a>, Up: <a href="40.5_报告警告.html">报告警告.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>用户使用这些变量来控制 Lisp 程序报告警告时发生的情况。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: warning-minimum-level ¶
+</pre></div>
+<p>此用户选项指定应立即向用户显示的最低严重性级别。默认为 :warning，即立即显示除 :debug 警告之外的所有警告。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: warning-minimum-log-level ¶
+</pre></div>
+<p>此用户选项指定应记录在警告缓冲区中的最低严重级别。默认值为 :warning，表示记录除 :debug 警告之外的所有警告。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: warning-suppress-types ¶
+</pre></div>
+<p>此列表指定不应立即向用户显示哪些警告类型。列表的每个元素都应该是一个符号列表。如果其元素与警告类型中的第一个元素匹配，则不会立即显示该警告。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: warning-suppress-log-types ¶
+</pre></div>
+<p>此列表指定不应将哪些警告类型记录在警告缓冲区中。列表的每个元素都应该是一个符号列表。如果它与警告类型中的前几个元素匹配，则不会记录该警告。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.5.4_延迟警告.html">延迟警告</a>, Previous: <a href="40.5.2_警告变量.html">警告变量</a>, Up: <a href="40.5_报告警告.html">报告警告.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.12.11 字体集</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.12.11 字体集</h3>
+<div class="nav-panel"><p>Next: <a href="40.12.12_低级字体表示.html">低级字体表示</a>, Previous: <a href="40.12.10_查找字体.html">查找字体</a>, Up: <a href="40.12_面.html">面.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>字体集是一个字体列表，每个字体都分配给一系列字符代码。单个字体不能显示 Emacs 支持的整个字符范围，但字体集可以。字体集具有名称，就像字体一样，当您为框架或面指定字体时，您可以使用字体集名称代替字体名称。这是有关在 Lisp 程序控制下定义字体集的信息。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: create-fontset-from-fontset-spec fontset-spec &amp;optional style-variant-p noerror ¶
+</pre></div>
+<p>该函数根据规范字符串 fontset-spec 定义一个新的字体集。该字符串应具有以下格式：
+</p>
+<div class="lisp">
+<pre class="lisp">fontpattern, [charset:font]…
+</pre></div>
+<p>逗号前后的空白字符将被忽略。
+</p>
+<p>字符串的第一部分 fontpattern 应该具有标准 X 字体名称的形式，除了最后两个字段应该是 <code>fontset-alias</code> 。
+</p>
+<p>新字体集有两个名称，一个长的，一个短的。长名称是 fontpattern 的全部。简称为 <code>fontset-alias</code> 。您可以通过任一名称引用字体集。如果已经存在同名字体集，则会发出错误信号，除非 noerror 为非 nil，在这种情况下，此函数不执行任何操作。
+</p>
+<p>如果可选参数 style-variant-p 不为零，则表示还要创建字体集的粗体、斜体和粗斜体变体。这些变体字体集没有短名称，只有长名称，这是通过更改 fontpattern 来指示粗体和/或斜体状态。
+</p>
+<p>规范字符串还说明要在字体集中使用哪些字体。详情见下文。
+</p>
+<p>构造 ’charset:font’ 为一个特定的字符集指定使用哪种字体（在此字体集中）。这里，charset 是字符集的名称，font 是用于该字符集的字体。您可以在规范字符串中多次使用此构造。
+</p>
+<p>对于剩余的字符集，那些您没有明确指定的字符集，Emacs 会根据 fontpattern 选择一种字体：它将 ’fontset-alias’ 替换为命名一个字符集的值。对于 ASCII 字符集， <code>fontset-alias</code> 替换为 <code>ISO8859-1</code> 。
+</p>
+<p>此外，当几个连续的字段是通配符时，Emacs 会将它们折叠成一个通配符。这是为了防止使用自动缩放字体。通过缩放较大的字体制作的字体不能用于编辑，缩放较小的字体也没有用，因为最好使用较小的字体以自己的大小，Emacs 就是这样做的。
+</p>
+<p>因此，如果 fontpattern 是这样的，
+</p><div class="lisp">
+<pre class="lisp">-*-fixed-medium-r-normal-*-24-*-*-*-*-*-fontset-24
+</pre></div>
+<p>ASCII 字符的字体规范是这样的：
+</p>
+<div class="lisp">
+<pre class="lisp">-*-fixed-medium-r-normal-*-24-*-ISO8859-1
+</pre></div>
+<p>中文 GB2312 字符的字体规范是这样的：
+</p>
+<div class="lisp">
+<pre class="lisp">-*-fixed-medium-r-normal-*-24-*-gb2312*-*
+</pre></div>
+<p>您可能没有任何符合上述字体规范的中文字体。大多数 X 发行版仅包含在 family 字段中具有 <code>song ti</code> 或 <code>fangsong ti</code> 的中文字体。在这种情况下， <code>Fontset-n</code> 可以指定如下：
+</p>
+<div class="lisp">
+<pre class="lisp">Emacs.Fontset-0: -*-fixed-medium-r-normal-*-24-*-*-*-*-*-fontset-24,\
+        chinese-gb2312:-*-*-medium-r-normal-*-24-*-gb2312*-*
+</pre></div>
+<p>然后，除中文 GB2312 字符之外的所有字体规范在族字段中都有 <code>固定</code> ，而中文 GB2312 字符的字体规范在族字段中具有通配符 <code>*</code> 。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-fontset-font name character font-spec &amp;optional frame add ¶
+</pre></div>
+<p>此函数修改现有字体集名称以使用与指定字符的 font-spec 匹配的字体。
+</p>
+<p>如果 name 为 nil，则此函数修改所选框架的字体集，如果 frame 不为 nil，则修改框架的字体集。
+</p>
+<p>如果 name 为 t，此函数修改默认字体集，其短名称为 ’fontset-default’。
+</p>
+<p>除了指定单个代码点外，字符还可以是一个 cons（从 .to），其中 from 和 to 是字符代码点。在这种情况下，对 from 和 to（包括）范围内的所有字符使用 font-spec。
+</p>
+<p>字符可能是一个字符集（参见字符集）。在这种情况下，对字符集中的所有字符使用 font-spec。
+</p>
+<p>字符可以是脚本名称（参见 char-script-table）。在这种情况下，对属于脚本的所有字符使用 font-spec。
+</p>
+<p>character 可以为 nil，这意味着对任何未指定 font-spec 的字符使用 font-spec。
+</p>
+<p>font-spec 可能是由函数 font-spec 创建的 font-spec 对象（请参阅 Low-Level Font Representation）。
+</p>
+<p>font-spec 可能是一个缺点；  (family .registry)，其中family是字体的家族名称（可能在头部包括铸造厂名称），registry是字体的注册表名称（可能在尾部包括编码名称）。
+</p>
+<p>font-spec 可以是字体名称、字符串。
+</p>
+<p>font-spec 可能为 nil，它明确指定指定字符没有字体。这很有用，例如，可以避免在系统范围内为没有字形的字符进行昂贵的字体搜索，例如来自 Unicode Private Use Area (PUA) 的字符。
+</p>
+<p>可选参数 add，如果非 nil，指定如何将 font-spec 添加到先前设置的字体规范。如果它是前置的，则 font-spec 是前置的。如果是追加，则追加字体规范。默认情况下，font-spec 会覆盖之前的设置。
+</p>
+<p>例如，这会将默认字体集更改为对属于字符集 Japanese-jisx0208 的所有字符使用家族名称为 <code>Kochi Gothic</code> 的字体。
+</p><div class="lisp">
+<pre class="lisp">(set-fontset-font t 'japanese-jisx0208
+                  (font-spec :family "Kochi Gothic"))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: char-displayable-p char ¶
+</pre></div>
+<p>如果 Emacs 应该能够显示字符，则此函数返回非 nil。或者更准确地说，如果所选框架的字体集具有显示 char 所属字符集的字体。
+</p>
+<p>字体集可以基于每个字符指定字体；  当字体集这样做时，此函数的值可能不准确。
+</p>
+<p>即使没有可用的字体，此函数也可能返回非零，因为它还检查文本终端的编码系统是否可以对字符进行编码（请参阅终端 I/O 编码）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.12.12_低级字体表示.html">低级字体表示</a>, Previous: <a href="40.12.10_查找字体.html">查找字体</a>, Up: <a href="40.12_面.html">面.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,20 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>10.2.2 符号形式</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">10.2.2 符号形式</h3>
+<div class="nav-panel"><p>Next: <a href="10.2.3_列表形式的分类.html">列表形式的分类</a>, Previous: <a href="10.2.1_自我评估表.html">自我评估表</a>, Up: <a href="10.2_表格种类.html">表格种类.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>评估符号时，将其视为变量。结果是变量的值，如果它有一个。如果符号没有作为变量的值，则 Lisp 解释器会发出错误信号。有关使用变量的更多信息，请参阅变量。
+</p>
+<p>在以下示例中，我们使用 setq 设置符号的值。然后我们评估符号，并取回 setq 存储的值。
+</p>
+<div class="lisp">
+<pre class="lisp">(setq a 123)
+     ⇒ 123
+
+(eval 'a)
+     ⇒ 123
+
+a
+     ⇒ 123
+</pre></div>
+<p>对符号 nil 和 t 进行特殊处理，使得 nil 的值始终为 nil，而 t 的值始终为 t；  您不能将它们设置或绑定到任何其他值。因此，这两个符号就像自我评估形式一样，尽管 eval 将它们视为任何其他符号。名称以 <code>：</code> 开头的符号也以相同的方式自我评估；  同样，它的值通常也不能改变。请参阅永不改变的变量。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="10.2.3_列表形式的分类.html">列表形式的分类</a>, Previous: <a href="10.2.1_自我评估表.html">自我评估表</a>, Up: <a href="10.2_表格种类.html">表格种类.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

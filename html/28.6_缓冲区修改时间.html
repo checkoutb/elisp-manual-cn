@@ -1,0 +1,51 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>28.6 缓冲区修改时间</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">28.6 缓冲区修改时间</h2>
+<div class="nav-panel"><p>Next: <a href="28.7_只读缓冲区.html">只读缓冲区</a>, Previous: <a href="28.5_缓冲区修改.html">缓冲区修改</a>, Up: <a href="28_缓冲区.html">缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>假设您访问一个文件并在其缓冲区中进行更改，同时文件本身在磁盘上也发生了更改。此时，保存缓冲区将覆盖文件中的更改。有时这可能是您想要的，但通常它会丢失有价值的信息。因此，Emacs 在保存文件之前使用下面描述的函数检查文件的修改时间。（请参阅文件属性，了解如何检查文件的修改时间。）
+</p>
+<div class="lisp">
+<pre class="lisp">Function: verify-visited-file-modtime &amp;optional buffer ¶
+</pre></div>
+<p>此函数将其访问文件的修改时间记录的缓冲区（默认情况下，当前缓冲区）与操作系统记录的文件的实际修改时间进行比较。这两者应该是相同的，除非在 Emacs 访问或保存文件后有其他进程写入了该文件。
+</p>
+<p>如果最后的实际修改时间和 Emacs 记录的修改时间相同，则函数返回 t，否则返回 nil。如果缓冲区没有记录最后修改时间，它也返回 t，即如果访问文件修改时间将返回零。
+</p>
+<p>对于没有访问文件的缓冲区，它总是返回 t，即使访问文件修改时间返回一个非零值。例如，它总是为 dired 缓冲区返回 t。对于访问不存在且从未存在的文件的缓冲区，它返回 t，但对于文件已被删除的文件访问缓冲区，它返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: clear-visited-file-modtime ¶
+</pre></div>
+<p>该函数清除当前缓冲区正在访问的文件的最后修改时间记录。因此，下次保存此缓冲区的尝试不会抱怨文件修改时间的差异。
+</p>
+<p>此函数在 set-visited-file-name 和其他不应该进行通常测试以避免覆盖已更改文件的特殊位置调用。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: visited-file-modtime ¶
+</pre></div>
+<p>此函数返回当前缓冲区记录的最后文件修改时间，作为 Lisp 时间戳（请参阅时间）。
+</p>
+<p>如果缓冲区没有记录最后修改时间，则此函数返回零。例如，如果缓冲区没有访问文件，或者时间已被 clear-visited-file-modtime 明确清除，就会出现这种情况。但是请注意，visited-file-modtime 也会返回一些非文件缓冲区的时间戳。例如，在列出目录的 Dired 缓冲区中，它返回该目录的最后修改时间，由 Dired 记录。
+</p>
+<p>如果缓冲区正在访问一个不存在的文件，则此函数返回 -1。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-visited-file-modtime &amp;optional time ¶
+</pre></div>
+<p>该函数将访问文件的最后修改时间的缓冲区记录更新为 time 指定的值，如果 time 不为零，否则更新为访问文件的最后修改时间。
+</p>
+<p>如果时间既不是 nil 也不是visited-file-modtime 返回的整数标志，它应该是一个 Lisp 时间值（参见时间）。
+</p>
+<p>如果缓冲区没有从文件中正常读取，或者文件本身由于某些已知的良性原因而被更改，则此函数很有用。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: ask-user-about-supersession-threat filename ¶
+</pre></div>
+<p>当文件比缓冲区文本更新时，此函数用于询问用户在尝试修改缓冲区访问文件文件名后如何进行。Emacs 检测到这一点是因为磁盘上文件的修改时间比上次保存时间要新，并且其内容已更改。这意味着其他一些程序可能已经更改了该文件。
+</p>
+<p>根据用户的回答，函数可能会正常返回，在这种情况下会继续修改缓冲区，或者它可能会用数据（文件名）发出文件替换错误信号，在这种情况下，建议的缓冲区修改是不允许的。
+</p>
+<p>Emacs 在适当的情况下会自动调用此函数。它存在，因此您可以通过重新定义它来自定义 Emacs。有关标准定义，请参见文件 userlock.el。
+</p>
+<p>另请参阅文件锁定中的文件锁定机制。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="28.7_只读缓冲区.html">只读缓冲区</a>, Previous: <a href="28.5_缓冲区修改.html">缓冲区修改</a>, Up: <a href="28_缓冲区.html">缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

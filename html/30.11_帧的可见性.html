@@ -1,0 +1,43 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>30.11 帧的可见性</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">30.11 帧的可见性</h2>
+<div class="nav-panel"><p>Next: <a href="30.12_提升、降低和重新堆叠帧.html">提升、降低和重新堆叠帧</a>, Previous: <a href="30.10_输入焦点.html">输入焦点</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>图形显示上的帧可以是可见的、不可见的或图标化的。如果它是可见的，它的内容就会以通常的方式显示。如果它被图标化，它的内容不会显示，但是在某处有一个小图标可以让帧重新进入视图（一些窗口管理器将此状态称为最小化而不是图标化，但从 Emacs 的角度来看，它们是相同的事物）。如果帧不可见，则根本不显示。
+</p>
+<p>可见性的概念与（未）映射帧的概念密切相关。帧（或更准确地说，它的窗口系统窗口）在第一次显示时以及每当它的可见性状态从图标化或不可见变为可见时，都会被映射并变为映射。相反，只要帧将其状态从可见更改为图标化或不可见，它就会变为未映射。
+</p>
+<p>可见性在文本终端上是没有意义的，因为在任何情况下实际上只显示选定的帧。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: frame-visible-p frame ¶
+</pre></div>
+<p>此函数返回帧帧的可见性状态。如果 frame 可见，则值为 t，如果不可见，则值为 nil，如果已图标化，则值为 icon。
+</p>
+<p>在文本终端上，出于此功能的目的，所有帧都被视为可见，即使只显示一个帧。请参阅提升、降低和重新堆叠帧。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: iconify-frame &amp;optional frame ¶
+</pre></div>
+<p>此功能图标化帧帧。如果您省略帧，它将图标化选定的帧。这通常会使帧的所有子帧（及其后代）不可见（请参阅子帧）。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: make-frame-visible &amp;optional frame ¶
+</pre></div>
+<p>此功能使帧帧可见。如果您省略帧，它会使选定的帧可见。这不会提升帧，但如果您愿意，您可以使用提升帧来做到这一点（请参阅提升、降低和重新堆叠帧）。
+</p>
+<p>使帧可见通常使其所有子帧（及其后代）也可见（请参阅子帧）。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: make-frame-invisible &amp;optional frame force ¶
+</pre></div>
+<p>此功能使帧帧不可见。如果您省略帧，它会使选定的帧不可见。通常，这会使帧的所有子帧（及其后代）也变得不可见（请参阅子帧）。
+</p>
+<p>除非 force 不为零，否则如果所有其他帧都不可见，则此函数拒绝使帧不可见。
+</p>
+<p>帧的可见性状态也可用作帧参数。您可以这样阅读或更改它。请参阅窗口管理参数。用户还可以使用窗口管理器对帧进行图标化和去图标化。这发生在 Emacs 可以施加任何控制的级别之下，但 Emacs 确实提供了可用于跟踪此类更改的事件。请参阅其他系统事件。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: x-double-buffered-p &amp;optional frame ¶
+</pre></div>
+<p>如果当前正在使用双缓冲渲染帧，则此函数返回非 nil。帧默认为选定的帧。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="30.12_提升、降低和重新堆叠帧.html">提升、降低和重新堆叠帧</a>, Previous: <a href="30.10_输入焦点.html">输入焦点</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

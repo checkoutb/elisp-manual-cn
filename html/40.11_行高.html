@@ -1,0 +1,54 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.11 行高</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">40.11 行高</h2>
+<div class="nav-panel"><p>Next: <a href="40.12_面.html">面</a>, Previous: <a href="40.10_显示文本的大小.html">显示文本的大小</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>每条显示行的总高度包括行内容的高度，加上显示行上方或下方可选的附加垂直行距。
+</p>
+<p>行内容的高度是该显示行上任何字符或图像的最大高度，包括最后一个换行符（如果有的话）。（继续的显示行不包括最后的换行符。）如果您不指定更大的高度，那是默认的行高。（在最常见的情况下，这等于相应框架的默认字体的高度，请参阅框架字体。）
+</p>
+<p>有几种方法可以显式指定更大的行高，或者通过指定显示行的绝对高度，或者通过指定垂直空间。但是，无论您指定什么，实际行高都不能小于默认值。
+</p>
+<p>换行符可以具有行高文本或覆盖属性，用于控制以该换行符结尾的显示行的总高度。属性值可以是以下几种形式之一：
+</p>
+<div class="lisp">
+<pre class="lisp">t
+</pre></div>
+<p>如果属性值为 t，则换行符对行的显示高度没有影响——可见内容单独决定了高度。在这种情况下，也将忽略下面描述的行间距属性。这对于平铺小图像（或图像切片）而不在图像之间添加空白区域很有用。
+</p><div class="lisp">
+<pre class="lisp">(height total)
+</pre></div>
+<p>如果属性值是显示的表单列表，则会在显示行下方添加额外的空间。首先 Emacs 使用 height 作为高度规范来控制线上方的额外空间；  然后它在线条下方添加足够的空间以使总线条高度达到总高度。在这种情况下，换行符的任何 line-spacing 属性值都将被忽略。
+</p>
+<p>任何其他类型的属性值都是高度规范，它转换为一个数字——指定的行高。有几种方法可以编写高度规范；  以下是它们每个转换为数字的方式：
+</p>
+<div class="lisp">
+<pre class="lisp">integer
+</pre></div>
+<p>如果高度规范是一个正整数，那么高度值就是那个整数。
+</p><div class="lisp">
+<pre class="lisp">float
+</pre></div>
+<p>如果高度规范是浮点数，浮点数，数字高度值是浮点数乘以框架的默认行高。
+</p><div class="lisp">
+<pre class="lisp">(face . ratio)
+</pre></div>
+<p>如果高度规格是所示格式的缺点，则数字高度是比率乘以面高度。ratio 可以是任何类型的数字，或者 nil 表示比率为 1。如果 face 是 t，它指的是当前面。
+</p><div class="lisp">
+<pre class="lisp">(nil . ratio)
+</pre></div>
+<p>如果高度规范是所示格式的缺点，则数字高度是行内容高度的比率乘以。
+</p>
+<p>因此，任何有效的高度规范都会以一种或另一种方式确定以像素为单位的高度。如果行内容的高度小于该值，Emacs 会在行上方添加额外的垂直空间以达到指定的总高度。
+</p>
+<p>如果不指定 line-height 属性，则行高由内容的高度加上行距组成。有几种方法可以为 Emacs 文本的不同部分指定行距。
+</p>
+<p>在图形终端上，您可以使用 line-spacing frame 参数指定框架中所有行的行距（请参阅布局参数）。但是，如果 line-spacing 的默认值不是 nil，它会覆盖框架的 line-spacing 参数。一个整数指定放置在行下方的像素数。浮点数指定相对于框架默认行高的间距。
+</p>
+<p>您可以通过 buffer-local line-spacing 变量指定缓冲区中所有行的行距。一个整数指定放置在行下方的像素数。浮点数指定相对于默认框架行高的间距。这会覆盖为框架指定的行距。
+</p>
+<p>最后，换行符可以有一个行间距文本或覆盖属性，可以扩大默认帧行间距和缓冲区本地行间距变量：如果它的值大于缓冲区或帧默认值，则使用较大的值，对于以该换行符结尾的显示行。
+</p>
+<p>这些机制以一种或另一种方式为每行的间距指定一个 Lisp 值。该值是一个高度规范，并且如上所述转换为 Lisp 值。但是，在这种情况下，数字高度值指定了行间距，而不是行高。
+</p>
+<p>在文本终端上，行距不能更改。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.12_面.html">面</a>, Previous: <a href="40.10_显示文本的大小.html">显示文本的大小</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

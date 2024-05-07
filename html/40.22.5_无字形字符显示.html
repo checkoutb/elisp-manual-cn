@@ -1,0 +1,78 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.22.5 无字形字符显示</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.22.5 无字形字符显示</h3>
+<div class="nav-panel"><p>Next: <a href="40.23_哔哔声.html">哔哔声</a>, Previous: <a href="40.22.4_字形.html">字形</a>, Up: <a href="40.22_字符显示.html">字符显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>无字形字符是以特殊方式显示的字符，例如，作为包含十六进制代码的框，而不是按字面显示。这些包括明确定义为无字形的字符，以及没有可用字体的字符（在图形显示上），以及终端编码系统无法编码的字符（在文本终端上）。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: glyphless-char-display ¶
+</pre></div>
+<p>这个变量的值是一个字符表，它定义了无字形字符以及它们的显示方式。每个条目必须是以下显示方法之一：
+</p>
+<div class="lisp">
+<pre class="lisp">nil
+</pre></div>
+<p>以通常的方式显示字符。
+</p><div class="lisp">
+<pre class="lisp">zero-width
+</pre></div>
+<p>不显示字符。
+</p><div class="lisp">
+<pre class="lisp">thin-space
+</pre></div>
+<p>在图形显示上显示 1 个像素宽，或在文本终端上显示 1 个字符宽。
+</p><div class="lisp">
+<pre class="lisp">empty-box
+</pre></div>
+<p>显示一个空框。
+</p><div class="lisp">
+<pre class="lisp">hex-code
+</pre></div>
+<p>以十六进制表示法显示一个包含字符的 Unicode 代码点的框。
+</p><div class="lisp">
+<pre class="lisp">an ASCII string
+</pre></div>
+<p>显示一个包含该字符串的框。该字符串最多应包含 6 个 ASCII 字符。
+</p><div class="lisp">
+<pre class="lisp">a cons cell (graphical . text)
+</pre></div>
+<p>在图形显示器上显示图形，在文本终端上显示文本。图形和文本都必须是上述显示方法之一。
+</p>
+<p>细空间、空框、十六进制代码和 ASCII 字符串显示方法使用 glyphless-char 面绘制。在文本终端上，方框由方括号 <code>[]</code> 模拟。
+</p>
+<p>char-table 有一个额外的槽，它决定了如何显示不能用任何可用字体显示的字符，或者不能被终端的编码系统编码的字符。它的值应该是上述显示方法之一，除了零宽度或 cons 单元格。
+</p>
+<p>如果一个字符在活动显示表中有非零条目，则显示表生效；  在这种情况下，Emacs 根本不咨询 glyphless-char-display。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: glyphless-char-display-control ¶
+</pre></div>
+<p>此用户选项提供了一种为相似字符组设置 glyphless-char-display 的便捷方法。不要直接从 Lisp 代码中设置它的值；  该值仅通过自定义 :set 函数生效（请参阅定义自定义变量），该函数会更新 glyphless-char-display。
+</p>
+<p>它的值应该是一个元素列表（group.method），其中 group 是指定一组字符的符号，method 是指定如何显示它们的符号。
+</p>
+<p>组应该是以下之一：
+</p>
+<div class="lisp">
+<pre class="lisp">c0-control
+</pre></div>
+<p>ASCII 控制字符 U+0000 到 U+001F，不包括换行符和制表符（通常显示为转义序列，如 ’<em>^A</em>’；请参阅 GNU Emacs 手册中的文本显示方式）。
+</p><div class="lisp">
+<pre class="lisp">c1-control
+</pre></div>
+<p>非 ASCII、非打印字符 U+0080 到 U+009F（通常显示为八进制转义序列，如 ’\230’）。
+</p><div class="lisp">
+<pre class="lisp">format-control
+</pre></div>
+<p>Unicode 通用类别 [Cf] 的字符，例如 U+200E LEFT-TO-RIGHT MARK，但不包括具有图形图像的字符，例如 U+00AD SOFT HYPHEN。
+</p><div class="lisp">
+<pre class="lisp">variation-selectors
+</pre></div>
+<p>Unicode VS-1 到 VS-16（U+FE00 到 U+FE0F），用于在相同代码点（通常是表情符号）的不同字形之间进行选择。
+</p><div class="lisp">
+<pre class="lisp">no-font
+</pre></div>
+<p>没有合适的字体或终端编码系统无法编码的字符。
+</p>
+<p>方法符号应该是零宽度、细空间、空框或十六进制代码之一。这些与上面的 glyphless-char-display 具有相同的含义。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.23_哔哔声.html">哔哔声</a>, Previous: <a href="40.22.4_字形.html">字形</a>, Up: <a href="40.22_字符显示.html">字符显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

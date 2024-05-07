@@ -1,0 +1,88 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.29 解析和生成 JSON 值</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">33.29 解析和生成 JSON 值</h2>
+<div class="nav-panel"><p>Next: <a href="33.30_JSONRPC_通信.html">JSONRPC_通信</a>, Previous: <a href="33.28.1_文档对象模型.html">文档对象模型</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当 Emacs 使用 JSON（JavaScript Object Notation）支持编译时，它提供了几个函数来在 Lisp 对象和 JSON 值之间进行转换。任何 JSON 值都可以转换为 Lisp 对象，反之则不行。具体来说：
+</p>
+<p>JSON 使用三个关键字：true、null、false。true 由符号 t 表示。默认情况下，其余两个分别由符号 :null 和 :false 表示。
+JSON 只有浮点数。它们可以表示 Lisp 整数和 Lisp 浮点数。
+JSON 字符串始终是以 UTF-8 编码的 Unicode 字符串。Lisp 字符串可以包含非 Unicode 字符。
+JSON 只有一种序列类型，即数组。JSON 数组使用 Lisp 向量表示。
+JSON 只有一种地图类型，即对象。JSON 对象使用 Lisp 哈希表、alist 或 plist 表示。当 alist 或 plist 包含多个具有相同键的元素时，Emacs 仅使用第一个元素进行序列化，这与 assq 的行为一致。
+</p>
+<p>请注意，nil 既是有效的 alist 又是有效的 plist，表示 {}，即空 JSON 对象；  not null、false 或空数组，它们都是不同的 JSON 值。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: json-available-p ¶
+</pre></div>
+<p>如果 Emacs 已使用 JSON 支持构建，并且该库在当前系统上可用，则此谓词返回非 nil。
+</p>
+<p>如果某些 Lisp 对象不能用 JSON 表示，序列化函数将发出错误类型参数类型的错误信号。解析函数还可以发出以下错误信号：
+</p>
+<div class="lisp">
+<pre class="lisp">json-unavailable
+</pre></div>
+<p>当解析库不可用时发出信号。
+</p><div class="lisp">
+<pre class="lisp">json-end-of-file
+</pre></div>
+<p>遇到输入文本过早结束时发出信号。
+</p><div class="lisp">
+<pre class="lisp">json-trailing-content
+</pre></div>
+<p>在解析第一个 JSON 对象后遇到意外输入时发出信号。
+</p><div class="lisp">
+<pre class="lisp">json-parse-error
+</pre></div>
+<p>遇到无效的 JSON 语法时发出信号。
+</p>
+<p>顶级值和这些顶级值中的子对象可以序列化为 JSON。同样，解析函数将返回上述任何可能的类型。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: json-serialize object &amp;rest args ¶
+</pre></div>
+<p>此函数返回一个新的 Lisp 字符串，其中包含对象的 JSON 表示。参数 args 是关键字/参数对的列表。接受以下关键字：
+</p>
+<div class="lisp">
+<pre class="lisp">:null-object
+</pre></div>
+<p>该值决定使用哪个 Lisp 对象来表示 JSON 关键字 null。它默认为符号：null。
+</p><div class="lisp">
+<pre class="lisp">:false-object
+</pre></div>
+<p>该值决定使用哪个 Lisp 对象来表示 JSON 关键字 false。它默认为符号：false。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: json-insert object &amp;rest args ¶
+</pre></div>
+<p>此函数将对象的 JSON 表示形式插入到当前缓冲区之前的点。参数 args 被解释为 json-parse-string。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: json-parse-string string &amp;rest args ¶
+</pre></div>
+<p>此函数解析字符串中的 JSON 值，该值必须是 Lisp 字符串。如果 string 不包含有效的 JSON 对象，则此函数会发出 json-parse-error 错误信号。
+</p>
+<p>参数 args 是关键字/参数对的列表。接受以下关键字：
+</p>
+<div class="lisp">
+<pre class="lisp">:object-type
+</pre></div>
+<p>该值决定了使用哪个 Lisp 对象来表示 JSON 对象的键值映射。它可以是默认的哈希表，以字符串作为键的哈希表；  alist 使用带有符号的 alists 作为键；  或 plist 使用带有关键字符号的 plist 作为键。
+</p><div class="lisp">
+<pre class="lisp">:array-type
+</pre></div>
+<p>该值决定了使用哪个 Lisp 对象来表示 JSON 数组。它可以是任意一个数组，默认使用 Lisp 数组；  或列表以使用列表。
+</p><div class="lisp">
+<pre class="lisp">:null-object
+</pre></div>
+<p>该值决定使用哪个 Lisp 对象来表示 JSON 关键字 null。它默认为符号：null。
+</p><div class="lisp">
+<pre class="lisp">:false-object
+</pre></div>
+<p>该值决定使用哪个 Lisp 对象来表示 JSON 关键字 false。它默认为符号：false。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: json-parse-buffer &amp;rest args ¶
+</pre></div>
+<p>此函数从当前缓冲区读取下一个 JSON 值，从点开始。如果包含一个有效的 JSON 对象，它会立即将点移动到值之后的位置；  否则它会发出 json-parse-error 错误信号并且不会移动点。参数 args 被解释为 json-parse-string。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.30_JSONRPC_通信.html">JSONRPC_通信</a>, Previous: <a href="33.28.1_文档对象模型.html">文档对象模型</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

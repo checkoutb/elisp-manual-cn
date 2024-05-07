@@ -1,0 +1,8 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>26.1 访问文件</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">26.1 访问文件</h2>
+<div class="nav-panel"><p>Next: <a href="26.1.1_文件访问函数.html">文件访问函数</a>, Previous: <a href="26_文件.html">文件</a>, Up: <a href="26_文件.html">文件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>访问文件意味着将文件读入缓冲区。完成后，我们说缓冲区正在访问该文件，并将该文件称为缓冲区的访问文件。
+</p>
+<p>文件和缓冲区是两个不同的东西。文件是永久记录在计算机中的信息（除非您将其删除）。另一方面，缓冲区是 Emacs 内部的信息，将在编辑会话结束时（或当您终止缓冲区时）消失。当缓冲区访问文件时，它包含从文件复制的信息。缓冲区中的副本是您使用编辑命令修改的内容。对缓冲区的更改不会更改文件；  要使更改永久化，您必须保存缓冲区，这意味着将更改的缓冲区内容复制回文件中。
+</p>
+<p>尽管文件和缓冲区之间存在区别，但人们通常在指缓冲区时指代文件，反之亦然。实际上，我们会说 <code>我正在编辑一个文件</code> ，而不是 <code>我正在编辑一个缓冲区，我将很快将其保存为同名文件</code> 。人类通常不需要明确区分。但是，在处理计算机程序时，最好记住区别。
+</p>
+<div class="nav-panel"><p>Next: <a href="26.1.1_文件访问函数.html">文件访问函数</a>, Previous: <a href="26_文件.html">文件</a>, Up: <a href="26_文件.html">文件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

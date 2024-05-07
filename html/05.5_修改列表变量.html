@@ -1,0 +1,100 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>5.5 修改列表变量</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">5.5 修改列表变量</h2>
+<div class="nav-panel"><p>Next: <a href="05.6_修改现有列表结构.html">修改现有列表结构</a>, Previous: <a href="05.4_构建_Cons_单元格和列表.html">构建_Cons_单元格和列表</a>, Up: <a href="05_列表.html">列表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这些函数和一个宏提供了修改存储在变量中的列表的便捷方法。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: push element listname
+</pre></div>
+<p>此宏创建一个新列表，其 CAR 为元素，其 CDR 为 listname 指定的列表，并将该列表保存在 listname 中。在最简单的情况下，listname 是一个不带引号的符号来命名一个列表，这个宏等价于 (setq listname (cons element listname))。
+</p>
+<div class="lisp">
+<pre class="lisp">(setq l '(a b))
+     ⇒ (a b)
+(push 'c l)
+     ⇒ (c a b)
+l
+     ⇒ (c a b)
+</pre></div>
+<p>更一般地说，listname 可以是一个广义变量。在这种情况下，这个宏相当于 (setf listname (cons element listname))。请参阅广义变量。
+</p>
+<p>对于从列表中删除第一个元素的 pop 宏，请参阅访问列表元素。
+</p>
+<p>两个函数修改作为变量值的列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: add-to-list symbol element &amp;optional append compare-fn
+</pre></div>
+<p>如果 element 还不是该值的成员，则此函数通过将 element 转换为旧值来设置变量符号。它返回结果列表，无论是否更新。symbol 的值最好是在调用之前已经存在的列表。add-to-list 使用 compare-fn 将元素与现有列表成员进行比较；  如果 compare-fn 为 nil，则使用 equal。
+</p>
+<p>通常，如果添加元素，则将其添加到符号的前面，但如果可选参数 append 为非 nil，则将其添加到末尾。
+</p>
+<p>参数符号没有被隐式引用；  add-to-list 是一个普通函数，与 set 类似，但与 setq 不同。如果这是您想要的，请自己引用论点。
+</p>
+<p>当符号引用词法变量时不要使用此函数。
+</p>
+<p>这是一个展示如何使用添加到列表的场景：
+</p><div class="lisp">
+<pre class="lisp">(setq foo '(a b))
+     ⇒ (a b)
+
+(add-to-list 'foo 'c)     ;; Add c.
+     ⇒ (c a b)
+
+(add-to-list 'foo 'b)     ;; No effect.
+     ⇒ (c a b)
+
+foo                       ;; foo was changed.
+     ⇒ (c a b)
+</pre></div>
+<p>(add-to-list ’var value) 的等效表达式是：
+</p>
+<div class="lisp">
+<pre class="lisp">(if (member value var)
+    var
+  (setq var (cons value var)))
+
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: add-to-ordered-list symbol element &amp;optional order
+</pre></div>
+<p>此函数通过在 order 指定的位置将元素插入旧值（必须是列表）来设置变量符号。如果元素已经是列表的成员，则根据顺序调整其在列表中的位置。使用 eq 测试成员资格。此函数返回结果列表，无论是否更新。
+</p>
+<p>顺序通常是一个数字（整数或浮点数），列表的元素按非递减数字顺序排序。
+</p>
+<p>order 也可以省略或为零。如果元素已经有一个，则元素的数字顺序保持不变；  否则，元素没有数字顺序。没有数字列表顺序的元素被放置在列表的末尾，没有特定的顺序。
+</p>
+<p>order 的任何其他值都会删除元素的数字顺序，如果它已经有一个；  否则，它等价于 nil。
+</p>
+<p>参数符号没有被隐式引用；  add-to-ordered-list 是一个普通函数，与 set 类似，但与 setq 不同。如有必要，请自己引用论点。
+</p>
+<p>排序信息存储在符号列表顺序属性的哈希表中。symbol 不能引用词法变量。
+</p>
+<p>这是一个展示如何使用 add-to-ordered-list 的场景：
+</p>
+<div class="lisp">
+<pre class="lisp">(setq foo '())
+     ⇒ nil
+
+(add-to-ordered-list 'foo 'a 1)     ;; Add a.
+     ⇒ (a)
+
+(add-to-ordered-list 'foo 'c 3)     ;; Add c.
+     ⇒ (a c)
+
+(add-to-ordered-list 'foo 'b 2)     ;; Add b.
+     ⇒ (a b c)
+
+(add-to-ordered-list 'foo 'b 4)     ;; Move b.
+     ⇒ (a c b)
+
+(add-to-ordered-list 'foo 'd)       ;; Append d.
+     ⇒ (a c b d)
+
+(add-to-ordered-list 'foo 'e)       ;; Add e.
+     ⇒ (a c b e d)
+
+foo                       ;; foo was changed.
+     ⇒ (a c b e d)
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="05.6_修改现有列表结构.html">修改现有列表结构</a>, Previous: <a href="05.4_构建_Cons_单元格和列表.html">构建_Cons_单元格和列表</a>, Up: <a href="05_列表.html">列表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

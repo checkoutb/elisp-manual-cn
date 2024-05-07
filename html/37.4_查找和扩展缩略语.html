@@ -1,0 +1,85 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>37.4 查找和扩展缩略语</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">37.4 查找和扩展缩略语</h2>
+<div class="nav-panel"><p>Next: <a href="37.5_标准缩写表.html">标准缩写表</a>, Previous: <a href="37.3_在文件中保存缩写.html">在文件中保存缩写</a>, Up: <a href="37_缩写和缩写扩展.html">缩写和缩写扩展.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>缩写通常由某些交互式命令扩展，包括 self-insert-command。本节介绍编写此类命令时使用的子程序，以及它们用于通信的变量。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: abbrev-symbol abbrev &amp;optional table ¶
+</pre></div>
+<p>此函数返回代表名为 abbrev 的缩写的符号。如果未定义该缩写，则返回 nil。可选的第二个参数表是要在其中查找的缩写表。如果 table 为 nil，此函数首先尝试当前缓冲区的本地缩写表，然后尝试全局缩写表。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: abbrev-expansion abbrev &amp;optional table ¶
+</pre></div>
+<p>此函数返回 abbrev 将扩展成的字符串（由用于当前缓冲区的 abbrev 表定义）。如果 abbrev 不是有效的缩写，则返回 nil。可选参数表指定要使用的缩写表，如 abbrev-symbol。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: expand-abbrev ¶
+</pre></div>
+<p>此命令扩展点之前的缩写（如果有）。如果 point 不跟随缩写，则此命令不执行任何操作。为了进行扩展，它调用作为 abbrev-expand-function 变量值的函数，不带参数，并返回该函数所做的任何事情。
+</p>
+<p>默认扩展函数在进行扩展时返回缩写符号，否则返回 nil。如果缩写符号有一个钩子函数，它是一个非自插入属性为非 nil 的符号，并且如果钩子函数返回 nil 作为其值，则默认扩展函数返回 nil，即使扩展确实发生了。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: abbrev-insert abbrev &amp;optional name start end ¶
+</pre></div>
+<p>此函数插入​​ abbrev 的 abbrev 扩展，替换 start 和 end 之间的文本。如果省略 start，则默认为 point。name，如果非零，应该是找到这个缩写的名字（一个字符串）；  用于判断是否调整扩张的资本化。如果 abbrev 插入成功，该函数返回 abbrev，否则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: abbrev-prefix-mark &amp;optional arg ¶
+</pre></div>
+<p>此命令将点的当前位置标记为缩写的开头。对 expand-abbrev 的下一次调用将使用从这里到点（当时在哪里）的文本作为展开的缩写，而不是像往常一样使用前一个单词。
+</p>
+<p>首先，此命令扩展点之前的任何缩写，除非 arg 不为 nil。（交互式地，arg 是前缀参数。）然后它在点之前插入一个连字符，以指示要扩展的下一个缩写的开始。实际的扩展删除了连字符。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: abbrev-all-caps ¶
+</pre></div>
+<p>当此设置为非零时，完全以大写输入的缩写将使用全部大写进行扩展。否则，通过大写扩展的每个单词来扩展完全以大写形式输入的缩写。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: abbrev-start-location ¶
+</pre></div>
+<p>此变量的值是一个缓冲区位置（整数或标记），用于 expand-abbrev 用作下一个要扩展的缩写的开始。该值也可以为 nil，这意味着使用 point 之前的单词代替。每次调用 expand-abbrev 时，abbrev-start-location 都设置为 nil。此变量也由 abbrev-prefix-mark 设置。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: abbrev-start-location-buffer ¶
+</pre></div>
+<p>此变量的值是已设置 abbrev-start-location 的缓冲区。尝试在任何其他缓冲区中扩展缩写会清除 abbrev-start-location。此变量由 abbrev-prefix-mark 设置。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: last-abbrev ¶
+</pre></div>
+<p>这是最近扩展的缩写的缩写符号。为了使用 unexpand-abbrev 命令，这些信息由 expand-abbrev 留下（参见 GNU Emacs 手册中的扩展缩写）。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: last-abbrev-location ¶
+</pre></div>
+<p>这是最近扩展的缩写的位置。这包含为 unexpand-abbrev 命令而由 expand-abbrev 留下的信息。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: last-abbrev-text ¶
+</pre></div>
+<p>这是在大小写转换（如果有）之后最近扩展的缩写的确切扩展文本。如果缩写已经展开，它的值为 nil。这包含为 unexpand-abbrev 命令而由 expand-abbrev 留下的信息。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: abbrev-expand-function ¶
+</pre></div>
+<p>这个变量的值是一个函数，expand-abbrev 将不带参数调用来进行扩展。该函数可以在执行扩展之前和之后做任何它想做的事情。如果发生扩展，它应该返回缩写符号。
+</p>
+<p>以下示例代码显示了 abbrev-expand-function 的简单使用。它假定 foo-mode 是一种用于编辑某些文件的模式，其中以 <code>#</code> 开头的行是注释。您想对这些行使用文本模式缩写。常规的本地缩写表 foo-mode-abbrev-table 适用于所有其他行。有关 local-abbrev-table 和 text-mode-abbrev-table 的定义，请参见标准缩写表。有关 add-function 的详细信息，请参阅 Advising Emacs Lisp Functions。
+</p><div class="lisp">
+<pre class="lisp">(defun foo-mode-abbrev-expand-function (expand)
+  (if (not (save-excursion (forward-line 0) (eq (char-after) ?#)))
+      ;; Performs normal expansion.
+      (funcall expand)
+    ;; We're inside a comment: use the text-mode abbrevs.
+    (let ((local-abbrev-table text-mode-abbrev-table))
+      (funcall expand))))
+
+(add-hook 'foo-mode-hook
+          (lambda ()
+            (add-function :around (local 'abbrev-expand-function)
+                          #'foo-mode-abbrev-expand-function)))
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="37.5_标准缩写表.html">标准缩写表</a>, Previous: <a href="37.3_在文件中保存缩写.html">在文件中保存缩写</a>, Up: <a href="37_缩写和缩写扩展.html">缩写和缩写扩展.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

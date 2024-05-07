@@ -1,0 +1,105 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>26.9.1 文件名组件</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">26.9.1 文件名组件</h3>
+<div class="nav-panel"><p>Next: <a href="26.9.2_绝对和相对文件名.html">绝对和相对文件名</a>, Previous: <a href="26.9_文件名.html">文件名</a>, Up: <a href="26.9_文件名.html">文件名.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>操作系统将文件分组到目录中。要指定文件，您必须指定目录和该目录中的文件名。因此，Emacs 认为文件名有两个主要部分：目录名部分和非目录部分（或目录中的文件名）。任何一部分都可能是空的。连接这两个部分会重现原始文件名。
+</p>
+<p>在大多数系统上，目录部分是直到最后一个斜杠的所有内容（在 MS-DOS 或 MS-Windows 上也允许在输入中使用反斜杠）；  非目录部分是其余部分。
+</p>
+<p>出于某些目的，非目录部分进一步细分为专有名称和版本号。在大多数系统上，只有备份文件的名称中有版本号。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-name-directory filename ¶
+</pre></div>
+<p>此函数返回文件名的目录部分，作为目录名（请参阅目录名），如果文件名不包含目录部分，则返回 nil。
+</p>
+<p>在 GNU 和其他类似 POSIX 的系统上，此函数返回的字符串总是以斜杠结尾。在 MS-DOS 上，它也可以以冒号结尾。
+</p><div class="lisp">
+<pre class="lisp">(file-name-directory "lewis/foo")  ; GNU example
+     ⇒ "lewis/"
+
+(file-name-directory "foo")        ; GNU example
+     ⇒ nil
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: file-name-nondirectory filename ¶
+</pre></div>
+<p>此函数返回文件名的非目录部分。
+</p><div class="lisp">
+<pre class="lisp">(file-name-nondirectory "lewis/foo")
+     ⇒ "foo"
+
+(file-name-nondirectory "foo")
+     ⇒ "foo"
+
+(file-name-nondirectory "lewis/")
+     ⇒ ""
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: file-name-sans-versions filename &amp;optional keep-backup-version ¶
+</pre></div>
+<p>此函数返回文件名，其中包含任何文件版本号、备份版本号或丢弃的尾随波浪号。
+</p>
+<p>如果 keep-backup-version 不为零，则从返回值中丢弃文件系统所理解的真实文件版本号，但保留备份版本号。
+</p><div class="lisp">
+<pre class="lisp">(file-name-sans-versions "~rms/foo.~1~")
+     ⇒ "~rms/foo"
+
+(file-name-sans-versions "~rms/foo~")
+     ⇒ "~rms/foo"
+
+(file-name-sans-versions "~rms/foo")
+     ⇒ "~rms/foo"
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: file-name-extension filename &amp;optional period ¶
+</pre></div>
+<p>在应用 file-name-sans-versions 删除任何版本/备份部分后，此函数返回文件名的最终扩展名（如果有）。文件名中的扩展名是最后一个 <code>。</code> 之后的部分。在姓氏组件中（减去任何版本/备份部分）。
+</p>
+<p>对于 foo 等无扩展名的文件名，此函数返回 nil。它为空扩展名返回 <code>~ ，如 foo.. 如果文件名的最后一个组件以 ~.</code> 开头，则该 <code>.</code>   不算作扩展的开始。因此，.emacs 的扩展名是 nil，而不是 ’.emacs’。
+</p>
+<p>如果 period 不为 nil，则返回值包括分隔扩展名的句点，如果 filename 没有扩展名，则该值为 ""。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-name-with-extension filename extension ¶
+</pre></div>
+<p>此函数返回扩展名设置为扩展名的文件名。如果扩展名中有一个前导点，则将被剥离。例如：
+</p><div class="lisp">
+<pre class="lisp">(file-name-with-extension "file" "el")
+     ⇒ "file.el"
+(file-name-with-extension "file" ".el")
+     ⇒ "file.el"
+(file-name-with-extension "file.c" "el")
+     ⇒ "file.el"
+</pre></div>
+<p>请注意，如果文件名或扩展名为空，或者文件名的形状像目录（即，如果 directory-name-p 返回非 nil），则此函数将出错。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-name-sans-extension filename ¶
+</pre></div>
+<p>此函数返回文件名减去其扩展名（如果有）。版本/备份部分（如果存在）仅在文件具有扩展名时才会被删除。例如，
+</p>
+<div class="lisp">
+<pre class="lisp">(file-name-sans-extension "foo.lose.c")
+     ⇒ "foo.lose"
+(file-name-sans-extension "big.hack/foo")
+     ⇒ "big.hack/foo"
+(file-name-sans-extension "/my/home/.emacs")
+     ⇒ "/my/home/.emacs"
+(file-name-sans-extension "/my/home/.emacs.el")
+     ⇒ "/my/home/.emacs"
+(file-name-sans-extension "~/foo.el.~3~")
+     ⇒ "~/foo"
+(file-name-sans-extension "~/foo.~3~")
+     ⇒ "~/foo.~3~"
+</pre></div>
+<p>请注意，最后两个示例中的 ’.~3~’ 是备份部分，而不是扩展名。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-name-base filename ¶
+</pre></div>
+<p>该功能是文件名无扩展名和文件名非目录的组合。例如，
+</p><div class="lisp">
+<pre class="lisp">(file-name-base "/my/home/foo.c")
+    ⇒ "foo"
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="26.9.2_绝对和相对文件名.html">绝对和相对文件名</a>, Previous: <a href="26.9_文件名.html">文件名</a>, Up: <a href="26.9_文件名.html">文件名.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

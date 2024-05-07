@@ -1,0 +1,35 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>36.6.1 基于解析的运动命令</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">36.6.1 基于解析的运动命令</h3>
+<div class="nav-panel"><p>Next: <a href="36.6.2_查找位置的解析状态.html">查找位置的解析状态</a>, Previous: <a href="36.6_解析表达式.html">解析表达式</a>, Up: <a href="36.6_解析表达式.html">解析表达式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍基于解析表达式操作的简单点运动函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: scan-lists from count depth ¶
+</pre></div>
+<p>此函数从位置开始扫描前向计数平衡括号分组。它返回扫描停止的位置。如果计数为负，则扫描向后移动。
+</p>
+<p>如果深度不为零，则将起始位置视为深度括号深。扫描仪在缓冲区中前后移动，直到深度变为零计数次数。因此，深度的正值具有将括号的深度级别从起始位置移出的效果，而负深度具有将括号的深度级别移动更深的效果。
+</p>
+<p>如果 parse-sexp-ignore-comments 不为零，则扫描会忽略注释。
+</p>
+<p>如果扫描到达缓冲区可访问部分的开头或结尾，则在扫描过 count 个括号分组之前，如果该点的深度为零，则返回值为零；  如果深度不为零，则发出扫描错误错误信号。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: scan-sexps from count ¶
+</pre></div>
+<p>这个函数从位置扫描前向计数sexp。它返回扫描停止的位置。如果计数为负，则扫描向后移动。
+</p>
+<p>如果 parse-sexp-ignore-comments 不为零，则扫描会忽略注释。
+</p>
+<p>如果扫描在括号分组的中间到达缓冲区（可访问部分）的开头或结尾，则会发出错误信号。如果它到达分组之间的开始或结束但在 count 用完之前，则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: forward-comment count ¶
+</pre></div>
+<p>此函数在计数完整注释（即包括起始定界符和终止定界符，如果有）以及途中遇到的任何空白处向前移动点。如果 count 为负，则向后移动。如果它遇到评论或空格以外的任何内容，它就会停止，并在它停止的地方留下点。这包括（例如）在前进时找到评论的结尾并期待评论的开头。该功能也会在移过指定数量的完整评论后立即停止。如果按预期找到计数注释，它们之间除了空格之外什么都没有，它返回 t；  否则返回零。
+</p>
+<p>此函数无法判断它遍历的注释是否嵌入在字符串中。如果它们看起来像评论，它会将它们视为评论。
+</p>
+<p>要在所有注释和空格后面移动，请使用 (forward-comment (buffer-size))。(buffer-size) 是一个很好的参数，因为缓冲区中的评论数量不能超过那么多。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="36.6.2_查找位置的解析状态.html">查找位置的解析状态</a>, Previous: <a href="36.6_解析表达式.html">解析表达式</a>, Up: <a href="36.6_解析表达式.html">解析表达式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

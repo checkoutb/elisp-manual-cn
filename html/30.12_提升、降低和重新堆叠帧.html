@@ -1,0 +1,45 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>30.12 提升、降低和重新堆叠帧</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">30.12 提升、降低和重新堆叠帧</h2>
+<div class="nav-panel"><p>Next: <a href="30.13_帧配置.html">帧配置</a>, Previous: <a href="30.11_帧的可见性.html">帧的可见性</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>大多数窗口系统都使用桌面隐喻。这个比喻的一部分是系统级窗口（表示，例如，Emacs 帧）堆叠在垂直于屏幕表面的名义三维中的想法。堆叠引起的顺序是总的，通常称为堆叠（或 Z-）顺序。在两个窗口的区域重叠的地方，按该顺序较高的一个将（部分）覆盖下面的一个。
+</p>
+<p>您可以使用 raise-frame 和 lower-frame 函数将帧提升到该顺序的顶部或将帧降低到底部。您可以使用函数 frame-restack 将帧直接重新堆叠在另一个帧的上方或下方。
+</p>
+<p>请注意，下面描述的所有功能都将尊重帧（和所有其他窗口系统窗口）对其各自 z 组的遵守（请参阅位置参数）。例如，通常不能将帧降低到桌面窗口的下方，并且不能将 z-group 参数为 nil 的帧升高到窗口系统的任务栏或工具提示窗口上方。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: raise-frame &amp;optional frame ¶
+</pre></div>
+<p>此功能将帧帧（默认为选定帧）提升到属于与帧相同或较低 z 组的所有其他帧之上。如果帧不可见或图标化，则使其可见。如果 frame 是子帧（参见子帧），这会将帧提升到其父帧的所有其他子帧之上。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: lower-frame &amp;optional frame ¶
+</pre></div>
+<p>此功能将帧帧（默认为选定帧）降低到属于与帧相同或更高 z 组的所有其他帧之下。如果帧是子帧（请参阅子帧），这会将帧降低到其父帧的所有其他子帧之下。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: frame-restack frame1 frame2 &amp;optional above ¶
+</pre></div>
+<p>此函数将 frame1 重新堆叠到 frame2 之下。这意味着如果两个帧都是可见的并且它们的显示区域重叠，那么帧 2 将（部分）遮盖帧 1。如果上面可选的第三个参数不为 nil，则此函数将 frame1 重新堆叠在 frame2 之上。这意味着如果两个帧都是可见的并且它们的显示区域重叠，那么帧 1 将（部分）遮盖帧 2。
+</p>
+<p>从技术上讲，这个函数可以被认为是分两步执行的原子动作： 第一步从显示中删除 frame1 的窗口系统窗口。第二步将 frame1 的窗口重新插入到 frame2 的下方（如果上面为真，则在上方）的显示中。因此，frame2 在其显示的 Z（堆叠）顺序中相对于除 frame1 之外的所有其他帧的位置保持不变。
+</p>
+<p>一些窗口管理器可能拒绝重新堆叠窗口。
+</p>
+<p>请注意，仅当所涉及的帧都没有被图标化或不可见时，重新堆叠的效果才会生效。您可以使用 z-group（请参阅位置参数）帧参数将帧添加到永久显示在其他帧上方或下方的一组帧中。只要一个帧属于这些组之一，重新堆叠它只会影响其在该组中的相对堆叠位置。重新堆叠属于不同 z 组的帧的效果是不确定的。您可以使用函数 frame-list-z-order 按当前堆叠顺序列出帧（请参阅查找所有帧）。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: minibuffer-auto-raise ¶
+</pre></div>
+<p>如果这是非零，则激活 minibuffer 会提升 minibuffer 窗口所在的帧。
+</p>
+<p>在窗口系统上，您还可以使用帧参数启用自动升高（在帧选择时）或自动降低（在帧取消选择时）。请参阅窗口管理参数。
+</p>
+<p>升高和降低帧的概念也适用于文本终端帧。在每个文本终端上，任何时候都只显示顶部帧。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: tty-top-frame &amp;optional terminal ¶
+</pre></div>
+<p>此函数返回终端上的顶部帧。terminal 应该是一个终端对象、一个帧（表示该帧的终端）或 nil（表示所选帧的终端）。如果它不引用文本终端，则返回值为 nil。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="30.13_帧配置.html">帧配置</a>, Previous: <a href="30.11_帧的可见性.html">帧的可见性</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

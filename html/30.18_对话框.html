@@ -1,0 +1,30 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>30.18 对话框</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">30.18 对话框</h2>
+<div class="nav-panel"><p>Next: <a href="30.19_指针形状.html">指针形状</a>, Previous: <a href="30.17_弹出菜单.html">弹出菜单</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>对话框是弹出菜单的一种变体——它看起来有点不同，它总是出现在帧的中心，并且只有一个级别和一个或多个按钮。对话框的主要用途是提出问题，用户可以用 <code>是</code> 、 <code>否</code> 和其他一些选择来回答。通过一个按钮，他们还可以强制用户确认重要信息。y-or-np 和 yes-or-no-p 函数在通过鼠标点击调用的命令调用时使用对话框而不是键盘。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: x-popup-dialog position contents &amp;optional header ¶
+</pre></div>
+<p>此函数显示一个弹出对话框并返回用户所做选择的指示。参数内容指定提供的替代方案；  它有这种格式：
+</p>
+<div class="lisp">
+<pre class="lisp">(title (string . value)…)
+</pre></div>
+<p>它看起来像为 x-popup-menu 指定单个窗格的列表。
+</p>
+<p>返回值是来自所选备选方案的值。
+</p>
+<p>至于 x-popup-menu，列表的元素可能只是一个字符串，而不是一个 cons 单元格（字符串 . 值）。这使一个无法选择的框。
+</p>
+<p>如果 nil 出现在列表中，它将左侧项目与右侧项目分开；  nil 之前的项目出现在左侧，nil 之后的项目出现在右侧。如果列表中不包含 nil，则大约一半的项目出现在每一侧。
+</p>
+<p>对话框总是出现在帧的中心；  参数位置指定哪个帧。可能的值与 x-popup-menu 中的一样，但精确坐标或单个窗口无关紧要；  只有帧很重要。
+</p>
+<p>如果 header 不为零，则框的帧标题为 <code>信息</code> ，否则为 <code>问题</code> 。前者用于消息框（见消息框）。（在文本终端上，不显示框标题。）
+</p>
+<p>在某些配置中，Emacs 无法显示真正的对话框；  因此，它会在帧中心的弹出菜单中显示相同的项目。
+</p>
+<p>如果用户在没有做出有效选择的情况下退出对话框，例如使用窗口管理器，那么这会产生退出并且 x-popup-dialog 不会返回。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="30.19_指针形状.html">指针形状</a>, Previous: <a href="30.17_弹出菜单.html">弹出菜单</a>, Up: <a href="30_帧.html">帧.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

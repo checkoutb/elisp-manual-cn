@@ -1,0 +1,12 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>22.9 特别活动</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">22.9 特别活动</h2>
+<div class="nav-panel"><p>Next: <a href="22.10_等待经过时间或输入.html">等待经过时间或输入</a>, Previous: <a href="22.8.6_杂项事件输入功能.html">杂项事件输入功能</a>, Up: <a href="22_命令循环.html">命令循环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>某些特殊事件在非常低的级别上进行处理——一旦它们被读取。read-event 函数自己处理这些事件，并且从不返回它们。相反，它一直等待第一个非特殊事件并返回该事件。
+</p>
+<p>特殊事件不会回显，它们永远不会组合成键序列，并且它们永远不会出现在 last-command-event 或 (this-command-keys) 的值中。它们不会丢弃数字参数，它们不能被未读命令事件读取，它们可能不会出现在键盘宏中，并且在定义键盘宏时它们不会记录在键盘宏中。
+</p>
+<p>然而，特殊事件确实会在读取后立即出现在 last-input-event 中，这是事件定义找到实际事件的方式。
+</p>
+<p>事件类型 iconify-frame、make-frame-visible、delete-frame、drag-n-drop、language-change 和 sigusr1 等用户信号通常以这种方式处理。定义如何处理特殊事件（以及哪些事件是特殊事件）的键映射位于变量 special-event-map 中（请参阅控制活动键映射）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="22.10_等待经过时间或输入.html">等待经过时间或输入</a>, Previous: <a href="22.8.6_杂项事件输入功能.html">杂项事件输入功能</a>, Up: <a href="22_命令循环.html">命令循环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

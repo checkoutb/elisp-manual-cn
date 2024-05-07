@@ -1,0 +1,116 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>21.6.5 读取文件名</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">21.6.5 读取文件名</h3>
+<div class="nav-panel"><p>Next: <a href="21.6.6_完成变量.html">完成变量</a>, Previous: <a href="21.6.4_高级完成函数.html">高级完成函数</a>, Up: <a href="21.6_完成.html">完成.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>高级完成函数 read-file-name、read-directory-name 和 read-shell-command 旨在分别读取文件名、目录名和 shell 命令。它们提供特殊功能，包括自动插入默认目录。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: read-file-name prompt &amp;optional directory default require-match initial predicate ¶
+</pre></div>
+<p>此函数读取文件名，提示并提供完成。
+</p>
+<p>作为一个例外，如果满足以下所有条件，则此函数使用图形文件对话框而不是 minibuffer 读取文件名：
+</p>
+<p>它是通过鼠标命令调用的。
+所选框架位于支持此类对话框的图形显示上。
+变量 use-dialog-box 不为零。请参阅 GNU Emacs 手册中的对话框。
+下面描述的目录参数没有指定远程文件。请参阅 GNU Emacs 手册中的远程文件。
+</p>
+<p>使用图形文件对话框时的确切行为取决于平台。在这里，我们简单地记录使用 minibuffer 时的行为。
+</p>
+<p>read-file-name 不会自动扩展返回的文件名。如果需要绝对文件名，您可以自己调用 expand-file-name。
+</p>
+<p>可选参数 require-match 与完成读取具有相同的含义。请参阅完成和 Minibuffer。
+</p>
+<p>参数目录指定用于完成相对文件名的目录。它应该是一个绝对目录名。如果变量 insert-default-directory 不为 nil，则目录也作为初始输入插入到 minibuffer 中。它默认为当前缓冲区的 default-directory 值。
+</p>
+<p>如果您指定 initial，则这是要插入缓冲区的初始文件名（在目录之后，如果已插入）。在这种情况下，点位于初始的开头。initial 的默认值为 nil——不插入任何文件名。要查看 initial 的作用，请在访问文件的缓冲区中尝试命令 Cx Cv。请注意：我们建议在大多数情况下使用默认值而不是初始值。
+</p>
+<p>如果 default 为非 nil，则如果用户以与最初插入的 read-file-name 相同的非空内容退出 minibuffer，则该函数返回 default。如果 insert-default-directory 为非零，则初始 minibuffer 内容始终为非空，默认情况下是这样。无论 require-match 的值如何，都不检查 default 的有效性。但是，如果 require-match 不为零，则初始 minibuffer 内容应该是有效的文件（或目录）名称。否则，如果用户在没有任何编辑的情况下退出，read-file-name 将尝试完成，并且不返回默认值。默认值也可通过历史命令获得。
+</p>
+<p>如果 default 是 nil，read-file-name 会尝试找到一个替代的默认值来代替它，它的处理方式与明确指定的方式完全相同。如果 default 为 nil，但 initial 为非 nil，则默认为从 directory 和 initial 中获取的绝对文件名。如果 default 和 initial 都为 nil 并且缓冲区正在访问文件，则 read-file-name 使用该文件的绝对文件名作为默认值。如果缓冲区没有访问文件，则没有默认值。在这种情况下，如果用户在没有任何编辑的情况下键入 RET，read-file-name 只会返回 minibuffer 的预插入内容。
+</p>
+<p>如果用户在一个空的 minibuffer 中输入 RET，这个函数返回一个空字符串，不管 require-match 的值是多少。例如，用户如何使用 Mx set-visited-file-name 使当前缓冲区不访问文件。
+</p>
+<p>如果谓词非零，它指定一个参数的函数，该函数决定哪些文件名是可接受的完成替代。如果谓词为其返回非零，则文件名是可接受的值。
+</p>
+<p>以下是使用读取文件名的示例：
+</p><div class="lisp">
+<pre class="lisp">(read-file-name "The file is ")
+
+;; After evaluation of the preceding expression,
+;;   the following appears in the minibuffer:
+
+
+---------- Buffer: Minibuffer ----------
+The file is /gp/gnu/elisp/∗
+---------- Buffer: Minibuffer ----------
+</pre></div>
+<p>键入手动 TAB 会导致以下结果：
+</p><div class="lisp">
+<pre class="lisp">---------- Buffer: Minibuffer ----------
+The file is /gp/gnu/elisp/manual.texi∗
+---------- Buffer: Minibuffer ----------
+</pre></div>
+<p>如果用户键入 RET，read-file-name 以字符串 <code>/gp/gnu/elisp/manual.texi</code> 的形式返回文件名。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: read-file-name-function ¶
+</pre></div>
+<p>如果非零，这应该是一个接受与读取文件名相同的参数的函数。当调用 read-file-name 时，它​​使用提供的参数调用此函数，而不是执行其通常的工作。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: read-file-name-completion-ignore-case ¶
+</pre></div>
+<p>如果此变量不为 nil，则 read-file-name 在执行完成时会忽略大小写。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: read-directory-name prompt &amp;optional directory default require-match initial ¶
+</pre></div>
+<p>此函数类似于 read-file-name 但仅允许目录名称作为完成替代。
+</p>
+<p>如果 default 为 nil 且 initial 为非 nil，则 read-directory-name 通过组合 directory（或当前缓冲区的默认目录，如果 directory 为 nil）和 initial 来构造替代默认值。如果 default 和 initial 都为 nil，则此函数使用目录作为替代默认值，如果 directory 为 nil，则使用当前缓冲区的默认目录。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: insert-default-directory ¶
+</pre></div>
+<p>这个变量被 read-file-name 使用，因此，间接地被大多数读取文件名的命令使用。（这包括所有在交互形式中使用代码字母 ’f’ 或 ’F’ 的命令。请参阅交互代码字符。）它的值控制 read-file-name 是否通过将默认目录的名称放在 minibuffer 中开始，加上初始文件名（如果有）。如果此变量的值为 nil，则 read-file-name 不会在 minibuffer 中放置任何初始输入（除非您使用初始参数指定初始输入）。在这种情况下，默认目录仍用于完成相对文件名，但不显示。
+</p>
+<p>如果此变量为 nil 并且初始 minibuffer 内容为空，则用户可能必须显式获取下一个历史元素以访问默认值。如果变量不为 nil，则初始 minibuffer 内容总是非空的，用户总是可以通过立即在未编辑的 minibuffer 中键入 RET 来请求默认值。（往上看。）
+</p>
+<p>例如：
+</p><div class="lisp">
+<pre class="lisp">
+
+;; Here the minibuffer starts out with the default directory.
+(let ((insert-default-directory t))
+  (read-file-name "The file is "))
+
+
+---------- Buffer: Minibuffer ----------
+The file is ~lewis/manual/∗
+---------- Buffer: Minibuffer ----------
+
+
+;; Here the minibuffer is empty and only the prompt
+;;   appears on its line.
+(let ((insert-default-directory nil))
+  (read-file-name "The file is "))
+
+
+---------- Buffer: Minibuffer ----------
+The file is ∗
+---------- Buffer: Minibuffer ----------
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: read-shell-command prompt &amp;optional initial history &amp;rest args ¶
+</pre></div>
+<p>该函数从 minibuffer 中读取一个 shell 命令，以提示符提示并提供智能完成。它使用适合命令名称的候选词来完成命令的第一个单词，其余的命令单词作为文件名。
+</p>
+<p>此函数使用 minibuffer-local-shell-command-map 作为 minibuffer 输入的键映射。history 参数指定要使用的历史列表；  如果省略或为零，则默认为 shell-command-history（请参阅 shell-command-history）。可选参数 initial 指定 minibuffer 的初始内容（参见初始输入）。其余的 args（如果存在）用作 read-from-minibuffer 中的默认参数和继承输入方法参数（请参阅Reading Text Strings with the Minibuffer）。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: minibuffer-local-shell-command-map ¶
+</pre></div>
+<p>此键映射由 read-shell-command 用于完成作为 shell 命令一部分的命令和文件名。它使用 minibuffer-local-map 作为其父键映射，并将 TAB 绑定到完成点。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="21.6.6_完成变量.html">完成变量</a>, Previous: <a href="21.6.4_高级完成函数.html">高级完成函数</a>, Up: <a href="21.6_完成.html">完成.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

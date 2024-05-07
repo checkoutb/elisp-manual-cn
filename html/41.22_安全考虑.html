@@ -1,0 +1,49 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>41.22 安全考虑</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">41.22 安全考虑</h2>
+<div class="nav-panel"><p>Next: <a href="42_准备分发的Lisp代码.html">准备分发的Lisp代码</a>, Previous: <a href="41.21_动态加载的库.html">动态加载的库</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>与任何应用程序一样，Emacs 可以在安全的环境中运行，其中操作系统强制执行有关访问等的规则。稍加注意，基于 Emacs 的应用程序也可以成为检查此类规则的安全边界的一部分。尽管 Emacs 的默认设置适用于典型的软件开发环境，但它们可能需要在包含可能包括攻击者的不受信任用户的环境中进行调整。如果您正在开发此类应用程序，以下是安全问题的概要，可能会对您有所帮助。它绝不是完整的；  它旨在让您了解所涉及的安全问题，而不是作为安全清单。
+</p>
+<div class="lisp">
+<pre class="lisp">File local variables ¶
+</pre></div>
+<p>Emacs 访问的文件可以包含影响访问该文件的缓冲区的变量设置；  请参阅文件局部变量。类似地，一个目录可以指定该目录中所有文件共有的局部变量值；  请参阅目录局部变量。尽管 Emacs 采取了一些措施来防止这些变量的滥用，但仅仅通过过于乐观地设置 safe-local-variable 的包就可以创建一个安全漏洞，这个问题太常见了。要对文件和目录禁用此功能，请将 enable-local-variables 设置为 nil。
+</p><div class="lisp">
+<pre class="lisp">Access control
+</pre></div>
+<p>尽管 Emacs 通常尊重底层操作系统的访问权限，但在某些情况下它会专门处理访问。例如，文件名可以具有专门处理文件的处理程序，并具有自己的访问检查。请参阅使某些文件名 <code>神奇</code> 。此外，即使相应的文件是可写的，缓冲区也可以是只读的，反之亦然，这可能导致诸如’File passwd is write-protected;  无论如何尝试保存？  （是还是不是）’。请参阅只读缓冲区。
+</p><div class="lisp">
+<pre class="lisp">Authentication
+</pre></div>
+<p>Emacs 有几个处理密码的函数，例如 read-passwd。请参阅读取密码。尽管这些函数不会尝试向世界广播密码，但它们的实现并不能证明可以访问 Emacs 内部的坚定攻击者。例如，即使 Elisp 代码在使用后使用 clear-string 从其内存中清除密码，密码的残余部分仍可能驻留在垃圾回收的空闲列表中。请参阅修改字符串。
+</p><div class="lisp">
+<pre class="lisp">Code injection
+</pre></div>
+<p>Emacs 可以向许多其他应用程序发送命令，并且应用程序应该注意作为这些命令的操作数发送的字符串不会被误解为指令。例如，当使用 shell 命令将文件 a 重命名为 b 时，不要简单地使用字符串 mv ab，因为文件名可能以 <code>-</code> 开头，或者可能包含 shell 元字符，如 <code>;</code> 。尽管 shell-quote-argument 之类的函数可以帮助避免此类问题，但它们并不是万能的；  例如，在 POSIX 平台上，shell-quote-argument 引用 shell 元字符但不前导 <code>-</code> 。在 MS-Windows 上，引用 ’%’ 假定所有环境变量的名称中都没有 ’^’。请参阅 Shell 参数。通常使用 call-process 比使用 subshel​​l 更安全。请参阅创建同步进程。而且使用内置的 Emacs 函数更安全；  例如，使用 (rename-file "a" "b" t) 而不是调用 mv。请参阅更改文件名和属性。
+</p><div class="lisp">
+<pre class="lisp">Coding systems
+</pre></div>
+<p>Emacs 尝试推断它访问的文件和网络连接的编码系统。请参阅编码系统。如果 Emacs 推断不正确，或者如果网络连接的其他方不同意 Emacs 的推断，则生成的系统可能不可靠。此外，即使推断正确，Emacs 也经常可以使用其他程序无法使用的字节。例如，尽管对于 Emacs 空字节只是一个字符，但许多其他应用程序将其视为字符串终止符并错误处理包含空字节的字符串或文件。
+</p><div class="lisp">
+<pre class="lisp">Environment and configuration variables
+</pre></div>
+<p>POSIX 指定了几个可以影响 Emacs 行为方式的环境变量。任何名称完全由大写 ASCII 字母、数字和下划线组成的环境变量都可能影响 Emacs 的内部行为。Emacs 使用了几个这样的变量，例如，EMACSLOADPATH。请参阅图书馆搜索。在某些平台上，某些环境变量（例如，PATH、POSIXLY<em>_CORRECT</em>、SHELL、TMPDIR）需要具有正确配置的值，以便获得 Emacs 可能调用的任何实用程序的标准行为。即使像 TZ 这样看似良性的变量也可能具有安全隐患。请参阅操作系统环境。
+</p>
+<p>Emacs 具有自定义和其他具有类似考虑的变量。例如，如果变量 shell-file-name 指定了具有非标准行为的 shell，则基于 Emacs 的应用程序可能会出现异常。
+</p><div class="lisp">
+<pre class="lisp">Installation
+</pre></div>
+<p>在安装 Emacs 时，如果安装目录层次结构可以被不受信任的用户修改，则应用程序不能被信任。这也适用于 Emacs 使用的程序的目录层次结构，以及 Emacs 读取和写入的文件的目录层次结构。
+</p><div class="lisp">
+<pre class="lisp">Network access
+</pre></div>
+<p>Emacs 经常访问网络，您可能需要对其进行配置以避免它通常会进行的网络访问。例如，除非您将 tramp-mode 设置为 nil，否则使用特定语法的文件名将被解释为网络文件，并通过网络进行检索。请参阅《流浪汉手册》中的《流浪汉手册》。
+</p><div class="lisp">
+<pre class="lisp">Race conditions
+</pre></div>
+<p>Emacs 应用程序具有与其他应用程序相同的竞争条件问题。例如，即使 (file-readable-p "foo.txt") 返回 t，也可能是 foo.txt 不可读，因为其他程序在调用 file-readable-p 和现在之间更改了文件的权限。请参阅测试可访问性。
+</p><div class="lisp">
+<pre class="lisp">Resource limits
+</pre></div>
+<p>当 Emacs 耗尽内存或其他操作系统资源时，它的行为可能不太可靠，因为通常运行到完成的计算可能会中止回到顶层。这可能会导致 Emacs 忽略它通常会执行的操作。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="42_准备分发的Lisp代码.html">准备分发的Lisp代码</a>, Previous: <a href="41.21_动态加载的库.html">动态加载的库</a>, Up: <a href="41_操作系统接口.html">操作系统接口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

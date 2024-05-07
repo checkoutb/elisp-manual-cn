@@ -1,0 +1,65 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.12.9 字体选择</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.12.9 字体选择</h3>
+<div class="nav-panel"><p>Next: <a href="40.12.10_查找字体.html">查找字体</a>, Previous: <a href="40.12.8_基本面.html">基本面</a>, Up: <a href="40.12_面.html">面.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在 Emacs 可以在图形显示器上绘制字符之前，它必须为该字符选择一种字体25。请参阅 GNU Emacs 手册中的字体。通常，Emacs 会根据分配给该字符的面自动选择字体——特别是面属性 :family、:weight、:slant 和 :width（请参阅面属性）。字体的选​​择还取决于要显示的字符；  某些字体只能显示有限的字符集。如果没有可用的字体完全符合要求，Emacs 会寻找最接近的匹配字体。本节中的变量控制 Emacs 如何进行此选择。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: face-font-family-alternatives ¶
+</pre></div>
+<p>如果指定了给定的系列但不存在，则此变量指定要尝试的替代字体系列。每个元素都应具有以下形式：
+</p>
+<div class="lisp">
+<pre class="lisp">(family alternate-families…)
+</pre></div>
+<p>如果指定了 family 但不可用，Emacs 将逐个尝试在alternate-family 中给出的其他族，直到找到确实存在的族。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: face-font-selection-order ¶
+</pre></div>
+<p>如果没有字体与所有所需的面属性（:width、:height、:weight 和 :slant）完全匹配，则此变量指定在选择最接近的匹配字体时应考虑这些属性的顺序。该值应该是包含这四个属性符号的列表，按重要性降序排列。默认值为 (:width :height :weight :slant)。
+</p>
+<p>字体选择首先找到列表中第一个属性的最佳可用匹配；  然后，在以这种方式最好的字体中，它在第二个属性中搜索最佳匹配，依此类推。
+</p>
+<p>属性 :weight 和 :width 在以正常为中心的范围内具有符号值。更极端（远离正常）的匹配比不太极端（更接近正常）的匹配更受欢迎；  这是为了尽可能确保非正常面与正常面形成对比。
+</p>
+<p>此变量产生影响的一个示例是默认字体没有等效斜体时。在默认排序下，斜体将使用与默认字体类似的非斜体字体。但是如果你把 :slant 放在 :height 之前，斜体将使用斜体字体，即使它的高度不是很正确。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: face-font-registry-alternatives ¶
+</pre></div>
+<p>如果指定了给定的注册表但不存在，此变量允许您指定要尝试的替代字体注册表。每个元素都应具有以下形式：
+</p>
+<div class="lisp">
+<pre class="lisp">(registry alternate-registries…)
+</pre></div>
+<p>如果 registry 已指定但不可用，Emacs 将一个接一个地尝试备用注册表中给出的其他注册表，直到找到确实存在的注册表。
+</p>
+<p>Emacs 可以使用可缩放字体，但默认情况下它不使用它们。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: scalable-fonts-allowed ¶
+</pre></div>
+<p>此变量控制要使用的可缩放字体。默认值 nil 表示不使用可缩放字体。t 表示使用任何适合文本的可缩放字体。
+</p>
+<p>否则，该值必须是正则表达式列表。如果其名称与列表中的任何正则表达式匹配，则启用可缩放字体以供使用。例如，
+</p><div class="lisp">
+<pre class="lisp">(setq scalable-fonts-allowed '("iso10646-1$"))
+</pre></div>
+<p>允许使用注册表 iso10646-1 的可缩放字体。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: face-font-rescale-alist ¶
+</pre></div>
+<p>此变量指定某些面的缩放。它的值应该是表单元素的列表
+</p>
+<div class="lisp">
+<pre class="lisp">(fontname-regexp . scale-factor)
+</pre></div>
+<p>如果 fontname-regexp 与即将使用的字体名称匹配，则表示根据因子 scale-factor 选择更大的相似字体。如果某些字体大于或小于其标称高度和宽度建议的值，您将使用此功能来规范字体大小。
+</p>
+<p>脚注
+(25)
+</p>
+<p>在这种情况下，术语字体与字体锁定无关（请参阅字体锁定模式）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.12.10_查找字体.html">查找字体</a>, Previous: <a href="40.12.8_基本面.html">基本面</a>, Up: <a href="40.12_面.html">面.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

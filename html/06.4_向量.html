@@ -1,0 +1,21 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>6.4 向量</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">6.4 向量</h2>
+<div class="nav-panel"><p>Next: <a href="06.5_向量函数.html">向量函数</a>, Previous: <a href="06.3_操作数组的函数.html">操作数组的函数</a>, Up: <a href="06_序列、数组和向量.html">序列、数组和向量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>向量是一个通用数组，其元素可以是任何 Lisp 对象。（相比之下，字符串的元素只能是字符。请参阅字符串和字符。）向量在 Emacs 中用于多种用途：作为键序列（请参阅键序列），作为符号查找表（请参阅创建和内部符号） ，作为字节编译函数表示的一部分（请参阅字节编译）等。
+</p>
+<p>与其他数组一样，向量使用零原点索引：第一个元素的索引为 0。
+</p>
+<p>向量在元素周围用方括号打印。因此，元素为符号 a、b 和 a 的向量被打印为 [aba]。您可以在 Lisp 输入中以相同的方式编写向量。
+</p>
+<p>向量，如字符串或数字，被认为是评估的常数：评估它的结果是相同的向量。这不会评估甚至检查向量的元素。请参阅自我评估表。用方括号编写的向量不应通过 aset 或其他破坏性操作进行修改。请参阅可变性。
+</p>
+<p>以下是说明这些原则的示例：
+</p><div class="lisp">
+<pre class="lisp">(setq avector [1 two '(three) "four" [five]])
+     ⇒ [1 two '(three) "four" [five]]
+(eval avector)
+     ⇒ [1 two '(three) "four" [five]]
+(eq avector (eval avector))
+     ⇒ t
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="06.5_向量函数.html">向量函数</a>, Previous: <a href="06.3_操作数组的函数.html">操作数组的函数</a>, Up: <a href="06_序列、数组和向量.html">序列、数组和向量.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

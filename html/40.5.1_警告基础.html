@@ -1,0 +1,44 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.5.1 警告基础</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.5.1 警告基础</h3>
+<div class="nav-panel"><p>Next: <a href="40.5.2_警告变量.html">警告变量</a>, Previous: <a href="40.5_报告警告.html">报告警告</a>, Up: <a href="40.5_报告警告.html">报告警告.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>每个警告都有一个文本消息，它为用户解释问题，以及一个严重级别，它是一个符号。以下是可能的严重性级别，按严重性降序排列，以及它们的含义：
+</p>
+<div class="lisp">
+<pre class="lisp">:emergency
+</pre></div>
+<p>如果您不及时处理，很快就会严重影响 Emacs 操作的问题。
+</p><div class="lisp">
+<pre class="lisp">:error
+</pre></div>
+<p>本质上错误的数据或情况的报告。
+</p><div class="lisp">
+<pre class="lisp">:warning
+</pre></div>
+<p>报告本质上不是错误的数据或情况，但会引起对可能问题的怀疑。
+</p><div class="lisp">
+<pre class="lisp">:debug
+</pre></div>
+<p>如果您正在调试，可能会有用的信息报告。
+</p>
+<p>当你的程序遇到无效的输入数据时，它可以通过调用 error 或 signal 来表示 Lisp 错误，或者报告严重性为 :error 的警告。发出 Lisp 错误信号是最简单的事情，但这意味着程序无法继续处理。如果您想不厌其烦地实施一种方法来继续处理不良数据，那么报告严重性警告 :error 是通知用户问题的正确方法。例如，Emacs Lisp 字节编译器可以通过这种方式报告错误并继续编译其他函数。（如果程序发出 Lisp 错误信号，然后用条件情况处理它，用户将看不到错误消息；它可以通过将消息报告为警告来向用户显示该消息。）
+</p>
+<p>每个警告都有一个警告类型来对其进行分类。类型是符号列表。第一个符号应该是您用于程序用户选项的自定义组。例如，字节编译器警告使用警告类型 (bytecomp)。如果您愿意，您还可以通过在列表中使用更多符号对警告进行子分类。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: display-warning type message &amp;optional level buffer-name ¶
+</pre></div>
+<p>此函数上报警告，使用 message 作为消息，使用 type 作为警告类型。level 应该是严重级别， :warning 是默认值。
+</p>
+<p>buffer-name，如果非零，则指定用于记录警告的缓冲区的名称。默认情况下，它是*警告*。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: lwarn type level message &amp;rest args ¶
+</pre></div>
+<p>此函数使用 (format-message message args…) 的值作为 <strong>Warnings</strong> 缓冲区中的消息报告警告。在其他方面，它相当于显示警告。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: warn message &amp;rest args ¶
+</pre></div>
+<p>此函数使用 (format-message message args…) 的值作为消息，(emacs) 作为类型，使用 :warning 作为严重级别来报告警告。它的存在只是为了兼容；  我们建议不要使用它，因为您应该指定特定的警告类型。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.5.2_警告变量.html">警告变量</a>, Previous: <a href="40.5_报告警告.html">报告警告</a>, Up: <a href="40.5_报告警告.html">报告警告.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

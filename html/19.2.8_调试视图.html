@@ -1,0 +1,36 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>19.2.8 调试视图</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">19.2.8 调试视图</h3>
+<div class="nav-panel"><p>Next: <a href="19.2.9_评估.html">评估</a>, Previous: <a href="19.2.7_捕获错误.html">捕获错误</a>, Up: <a href="19.2_调试.html">调试.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这些 Edebug 命令让您可以查看缓冲区和窗口状态的各个方面，就像它们在进入 Edebug 之前一样。外部窗口配置是在 Edebug 之外有效的窗口和内容的集合。
+</p>
+<div class="lisp">
+<pre class="lisp">P
+</pre></div>
+<div class="lisp">
+<pre class="lisp">v
+</pre></div>
+<p>切换到查看外部窗口配置 (edebug-view-outside)。键入 Cx X w 返回 Edebug。
+</p><div class="lisp">
+<pre class="lisp">p
+</pre></div>
+<p>临时显示外部当前缓冲区，点位于其外部位置（edebug-bounce-point），暂停一秒钟，然后返回 Edebug。使用前缀参数 n，改为暂停 n 秒。
+</p><div class="lisp">
+<pre class="lisp">w
+</pre></div>
+<p>将点移回源代码缓冲区（edebug-where）中的当前停止点。
+</p>
+<p>如果您在显示相同缓冲区的不同窗口中使用此命令，则将来将使用该窗口来显示当前定义。
+</p><div class="lisp">
+<pre class="lisp">W
+</pre></div>
+<p>切换 Edebug 是否保存和恢复外部窗口配置 (edebug-toggle-save-windows)。
+</p>
+<p>使用前缀参数，W 仅切换所选窗口的保存和恢复。要指定不显示源代码缓冲区的窗口，您必须使用全局键盘映射中的 Cx XW。
+</p>
+<p>您可以使用 v 查看外部窗口配置，或者使用 p 弹跳到当前缓冲区中的点，即使它没有正常显示。
+</p>
+<p>移动点后，您不妨跳回停止点。您可以使用来自源代码缓冲区的 w 来做到这一点。您可以使用 Cx X w 从任何缓冲区跳回源代码缓冲区中的停止点。
+</p>
+<p>每次您使用 W 关闭保存时，Edebug 都会忘记保存的外部窗口配置——因此即使您重新打开保存，当前窗口配置在您下次退出 Edebug 时（通过继续程序）保持不变。然而，*edebug* 和 <strong>edebug-trace</strong> 的自动重新显示可能与您希望看到的缓冲区冲突，除非您打开了足够多的窗口。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="19.2.9_评估.html">评估</a>, Previous: <a href="19.2.7_捕获错误.html">捕获错误</a>, Up: <a href="19.2_调试.html">调试.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

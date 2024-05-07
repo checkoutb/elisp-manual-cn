@@ -1,0 +1,31 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>19.2.2 为 Edebug 检测</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">19.2.2 为 Edebug 检测</h3>
+<div class="nav-panel"><p>Next: <a href="19.2.3_Edebug_执行模式.html">Edebug_执行模式</a>, Previous: <a href="19.2.1_使用_Edebug.html">使用_Edebug</a>, Up: <a href="19.2_调试.html">调试.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>为了使用 Edebug 调试 Lisp 代码，您必须首先检测代码。检测代码会在其中插入额外的代码，以便在适当的位置调用 Edebug。
+</p>
+<p>当您在函数定义上调用带有前缀参数的命令 CMx (eval-defun) 时，它会在对定义进行评估之前对其进行检测。（这不会修改源代码本身。）如果变量 edebug-all-defs 不为 nil，则会反转前缀参数的含义：在这种情况下，CMx 检测定义，除非它具有前缀参数。edebug-all-defs 的默认值为 nil。命令 Mx edebug-all-defs 切换变量 edebug-all-defs 的值。
+</p>
+<p>如果 edebug-all-defs 不是 nil，那么命令 eval-region、eval-current-buffer 和 eval-buffer 也会检测它们评估的任何定义。同样， edebug-all-forms 控制 eval-region 是否应该检测任何形式，甚至是非定义形式。这不适用于 minibuffer 中的加载或评估。命令 Mx edebug-all-forms 切换此选项。
+</p>
+<p>另一个命令 Mx edebug-eval-top-level-form 可用于检测任何顶级表单，而不管 edebug-all-defs 和 edebug-all-forms 的值如何。edebug-defun 是 edebug-eval-top-level-form 的别名。
+</p>
+<p>当 Edebug 处于活动状态时，命令 I (edebug-instrument-callee) 会在点之后检测由列表形式调用的函数或宏的定义，如果它尚未检测的话。只有当 Edebug 知道在哪里可以找到该函数的源时，这才有可能；  出于这个原因，在加载 Edebug 之后，eval-region 会记录它评估的每个定义的位置，即使没有检测它。另请参阅 i 命令（请参阅 Jumping），它在检测函数后进入调用。
+</p>
+<p>Edebug 知道如何检测所有标准的特殊形式、带有表达式参数的交互式形式、匿名 lambda 表达式和其他定义形式。但是，Edebug 无法自行确定用户定义的宏将如何处理宏调用的参数，因此您必须使用 Edebug 规范提供该信息；  有关详细信息，请参阅 Edebug 和宏。
+</p>
+<p>当 Edebug 即将在会话中第一次检测代码时，它会运行钩子 edebug-setup-hook，然后将其设置为 nil。您可以使用它来加载与您正在使用的包关联的 Edebug 规范，但仅限于使用 Edebug 时。
+</p>
+<p>如果 Edebug 在检测时检测到语法错误，它将指向错误代码并发出无效读取语法错误信号。例子：
+</p>
+<div class="lisp">
+<pre class="lisp">error→ Invalid read syntax: "Expected lambda expression"
+</pre></div>
+<p>这种检测失败的一个潜在原因是 Emacs 还不知道某些宏定义。要解决此问题，请加载定义您将要检测的函数的文件。
+</p>
+<p>要从定义中删除插桩，只需以不插桩的方式重新评估其定义。有两种从不检测表单的方法：从带有 load 的文件，以及从带有 eval-expression (M-:) 的 minibuffer。
+</p>
+<p>从定义中删除检测的另一种方法是使用 edebug-remove-instrumentation 命令。它还允许从已检测的所有内容中删除检测。
+</p>
+<p>有关 Edebug 内部可用的其他评估功能，请参阅评估。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="19.2.3_Edebug_执行模式.html">Edebug_执行模式</a>, Previous: <a href="19.2.1_使用_Edebug.html">使用_Edebug</a>, Up: <a href="19.2_调试.html">调试.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.17.3 缩进整个区域</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">33.17.3 缩进整个区域</h3>
+<div class="nav-panel"><p>Next: <a href="33.17.4_相对于前几行的缩进.html">相对于前几行的缩进</a>, Previous: <a href="33.17.2_主模式控制的缩进.html">主模式控制的缩进</a>, Up: <a href="33.17_缩进.html">缩进.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍缩进区域中所有行的命令。它们返回不可预测的值。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: indent-region start end &amp;optional to-column ¶
+</pre></div>
+<p>此命令从 start（包括）和 end（不包括）之间开始缩进每个非空行。如果 to-column 为 nil，则 indent-region 通过调用当前模式的缩进函数，即 indent-line-function 的值来缩进每个非空行。
+</p>
+<p>如果 to-column 不是 nil，它应该是一个整数，指定缩进的列数；  然后这个函数通过添加或删除空格给每一行精确的缩进。
+</p>
+<p>如果有填充前缀，则 indent-region 通过使其以填充前缀开头来缩进每一行。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: indent-region-function ¶
+</pre></div>
+<p>这个变量的值是一个函数，可以被 indent-region 用作快捷方式。它应该有两个参数，区域的开始和结束。您应该设计该函数，使其产生与逐条缩进该区域的行相同的结果，但可能更快。
+</p>
+<p>如果该值为 nil，则没有捷径，并且 indent-region 实际上是逐行工作的。
+</p>
+<p>快捷函数在 C 模式和 Lisp 模式等模式下很有用，其中缩进行函数必须从函数定义的开头开始扫描：将其应用于每一行将是时间的二次方。快捷方式可以在通过缩进它们的行时更新扫描信息；  这需要线性时间。在单独缩进一行速度很快的模式下，不需要捷径。
+</p>
+<p>indent-region 带有非 nil 参数 to-column 具有不同的含义，并且不使用此变量。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: indent-rigidly start end count ¶
+</pre></div>
+<p>此函数按计数列横向缩进开始（包括）和结束（不包括）之间的所有行。这保留了受影响区域的形状，将其作为一个刚性单元移动。
+</p>
+<p>这不仅适用于缩进未缩进文本的区域，也适用于缩进格式化代码的区域。例如，如果 count 为 3，则此命令将 3 列缩进添加到从指定区域开始的每一行。
+</p>
+<p>如果不带前缀参数以交互方式调用，此命令将调用瞬态模式来严格调整缩进。请参阅 GNU Emacs 手册中的缩进命令。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: indent-code-rigidly start end columns &amp;optional nochange-regexp ¶
+</pre></div>
+<p>这就像 indent-rigidly 一样，只是它不会改变以字符串或注释开头的行。
+</p>
+<p>此外，如果 nochange-regexp 在行首匹配（如果 nochange-regexp 不为零），它不会更改行。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.17.4_相对于前几行的缩进.html">相对于前几行的缩进</a>, Previous: <a href="33.17.2_主模式控制的缩进.html">主模式控制的缩进</a>, Up: <a href="33.17_缩进.html">缩进.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

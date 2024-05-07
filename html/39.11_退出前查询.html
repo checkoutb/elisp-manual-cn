@@ -1,0 +1,27 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>39.11 退出前查询</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">39.11 退出前查询</h2>
+<div class="nav-panel"><p>Next: <a href="39.12_访问其他进程.html">访问其他进程</a>, Previous: <a href="39.10_Sentinels：检测进程状态变化.html">Sentinels：检测进程状态变化</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当 Emacs 退出时，它会终止它的所有子进程。对于运行程序的子进程，它会向它们发送 SIGHUP 信号；  连接被简单地关闭。因为子进程可能正在做有价值的工作，Emacs 通常会要求用户确认可以终止它们。每个进程都有一个查询标志，如果不是 nil，则表示 Emacs 应该在退出之前要求确认，从而终止该进程。查询标志的默认值为 t，表示执行查询。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: process-query-on-exit-flag process ¶
+</pre></div>
+<p>这将返回进程的查询标志。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-process-query-on-exit-flag process flag ¶
+</pre></div>
+<p>该函数将进程的查询标志设置为flag。它返回标志。
+</p>
+<p>下面是一个在 shell 进程上使用 set-process-query-on-exit-flag 来避免查询的示例：
+</p>
+<div class="lisp">
+<pre class="lisp">(set-process-query-on-exit-flag (get-process "shell") nil)
+     ⇒ nil
+</pre></div>
+<div class="lisp">
+<pre class="lisp">User Option: confirm-kill-processes ¶
+</pre></div>
+<p>如果此用户选项设置为 t（默认值），那么 Emacs 会在退出时终止进程之前要求确认。如果为 nil，Emacs 会在不确认的情况下杀死进程，即忽略所有进程的查询标志。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="39.12_访问其他进程.html">访问其他进程</a>, Previous: <a href="39.10_Sentinels：检测进程状态变化.html">Sentinels：检测进程状态变化</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

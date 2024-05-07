@@ -1,0 +1,10 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>19.1.5 显式进入调试器</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">19.1.5 显式进入调试器</h3>
+<div class="nav-panel"><p>Next: <a href="19.1.6_使用调试器.html">使用调试器</a>, Previous: <a href="19.1.4_修改变量时进入调试器.html">修改变量时进入调试器</a>, Up: <a href="19.1_Lisp_调试器.html">Lisp_调试器.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>您可以通过在该点编写表达式 (debug) 来使调试器在程序中的某个点被调用。为此，请访问源文件，在适当的位置插入文本 <code>(debug)</code> ，然后键入 CMx（eval-defun，一种 Lisp 模式键绑定）。警告：如果您这样做是出于临时调试目的，请务必在保存文件之前撤消此插入！
+</p>
+<p>插入 <code>（调试）</code> 的位置必须是可以评估附加表单并忽略其值的位置。（如果 (debug) 的值没有被忽略，它将改​​变程序的执行！）最常见的合适位置是在 progn 或隐式 progn 内（参见 Sequencing）。
+</p>
+<p>如果您不知道要在源代码中的确切位置放置调试语句，但希望在显示特定消息时显示回溯，则可以将 debug-on-message 设置为匹配所需消息的正则表达式.
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="19.1.6_使用调试器.html">使用调试器</a>, Previous: <a href="19.1.4_修改变量时进入调试器.html">修改变量时进入调试器</a>, Up: <a href="19.1_Lisp_调试器.html">Lisp_调试器.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>20.4 输出流</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">20.4 输出流</h2>
+<div class="nav-panel"><p>Next: <a href="20.5_输出函数.html">输出函数</a>, Previous: <a href="20.3_输入函数.html">输入函数</a>, Up: <a href="20_阅读和打印_Lisp_对象.html">阅读和打印_Lisp_对象.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>输出流指定如何处理打印产生的字符。大多数打印函数接受输出流作为可选参数。以下是可能的输出流类型：
+</p>
+<div class="lisp">
+<pre class="lisp">buffer ¶
+</pre></div>
+<p>输出字符被插入到缓冲区中。插入字符时点前进。
+</p><div class="lisp">
+<pre class="lisp">marker ¶
+</pre></div>
+<p>输出字符被插入到标记指向的缓冲区中，在标记位置。标记位置随着字符的插入而前进。当流为标记时，缓冲区中point的值对打印没有影响，并且这种打印不会移动点（除非标记指向点的位置或之前，点会随着周围的文本前进，照常）。
+</p><div class="lisp">
+<pre class="lisp">function ¶
+</pre></div>
+<p>输出字符被传递给函数，该函数负责将它们存储起来。它以单个字符作为参数调用，与要输出的字符一样多次，并负责将字符存储在您想要放置它们的任何位置。
+</p><div class="lisp">
+<pre class="lisp">t ¶
+</pre></div>
+<p>输出字符显示在回显区域中。如果 Emacs 以批处理模式运行（请参阅批处理模式），则输出将改为写入标准输出描述符。
+</p><div class="lisp">
+<pre class="lisp">nil ¶
+</pre></div>
+<p>nil 指定为输出流意味着使用标准输出变量的值；  该值是默认输出流，并且不能为 nil。
+</p><div class="lisp">
+<pre class="lisp">symbol
+</pre></div>
+<p>作为输出流的符号等效于符号的函数定义（如果有）。
+</p>
+<p>许多有效的输出流也可以作为输入流有效。因此，输入和输出流之间的区别更多地在于您如何使用 Lisp 对象，而不是不同类型的对象。
+</p>
+<p>这是用作输出流的缓冲区的示例。点最初位于 <code>the</code> 中的 <code>h</code> 之前，如图所示。最后，点位于同一个 <code>h</code> 之前。
+</p>
+<div class="lisp">
+<pre class="lisp">---------- Buffer: foo ----------
+This is t∗he contents of foo.
+---------- Buffer: foo ----------
+
+
+(print "This is the output" (get-buffer "foo"))
+     ⇒ "This is the output"
+
+---------- Buffer: foo ----------
+This is t
+"This is the output"
+∗he contents of foo.
+---------- Buffer: foo ----------
+</pre></div>
+<p>现在我们展示了如何使用标记作为输出流。最初，标记位于缓冲区 foo 中，位于单词 ’the’ 中的 ’t’ 和 ’h’ 之间。最后，标记已经超过了插入的文本，因此它仍然位于相同的 <code>h</code> 之前。请注意，以通常方式显示的点的位置没有效果。
+</p><div class="lisp">
+<pre class="lisp">
+
+---------- Buffer: foo ----------
+This is the ∗output
+---------- Buffer: foo ----------
+
+
+(setq m (copy-marker 10))
+     ⇒ #&lt;marker at 10 in foo&gt;
+
+
+(print "More output for foo." m)
+     ⇒ "More output for foo."
+
+
+---------- Buffer: foo ----------
+This is t
+"More output for foo."
+he ∗output
+---------- Buffer: foo ----------
+
+
+m
+     ⇒ #&lt;marker at 34 in foo&gt;
+</pre></div>
+<p>以下示例显示了回显区域的输出：
+</p>
+<div class="lisp">
+<pre class="lisp">(print "Echo Area output" t)
+     ⇒ "Echo Area output"
+---------- Echo Area ----------
+"Echo Area output"
+---------- Echo Area ----------
+</pre></div>
+<p>最后输出
+</p><div class="lisp">
+<pre class="lisp">(setq last-output nil)
+     ⇒ nil
+
+
+(defun eat-output (c)
+  (setq last-output (cons c last-output)))
+     ⇒ eat-output
+
+
+(print "This is the output" #'eat-output)
+     ⇒ "This is the output"
+
+
+last-output
+     ⇒ (10 34 116 117 112 116 117 111 32 101 104
+    116 32 115 105 32 115 105 104 84 34 10)
+</pre></div>
+<p>现在我们可以通过反转列表来将输出按正确的顺序排列：
+</p><div class="lisp">
+<pre class="lisp">(concat (nreverse last-output))
+     ⇒ "
+\"This is the output\"
+"
+</pre></div>
+<p>调用 concat 会将列表转换为字符串，以便您可以更清楚地看到其内容。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: external-debugging-output character ¶
+</pre></div>
+<p>在调试时，此函数可用作输出流。它将字符写入标准错误流。
+</p>
+<p>例如
+</p><div class="lisp">
+<pre class="lisp">(print "This is the output" #'external-debugging-output)
+-| This is the output
+⇒ "This is the output"
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="20.5_输出函数.html">输出函数</a>, Previous: <a href="20.3_输入函数.html">输入函数</a>, Up: <a href="20_阅读和打印_Lisp_对象.html">阅读和打印_Lisp_对象.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

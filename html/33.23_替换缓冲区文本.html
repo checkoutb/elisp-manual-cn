@@ -1,0 +1,30 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.23 替换缓冲区文本</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">33.23 替换缓冲区文本</h2>
+<div class="nav-panel"><p>Next: <a href="33.24_处理压缩数据.html">处理压缩数据</a>, Previous: <a href="33.22_文本转置.html">文本转置</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>您可以使用以下函数将一个缓冲区的文本替换为另一个缓冲区的文本：
+</p>
+<div class="lisp">
+<pre class="lisp">Command: replace-buffer-contents source &amp;optional max-secs max-costs ¶
+</pre></div>
+<p>此函数将当前缓冲区的可访问部分替换为缓冲区源的可访问部分。source 可以是缓冲区对象或缓冲区的名称。当 replace-buffer-contents 成功时，当前缓冲区的可访问部分的文本将等于源缓冲区的可访问部分的文本。
+</p>
+<p>此函数尝试保持当前缓冲区中的点、标记、文本属性和覆盖不变。这种行为有用的一个潜在情况是外部代码格式化程序：它们通常将重新格式化的文本写入临时缓冲区或文件，并且使用 delete-region 和 insert-buffer-substring 会破坏这些属性。但是，后一种组合通常更快（请参阅删除文本和插入文本）。
+</p>
+<p>对于它的工作，replace-buffer-contents 需要将原始缓冲区的内容与源的内容进行比较，如果缓冲区很大并且它们之间存在大量差异，则这是一项昂贵的操作。为了保持 replace-buffer-contents 的运行时间在界限内，它有两个可选参数。
+</p>
+<p>max-secs 以秒为单位定义硬边界。如果给定并超出，它将回退到删除区域和插入缓冲区子字符串。
+</p>
+<p>max-costs 定义了差异计算的质量。如果实际成本超过此限制，则使用启发式算法来提供更快但次优的解决方案。默认值为 1000000。
+</p>
+<p>如果可以执行非破坏性替换，replace-buffer-contents 返回 t。否则，即如果超过 max-secs，则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: replace-region-contents beg end replace-fn &amp;optional max-secs max-costs ¶
+</pre></div>
+<p>此函数使用给定的 replace-fn 替换 beg 和 end 之间的区域。函数 replace-fn 在缩小到指定区域的当前缓冲区中运行，它应该返回一个字符串或一个替换该区​​域的缓冲区。
+</p>
+<p>替换是使用 replace-buffer-contents（见上文）执行的，它还描述了 max-secs 和 max-costs 参数以及返回值。
+</p>
+<p>注意：如果替换是一个字符串，它将被放置在一个临时缓冲区中，以便 replace-buffer-contents 可以对其进行操作。因此，如果您已经在缓冲区中进行了替换，则使用 buffer-substring 或类似方法将其转换为字符串是没有意义的。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.24_处理压缩数据.html">处理压缩数据</a>, Previous: <a href="33.22_文本转置.html">文本转置</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>5.3 访问列表元素</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">5.3 访问列表元素</h2>
+<div class="nav-panel"><p>Next: <a href="05.4_构建_Cons_单元格和列表.html">构建_Cons_单元格和列表</a>, Previous: <a href="05.2_列表上的谓词.html">列表上的谓词</a>, Up: <a href="05_列表.html">列表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><div class="lisp">
+<pre class="lisp">Function: car cons-cell
+</pre></div>
+<p>此函数返回由 cons 单元 cons-cell 的第一个槽引用的值。换句话说，它返回 cons-cell 的 CAR。
+</p>
+<p>作为一种特殊情况，如果 cons-cell 为 nil，则此函数返回 nil。因此，任何列表都是有效的参数。如果参数不是 cons 单元格或 nil，则会发出错误信号。
+</p>
+<div class="lisp">
+<pre class="lisp">(car '(a b c))
+     ⇒ a
+
+(car '())
+     ⇒ nil
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: cdr cons-cell
+</pre></div>
+<p>此函数返回 cons 单元 cons-cell 的第二个槽引用的值。换句话说，它返回 cons-cell 的 CDR。
+</p>
+<p>作为一种特殊情况，如果 cons-cell 为 nil，则此函数返回 nil；  因此，任何列表都是有效的参数。如果参数不是 cons 单元格或 nil，则会发出错误信号。
+</p>
+<div class="lisp">
+<pre class="lisp">(cdr '(a b c))
+     ⇒ (b c)
+
+(cdr '())
+     ⇒ nil
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: car-safe object
+</pre></div>
+<p>此函数允许您获取 cons 单元格的 CAR，同时避免其他数据类型的错误。如果 object 是 cons 单元格，则返回 object 的 CAR，否则返回 nil。这与 car 不同，如果 object 不是列表，则会发出错误信号。
+</p>
+<div class="lisp">
+<pre class="lisp">(car-safe object)
+≡
+(let ((x object))
+  (if (consp x)
+      (car x)
+    nil))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: cdr-safe object
+</pre></div>
+<p>此函数允许您获取 cons 单元的 CDR，同时避免其他数据类型的错误。如果 object 是 cons 单元格，则返回 object 的 CDR，否则返回 nil。这与 cdr 不同，如果 object 不是列表，则会发出错误信号。
+</p>
+<div class="lisp">
+<pre class="lisp">(cdr-safe object)
+≡
+(let ((x object))
+  (if (consp x)
+      (cdr x)
+    nil))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Macro: pop listname
+</pre></div>
+<p>这个宏提供了一种方便的方法来检查列表的 CAR，并一次性将其从列表中删除。它对存储在 listname 中的列表进行操作。它从列表中删除第一个元素，将 CDR 保存到 listname 中，然后返回删除的元素。
+</p>
+<p>在最简单的情况下，listname 是命名列表的不带引号的符号；  在这种情况下，此宏等效于 (prog1 (car listname) (setq listname (cdr listname)))。
+</p>
+<div class="lisp">
+<pre class="lisp">x
+     ⇒ (a b c)
+(pop x)
+     ⇒ a
+x
+     ⇒ (b c)
+</pre></div>
+<p>更一般地说，listname 可以是一个广义变量。在这种情况下，此宏使用 setf 保存到 listname 中。请参阅广义变量。
+</p>
+<p>对于将元素添加到列表的 push 宏，请参阅修改列表变量。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: nth n list
+</pre></div>
+<p>此函数返回列表的第 n 个元素。元素从零开始编号，因此列表的 CAR 是元素编号为零。如果列表的长度为 n 或更小，则值为 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">(nth 2 '(1 2 3 4))
+     ⇒ 3
+
+(nth 10 '(1 2 3 4))
+     ⇒ nil
+
+(nth n x) ≡ (car (nthcdr n x))
+</pre></div>
+<p>elt 函数类似，但适用于任何类型的序列。由于历史原因，它以相反的顺序提出论点。请参阅序列。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: nthcdr n list
+</pre></div>
+<p>此函数返回列表的第 n 个 CDR。换句话说，它跳过了 list 的前 n 个链接并返回后面的内容。
+</p>
+<p>如果 n 为零，则 nthcdr 返回所有列表。如果列表的长度为 n 或更小，则 nthcdr 返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">
+
+(nthcdr 1 '(1 2 3 4))
+     ⇒ (2 3 4)
+
+(nthcdr 10 '(1 2 3 4))
+     ⇒ nil
+
+(nthcdr 0 '(1 2 3 4))
+     ⇒ (1 2 3 4)
+
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: last list &amp;optional n
+</pre></div>
+<p>此函数返回列表的最后一个链接。此链接的汽车是列表的最后一个元素。如果 list 为 null，则返回 nil。如果 n 不为零，则返回第 n 个到最后一个链接，或者如果 n 大于列表的长度，则返回整个列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: safe-length list
+</pre></div>
+<p>此函数返回列表的长度，没有错误或无限循环的风险。它通常返回列表中不同的 cons 单元格的数量。但是，对于循环列表，该值只是一个上限；  它通常太大。
+</p>
+<p>如果 list 不是 nil 或 cons 单元格，则安全长度返回 0。
+</p>
+<p>当您不担心它可能是圆形时，计算列表长度的最常用方法是使用长度。请参阅序列。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: caar cons-cell
+</pre></div>
+<p>这与 (car (car cons-cell)) 相同。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: cadr cons-cell
+</pre></div>
+<p>这与 (car (cdr cons-cell)) 或 (nth 1 cons-cell) 相同。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: cdar cons-cell
+</pre></div>
+<p>这与 (cdr (car cons-cell)) 相同。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: cddr cons-cell
+</pre></div>
+<p>这与 (cdr (cdr cons-cell)) 或 (nthcdr 2 cons-cell) 相同。
+</p>
+<p>除了上述之外，car 和 cdr 的另外 24 个组合被定义为 cxxxr 和 cxxxxr，其中每个 x 是 a 或 d。cadr、caddr 和 cadddr 分别选出列表的第二个、第三个或第四个元素。cl-lib 以 cl-second、cl-third 和 cl-fourth 的名称提供相同的功能。请参阅 Common Lisp Extensions 中的列表函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: butlast x &amp;optional n
+</pre></div>
+<p>此函数返回删除了最后一个元素或最后 n 个元素的列表 x。如果 n 大于零，它会复制列表，以免损坏原始列表。通常， (append (butlast xn) (last xn)) 将返回一个等于 x 的列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: nbutlast x &amp;optional n
+</pre></div>
+<p>这是 butlast 的一个版本，它通过破坏性地修改适当元素的 cdr 来工作，而不是制作列表的副本。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="05.4_构建_Cons_单元格和列表.html">构建_Cons_单元格和列表</a>, Previous: <a href="05.2_列表上的谓词.html">列表上的谓词</a>, Up: <a href="05_列表.html">列表.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>29.28 窗口滚动和改变的钩子</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">29.28 窗口滚动和改变的钩子</h2>
+<div class="nav-panel"><p>Next: <a href="30_帧.html">帧</a>, Previous: <a href="29.27_窗口参数.html">窗口参数</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节描述 Lisp 程序如何在窗口滚动或发生其他窗口修改后采取行动。我们首先考虑窗口显示其缓冲区的不同部分的情况。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: window-scroll-functions ¶
+</pre></div>
+<p>这个变量保存了 Emacs 在重新显示带有滚动的窗口之前应该调用的函数列表。在窗口中显示不同的缓冲区并创建新窗口也调用这些函数。
+</p>
+<p>这个变量不是一个普通的钩子，因为每个函数都用两个参数调用：窗口和它的新显示开始位置。在调用的时候，参数窗口的显示开始位置已经被设置为它的新值，并且要在窗口中显示的缓冲区被设置为当前缓冲区。
+</p>
+<p>这些函数在使用 window-end 时必须小心（参见窗口开始和结束位置）；  如果你需要一个最新的值，你必须使用 update 参数来确保你得到它。
+</p>
+<p>警告：不要使用此功能来改变窗口的滚动方式。它不是为此而设计的，这样的使用可能行不通。
+</p>
+<p>此外，您可以使用 jit-lock-register 注册一个 Font Lock 字体化函数，该函数将在缓冲区的某些部分因窗口滚动或大小更改而被（重新）字体化时调用。请参阅其他字体锁定变量。
+</p>
+<p>本节的其余部分涵盖了在重新显示期间调用的六个挂钩，前提是已检测到窗口的显着非滚动更改。为简单起见，这些钩子及其调用的函数将统称为窗口更改函数。与任何钩子一样，这些钩子可以在安装钩子时通过 add-hook 的本地参数（请参阅设置钩子）全局或本地缓冲区设置。
+</p>
+<p>这些钩子中的第一个在检测到窗口缓冲区更改后运行，这意味着创建、删除或分配了另一个缓冲区的窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: window-buffer-change-functions ¶
+</pre></div>
+<p>此变量指定在窗口缓冲区更改时重新显示期间调用的函数。该值应该是一个接受一个参数的函数列表。
+</p>
+<p>如果自上次运行窗口更改函数以来已创建或分配该缓冲区，则为显示相应缓冲区的任何窗口调用本地指定缓冲区的函数。在这种情况下，窗口作为参数传递。
+</p>
+<p>如果自上次运行窗口更改函数以来已添加、删除或分配了另一个缓冲区，则为该帧调用由默认值指定的函数。在这种情况下， <code>帧</code> ( <code>frame</code> )作为参数传递。
+</p>
+<p>当检测到窗口大小发生变化时，将运行第二个钩子，这意味着创建了一个窗口，分配了另一个缓冲区，或者改变了它的总大小或其文本区域的大小。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: window-size-change-functions ¶
+</pre></div>
+<p>此变量指定在发生窗口大小更改时重新显示期间调用的函数。该值应该是一个接受一个参数的函数列表。
+</p>
+<p>如果自上次运行窗口更改函数以来已添加或分配另一个缓冲区或更改了其总大小或主体大小，则为显示相应缓冲区的任何窗口调用本地指定缓冲区的函数。在这种情况下，窗口作为参数传递。
+</p>
+<p>如果自上次运行窗口更改函数以来已添加或分配了另一个缓冲区或更改了其总大小或主体大小，则为该帧调用由默认值指定的函数。在这种情况下， <code>帧</code> ( <code>frame</code> )作为参数传递。
+</p>
+<p>当窗口选择更改自上次重新显示后选择了另一个窗口时，将运行这些钩子中的第三个。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: window-selection-change-functions ¶
+</pre></div>
+<p>此变量指定在选定窗口或 <code>帧</code> ( <code>frame</code> )的选定窗口发生更改时重新显示期间调用的函数。该值应该是一个接受一个参数的函数列表。
+</p>
+<p>如果自上次运行窗口更改函数以来已选择或取消选择该窗口（在所有窗口中或在其 <code>帧</code> ( <code>frame</code> )上的所有窗口中），则为显示相应缓冲区的任何窗口调用本地指定缓冲区的函数。在这种情况下，窗口作为参数传递。
+</p>
+<p>如果该 <code>帧</code> ( <code>frame</code> )已被选择或取消选择，或者自上次运行窗口更改函数以来该 <code>帧</code> ( <code>frame</code> )的选定窗口已更改，则为该 <code>帧</code> ( <code>frame</code> )调用由默认值指定的函数。在这种情况下， <code>帧</code> ( <code>frame</code> )作为参数传递。
+</p>
+<p>这些钩子中的第四个在检测到窗口状态更改时运行，这意味着至少发生了前面三个窗口更改中的一个。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: window-state-change-functions ¶
+</pre></div>
+<p>此变量指定在重新显示期间在发生窗口缓冲区或大小更改或选定窗口或 <code>帧</code> ( <code>frame</code> )的选定窗口已更改时调用的函数。该值应该是一个接受一个参数的函数列表。
+</p>
+<p>如果该窗口已添加或分配另一个缓冲区、更改其总大小或主体大小或已选择或取消选择（在所有窗口中或在其 <code>帧</code> ( <code>frame</code> )上的所有窗口中），则为显示相应缓冲区的任何窗口调用本地指定缓冲区的函数上次运行窗口更改功能。在这种情况下，窗口作为参数传递。
+</p>
+<p>如果该 <code>帧</code> ( <code>frame</code> )上的至少一个窗口已添加、删除或分配另一个缓冲区、更改其总大小或主体大小、或该 <code>帧</code> ( <code>frame</code> )已被选择或取消选择或该 <code>帧</code> ( <code>frame</code> )的选定窗口已更改，则为该 <code>帧</code> ( <code>frame</code> )调用由默认值指定的函数自上次运行窗口更改功能以来。在这种情况下， <code>帧</code> ( <code>frame</code> )作为参数传递。
+</p>
+<p>当自上次重新显示以来已设置该帧的窗口状态更改标志（见下文）时，默认值指定的函数也会为该帧运行。
+</p>
+<p>当检测到窗口配置更改时运行这些钩子中的第五个，这意味着缓冲区或窗口大小发生了变化。它与前面四个钩子的不同之处在于它的运行方式。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: window-configuration-change-hook ¶
+</pre></div>
+<p>此变量指定在缓冲区或窗口大小发生更改时重新显示期间调用的函数。该值应该是不带参数的函数列表。
+</p>
+<p>如果自上次运行窗口更改函数以来，该帧上的至少一个窗口已添加、删除或分配另一个缓冲区或更改了其总大小或主体大小，则为显示相应缓冲区的任何窗口调用本地指定缓冲区的函数。每次调用都使用显示临时选择的缓冲区及其当前缓冲区的窗口来执行。
+</p>
+<p>如果自上次运行窗口更改函数以来已添加、删除或分配另一个缓冲区或更改了其总大小或主体大小，则为每一帧调用由默认值指定的函数。每次调用都是在临时选定的帧和当前选定窗口的缓冲区中执行的。
+</p>
+<p>最后，Emacs 运行一个普通的钩子来概括窗口状态更改函数的行为。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: window-state-change-hook ¶
+</pre></div>
+<p>此变量的默认值指定在检测到窗口状态更改或已在至少一帧上设置了窗口状态更改标志时在重新显示期间调用的函数。该值应该是不带参数的函数列表。
+</p>
+<p>只有当应用程序想要对自上次重新显示以来发生在（或已发出信号）两个或多个帧上的更改做出反应时，应用程序才应在此挂钩上放置一个函数。在所有其他情况下，应该首选将函数放在窗口状态更改函数上。
+</p>
+<p>在每帧重新显示期间调用窗口改变函数如下：首先，按此顺序调用任何缓冲区局部窗口缓冲区改变函数、窗口大小改变函数、选定窗口改变和窗口状态改变函数。接下来，以相同的顺序调用这些函数的默认值。然后调用任何缓冲区本地窗口配置更改函数，然后调用这些函数的默认值指定的函数。最后，运行 window-state-change-hook 上的函数。
+</p>
+<p>仅当先前为该帧注册了相应的更改时，才会为特定帧运行窗口更改函数。此类更改包括创建或删除窗口或将另一个缓冲区或大小分配给窗口。请注意，即使已注册此类更改，这也不意味着运行上述任何挂钩。例如，如果在窗口偏移范围内注册了更改（请参阅窗口配置），则只有在运行更改函数时该偏移仍然存在时，才会触发窗口更改函数的调用。如果它提前退出，则只有在该偏移范围之外的更改注册时才会运行挂钩。
+</p>
+<p><code>帧</code> ( <code>frame</code> )的窗口状态更改标志，如果设置，将导致窗口状态更改函数的默认值（对于该 <code>帧</code> ( <code>frame</code> )）和窗口状态更改挂钩在下一次重新显示期间运行，无论窗口状态是否该帧是否实际发生了变化。在这些钩子上运行任何函数后，将为每一帧重置标志。应用程序可以使用以下函数设置该标志并检查其值。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-frame-window-state-change &amp;optional frame arg ¶
+</pre></div>
+<p>如果 arg 不为零，则此函数设置 <code>帧</code> ( <code>frame</code> )的窗口状态更改标志，否则将其重置。frame 必须是实时帧，默认为选定的帧。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: frame-window-state-change &amp;optional frame ¶
+</pre></div>
+<p>如果设置了 <code>帧</code> ( <code>frame</code> )的窗口状态更改标志，则此函数返回 t，否则返回 nil。frame 必须是实时帧，默认为选定的帧。
+</p>
+<p>在运行窗口更改函数时，可以调用接下来描述的函数来更深入地了解自上次重新显示以来特定窗口或 <code>帧</code> ( <code>frame</code> )的更改内容。所有这些函数都将实时窗口作为单个可选参数，默认为选定窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-old-buffer &amp;optional window ¶
+</pre></div>
+<p>此函数返回上次窗口更改函数为窗口 <code>帧</code> ( <code>frame</code> )运行时窗口中显示的缓冲区。如果它返回 nil，则在此之后创建了窗口。如果它返回 t，则窗口当时未显示，但之后已从先前保存的窗口配置中恢复。否则，返回值为 window 当时显示的缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-old-pixel-width &amp;optional window ¶
+</pre></div>
+<p>此函数返回窗口的总像素宽度，最后一次窗口更改函数在其 <code>帧</code> ( <code>frame</code> )上找到窗口。如果在此之后创建窗口，则为零。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-old-pixel-height &amp;optional window ¶
+</pre></div>
+<p>此函数返回最后一次窗口更改函数在其 <code>帧</code> ( <code>frame</code> )上发现窗口时窗口的总像素高度。如果在此之后创建窗口，则为零。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-old-body-pixel-width &amp;optional window ¶
+</pre></div>
+<p>此函数返回上次窗口更改函数在其 <code>帧</code> ( <code>frame</code> )上发现窗口时窗口文本区域的像素宽度。如果在此之后创建窗口，则为零。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-old-body-pixel-height &amp;optional window ¶
+</pre></div>
+<p>该函数返回上次窗口更改函数在其 <code>帧</code> ( <code>frame</code> )上发现窗口时窗口文本区域的像素高度。如果在此之后创建窗口，则为零。
+</p>
+<p>为了找出上次运行窗口更改函数时选择了哪个窗口或 <code>帧</code> ( <code>frame</code> )，可以使用以下函数：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: frame-old-selected-window &amp;optional frame ¶
+</pre></div>
+<p>此函数返回上次运行窗口更改函数时选定的帧窗口。如果省略或 nil  <code>帧</code> ( <code>frame</code> )默认为选定的 <code>帧</code> ( <code>frame</code> )。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: old-selected-window ¶
+</pre></div>
+<p>此函数返回上次运行窗口更改函数时选定的窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: old-selected-frame ¶
+</pre></div>
+<p>此函数返回上次运行窗口更改函数时选定的帧。
+</p>
+<p>请注意，窗口更改函数不提供有关自上次运行以来已删除哪些窗口的信息。如有必要，应用程序应记住在该缓冲区的局部变量中显示特定缓冲区的任何窗口，并在检测到窗口缓冲区更改时运行的任何挂钩的默认值运行的函数中更新它。
+</p>
+<p>向窗口更改函数添加函数时应考虑以下注意事项：
+</p>
+<ul>
+<li>
+某些操作不会触发窗口更改函数的调用。这些包括在 minibuffer 窗口中显示另一个缓冲区或工具提示窗口的任何更改。
+</li><li>
+窗口更改函数不应创建或删除窗口或更改任何窗口的缓冲区、大小或选择状态，因为无法保证有关此类更改的信息将传播到其他窗口更改函数。如果有的话，任何此类更改都应仅由 window-state-change-hook 的默认值列出的最后一个函数执行。
+</li><li>
+运行窗口更改函数时，可以使用诸如 save-window-excursion、with-selected-window 或 with-current-buffer 之类的宏。
+</li><li>
+运行窗口更改函数不会保存和恢复匹配数据。除非运行 window-configuration-change-hook 它不会保存或恢复选定的窗口或 <code>帧</code> ( <code>frame</code> )或当前缓冲区。
+</li><li>
+可能会中止任何触发窗口更改功能运行的重新显示。如果中止发生在窗口更改函数运行完成之前，它们将使用以前的值再次运行，也就是说，就好像没有执行重新显示一样。如果稍后中止，它们将使用新值运行，也就是说，就像实际执行了重新显示一样。
+</li></ul>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="30_帧.html">帧</a>, Previous: <a href="29.27_窗口参数.html">窗口参数</a>, Up: <a href="29_窗口.html">窗口.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.32 更改挂钩</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">33.32 更改挂钩</h2>
+<div class="nav-panel"><p>Next: <a href="34_非ASCII字符.html">非ASCII字符</a>, Previous: <a href="33.31_原子变更组.html">原子变更组</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这些钩子变量让您可以安排注意缓冲区（或特定缓冲区中的更改，如果您将它们设为缓冲区本地）。有关如何检测文本特定部分的更改，另请参见具有特殊含义的属性。
+</p>
+<p>您在这些钩子中使用的函数应该保存和恢复匹配数据，如果它们执行任何使用正则表达式的操作；  否则，它们将以奇怪的方式干扰调用它们的编辑操作。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: before-change-functions ¶
+</pre></div>
+<p>当 Emacs 即将修改缓冲区时，此变量保存要调用的函数列表。每个函数都有两个参数，即将改变的区域的开始和结束，用整数表示。即将更改的缓冲区始终是调用函数时的当前缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: after-change-functions ¶
+</pre></div>
+<p>该变量保存了在 Emacs 修改缓冲区后要调用的函数列表。每个函数接收三个参数：刚刚更改的区域的开始和结束，以及更改之前存在的文本的长度。所有三个参数都是整数。调用函数时，已更改的缓冲区始终是当前缓冲区。
+</p>
+<p>旧文本的长度是该文本之前和之后的缓冲区位置与更改之前的差异。至于更改后的文本，它的长度只是前两个参数之间的差异。
+</p>
+<p>将消息输出到 <strong>Messages</strong> 缓冲区不会调用这些函数，某些内部缓冲区更改也不会调用，例如 Emacs 内部为某些作业创建的缓冲区的更改，这些对 Lisp 程序不可见。
+</p>
+<p>绝大多数缓冲区更改原语将以平衡的对调用更改前函数和更改后函数，每次更改一次，其中这些钩子的参数准确地界定了所做的更改。然而，钩子函数不应该总是依赖于这种情况，因为一些复杂的原语在进行更改之前调用一次更改前函数，然后调用更改后函数零次或多次，具体取决于原语有多少单独的更改正在做。发生这种情况时，更改前函数的参数将包含一个进行单个更改的区域，但不一定是最小的此类区域，然后更改后函数的每个连续调用的参数将准确界定正在更改的文本部分。一般来说，我们建议使用 before- 或 after-change 钩子，但不要同时使用。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: combine-after-change-calls body… ¶
+</pre></div>
+<p>宏正常执行主体，但安排为一系列更改只调用一次更改后函数——如果这看起来安全的话。
+</p>
+<p>如果一个程序在缓冲区的同一区域进行了多次文本更改，那么在使用更改后挂钩时，在程序的该部分周围使用宏 combine-after-change-calls 可以使其运行得更快。当最终调用更改后挂钩时，参数指定缓冲区的一部分，包括在 combine-after-change-calls 主体中所做的所有更改。
+</p>
+<p>警告：您不得在 combine-after-change-calls 表单的主体中更改 after-change-functions 的值。
+</p>
+<p>警告：如果您合并的更改发生在缓冲区广泛分散的部分，这仍然有效，但不建议这样做，因为它可能导致某些更改挂钩函数的行为效率低下。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: combine-change-calls beg end body… ¶
+</pre></div>
+<p>这将正常执行主体，除了它所做的任何缓冲区更改都不会触发对更改前函数和更改后函数的调用。相反，对于由 beg 和 end 包围的区域，这些钩子中的每一个都有一个单独的调用，提供给 after-change-functions 的参数反映了主体对区域大小所做的更改。
+</p>
+<p>这个宏的结果就是body返回的结果。
+</p>
+<p>当函数可能对缓冲区进行大量重复更改时，此宏很有用，否则更改挂钩将需要很长时间才能运行，如果它们针对每个单独的缓冲区修改运行的话。Emacs 本身就使用这个宏，例如，在comment-region 和uncomment-region 命令中。
+</p>
+<p>警告：您不得更改 body 内的 before-change-functions 或 after-change-functions 的值。
+</p>
+<p>警告：您不得在 beg 和 end 指定的区域之外进行任何缓冲区更改。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: first-change-hook ¶
+</pre></div>
+<p>这个变量是一个正常的钩子，每当一个以前处于未修改状态的缓冲区被改变时，它就会运行。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: inhibit-modification-hooks ¶
+</pre></div>
+<p>如果此变量不为 nil，则禁用所有更改挂钩；  他们都没有运行。这会影响本节上面描述的所有挂钩变量，以及附加到某些特殊文本属性（请参阅具有特殊含义的属性）和覆盖属性（请参阅覆盖属性）的挂钩。
+</p>
+<p>此外，在运行这些相同的钩子变量时，此变量绑定为非零，因此默认情况下，从修改钩子修改缓冲区不会导致其他修改钩子运行。如果您确实希望修改挂钩在本身从修改挂钩运行的特定代码段中运行，则将本地禁止修改挂钩重新绑定为 nil。但是，这样做可能会导致对修改挂钩的递归调用，因此请务必为此做好准备（例如，通过绑定一些变量来告诉您的挂钩什么都不做）。
+</p>
+<p>我们建议您仅将此变量绑定到不会导致对缓冲区文本内容进行持久更改的修改（例如面部更改或临时修改）。如果您需要在一系列更改期间延迟更改挂钩（通常出于性能原因），请改用 combine-change-calls 或 combine-after-change-calls。
+</p>
+<hr size="6"/>
+
+<div class="nav-panel"><p>Next: <a href="34_非ASCII字符.html">非ASCII字符</a>, Previous: <a href="33.31_原子变更组.html">原子变更组</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

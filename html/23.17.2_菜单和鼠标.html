@@ -1,0 +1,14 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>23.17.2 菜单和鼠标</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">23.17.2 菜单和鼠标</h3>
+<div class="nav-panel"><p>Next: <a href="23.17.3_菜单和键盘.html">菜单和键盘</a>, Previous: <a href="23.17.1_定义菜单.html">定义菜单</a>, Up: <a href="23.17_菜单键映射.html">菜单键映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>使菜单键映射生成菜单的常用方法是使其成为前缀键的定义。（Lisp 程序可以显式弹出一个菜单并接收用户的选择——参见弹出菜单。）
+</p>
+<p>如果前缀键以鼠标事件结束，Emacs 通过弹出一个可见菜单来处理菜单键映射，以便用户可以用鼠标选择一个选项。当用户单击一个菜单项时，所生成的事件是任何具有导致该菜单项的绑定的字符或符号。（如果菜单具有多个级别或来自菜单栏，则菜单项可能会生成一系列事件。）
+</p>
+<p>通常最好使用按钮按下事件来触发菜单。然后用户可以通过释放按钮来选择菜单项。
+</p>
+<p>如果菜单键映射包含到嵌套键映射的绑定，则嵌套键映射指定子菜单。会有一个菜单项，由嵌套的keymap的item字符串标记，点击这个item会自动弹出指定的子菜单。作为一个特殊的例外，如果菜单键映射包含单个嵌套键映射并且没有其他菜单项，则菜单直接显示嵌套键映射的内容，而不是作为子菜单。
+</p>
+<p>但是，如果 Emacs 在没有 X 工具包支持的情况下编译，或者在文本终端上，则不支持子菜单。每个嵌套的键盘映射都显示为一个菜单项，但单击它不会自动弹出子菜单。如果你想模仿子菜单的效果，你可以通过给嵌套的键盘映射一个以’@’开头的项目字符串来做到这一点。这会导致 Emacs 使用单独的菜单窗格显示嵌套的键盘映射；  ’@’ 之后的项目字符串的其余部分是窗格标签。如果在没有 X 工具包支持的情况下编译 Emacs，或者如果在文本终端上显示菜单，则不使用菜单窗格；  在这种情况下，显示菜单标签时会省略项目字符串开头的 <code>@</code> ，并且没有其他效果。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="23.17.3_菜单和键盘.html">菜单和键盘</a>, Previous: <a href="23.17.1_定义菜单.html">定义菜单</a>, Up: <a href="23.17_菜单键映射.html">菜单键映射.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.18 嵌入式原生小部件</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">40.18 嵌入式原生小部件</h2>
+<div class="nav-panel"><p>Next: <a href="40.19_按钮.html">按钮</a>, Previous: <a href="40.17.11_图像缓存.html">图像缓存</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当 Emacs 使用必要的支持库构建并在图形终端上运行时，Emacs 能够在 Emacs 缓冲区中显示本机小部件，例如 GTK+ WebKit 小部件。要测试 Emacs 是否支持显示嵌入式小部件，请检查 xwidget-internal 功能是否可用（请参阅功能）。
+</p>
+<p>要在缓冲区中显示嵌入的小部件，您必须首先创建一个 xwidget 对象，然后将该对象用作显示文本或覆盖属性中的显示说明符（请参阅显示属性）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-xwidget type title width height arguments &amp;optional buffer ¶
+</pre></div>
+<p>这将创建并返回一个 xwidget 对象。如果缓冲区被省略或为零，则默认为当前缓冲区。如果缓冲区命名一个不存在的缓冲区，它将被创建。type 标识 xwidget 组件的类型，它可以是以下之一：
+</p>
+<p>网络套件
+</p>
+<p>WebKit 组件。
+</p>
+<p>width 和 height 参数以像素为单位指定小部件的大小，并且 title 是一个字符串，指定其标题。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: xwidgetp object ¶
+</pre></div>
+<p>如果 object 是 xwidget，此函数返回 t，否则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: xwidget-plist xwidget ¶
+</pre></div>
+<p>该函数返回 xwidget 的属性列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-xwidget-plist xwidget plist ¶
+</pre></div>
+<p>此函数将 xwidget 的属性列表替换为 plist 给出的新属性列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: xwidget-buffer xwidget ¶
+</pre></div>
+<p>该函数返回 xwidget 的缓冲区。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: get-buffer-xwidgets buffer ¶
+</pre></div>
+<p>此函数返回与缓冲区关联的 xwidget 对象列表，可以将其指定为缓冲区对象或现有缓冲区的名称、字符串。如果缓冲区不包含 xwidget，则该值为 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: xwidget-webkit-goto-uri xwidget uri ¶
+</pre></div>
+<p>此函数浏览给定 xwidget 中的指定 uri。uri 是一个字符串，用于指定文件或 URL 的名称。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: xwidget-webkit-execute-script xwidget script ¶
+</pre></div>
+<p>此函数使 xwidget 指定的浏览器小部件执行指定的 JavaScript 脚本。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: xwidget-webkit-execute-script-rv xwidget script &amp;optional default ¶
+</pre></div>
+<p>这个函数像 xwidget-webkit-execute-script 一样执行指定的脚本，但它也将脚本的返回值作为字符串返回。如果脚本没有返回值，则此函数返回默认值，如果省略默认值，则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: xwidget-webkit-get-title xwidget ¶
+</pre></div>
+<p>此函数将 xwidget 的标题作为字符串返回。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: xwidget-resize xwidget width height ¶
+</pre></div>
+<p>此函数将指定 xwidget 的大小调整为宽度 x 高度像素。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: xwidget-size-request xwidget ¶
+</pre></div>
+<p>此函数将所需大小的 xwidget 作为表单列表返回（宽度高度）。尺寸以像素为单位。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: xwidget-info xwidget ¶
+</pre></div>
+<p>此函数将 xwidget 的属性作为 [type title width height] 形式的向量返回。属性通常在创建 xwidget 时由 make-xwidget 确定。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-xwidget-query-on-exit-flag xwidget flag ¶
+</pre></div>
+<p>此功能允许您安排 Emacs 在退出之前或在终止与 xwidget 关联的缓冲区之前要求用户确认。如果 flag 不为 nil，Emacs 会查询用户，否则不会。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: xwidget-query-on-exit-flag xwidget ¶
+</pre></div>
+<p>此函数返回 xwidgets query-on-exit 标志的当前设置，t 或 nil。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.19_按钮.html">按钮</a>, Previous: <a href="40.17.11_图像缓存.html">图像缓存</a>, Up: <a href="40_Emacs显示.html">Emacs显示.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

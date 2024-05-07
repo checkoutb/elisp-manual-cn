@@ -1,0 +1,47 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.8.5 低级环</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">33.8.5 低级环</h3>
+<div class="nav-panel"><p>Next: <a href="33.8.6_环的内部.html">环的内部</a>, Previous: <a href="33.8.4_Yanking_函数.html">Yanking_函数</a>, Up: <a href="33.8_环.html">环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这些函数和变量在较低级别提供了对 kill ring 的访问，但仍然便于在 Lisp 程序中使用，因为它们负责与窗口系统选择的交互（请参阅窗口系统选择）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: current-kill n &amp;optional do-not-move ¶
+</pre></div>
+<p>函数 current-kill 将指定 kill ring 前端的 yanking 指针旋转 n 个位置（从较新的 kill 到较旧的 kill），并返回 ring 中该位置的文本。
+</p>
+<p>如果可选的第二个参数 do-not-move 不是 nil，那么 current-kill 不会改变 yanking 指针；  它只返回第 n 次杀戮，从当前的 yanking 指针开始计数。
+</p>
+<p>如果 n 为零，表示请求最新的 kill，current-kill 在查询 kill ring 之前调用 interprogram-paste-function 的值（如下所述）。如果该值是一个函数并且调用它返回一个字符串或几个字符串的列表，则 current-kill 将字符串推送到 kill ring 上并返回第一个字符串。它还将 yanking 指针设置为指向 interprogram-paste-function 返回的第一个字符串的 kill-ring 条目，而不管 do-not-move 的值如何。否则，current-kill 不会特别处理 n 的零值：它返回由 yanking 指针指向的条目并且不移动 yanking 指针。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: kill-new string &amp;optional replace ¶
+</pre></div>
+<p>此函数将文本字符串推送到 kill ring 上，并使 yanking 指针指向它。如果合适，它会丢弃最旧的条目。它还调用 interprogram-paste-function 的值（取决于用户选项 save-interprogram-paste-before-kill）和 interprogram-cut-function（见下文）。
+</p>
+<p>如果 replace 不为零，则 kill-new 用字符串替换终止环的第一个元素，而不是将字符串推到终止环上。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: kill-append string before-p ¶
+</pre></div>
+<p>此函数将文本字符串附加到 kill ring 中的第一个条目，并使 yanking 指针指向组合条目。通常 string 位于条目的末尾，但如果 before-p 不为零，则它位于开头。该函数将 kill-new 作为子例程调用，从而导致 interprogram-cut-function 和可能的 interprogram-paste-function（见下文）的值被扩展调用。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: interprogram-paste-function ¶
+</pre></div>
+<p>当您使用窗口系统时，此变量提供了一种从其他程序传输终止文本的方法。它的值应该是 nil 或没有参数的函数。
+</p>
+<p>如果该值是一个函数，current-kill 会调用它来获取最近的 kill。如果函数返回一个非零值，那么该值将用作最近的终止。如果它返回 nil，则使用 kill ring 的前面。
+</p>
+<p>为了便于支持支持多选的窗口系统，该函数还可以返回一个字符串列表。在这种情况下，第一个字符串用作最近的 kill，所有其他字符串都被推到 kill ring 上，以便 yank-pop 轻松访问。
+</p>
+<p>这个函数的正常使用是获取窗口系统的剪贴板作为最近的kill，即使选择属于另一个应用程序。请参阅窗口系统选择。但是，如果剪贴板内容来自当前 Emacs 会话，则此函数应返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: interprogram-cut-function ¶
+</pre></div>
+<p>当您使用窗口系统时，此变量提供了一种将终止文本与其他程序通信的方法。它的值应该是 nil 或一个必需参数的函数。
+</p>
+<p>如果该值是一个函数，kill-new 和 kill-append 以 kill ring 的新第一个元素作为参数调用它。
+</p>
+<p>该函数的正常使用是将新杀死的文本放入窗口系统的剪贴板。请参阅窗口系统选择。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.8.6_环的内部.html">环的内部</a>, Previous: <a href="33.8.4_Yanking_函数.html">Yanking_函数</a>, Up: <a href="33.8_环.html">环.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

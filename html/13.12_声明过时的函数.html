@@ -1,0 +1,46 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>13.12 声明过时的函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">13.12 声明过时的函数</h2>
+<div class="nav-panel"><p>Next: <a href="13.13_内联函数.html">内联函数</a>, Previous: <a href="13.11.4_使用旧的_defadvice_适配代码.html">使用旧的_defadvice_适配代码</a>, Up: <a href="13_函数.html">函数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>您可以将命名函数标记为过时，这意味着它可能会在将来的某个时候被删除。这会导致 Emacs 在对包含该函数的代码进行字节编译时以及在显示该函数的文档时警告该函数已过时。在所有其他方面，过时的函数的行为与任何其他函数一样。
+</p>
+<p>将函数标记为过时的最简单方法是将 (declare (obsolete …)) 形式放入函数的 defun 定义中。请参阅声明表格。或者，您可以使用 make-obsolete 函数，如下所述。
+</p>
+<p>宏（参见宏）也可以用 make-obsolete 标记为过时的；  这与函数具有相同的效果。函数或宏的别名也可以标记为过时；  这使得别名本身已经过时，而不是它解析为的函数或宏。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: make-obsolete obsolete-name current-name when ¶
+</pre></div>
+<p>此函数将过时的名称标记为过时。obsolete-name 应该是命名函数或宏的符号，或者是函数或宏的别名。
+</p>
+<p>如果 current-name 是一个符号，则警告消息说使用 current-name 而不是 obsolete-name。current-name 不需要是 obsolete-name 的别名；  它可以是具有相似功能的不同功能。current-name 也可以是一个字符串，用作警告信息。消息应以小写字母开头，并以句点结尾。它也可以为 nil，在这种情况下，警告消息不提供其他详细信息。
+</p>
+<p>参数 when 应该是一个字符串，指示函数第一次被废弃的时间——例如，日期或版本号。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: define-obsolete-function-alias obsolete-name current-name when &amp;optional doc ¶
+</pre></div>
+<p>此便利宏将函数 obsolete-name 标记为已过时，并将其定义为函数 current-name 的别名。它等价于以下内容：
+</p>
+<div class="lisp">
+<pre class="lisp">(defalias obsolete-name current-name doc)
+(make-obsolete obsolete-name current-name when)
+</pre></div>
+<p>此外，您可以将函数的特定调用约定标记为过时：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-advertised-calling-convention function signature when ¶
+</pre></div>
+<p>此函数将参数列表签名指定为调用函数的正确方式。这会导致 Emacs 字节编译器在遇到以任何其他方式调用函数的 Emacs Lisp 程序时发出警告（但是，它仍然允许对代码进行字节编译）。when 应该是一个字符串，指示变量第一次被废弃的时间（通常是版本号字符串）。
+</p>
+<p>例如，在旧版本的 Emacs 中，sit-for 函数接受三个参数，像这样
+</p>
+<div class="lisp">
+<pre class="lisp">(sit-for seconds milliseconds nodisp)
+</pre></div>
+<p>但是，以这种方式调用 sit-for 被认为是过时的（请参阅等待经过的时间或输入）。不推荐使用旧的调用约定，如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(set-advertised-calling-convention
+  'sit-for '(seconds &amp;optional nodisp) "22.1")
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="13.13_内联函数.html">内联函数</a>, Previous: <a href="13.11.4_使用旧的_defadvice_适配代码.html">使用旧的_defadvice_适配代码</a>, Up: <a href="13_函数.html">函数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

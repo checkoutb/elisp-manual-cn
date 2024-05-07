@@ -1,0 +1,29 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.13.6 叠加箭头</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.13.6 叠加箭头</h3>
+<div class="nav-panel"><p>Next: <a href="40.14_滚动条.html">滚动条</a>, Previous: <a href="40.13.5_自定义边缘位图.html">自定义边缘位图</a>, Up: <a href="40.13_条纹.html">条纹.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>覆盖箭头对于将用户的注意力引导到缓冲区中的特定行很有用。例如，在用于调试器接口的模式中，覆盖箭头指示将要执行的代码行。此功能与叠加无关（请参阅叠加）。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: overlay-arrow-string ¶
+</pre></div>
+<p>此变量保存要显示的字符串以引起对特定行的注意，如果未使用箭头功能，则为 nil。在图形显示中，如果显示左边缘，则忽略字符串的内容；  而是在显示区域左侧的边缘区域中显示一个字形。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: overlay-arrow-position ¶
+</pre></div>
+<p>此变量包含一个标记，指示在何处显示叠加箭头。它应该指向一行的开头。在非图形显示器上，或当未显示左边缘时，箭头文本出现在该行的开头，覆盖任何原本会出现的文本。由于箭头通常很短，并且行通常以缩进开头，因此通常不会覆盖任何重要内容。
+</p>
+<p>如果该缓冲区中的覆盖箭头位置的值指向该缓冲区，则覆盖箭头字符串将显示在任何给定缓冲区中。因此，可以通过创建覆盖箭头位置的缓冲区本地绑定来显示多个覆盖箭头字符串。但是，使用overlay-arrow-variable-list 来实现此结果通常更简洁。
+</p>
+<p>您可以通过使用 before-string 属性创建覆盖来完成类似的工作。请参见叠加属性。
+</p>
+<p>您可以通过变量 overlay-arrow-variable-list 定义多个覆盖箭头。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: overlay-arrow-variable-list ¶
+</pre></div>
+<p>这个变量的值是一个变量列表，每个变量指定一个覆盖箭头的位置。变量 overlay-arrow-position 具有其正常含义，因为它在此列表中。
+</p>
+<p>此列表中的每个变量都可以具有属性 overlay-arrow-string 和 overlay-arrow-bitmap 指定覆盖箭头字符串（用于文本终端或没有显示左边缘的图形终端）或边缘位图（用于具有左边缘的图形终端）显示在相应的叠加箭头位置。如果任一属性未设置，则使用默认的覆盖箭头字符串或覆盖箭头边缘指示符。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.14_滚动条.html">滚动条</a>, Previous: <a href="40.13.5_自定义边缘位图.html">自定义边缘位图</a>, Up: <a href="40.13_条纹.html">条纹.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

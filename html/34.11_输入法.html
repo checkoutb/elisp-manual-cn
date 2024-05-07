@@ -1,0 +1,47 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>34.11 输入法</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">34.11 输入法</h2>
+<div class="nav-panel"><p>Next: <a href="34.12_语言环境.html">语言环境</a>, Previous: <a href="34.10.8_终端_IO_编码.html">终端_IO_编码</a>, Up: <a href="34_非ASCII字符.html">非ASCII字符.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>输入法提供了从键盘输入非 ASCII 字符的便捷方式。与将非 ASCII 字符与程序读取的编码进行转换的编码系统不同，输入法提供了人性化的命令。（有关用户如何使用输入法输入文本的信息，请参阅 GNU Emacs 手册中的输入法。）本手册中尚未记录如何定义输入法，但我们在此描述如何使用它们。
+</p>
+<p>每个输入法都有一个名字，目前是一个字符串；  将来，符号也可以用作输入法名称。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: current-input-method ¶
+</pre></div>
+<p>此变量保存当前缓冲区中现在处于活动状态的输入法的名称。（当以任何方式设置时，它会在每个缓冲区中自动变为本地。）如果现在缓冲区中没有输入法处于活动状态，则为 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: default-input-method ¶
+</pre></div>
+<p>此变量保存选择输入法的命令的默认输入法。与 current-input-method 不同，此变量通常是全局的。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: set-input-method input-method ¶
+</pre></div>
+<p>此命令激活当前缓冲区的输入法输入法。它还将默认输入方法设置为输入方法。如果 input-method 为 nil，则此命令停用当前缓冲区的任何输入法。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: read-input-method-name prompt &amp;optional default inhibit-null ¶
+</pre></div>
+<p>该函数使用 minibuffer 读取输入法名称，以 prompt 提示。如果默认为非零，则默认返回，如果用户输入空输入。但是，如果 inhibitor-null 不为零，则空输入表示错误。
+</p>
+<p>返回值是一个字符串。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: input-method-alist ¶
+</pre></div>
+<p>这个变量定义了所有支持的输入法。每个元素定义一个输入法，并且应该具有以下形式：
+</p>
+<div class="lisp">
+<pre class="lisp">(input-method language-env activate-func
+ title description args...)
+</pre></div>
+<p>这里的input-method是输入法名称，一个字符串；  language-env 是另一个字符串，建议使用此输入法的语言环境的名称。（这仅用于文档目的。）
+</p>
+<p>activate-func 是调用以激活此方法的函数。args（如果有）作为参数传递给 activate-func。总而言之，activate-func 的参数是输入方法和参数。
+</p>
+<p>标题是此方法处于活动状态时在模式行中显示的字符串。description 是描述此方法及其用途的字符串。
+</p>
+<p>输入法的基本接口是通过变量输入法函数。请参阅读取一个事件和调用输入法。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="34.12_语言环境.html">语言环境</a>, Previous: <a href="34.10.8_终端_IO_编码.html">终端_IO_编码</a>, Up: <a href="34_非ASCII字符.html">非ASCII字符.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

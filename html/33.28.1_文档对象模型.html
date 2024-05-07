@@ -1,0 +1,132 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.28.1 文档对象模型</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">33.28.1 文档对象模型</h3>
+<div class="nav-panel"><p>Next: <a href="33.29_解析和生成_JSON_值.html">解析和生成_JSON_值</a>, Previous: <a href="33.28_解析_HTML_和_XML.html">解析_HTML_和_XML</a>, Up: <a href="33.28_解析_HTML_和_XML.html">解析_HTML_和_XML.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>libxml-parse-html-region（和其他 XML 解析函数）返回的 DOM 是一个树形结构，其中每个节点都有一个节点名称（称为标签），以及可选的键/值属性列表，然后是一个子节点列表节点。子节点是字符串或 DOM 对象。
+</p>
+<div class="lisp">
+<pre class="lisp">(body ((width . "101"))
+ (div ((class . "thing"))
+  "Foo"
+  (div nil
+   "Yes")))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: dom-node tag &amp;optional attributes &amp;rest children ¶
+</pre></div>
+<p>该函数创建一个类型为 tag 的 DOM 节点。如果给定，属性应该是键/值对列表。如果给定，子节点应该是 DOM 节点。
+</p>
+<p>以下函数可用于处理此结构。每个函数都接受一个 DOM 节点或节点列表。在后一种情况下，仅使用列表中的第一个节点。
+</p>
+<div class="lisp">
+<pre class="lisp">Simple accessors:
+</pre></div>
+<div class="lisp">
+<pre class="lisp">dom-tag node
+</pre></div>
+<p>返回节点的标签（也称为 <code>节点名称</code> ）。
+</p><div class="lisp">
+<pre class="lisp">dom-attr node attribute
+</pre></div>
+<p>返回节点中属性的值。一个常见的用法是：
+</p>
+<div class="lisp">
+<pre class="lisp">(dom-attr img 'href)
+=&gt; "https://fsf.org/logo.png"
+</pre></div>
+<div class="lisp">
+<pre class="lisp">dom-children node
+</pre></div>
+<p>返回节点的所有子节点。
+</p><div class="lisp">
+<pre class="lisp">dom-non-text-children node
+</pre></div>
+<p>返回节点的所有非字符串子节点。
+</p><div class="lisp">
+<pre class="lisp">dom-attributes node
+</pre></div>
+<p>返回节点属性的键/值对列表。
+</p><div class="lisp">
+<pre class="lisp">dom-text node
+</pre></div>
+<p>将节点的所有文本元素作为连接字符串返回。
+</p><div class="lisp">
+<pre class="lisp">dom-texts node
+</pre></div>
+<p>递归地返回节点的所有文本元素，以及节点的所有子节点的文本元素，作为连接字符串。此函数还需要在文本元素之间插入一个可选的分隔符。
+</p><div class="lisp">
+<pre class="lisp">dom-parent dom node
+</pre></div>
+<p>返回 dom 中节点的父节点。
+</p>
+<div class="lisp">
+<pre class="lisp">dom-remove dom node
+</pre></div>
+<p>从 dom 中删除节点。
+</p>
+<p>以下是用于更改 DOM 的函数。
+</p>
+<div class="lisp">
+<pre class="lisp">dom-set-attribute node attribute value
+</pre></div>
+<p>将节点的属性设置为 value。
+</p><div class="lisp">
+<pre class="lisp">dom-remove-attribute node attribute
+</pre></div>
+<p>从节点中删除属性。
+</p><div class="lisp">
+<pre class="lisp">dom-append-child node child
+</pre></div>
+<p>追加子节点作为节点的最后一个子节点。
+</p><div class="lisp">
+<pre class="lisp">dom-add-child-before node child before
+</pre></div>
+<p>在前节点之前将子节点添加到节点的子列表中。如果 before 为 nil，则让 child 成为第一个孩子。
+</p><div class="lisp">
+<pre class="lisp">dom-set-attributes node attributes
+</pre></div>
+<p>用新的键/值列表替换节点的所有属性。
+</p>
+<p>以下是用于在 DOM 中搜索元素的函数。它们都返回匹配节点的列表。
+</p>
+<div class="lisp">
+<pre class="lisp">dom-by-tag dom tag
+</pre></div>
+<p>返回 dom 中所有类型为 tag 的节点。一个典型的用途是：
+</p><div class="lisp">
+<pre class="lisp">`(dom-by-tag dom 'td)
+=&gt; '((td ...) (td ...) (td ...))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">dom-by-class dom match
+</pre></div>
+<p>返回 dom 中类名匹配 match 的所有节点，这是一个正则表达式。
+</p><div class="lisp">
+<pre class="lisp">dom-by-style dom style
+</pre></div>
+<p>返回 dom 中所有样式匹配 match 的节点，这是一个正则表达式。
+</p><div class="lisp">
+<pre class="lisp">dom-by-id dom style
+</pre></div>
+<p>返回 dom 中所有 ID 与 match 匹配的节点，这是一个正则表达式。
+</p><div class="lisp">
+<pre class="lisp">dom-search dom predicate
+</pre></div>
+<p>返回 dom 中 predicate 返回非 nil 值的所有节点。以要测试的节点作为参数调用谓词。
+</p><div class="lisp">
+<pre class="lisp">dom-strings dom
+</pre></div>
+<p>返回 dom 中的所有字符串。
+</p>
+<div class="lisp">
+<pre class="lisp">Utility functions:
+</pre></div>
+<div class="lisp">
+<pre class="lisp">dom-pp dom &amp;optional remove-empty
+</pre></div>
+<p>漂亮的 dom 在点。如果 remove-empty，则不要打印仅包含空格的文本节点。
+</p><div class="lisp">
+<pre class="lisp">dom-print dom &amp;optional pretty xml
+</pre></div>
+<p>在点处打印 dom。如果 xml 不为零，则打印为 XML；  否则，打印为 HTML。如果 pretty 不为零，则按逻辑缩进 HTML/XML。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.29_解析和生成_JSON_值.html">解析和生成_JSON_值</a>, Previous: <a href="33.28_解析_HTML_和_XML.html">解析_HTML_和_XML</a>, Up: <a href="33.28_解析_HTML_和_XML.html">解析_HTML_和_XML.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

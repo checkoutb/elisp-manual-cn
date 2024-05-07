@@ -1,0 +1,13 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.22 文本转置</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">33.22 文本转置</h2>
+<div class="nav-panel"><p>Next: <a href="33.23_替换缓冲区文本.html">替换缓冲区文本</a>, Previous: <a href="33.21_寄存器.html">寄存器</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>此函数可用于转置文本片段：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: transpose-regions start1 end1 start2 end2 &amp;optional leave-markers ¶
+</pre></div>
+<p>此函数交换缓冲区的两个不重叠部分（如果它们重叠，则该函数会发出错误信号）。参数 start1 和 end1 指定一个部分的边界，参数 start2 和 end2 指定另一部分的边界。
+</p>
+<p>通常，转置区域使用转置文本重新定位标记。先前位于两个转置部分之一内的标记与该部分一起移动，因此在新位置的相同两个字符之间保持不变。但是，如果 leave-markers 不为 nil，则 transpose-regions 不会这样做——它会使所有标记都未重定位。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.23_替换缓冲区文本.html">替换缓冲区文本</a>, Previous: <a href="33.21_寄存器.html">寄存器</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>21.8 提出多项选择题</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">21.8 提出多项选择题</h2>
+<div class="nav-panel"><p>Next: <a href="21.9_读取密码.html">读取密码</a>, Previous: <a href="21.7_是或否查询.html">是或否查询</a>, Up: <a href="21_小缓冲区.html">小缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节描述了用于向用户询问更复杂问题或几个类似问题的工具。
+</p>
+<p>当您有一系列类似的问题要问时，例如 <code>您要保存此缓冲区吗？</code>   对于每个缓冲区，您应该使用 map-y-or-np 来询问问题集合，而不是单独询问每个问题。这为用户提供了一定的便利设施，例如一次回答整个系列的能力。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: map-y-or-n-p prompter actor list &amp;optional help action-alist no-cursor-in-echo-area ¶
+</pre></div>
+<p>此功能向用户提出一系列问题，在回显区域中为每个问题读取一个单字符答案。
+</p>
+<p>list 的值指定要询问的对象。它应该是对象列表或生成器函数。如果它是一个函数，它将在没有参数的情况下被调用，并且应该返回下一个要询问的对象，或者返回 nil，意思是停止提问。
+</p>
+<p>参数提示器指定如何提出每个问题。如果 prompter 是一个字符串，那么问题文本的计算方式如下：
+</p>
+<div class="lisp">
+<pre class="lisp">(format prompter object)
+</pre></div>
+<p>其中 object 是下一个要询问的对象（从列表中获得）。有关格式的更多信息，请参阅格式化字符串。
+</p>
+<p>如果 prompter 不是字符串，它应该是一个参数（要询问的对象）的函数，并且应该返回该对象的问题文本。如果提示器返回的值是一个字符串，那就是要问用户的问题。该函数还可以返回 t，表示不询问用户就对这个对象进行操作，或者返回 nil，表示默默地忽略这个对象。
+</p>
+<p>参数参与者说如何对用户回答是的对象采取行动。它应该是一个参数的函数，并且将与用户回答是的列表中的每个对象一起调用。
+</p>
+<p>如果给出参数帮助，它应该是这种形式的列表：
+</p>
+<div class="lisp">
+<pre class="lisp">(singular plural action)
+</pre></div>
+<p>其中单数是包含单数名词的字符串，它描述要作用的单个对象，复数是对应的复数名词，动作是及物动词，描述演员对对象所做的事情。
+</p>
+<p>如果您不指定帮助，则默认为列表（ <code>object</code> <code>objects</code> <code>act on</code> ）。
+</p>
+<p>每次提出问题时，用户可以回答如下：
+</p>
+<div class="lisp">
+<pre class="lisp">y, Y, or SPC
+</pre></div>
+<p>作用于物体
+</p><div class="lisp">
+<pre class="lisp">n, N, or DEL
+</pre></div>
+<p>跳过对象
+</p><div class="lisp">
+<pre class="lisp">!
+</pre></div>
+<p>作用于以下所有对象
+</p><div class="lisp">
+<pre class="lisp">ESC or q
+</pre></div>
+<p>退出（跳过所有以下对象）
+</p><div class="lisp">
+<pre class="lisp">. (period)
+</pre></div>
+<p>作用于对象然后退出
+</p><div class="lisp">
+<pre class="lisp">C-h
+</pre></div>
+<p>得到帮助
+</p>
+<p>这些是 query-replace 接受的相同答案。keymap query-replace-map 定义了它们对 map-y-or-np 和 query-replace 的含义；  请参阅搜索和替换。
+</p>
+<p>您可以使用 action-alist 指定其他可能的答案及其含义。如果提供，action-alist 应该是一个 alist，其元素的格式为 (char function help)。每个 alist 元素都定义了一个附加答案。在每个元素中，char 是一个字符（答案）；  函数是一个参数的函数（列表中的一个对象）；  帮助是一个字符串。当用户使用 char 响应时，map-y-or-np 调用函数。如果它返回非 nil，则认为该对象已被执行，并且 map-y-or-np 前进到列表中的下一个对象。如果它返回 nil，则对同一对象重复提示。如果用户请求帮助，帮助中的文本用于描述这些附加答案。
+</p>
+<p>通常，map-y-or-np 在提示时绑定 cursor-in-echo-area。但是，如果 no-cursor-in-echo-area 不为零，则它不会那样做。
+</p>
+<p>如果在使用鼠标调用的命令中调用 map-y-or-np——更准确地说，如果 last-nonmenu-event（参见命令循环中的信息）为 nil 或列表——则它使用一个对话框或弹出菜单来提问。在这种情况下，它不使用键盘输入或回声区域。您可以通过将 last-nonmenu-event 绑定到调用周围的合适值来强制使用鼠标或键盘输入。
+</p>
+<p>map-y-or-np 的返回值是作用于对象的数量。
+</p>
+<p>如果您需要向用户询问一个可能不止 2 个答案的问题，请使用 read-answer。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: read-answer question answers ¶
+</pre></div>
+<p>此功能会提示用户有问题的文本，该文本应以 <code>SPC</code> 字符结尾。该功能通过将答案附加到问题的末尾来在提示中包含可能的答案。可能的响应以列表形式在答案中提供，其元素具有以下形式：
+</p><div class="lisp">
+<pre class="lisp">(long-answer short-answer help-message)
+</pre></div>
+<p>其中 long-answer 是用户响应的完整文本，一个字符串；  short-answer 是相同响应、单个字符或功能键的缩写形式；  help-message 是描述答案含义的文本。如果变量 read-answer-short 不为零，则提示将显示可能答案的简短变体，并且用户应键入提示中显示的单个字符/键；  否则提示将显示答案的长变体，并且用户应键入其中一个答案的全文并按 RET 键结束。如果 use-dialog-box 不为 nil，并且此函数由鼠标事件调用，则问题和答案将显示在 GUI 对话框中。
+</p>
+<p>该函数返回用户选择的长答案的文本，无论提示中显示长答案还是短答案并由用户键入。
+</p>
+<p>下面是一个使用这个函数的例子：
+</p><div class="lisp">
+<pre class="lisp">(let ((read-answer-short t))
+  (read-answer "Foo "
+     '(("yes"  ?y "perform the action")
+       ("no"   ?n "skip to the next")
+       ("all"  ?! "perform for the rest without more questions")
+       ("help" ?h "show help")
+       ("quit" ?q "exit"))))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: read-char-from-minibuffer prompt &amp;optional chars history ¶
+</pre></div>
+<p>此函数使用 minibuffer 读取并返回单个字符。可选地，它忽略任何不是 chars 成员的输入，这是一个接受的字符列表。history 参数指定要使用的历史列表符号；  如果省略或为零，则此函数不使用历史记录。
+</p>
+<p>如果在调用 read-char-from-minibuffer 时将 help-form（请参阅帮助函数）绑定到非 nil 值，则按 help-char 会导致它评估 help-form 并显示结果。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="21.9_读取密码.html">读取密码</a>, Previous: <a href="21.7_是或否查询.html">是或否查询</a>, Up: <a href="21_小缓冲区.html">小缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

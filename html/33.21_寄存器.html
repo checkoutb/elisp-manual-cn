@@ -1,0 +1,83 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.21 寄存器</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">33.21 寄存器</h2>
+<div class="nav-panel"><p>Next: <a href="33.22_文本转置.html">文本转置</a>, Previous: <a href="33.20_替换字符代码.html">替换字符代码</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>寄存器是 Emacs 编辑中使用的一种变量，可以保存各种不同类型的值。每个寄存器都由一个字符命名。所有 ASCII 字符及其元变体（但 Cg 除外）都可用于命名寄存器。因此，有 255 个可能的寄存器。在 Emacs Lisp 中，寄存器由其名称字符指定。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: register-alist ¶
+</pre></div>
+<p>此变量是表单元素的列表（名称.内容）。通常，每个已使用的 Emacs 寄存器都有一个元素。
+</p>
+<p>对象名称是标识寄存器的字符（整数）。
+</p>
+<p>寄存器的内容可以有几种可能的类型：
+</p>
+<div class="lisp">
+<pre class="lisp">a number
+</pre></div>
+<p>一个数字代表它自己。如果 insert-register 在寄存器中找到一个数字，它会将这个数字转换为十进制。
+</p><div class="lisp">
+<pre class="lisp">a marker
+</pre></div>
+<p>标记表示要跳转到的缓冲区位置。
+</p><div class="lisp">
+<pre class="lisp">a string
+</pre></div>
+<p>字符串是保存在寄存器中的文本。
+</p><div class="lisp">
+<pre class="lisp">a rectangle ¶
+</pre></div>
+<p>矩形由字符串列表表示。
+</p><div class="lisp">
+<pre class="lisp">(window-configuration position)
+</pre></div>
+<p>这表示要在一帧中恢复的窗口配置，以及要在当前缓冲区中跳转到的位置。
+</p><div class="lisp">
+<pre class="lisp">(frame-configuration position)
+</pre></div>
+<p>这表示要恢复的帧配置，以及当前缓冲区中要跳转到的位置。
+</p><div class="lisp">
+<pre class="lisp">(file filename)
+</pre></div>
+<p>这表示要访问的文件；  跳转到这个值访问文件文件名。
+</p><div class="lisp">
+<pre class="lisp">(file-query filename position)
+</pre></div>
+<p>这表示要访问的文件和其中的位置；  跳转到该值访问文件文件名并转到缓冲区位置位置。恢复这种类型的位置首先要求用户确认。
+</p>
+<p>除非另有说明，否则本节中的函数会返回不可预测的值。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: get-register reg ¶
+</pre></div>
+<p>此函数返回寄存器 reg 的内容，如果没有内容，则返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-register reg value ¶
+</pre></div>
+<p>此函数将寄存器 reg 的内容设置为值。寄存器可以设置为任何值，但其他寄存器函数只需要某些数据类型。返回值是值。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: view-register reg ¶
+</pre></div>
+<p>此命令显示寄存器 reg 中包含的内容。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: insert-register reg &amp;optional beforep ¶
+</pre></div>
+<p>此命令将寄存器 reg 的内容插入当前缓冲区。
+</p>
+<p>通常，此命令将点放在插入的文本之前，然后将标记放在它之后。但是，如果可选的第二个参数 beforep 不是 nil，它会将标记放在之前并指向之后。
+</p>
+<p>当以交互方式调用时，该命令默认将点放在文本之后，并且前缀参数会反转此行为。
+</p>
+<p>如果寄存器包含一个矩形，则插入该矩形，其左上角为点。这意味着文本被插入到当前行中，并在连续行的下方插入。
+</p>
+<p>如果寄存器包含的不是保存的文本（字符串）或矩形（列表），那么当前无用的事情就会发生。这在未来可能会改变。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: register-read-with-preview prompt ¶
+</pre></div>
+<p>此函数读取并返回一个寄存器名称，提示并可能显示现有寄存器及其内容的预览。预览显示在一个临时窗口中，在用户选项 register-preview-delay 指定的延迟之后，如果它的值和 register-alist 都是非零。如果用户请求帮助（例如，通过键入帮助字符），也会显示预览。我们建议所有读取寄存器名称的交互式命令都使用此函数。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.22_文本转置.html">文本转置</a>, Previous: <a href="33.20_替换字符代码.html">替换字符代码</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

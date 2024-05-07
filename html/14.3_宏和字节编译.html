@@ -1,0 +1,12 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>14.3 宏和字节编译</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">14.3 宏和字节编译</h2>
+<div class="nav-panel"><p>Next: <a href="14.4_定义宏.html">定义宏</a>, Previous: <a href="14.2_宏调用的扩展.html">宏调用的扩展</a>, Up: <a href="14_宏.html">宏.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>你可能会问我们为什么要麻烦计算宏的展开然后评估展开。为什么不让宏体直接产生想要的结果呢？  原因与编译有关。
+</p>
+<p>当宏调用出现在正在编译的 Lisp 程序中时，Lisp 编译器会像解释器一样调用宏定义，并接收扩展。但它不是评估这个扩展，而是编译这个扩展，就好像它直接出现在程序中一样。因此，编译后的代码会产生预期用于宏的值和副作用，但会以全编译速度执行。如果宏体自己计算值和副作用，这将不起作用——它们将在编译时计算，这是没有用的。
+</p>
+<p>为了使宏调用的编译工作，宏必须在编译对它们的调用时已经在 Lisp 中定义。编译器有一个特殊功能可以帮助您做到这一点：如果正在编译的文件包含 defmacro 形式，则该宏将临时定义用于该文件的其余编译。
+</p>
+<p>对文件进行字节编译还会在文件的顶层执行任何 require 调用，因此您可以通过要求定义宏定义的文件来确保在编译期间必要的宏定义可用（请参阅功能）。为了避免在有人运行已编译的程序时加载宏定义文件，请在 require 调用周围编写 eval-when-compile（请参阅编译期间的评估）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="14.4_定义宏.html">定义宏</a>, Previous: <a href="14.2_宏调用的扩展.html">宏调用的扩展</a>, Up: <a href="14_宏.html">宏.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

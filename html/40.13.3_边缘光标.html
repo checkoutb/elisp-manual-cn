@@ -1,0 +1,22 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.13.3 边缘光标</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.13.3 边缘光标</h3>
+<div class="nav-panel"><p>Next: <a href="40.13.4_边缘位图.html">边缘位图</a>, Previous: <a href="40.13.2_边缘指标.html">边缘指标</a>, Up: <a href="40.13_条纹.html">条纹.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>当一行与窗口一样宽时，Emacs 将光标显示在右边缘，而不是使用两行。根据当前缓冲区的光标类型，使用不同的位图来表示边缘中的光标。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: overflow-newline-into-fringe ¶
+</pre></div>
+<p>如果这是非零，则与窗口宽度完全相同的行（不包括最后的换行符）不会继续。相反，当点位于行尾时，光标会出现在右边缘。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: fringe-cursor-alist ¶
+</pre></div>
+<p>此变量指定从逻辑光标类型到显示在右边缘的实际边缘位图的映射。该值是一个列表，其中每个元素都具有 (cursor-type . bitmap) 的形式，这意味着使用边缘位图位图来显示类型为 cursor-type 的光标。
+</p>
+<p>每个光标类型应该是 box、hollow、bar、hbar 或hollow-small 之一。前四个与光标类型框架参数中的含义相同（请参阅光标参数）。当普通的空心矩形位图太高而无法放在特定的显示行上时，使用空心小类型代替空心。
+</p>
+<p>每个位图应该是一个符号，指定要为该逻辑光标类型显示的边缘位图。请参阅边缘位图。
+</p>
+<p>当 fringe-cursor-alist 具有缓冲区本地值，并且没有为游标类型定义位图时，使用 fringes-indicator-alist 的默认值中的对应值。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.13.4_边缘位图.html">边缘位图</a>, Previous: <a href="40.13.2_边缘指标.html">边缘指标</a>, Up: <a href="40.13_条纹.html">条纹.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

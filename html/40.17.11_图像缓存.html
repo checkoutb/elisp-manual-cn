@@ -1,0 +1,38 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.17.11 图像缓存</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.17.11 图像缓存</h3>
+<div class="nav-panel"><p>Next: <a href="40.18_嵌入式原生小部件.html">嵌入式原生小部件</a>, Previous: <a href="40.17.10_多帧图像.html">多帧图像</a>, Up: <a href="40.17_图像.html">图像.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 缓存图像，以便它可以更有效地再次显示它们。当 Emacs 显示图像时，它会在图像缓存中搜索与所需规格相等的现有图像规格。如果找到匹配项，则显示缓存中的图像。否则，Emacs 会正常加载图像。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: image-flush spec &amp;optional frame ¶
+</pre></div>
+<p>此函数从帧帧的图像缓存中删除具有规范规范的图像。使用 equal 比较图像规格。如果 frame 为 nil，则默认为选定的帧。如果 frame 为 t，则在所有现有帧上刷新图像。
+</p>
+<p>在 Emacs 当前的实现中，每个图形终端都拥有一个图像缓存，该缓存由该终端上的所有帧共享（请参阅多个终端）。因此，刷新一帧中的图像也会刷新同一终端上的所有其他帧中的图像。
+</p>
+<p>image-flush 的一个用途是告诉 Emacs 一个图像文件的变化。如果图像规范包含 :file 属性，则图像在首次显示时根据文件的内容进行缓存。即使文件随后发生更改，Emacs 也会继续显示旧版本的图像。调用 image-flush 从缓存中刷新图像，迫使 Emacs 在下次需要显示该图像时重新读取该文件。
+</p>
+<p>图像刷新的另一个用途是节省内存。如果您的 Lisp 程序在比 image-cache-eviction-delay 更短的时间内创建了大量临时图像（见下文），您可以选择自己刷新未使用的图像，而不是等待 Emacs 自动执行。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: clear-image-cache &amp;optional filter ¶
+</pre></div>
+<p>此函数清除图像缓存，删除存储在其中的所有图像。如果过滤器被省略或为零，它将清除所选帧的缓存。如果过滤器是一个帧，它会清除该帧的缓存。如果 filter 为 t，则清除所有图像缓存。否则，过滤器将被视为文件名，并且与该文件名关联的所有图像都将从所有图像缓存中删除。
+</p>
+<p>如果图像缓存中的图像在指定的时间段内没有显示，Emacs 会将其从缓存中删除并释放相关的内存。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: image-cache-eviction-delay ¶
+</pre></div>
+<p>此变量指定图像可以保留在缓存中而不显示的秒数。当图像在这段时间内未显示时，Emacs 会将其从图像缓存中删除。
+</p>
+<p>在某些情况下，如果缓存中的图像数量增长过大，实际的驱逐延迟可能会比这更短。
+</p>
+<p>如果值为 nil，Emacs 不会从缓存中删除图像，除非您明确清除它。此模式可用于调试。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: image-cache-size ¶
+</pre></div>
+<p>此函数返回当前图像缓存的总大小，以字节为单位。例如，大小为 200x100、每种颜色 24 位的图像将具有 60000 字节的缓存大小。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.18_嵌入式原生小部件.html">嵌入式原生小部件</a>, Previous: <a href="40.17.10_多帧图像.html">多帧图像</a>, Up: <a href="40.17_图像.html">图像.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

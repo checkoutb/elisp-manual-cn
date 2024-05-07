@@ -1,0 +1,33 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>30.3.3 帧位置</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">30.3.3 帧位置</h3>
+<div class="nav-panel"><p>Next: <a href="30.3.4_帧大小.html">帧大小</a>, Previous: <a href="30.3.2_帧字体.html">帧字体</a>, Up: <a href="30.3_帧几何.html">帧几何.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>在图形系统上，普通顶层帧的位置被指定为其外帧的绝对位置（参见帧几何）。子帧的位置（参见子帧）是通过其外边缘相对于其父帧的原始位置的像素偏移量来指定的。
+</p>
+<p>您可以使用左侧和顶部的帧参数访问或更改帧的位置（请参阅位置参数）。这是用于处理现有可见帧位置的两个附加功能。对于这两个函数，参数帧必须表示一个实时帧，并且默认为选定的帧。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: frame-position &amp;optional frame ¶
+</pre></div>
+<p>对于普通的非子帧，此函数返回其外部位置（请参阅帧布局）相对于其显示原点 (0, 0) 的像素坐标的 cons。对于子帧（请参阅子帧），此函数返回其外部位置相对于帧父级原始位置的原点 (0, 0) 的像素坐标。
+</p>
+<p>负值从不表示从帧的显示或父帧的右边缘或下边缘偏移。相反，它们意味着帧的外部位置在其显示的原点或其父帧的本机位置的左侧和/或上方。这通常意味着帧仅部分可见（或完全不可见）。但是，在显示器的原点与其左上角不一致的系统上，该帧可能在辅助监视器上可见。
+</p>
+<p>在文本终端帧上，两个值都为零。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-frame-position frame x y ¶
+</pre></div>
+<p>该函数将frame的外框位置设置为(x, y)。后面的参数指定像素，通常从帧显示位置 (0, 0) 的原点开始计数。对于子帧，它们从帧的父帧的本机位置开始计数。
+</p>
+<p>负参数值将外框的右边缘从屏幕的右边缘（或父帧的原生矩形）向左定位 -x 像素，将底部边缘从屏幕的底部边缘向上定位 -y 像素（或父帧的原生矩形）。
+</p>
+<p>请注意，负值不允许将帧的右边缘或下边缘精确对齐其显示或父帧的右边缘或下边缘。它们也不允许指定不在显示或父帧边缘内的位置。帧参数 left 和 top（请参阅 Position Parameters）允许这样做，但仍可能无法为初始帧或新帧提供良好的结果。
+</p>
+<p>此功能对文本终端帧没有影响。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: move-frame-functions ¶
+</pre></div>
+<p>这个钩子指定了当 Emacs 帧被窗口系统或窗口管理器移动（分配一个新位置）时运行的函数。这些函数使用一个参数运行，即移动的帧。对于子帧（请参阅子帧），仅当帧的位置相对于其父帧的位置发生变化时，函数才会运行。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="30.3.4_帧大小.html">帧大小</a>, Previous: <a href="30.3.2_帧字体.html">帧字体</a>, Up: <a href="30.3_帧几何.html">帧几何.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

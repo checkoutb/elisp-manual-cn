@@ -1,0 +1,23 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>39.15 网络服务器</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">39.15 网络服务器</h2>
+<div class="nav-panel"><p>Next: <a href="39.16_数据报.html">数据报</a>, Previous: <a href="39.14_网络连接.html">网络连接</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>您可以通过使用 :server t 调用 make-network-process（请参阅 make-network-process）来创建服务器。服务器将侦听来自客户端的连接请求。当它接受客户端连接请求时，它会创建一个新的网络连接，它本身就是一个进程对象，具有以下参数：
+</p>
+<ul>
+<li>
+连接的进程名称是通过连接服务器进程的名称和客户端标识字符串来构造的。IPv4 连接的客户端标识字符串类似于 <code>&lt;abcd:p&gt;</code> ，它表示地址和端口号。否则，它是括号中的唯一编号，如 <code>&lt;nnn&gt;</code> 。对于 Emacs 会话中的每个连接，该编号都是唯一的。
+</li><li>
+如果服务器有非默认过滤器，则连接进程不会获得单独的进程缓冲区；  否则，Emacs 会为此创建一个新缓冲区。缓冲区名称是服务器的缓冲区名称或进程名称，与客户端标识字符串连接。
+
+</li><li>
+服务器的进程缓冲区值从不直接使用，但日志函数可以检索它并通过在其中插入文本来使用它来记录连接。
+</li><li>
+通信类型和进程过滤器和哨兵是从服务器继承的。服务器从不直接使用它的过滤器和哨兵；  它们的唯一目的是初始化与服务器的连接。
+</li><li>
+连接的进程联系信息是根据客户端的寻址信息（通常是IP地址和端口号）设置的。此信息与进程联系关键字:host、:service、:remote 相关联。
+</li><li>
+连接的本地地址是根据用于连接的端口号设置的。
+</li><li>
+客户端进程的 plist 是从服务器的 plist 初始化的。
+</li></ul>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="39.16_数据报.html">数据报</a>, Previous: <a href="39.14_网络连接.html">网络连接</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

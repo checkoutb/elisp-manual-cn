@@ -1,0 +1,36 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>30.4.2 初始帧参数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">30.4.2 初始帧参数</h3>
+<div class="nav-panel"><p>Next: <a href="30.4.3_窗框参数.html">窗框参数</a>, Previous: <a href="30.4.1_访问帧参数.html">访问帧参数</a>, Up: <a href="30.4_帧参数.html">帧参数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>您可以通过在初始化文件中设置 initial-frame-alist 来指定初始启动帧的参数（请参阅初始化文件）。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: initial-frame-alist ¶
+</pre></div>
+<p>此变量的值是创建初始帧时使用的参数值列表。您可以设置此变量来指定初始帧的外观，而无需更改后续帧。每个元素具有以下形式：
+</p>
+<div class="lisp">
+<pre class="lisp">(parameter . value)
+</pre></div>
+<p>Emacs 在读取您的 init 文件之前创建初始帧。读取该文件后，Emacs 会检查 initial-frame-alist，并将更改后的值中的参数设置应用于已创建的初始帧。
+</p>
+<p>如果这些设置影响帧几何形状和外观，您会看到帧出现错误，然后更改为指定的。如果这让您感到困扰，您可以使用 X 资源指定相同的几何图形和外观；  这些确实在创建帧之前生效。请参阅 GNU Emacs 手册中的 X 资源。
+</p>
+<p>X 资源设置通常适用于所有帧。如果您只想为初始帧指定一些 X 资源，并且您不希望它们应用于后续帧，这里是如何实现的。在 default-frame-alist 中指定参数以覆盖后续帧的 X 资源；  然后，为了防止这些影响初始帧，在 initial-frame-alist 中指定相同的参数，其值与 X 资源匹配。
+</p>
+<p>如果这些参数包括 (minibuffer . nil)，则表明初始帧应该没有 minibuffer。在这种情况下，Emacs 也会创建一个单独的 minibuffer-only 帧。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: minibuffer-frame-alist ¶
+</pre></div>
+<p>这个变量的值是一个参数值列表，当创建一个初始的 minibuffer-only 帧（即，如果 initial-frame-alist 指定一个没有 minibuffer 的帧，Emacs 创建的 minibuffer-only 帧）时使用的参数值列表。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: default-frame-alist ¶
+</pre></div>
+<p>这是一个列表，指定所有 Emacs 帧的帧参数的默认值——第一帧和后续帧。在使用 X Window System 时，在很多情况下可以通过 X 资源获得相同的结果。
+</p>
+<p>设置此变量不会影响现有帧。此外，在单独的帧中显示缓冲区的函数可以通过提供自己的参数来覆盖默认参数。
+</p>
+<p>如果您使用指定帧外观的命令行选项调用 Emacs，这些选项会通过将元素添加到 initial-frame-alist 或 default-frame-alist 来生效。仅影响初始帧的选项，例如 <code>--geometry</code> 和 <code>--maximized</code> ，添加到initial-frame-alist；  其他添加到默认帧列表。请参阅 GNU Emacs 手册中的 Emacs 调用的命令行参数。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="30.4.3_窗框参数.html">窗框参数</a>, Previous: <a href="30.4.1_访问帧参数.html">访问帧参数</a>, Up: <a href="30.4_帧参数.html">帧参数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

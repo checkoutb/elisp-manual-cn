@@ -1,0 +1,359 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.17.6 SVG 图像</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.17.6 SVG 图像</h3>
+<div class="nav-panel"><p>Next: <a href="40.17.7_其他图像类型.html">其他图像类型</a>, Previous: <a href="40.17.5_ImageMagick_图像.html">ImageMagick_图像</a>, Up: <a href="40.17_图像.html">图像.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>SVG（可缩放矢量图形）是一种用于指定图像的 XML 格式。SVG 图像支持以下附加图像描述符属性：
+</p>
+<div class="lisp">
+<pre class="lisp">:foreground foreground
+</pre></div>
+<p>foreground，如果非零，应该是一个指定颜色的字符串，用作图像的前景色。如果值为 nil，则默认为当前面的前景色。
+</p><div class="lisp">
+<pre class="lisp">:background background
+</pre></div>
+<p>背景，如果非零，应该是一个指定颜色的字符串，如果图像支持透明度，则用作图像的背景颜色。如果值为 nil，则默认为当前面的背景颜色。
+</p><div class="lisp">
+<pre class="lisp">:css css
+</pre></div>
+<p>css，如果非零，应该是一个字符串，指定 CSS 以覆盖生成图像时使用的默认 CSS。
+</p>
+<div class="lisp">
+<pre class="lisp">SVG library
+</pre></div>
+<p>如果您的 Emacs 构建支持 SVG，您可以使用 svg.el 库中的以下函数创建和操作这些图像。
+</p><div class="lisp">
+<pre class="lisp">Function: svg-create width height &amp;rest args ¶
+</pre></div>
+<p>创建具有指定尺寸的新的空 SVG 图像。args 是一个参数 plist，您可以指定以下内容：
+</p>
+<div class="lisp">
+<pre class="lisp">:stroke-width
+</pre></div>
+<p>创建的任何线条的默认宽度（以像素为单位）。
+</p>
+<div class="lisp">
+<pre class="lisp">:stroke
+</pre></div>
+<p>创建的任何线条上的默认笔触颜色。
+</p>
+<p>此函数返回一个 SVG 对象，一个指定 SVG 图像的 Lisp 数据结构，并且以下所有函数都在该结构上工作。以下函数中的参数 svg 指定了这样一个 SVG 对象。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: svg-gradient svg id type stops ¶
+</pre></div>
+<p>在 svg 中创建一个带有标识符 id 的渐变。type 指定渐变类型，可以是线性的或径向的。stop 是百分比/颜色对的列表。
+</p>
+<p>下面将创建一个线性渐变，从开始时的红色到 25% 的绿色，最后到蓝色：
+</p><div class="lisp">
+<pre class="lisp">(svg-gradient svg "gradient1" 'linear
+              '((0 . "red") (25 . "green") (100 . "blue")))
+</pre></div>
+<p>创建的渐变（并插入到 SVG 对象中）稍后可以被所有创建形状的函数使用。
+</p>
+<p>以下所有函数都采用关键字参数的可选列表，这些参数会改变各种属性的默认值。有效属性包括：
+</p>
+<div class="lisp">
+<pre class="lisp">:stroke-width
+</pre></div>
+<p>绘制的线条的宽度（以像素为单位），以及实体形状周围的轮廓。
+</p><div class="lisp">
+<pre class="lisp">:stroke-color
+</pre></div>
+<p>绘制线条的颜色，以及实体形状周围的轮廓。
+</p><div class="lisp">
+<pre class="lisp">:fill-color
+</pre></div>
+<p>用于实体形状的颜色。
+</p><div class="lisp">
+<pre class="lisp">:id
+</pre></div>
+<p>形状的标识。
+</p><div class="lisp">
+<pre class="lisp">:gradient
+</pre></div>
+<p>如果给定，这应该是先前定义的渐变对象的标识符。
+</p><div class="lisp">
+<pre class="lisp">:clip-path
+</pre></div>
+<p>剪辑路径的标识符。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: svg-rectangle svg x y width height &amp;rest args ¶
+</pre></div>
+<p>向 svg 添加一个矩形，其左上角位于 x/y 位置，其大小为宽度/高度。
+</p><div class="lisp">
+<pre class="lisp">(svg-rectangle svg 100 100 500 500 :gradient "gradient1")
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: svg-circle svg x y radius &amp;rest args ¶
+</pre></div>
+<p>向 svg 添加一个圆心位于 x/y 且半径为半径的圆。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: svg-ellipse svg x y x-radius y-radius &amp;rest args ¶
+</pre></div>
+<p>向 svg 添加一个椭圆，其中心位于 x/y，水平半径为 x 半径，垂直半径为 y 半径。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: svg-line svg x1 y1 x2 y2 &amp;rest args ¶
+</pre></div>
+<p>向 svg 添加一条从 x1/y1 开始并延伸到 x2/y2 的线。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: svg-polyline svg points &amp;rest args ¶
+</pre></div>
+<p>向 svg 添加一条穿过点的多段线（又名 <code>折线</code> ），它是 X/Y 位置对的列表。
+</p>
+<div class="lisp">
+<pre class="lisp">(svg-polyline svg '((200 . 100) (500 . 450) (80 . 100))
+              :stroke-color "green")
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: svg-polygon svg points &amp;rest args ¶
+</pre></div>
+<p>向 svg 添加一个多边形，其中 points 是描述多边形外周的 X/Y 对列表。
+</p><div class="lisp">
+<pre class="lisp">(svg-polygon svg '((100 . 100) (200 . 150) (150 . 90))
+             :stroke-color "blue" :fill-color "red")
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: svg-path svg commands &amp;rest args ¶
+</pre></div>
+<p>根据命令将形状的轮廓添加到 svg，请参阅 SVG 路径命令。
+</p>
+<p>默认情况下，坐标是绝对的。要使用相对于最后一个位置的坐标，或者 - 最初 - 相对于原点，请将属性 :relative 设置为 t。可以为函数或单个命令指定此属性。如果为函数指定，则默认情况下所有命令都使用相对坐标。要使单个命令使用绝对坐标，请将 :relative 设置为 nil。
+</p><div class="lisp">
+<pre class="lisp">(svg-path svg
+          '((moveto ((100 . 100)))
+            (lineto ((200 . 0) (0 . 200) (-200 . 0)))
+            (lineto ((100 . 100)) :relative nil))
+          :stroke-color "blue"
+          :fill-color "lightblue"
+          :relative t)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: svg-text svg text &amp;rest args ¶
+</pre></div>
+<p>将指定的文本添加到 svg。
+</p><div class="lisp">
+<pre class="lisp">(svg-text
+ svg "This is a text"
+ :font-size "40"
+ :font-weight "bold"
+ :stroke "black"
+ :fill "white"
+ :font-family "impact"
+ :letter-spacing "4pt"
+ :x 300
+ :y 400
+ :stroke-width 1)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: svg-embed svg image image-type datap &amp;rest args ¶
+</pre></div>
+<p>将嵌入（光栅）图像添加到 svg。如果 datap 为 nil，则 image 应该是文件名；  否则它应该是一个包含图像数据作为原始字节的字符串。image-type 应该是 MIME 图像类型，例如 <code>image/jpeg</code> 。
+</p>
+<div class="lisp">
+<pre class="lisp">(svg-embed svg "~/rms.jpg" "image/jpeg" nil
+           :width "100px" :height "100px"
+           :x "50px" :y "75px")
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: svg-embed-base-uri-image svg relative-filename &amp;rest args ¶
+</pre></div>
+<p>要 svg 添加放置在相对文件名的嵌入（光栅）图像。在 :base-uri svg 图像属性的文件名目录中搜索相对文件名。:base-uri 指定要创建的 svg 图像的（可能不存在的）文件名，因此所有嵌入的文件都相对于 :base-uri 文件名的目录进行搜索。如果省略 :base-uri，则使用加载 svg 图像的文件名。与 svg-embed 相比，使用 :base-uri 提高了嵌入大图像的性能，因为所有工作都直接由 librsvg 完成。
+</p>
+<div class="lisp">
+<pre class="lisp">;; Embeding /tmp/subdir/rms.jpg and /tmp/another/rms.jpg
+(svg-embed-base-uri-image svg "subdir/rms.jpg"
+           :width "100px" :height "100px"
+           :x "50px" :y "75px")
+(svg-embed-base-uri-image svg "another/rms.jpg"
+           :width "100px" :height "100px"
+           :x "75px" :y "50px")
+(svg-image svg :scale 1.0
+           :base-uri "/tmp/dummy"
+           :width 175 :height 175)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: svg-clip-path svg &amp;rest args ¶
+</pre></div>
+<p>为 svg 添加剪切路径。如果通过 :clip-path 属性应用于形状，则不会绘制该形状中位于剪切路径之外的部分。
+</p>
+<div class="lisp">
+<pre class="lisp">(let ((clip-path (svg-clip-path svg :id "foo")))
+  (svg-circle clip-path 200 200 175))
+(svg-rectangle svg 50 50 300 300
+               :fill-color "red"
+               :clip-path "url(#foo)")
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: svg-node svg tag &amp;rest args ¶
+</pre></div>
+<p>将自定义节点标签添加到 svg。
+</p><div class="lisp">
+<pre class="lisp">(svg-node svg
+          'rect
+          :width 300 :height 200 :x 50 :y 100 :fill-color "green")
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: svg-remove svg id ¶
+</pre></div>
+<p>从 svg 中删除具有标识符 id 的元素。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: svg-image svg ¶
+</pre></div>
+<p>最后，svg-image 将一个 SVG 对象作为其参数，并返回一个适合在 insert-image 等函数中使用的图像对象。
+</p>
+<p>这是一个完整的示例，它创建并插入带有圆圈的图像：
+</p>
+<div class="lisp">
+<pre class="lisp">(let ((svg (svg-create 400 400 :stroke-width 10)))
+  (svg-gradient svg "gradient1" 'linear '((0 . "red") (100 . "blue")))
+  (svg-circle svg 200 200 100 :gradient "gradient1"
+                  :stroke-color "green")
+  (insert-image (svg-image svg)))
+</pre></div>
+<p>SVG 路径命令
+SVG 路径允许通过组合直线、曲线、圆弧和其他基本形状来创建复杂的图像。下面描述的函数允许从 Lisp 程序调用 SVG 路径命令。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: moveto points ¶
+</pre></div>
+<p>将笔移动到点的第一个点。附加点用线连接。points 是 X/Y 坐标对的列表。随后的 moveto 命令表示新子路径的开始。
+</p>
+<div class="lisp">
+<pre class="lisp">(svg-path svg '((moveto ((200 . 100) (100 . 200) (0 . 100))))
+          :fill "white" :stroke "black")
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Command: closepath ¶
+</pre></div>
+<p>通过将当前子路径连接回其初始点来结束当前子路径。沿着连接绘制一条线。
+</p>
+<div class="lisp">
+<pre class="lisp">(svg-path svg '((moveto ((200 . 100) (100 . 200) (0 . 100)))
+                (closepath)
+                (moveto ((75 . 125) (100 . 150) (125 . 125)))
+                (closepath))
+          :fill "red" :stroke "black")
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Command: lineto points ¶
+</pre></div>
+<p>从当前点到点的第一个元素画一条线，一个 X/Y 位置对的列表。如果指定了多个点，则绘制一条折线。
+</p>
+<div class="lisp">
+<pre class="lisp">(svg-path svg '((moveto ((200 . 100)))
+                (lineto ((100 . 200) (0 . 100))))
+          :fill "yellow" :stroke "red")
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Command: horizontal-lineto x-coordinates ¶
+</pre></div>
+<p>从当前点到 x 坐标中的第一个元素绘制一条水平线。指定多个坐标是可能的，尽管这通常没有意义。
+</p>
+<div class="lisp">
+<pre class="lisp">(svg-path svg '((moveto ((100 . 200)))
+                (horizontal-lineto (300)))
+          :stroke "green")
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Command: vertical-lineto y-coordinates ¶
+</pre></div>
+<p>画垂直线。
+</p>
+<div class="lisp">
+<pre class="lisp">(svg-path svg '((moveto ((200 . 100)))
+                (vertical-lineto (300)))
+          :stroke "green")
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Command: curveto coordinate-sets ¶
+</pre></div>
+<p>使用坐标集中的第一个元素，从当前点绘制三次贝塞尔曲线。如果有多个坐标集，绘制一个多边形。每个坐标集都是 (x1 y1 x2 y2 xy) 形式的列表，其中 (x, y) 是曲线的终点。(x1, y1) 和 (x2, y2) 分别是开始和结束的控制点。
+</p>
+<div class="lisp">
+<pre class="lisp">(svg-path svg '((moveto ((100 . 100)))
+                (curveto ((200 100 100 200 200 200)
+                          (300 200 0 100 100 100))))
+          :fill "transparent" :stroke "red")
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Command: smooth-curveto coordinate-sets ¶
+</pre></div>
+<p>使用坐标集中的第一个元素，从当前点绘制三次贝塞尔曲线。如果有多个坐标集，绘制一个多边形。每个坐标集是一个 (x2 y2 xy) 形式的列表，其中 (x, y) 是曲线的终点， (x2, y2) 是对应的控制点。第一个控制点是上一个命令的第二个控制点相对于当前点的反映，如果该命令是curveto 或smooth-curveto。否则第一个控制点与当前点重合。
+</p>
+<div class="lisp">
+<pre class="lisp">(svg-path svg '((moveto ((100 . 100)))
+                (curveto ((200 100 100 200 200 200)))
+                (smooth-curveto ((0 100 100 100))))
+          :fill "transparent" :stroke "blue")
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Command: quadratic-bezier-curveto coordinate-sets ¶
+</pre></div>
+<p>使用坐标集中的第一个元素，从当前点绘制二次贝塞尔曲线。如果有多个坐标集，绘制一个多边形。每个坐标集是一个 (x1 y1 xy) 形式的列表，其中 (x, y) 是曲线的终点， (x1, y1) 是控制点。
+</p><div class="lisp">
+<pre class="lisp">(svg-path svg '((moveto ((200 . 100)))
+                (quadratic-bezier-curveto ((300 100 300 200)))
+                (quadratic-bezier-curveto ((300 300 200 300)))
+                (quadratic-bezier-curveto ((100 300 100 200)))
+                (quadratic-bezier-curveto ((100 100 200 100))))
+          :fill "transparent" :stroke "pink")
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Command: smooth-quadratic-bezier-curveto coordinate-sets ¶
+</pre></div>
+<p>使用坐标集中的第一个元素，从当前点绘制二次贝塞尔曲线。如果有多个坐标集，绘制一个多边形。每个坐标集是一个 (xy) 形式的列表，其中 (x, y) 是曲线的终点。控制点是前一个命令的控制点相对于当前点的反映，如果该命令是 quadratic-bezier-curveto 或 smooth-quadratic-bezier-curveto。否则控制点与当前点重合。
+</p><div class="lisp">
+<pre class="lisp">(svg-path svg '((moveto ((200 . 100)))
+                (quadratic-bezier-curveto ((300 100 300 200)))
+                (smooth-quadratic-bezier-curveto ((200 300)))
+                (smooth-quadratic-bezier-curveto ((100 200)))
+                (smooth-quadratic-bezier-curveto ((200 100))))
+          :fill "transparent" :stroke "lightblue")
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Command: elliptical-arc coordinate-sets ¶
+</pre></div>
+<p>使用坐标集中的第一个元素，从当前点绘制一条椭圆弧。如果有多个坐标集，则绘制一系列椭圆弧。每个坐标集是一个形式为 (rx ry xy) 的列表，其中 (x, y) 是椭圆的终点， (rx, ry) 是它的半径。属性可以附加到列表中：
+</p>
+<div class="lisp">
+<pre class="lisp">:x-axis-rotation
+</pre></div>
+<p>椭圆的 x 轴相对于当前坐标系的 x 轴旋转的角度（以度为单位）。
+</p><div class="lisp">
+<pre class="lisp">:large-arc
+</pre></div>
+<p>如果设置为 t，则绘制大于或等于 180 度的弧形扫描。否则，绘制小于或等于 180 度的圆弧扫描。
+</p><div class="lisp">
+<pre class="lisp">:sweep
+</pre></div>
+<p>如果设置为 t，则在正角度方向绘制圆弧。否则，以负角方向绘制。
+</p><div class="lisp">
+<pre class="lisp">
+
+(svg-path svg '((moveto ((200 . 250)))
+                (elliptical-arc ((75 75 200 350))))
+          :fill "transparent" :stroke "red")
+(svg-path svg '((moveto ((200 . 250)))
+                (elliptical-arc ((75 75 200 350 :large-arc t))))
+          :fill "transparent" :stroke "green")
+(svg-path svg '((moveto ((200 . 250)))
+                (elliptical-arc ((75 75 200 350 :sweep t))))
+          :fill "transparent" :stroke "blue")
+(svg-path svg '((moveto ((200 . 250)))
+                (elliptical-arc ((75 75 200 350 :large-arc t
+                                     :sweep t))))
+          :fill "transparent" :stroke "gray")
+(svg-path svg '((moveto ((160 . 100)))
+                (elliptical-arc ((40 100 80 0)))
+                (elliptical-arc ((40 100 -40 -70
+                                     :x-axis-rotation -120)))
+                (elliptical-arc ((40 100 -40 70
+                                     :x-axis-rotation -240))))
+          :stroke "pink" :fill "lightblue"
+          :relative t)
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.17.7_其他图像类型.html">其他图像类型</a>, Previous: <a href="40.17.5_ImageMagick_图像.html">ImageMagick_图像</a>, Up: <a href="40.17_图像.html">图像.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.7 用户级删除命令</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">33.7 用户级删除命令</h2>
+<div class="nav-panel"><p>Next: <a href="33.8_环.html">环</a>, Previous: <a href="33.6_删除文本.html">删除文本</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节描述用于删除文本的高级命令，这些命令主要针对用户，但在 Lisp 程序中也很有用。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: delete-horizontal-space &amp;optional backward-only ¶
+</pre></div>
+<p>此函数删除点周围的所有空格和制表符。它返回零。
+</p>
+<p>如果backward-only 是非零，该函数删除点之前的空格和制表符，但不删除点之后。
+</p>
+<p>在下面的例子中，我们调用 delete-horizo​​ntal-space 四次，每行一次，每次都在行的第二个和第三个字符之间。
+</p><div class="lisp">
+<pre class="lisp">
+
+---------- Buffer: foo ----------
+I ∗thought
+I ∗     thought
+We∗ thought
+Yo∗u thought
+---------- Buffer: foo ----------
+
+
+(delete-horizontal-space)   ; Four times.
+     ⇒ nil
+
+---------- Buffer: foo ----------
+Ithought
+Ithought
+Wethought
+You thought
+---------- Buffer: foo ----------
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Command: delete-indentation &amp;optional join-following-p beg end ¶
+</pre></div>
+<p>此函数将行点连接到上一行，删除连接处的任何空格，在某些情况下用一个空格替换它。如果 join-following-p 不为 nil，则 delete-indentation 将此行连接到下一行。否则，如果 beg 和 end 不为零，则此函数连接它们定义的区域中的所有行。
+</p>
+<p>在交互式调用中，join-following-p 是前缀参数，如果区域处于活动状态，beg 和 end 分别是区域的开始和结束，否则为零。该函数返回零。
+</p>
+<p>如果有填充前缀，并且要连接的第二行以该前缀开头，则 delete-indentation 会在连接行之前删除填充前缀。请参阅填充边距。
+</p>
+<p>在下面的示例中，point 位于开始 ’events’ 的行上，如果前一行中有尾随空格，则没有区别。
+</p><div class="lisp">
+<pre class="lisp">
+
+---------- Buffer: foo ----------
+When in the course of human
+∗    events, it becomes necessary
+---------- Buffer: foo ----------
+
+
+(delete-indentation)
+     ⇒ nil
+
+---------- Buffer: foo ----------
+When in the course of human∗ events, it becomes necessary
+---------- Buffer: foo ----------
+</pre></div>
+<p>线连接后，函数 fixup-whitespace 负责决定是否在连接处留出空格。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: fixup-whitespace ¶
+</pre></div>
+<p>此函数根据上下文将所有水平空格周围的点替换为一个空格或没有空格。它返回零。
+</p>
+<p>在一行的开头或结尾，适当的空格是无。在具有右括号语法的字符之前，或者在具有开括号或表达式前缀语法的字符之后，也没有空格是合适的。否则，一个空格是合适的。请参阅语法类表。
+</p>
+<p>在下面的示例中，第一次调用 fixup-whitespace，并在第一行中的单词 <code>空格</code> 之前添加点。对于第二次调用，point 直接位于 ’(’ 之后。
+</p><div class="lisp">
+<pre class="lisp">
+
+---------- Buffer: foo ----------
+This has too many     ∗spaces
+This has too many spaces at the start of (∗   this list)
+---------- Buffer: foo ----------
+
+
+(fixup-whitespace)
+     ⇒ nil
+(fixup-whitespace)
+     ⇒ nil
+
+
+---------- Buffer: foo ----------
+This has too many spaces
+This has too many spaces at the start of (this list)
+---------- Buffer: foo ----------
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Command: just-one-space &amp;optional n ¶
+</pre></div>
+<p>此命令将点周围的任何空格和制表符替换为单个空格，如果指定了 n，则替换为 n 个空格。它返回零。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: delete-blank-lines ¶
+</pre></div>
+<p>此功能删除点周围的空白行。如果点在一个空行上，并且在它之前或之后有一个或多个空行，则除其中一个之外的所有空行都将被删除。如果点位于孤立的空白行上，则将其删除。如果 point 在非空行上，则该命令会删除紧随其后的所有空行。
+</p>
+<p>空行定义为仅包含制表符和空格的行。
+</p>
+<p>删除空白行返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: delete-trailing-whitespace &amp;optional start end ¶
+</pre></div>
+<p>删除由 start 和 end 定义的区域中的尾随空格。
+</p>
+<p>此命令删除区域中每一行中最后一个非空白字符之后的空白字符。
+</p>
+<p>如果此命令作用于整个缓冲区（即，如果以非活动标记交互调用，或以 end nil 从 Lisp 调用），如果变量 delete-trailing-lines 为非，它也会删除缓冲区末尾的所有尾随行-零。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.8_环.html">环</a>, Previous: <a href="33.6_删除文本.html">删除文本</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

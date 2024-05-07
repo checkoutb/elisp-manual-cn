@@ -1,0 +1,57 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>21.6.8 在普通缓冲区中完成</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">21.6.8 在普通缓冲区中完成</h3>
+<div class="nav-panel"><p>Next: <a href="21.7_是或否查询.html">是或否查询</a>, Previous: <a href="21.6.7_编程完成.html">编程完成</a>, Up: <a href="21.6_完成.html">完成.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>虽然完成通常在 minibuffer 中完成，但完成功能也可以用于普通 Emacs 缓冲区中的文本。在许多主要模式中，缓冲区内完成由 CMi 或 M-TAB 命令执行，绑定到完成点。请参阅 GNU Emacs 手册中的符号完成。该命令使用异常钩子变量completion-at-point-functions：
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: completion-at-point-functions ¶
+</pre></div>
+<p>这个异常钩子的值应该是一个函数列表，用于计算完成表（参见基本完成函数）以完成该点的文本。主要模式可以使用它来提供特定于模式的完成表（请参阅主要模式约定）。
+</p>
+<p>当completion-at-point命令运行时，它会一一调用列表中的函数，不带任何参数。每个函数都应该返回 nil ，除非它可以并且想要对当前文本的完成数据负责。否则，它应该返回以下形式的列表：
+</p>
+<div class="lisp">
+<pre class="lisp">(start end collection . props)
+</pre></div>
+<p>start 和 end 分隔要完成的文本（应该包含点）。collection 是用于完成该文本的完成表，其形式适合作为第二个参数传递给 try-completion（请参阅基本完成函数）；  通过完成样式中定义的完成样式（请参阅完成变量），将以通常的方式从此完成表生成完成替代项。props 是附加信息的属性列表；  识别完成额外属性中的任何属性（请参阅完成变量），以及以下附加属性：
+</p>
+<p>：谓词
+</p>
+<p>     该值应该是完成候选者需要满足的谓词。
+：独家的
+</p>
+<p>如果值为 no，则如果完成表未能与点处的文本匹配，则完成点移动到完成点函数中的下一个函数，而不是报告完成失败。
+</p>
+<p>这个钩子上的函数通常应该快速返回，因为它们可能会被非常频繁地调用（例如，从 post-command-hook）。如果生成完成列表是一项昂贵的操作，强烈建议提供收集功能。Emacs 可能会在内部多次调用完成点函数中的函数，但只关心其中一些调用的集合值。通过提供收集功能，Emacs 可以推迟生成完成，直到需要。您可以使用 completion-table-dynamic 创建一个包装函数：
+</p>
+<div class="lisp">
+<pre class="lisp">;; Avoid this pattern.
+(let ((beg ...) (end ...) (my-completions (my-make-completions)))
+  (list beg end my-completions))
+
+;; Use this instead.
+(let ((beg ...) (end ...))
+  (list beg
+        end
+        (completion-table-dynamic
+          (lambda (_)
+            (my-make-completions)))))
+</pre></div>
+<p>此外，集合通常不应根据开始和结束之间的当前文本进行预过滤，因为这是完成点函数的调用者根据它决定使用的完成样式来执行此操作的责任。
+</p>
+<p>完成点函数中的函数也可以返回一个函数而不是如上所述的列表。在这种情况下，调用返回的函数，没有参数，它完全负责执行完成。我们不鼓励这种用法；  它仅旨在帮助将旧代码转换为使用完成点。
+</p>
+<p>完成点函数中第一个返回非零值的函数由点完成函数使用。不调用其余函数。例外情况是存在 :exclusive 规范，如上所述。
+</p>
+<p>以下函数提供了一种方便的方法来对 Emacs 缓冲区中的任意一段文本执行补全：
+</p>
+<div class="lisp">
+<pre class="lisp">Function: completion-in-region start end collection &amp;optional predicate ¶
+</pre></div>
+<p>此函数使用集合完成当前缓冲区中起始和结束位置之间的文本。参数集合与 try-completion 中的含义相同（请参阅基本完成函数）。
+</p>
+<p>此函数将完成文本直接插入当前缓冲区。与完成读取不同（请参阅完成和迷你缓冲区），它不会激活迷你缓冲区。
+</p>
+<p>要使此功能起作用，点必须位于开始和结束之间的某个位置。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="21.7_是或否查询.html">是或否查询</a>, Previous: <a href="21.6.7_编程完成.html">编程完成</a>, Up: <a href="21.6_完成.html">完成.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>10.3 引用</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">10.3 引用</h2>
+<div class="nav-panel"><p>Next: <a href="10.4_反引号.html">反引号</a>, Previous: <a href="10.2.8_自动加载.html">自动加载</a>, Up: <a href="10_评估.html">评估.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>特殊形式的引号返回其单个参数，如所写，而不对其进行评估。这提供了一种在程序中包含不是自评估对象的常量符号和列表的方法。（不必引用数字、字符串和向量等自评估对象。）
+</p>
+<div class="lisp">
+<pre class="lisp">Special Form: quote object ¶
+</pre></div>
+<p>这种特殊形式返回对象，而不对其进行评估。返回的值可能是共享的，不应修改。请参阅自我评估表。 
+</p>
+<p>因为引号在程序中经常使用，所以 Lisp 为它提供了一种方便的读取语法。一个撇号字符 (”’) 后跟一个 Lisp 对象（在读取语法中）扩展为一个列表，其第一个元素是引号，其第二个元素是对象。因此，读语法 ’x 是 (quote x) 的缩写。
+</p>
+<p>以下是一些使用引号的表达式示例：
+</p><div class="lisp">
+<pre class="lisp">(quote (+ 1 2))
+     ⇒ (+ 1 2)
+
+(quote foo)
+     ⇒ foo
+
+'foo
+     ⇒ foo
+
+''foo
+     ⇒ 'foo
+
+'(quote foo)
+     ⇒ 'foo
+
+['foo]
+     ⇒ ['foo]
+
+</pre></div>
+<p>尽管表达式 (list ’+ 1 2) 和 ’(+ 1 2) 都产生等于 (+ 1 2) 的列表，但前者产生一个新生成的可变列表，而后者产生一个由可能共享的 conses 构建的列表并且不应修改。请参阅自我评估表。
+</p>
+<p>其他引用结构包括 function（参见 Anonymous Functions），它导致用 Lisp 编写的匿名 lambda 表达式被编译，以及 ’‘’（参见 Backquote），它用于仅引用列表的一部分，同时计算和替换其他部分.
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="10.4_反引号.html">反引号</a>, Previous: <a href="10.2.8_自动加载.html">自动加载</a>, Up: <a href="10_评估.html">评估.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

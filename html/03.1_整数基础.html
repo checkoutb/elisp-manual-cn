@@ -1,0 +1,63 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>3.1 整数基础</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">3.1 整数基础</h2>
+<div class="nav-panel"><p>Next: <a href="03.2_浮点基础.html">浮点基础</a>, Previous: <a href="03_数字.html">数字</a>, Up: <a href="03_数字.html">数字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Lisp 阅读器将整数读取为具有可选初始符号和可选最后句点的十进制数字的非空序列。
+</p><div class="lisp">
+<pre class="lisp"> 1               ; The integer 1.
+ 1.              ; The integer 1.
++1               ; Also the integer 1.
+-1               ; The integer -1.
+ 0               ; The integer 0.
+-0               ; The integer 0.
+</pre></div>
+<p>以 10 为基数的整数的语法由 ’#’ 后跟一个基数指示，后跟一个或多个数字组成。基数指示是~ b~ 表示二进制，~ o~ 表示八进制，~ x~ 表示十六进制，~ radixr~ 表示基数。因此，’#binteger’ 以二进制读取整数，而 ’#radixrinteger’ 以 radix radix 读取整数。radix 的允许值从 2 到 36，允许的数字是从 ’0’-’9’、’A’-’Z’ 中取出的第一个 radix 字符。字母大小写被忽略，没有初始符号或最后一个句点。例如：
+</p><div class="lisp">
+<pre class="lisp">#b101100 ⇒ 44
+#o54 ⇒ 44
+#x2c ⇒ 44
+#24r1k ⇒ 44
+</pre></div>
+<p>要了解各种函数如何处理整数，尤其是位运算符（请参阅整数的位运算），查看二进制形式的数字通常会有所帮助。
+</p>
+<p>在二进制中，十进制整数 5 如下所示：
+</p><div class="lisp">
+<pre class="lisp">…000101
+</pre></div>
+<p>（省略号~ …~ 在概念上代表与前导位匹配的无限数量的位；这里是无限数量的 0 位。后面的示例也使用此~ …~ 表示法。）
+</p>
+<p>整数 -1 如下所示：
+</p><div class="lisp">
+<pre class="lisp">…111111
+</pre></div>
+<p>-1 表示为全1。（这称为二进制补码表示法。）
+</p>
+<p>从 -1 中减去 4 返回负整数 -5。在二进制中，十进制整数 4 是 100。因此，-5 看起来像这样：
+</p><div class="lisp">
+<pre class="lisp">…111011
+</pre></div>
+<p>本章中描述的许多函数都接受参数的标记来代替数字。（请参阅标记。）由于此类函数的实际参数可能是数字或标记，因此我们通常将这些参数命名为数字或标记。当参数值为标记时，使用其位置值并忽略其缓冲区。
+</p>
+<p>在 Emacs Lisp 中，文本字符由整数表示。介于零和 (max-char) 的值之间的任何整数（包括端点）都被认为是有效的字符。请参阅字符代码。
+</p>
+<p>Emacs Lisp 中的整数不受机器字长的限制。然而，在底层，有两种整数：较小的整数，称为 fixnums，以及较大的整数，称为 bignums。尽管 Emacs Lisp 代码通常不应该依赖于整数是 fixnum 还是 bignum，但旧的 Emacs 版本仅支持 fixnums，Emacs 中的某些函数仍然只接受 fixnums，并且旧的 Emacs Lisp 代码在给定 bignums 时可能会出现问题。例如，虽然较旧的 Emacs Lisp 代码可以安全地将整数与 eq 进行数值相等比较，但 bignums 的存在意味着现在应该使用 eql 和 = 等相等谓词来比较整数。
+</p>
+<p>bignums 的值范围受主内存量、机器特性（例如用于表示 bignum 指数的字的大小）以及整数宽度变量的限制。这些限制通常比 fixnums 的限制要宽松得多。bignum 在数值上永远不会等于 fixnum。Emacs 总是将 fixnum 范围内的整数表示为 fixnum，而不是 bignum。
+</p>
+<p>fixnum 的值范围取决于机器。最小范围是 -536,870,912 到 536,870,911（30 位；即 -2**29 到 2**29 - 1），但许多机器提供的范围更广。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: most-positive-fixnum
+</pre></div>
+<p>这个变量的值是 Emacs Lisp 可以处理的最大的~ 小~ 整数。典型值为 32 位平台上的 2**29 - 1 和 64 位平台上的 2**61 - 1。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: most-negative-fixnum
+</pre></div>
+<p>这个变量的值是 Emacs Lisp 可以处理的数字最小的~ 小~ 整数。它是负面的。典型值为 32 位平台上的 -2**29 和 64 位平台上的 -2**61。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: integer-width
+</pre></div>
+<p>该变量的值是一个非负整数，用于控制 Emacs 在计算大整数时是否发出范围错误信号。绝对值小于 2**n 的整数（其中 n 是此变量的值）不表示范围错误。尝试创建更大的整数通常表示范围错误，但如果可以廉价地创建更大的整数，则可能没有信号。如果计算创建巨大的整数，则将此变量设置为较大的数字可能会很昂贵。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="03.2_浮点基础.html">浮点基础</a>, Previous: <a href="03_数字.html">数字</a>, Up: <a href="03_数字.html">数字.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

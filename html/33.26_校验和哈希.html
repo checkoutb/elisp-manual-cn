@@ -1,0 +1,38 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>33.26 校验和/哈希</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">33.26 校验和/哈希</h2>
+<div class="nav-panel"><p>Next: <a href="33.27_GnuTLS_密码学.html">GnuTLS_密码学</a>, Previous: <a href="33.25_Base_64_编码.html">Base_64_编码</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>Emacs 内置了对计算加密哈希的支持。加密哈希或校验和是一段数据（例如，一段文本）的数字指纹，可用于检查您是否拥有该数据的未更改副本。
+</p>
+<p>Emacs 支持几种常见的加密哈希算法：MD5、SHA-1、SHA-2、SHA-224、SHA-256、SHA-384 和 SHA-512。MD5 是这些算法中最古老的一种，通常用于消息摘要中以检查通过网络传输的消息的完整性。MD5 和 SHA-1 不是抗冲突的（即，可以故意设计具有相同 MD5 或 SHA-1 哈希的不同数据片段），因此您不应该将它们用于任何与安全相关的事情。对于与安全相关的应用程序，您应该使用其他散列类型，例如 SHA-2（例如 sha256 或 sha512）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: secure-hash-algorithms ¶
+</pre></div>
+<p>此函数返回代表安全哈希可以使用的算法的符号列表。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: secure-hash algorithm object &amp;optional start end binary ¶
+</pre></div>
+<p>此函数返回对象的哈希值。参数算法是一个符号，说明要计算哪个哈希：md5、sha1、sha224、sha256、sha384 或 sha512 之一。参数对象应该是缓冲区或字符串。
+</p>
+<p>可选参数 start 和 end 是指定要计算消息摘要的对象部分的字符位置。如果它们为 nil 或省略，则为整个对象计算散列。
+</p>
+<p>如果参数 binary 被省略或为零，该函数返回散列的文本形式，作为一个普通的 Lisp 字符串。如果 binary 不为零，则它以二进制形式返回哈希，作为存储在单字节字符串中的字节序列。
+</p>
+<p>此函数不直接从对象文本的内部表示计算散列（请参阅文本表示）。相反，它使用编码系统（请参阅编码系统）对文本进行编码，并根据该编码文本计算散列。如果 object 是缓冲区，则使用的编码系统是默认选择用于将文本写入文件的编码系统。如果 object 是字符串，则使用用户首选的编码系统（请参阅 GNU Emacs 手册中的识别编码）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: md5 object &amp;optional start end coding-system noerror ¶
+</pre></div>
+<p>此函数返回一个 MD5 哈希。它是半过时的，因为在大多数情况下，它等同于使用 md5 作为算法参数调用安全哈希。对象、开始和结束参数与安全哈希中的含义相同。
+</p>
+<p>如果 coding-system 是非零，它指定用于编码文本的编码系统；  如果省略或为零，则使用默认编码系统，如在安全哈希中。
+</p>
+<p>通常，如果无法使用指定或选择的编码系统对文本进行编码，则 md5 会发出错误信号。但是，如果 noerror 不为零，它会默默地使用原始文本编码。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: buffer-hash &amp;optional buffer-or-name ¶
+</pre></div>
+<p>返回缓冲区或名称的哈希。如果为零，则默认为当前缓冲区。与安全散列相反，此函数根据缓冲区的内部表示计算散列，而不考虑任何编码系统。因此，它仅在比较在相同 Emacs 中运行的两个缓冲区时才有用，并且不能保证在不同 Emacs 版本之间返回相同的哈希值。它在更大的缓冲区上应该比安全哈希更有效，并且不应该分配更多的内存。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="33.27_GnuTLS_密码学.html">GnuTLS_密码学</a>, Previous: <a href="33.25_Base_64_编码.html">Base_64_编码</a>, Up: <a href="33_文本.html">文本.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>13.10 闭包</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">13.10 闭包</h2>
+<div class="nav-panel"><p>Next: <a href="13.11_建议_Emacs_Lisp_函数.html">建议_Emacs_Lisp_函数</a>, Previous: <a href="13.9_访问函数单元格内容.html">访问函数单元格内容</a>, Up: <a href="13_函数.html">函数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>正如变量绑定的范围规则中所解释的，Emacs 可以选择启用变量的词法绑定。启用词法绑定后，您创建的任何命名函数（例如，使用 defun）以及您使用 lambda 宏或函数特殊形式或 #’ 语法（请参阅匿名函数）创建的任何匿名函数都会自动转换为闭包。
+</p>
+<p>闭包是一个函数，它还带有定义函数时存在的词法环境的记录。当它被调用时，其定义中的任何词法变量引用都使用保留的词法环境。在所有其他方面，闭包的行为很像普通函数。特别是，它们可以像普通函数一样被调用。
+</p>
+<p>有关使用闭包的示例，请参见词法绑定。
+</p>
+<p>目前，Emacs Lisp 闭包对象由一个列表表示，其中符号闭包作为第一个元素，一个表示词法环境的列表作为第二个元素，参数列表和主体形式作为其余元素：
+</p>
+<div class="lisp">
+<pre class="lisp">;; lexical binding is enabled.
+(lambda (x) (* x x))
+     ⇒ (closure (t) (x) (* x x))
+</pre></div>
+<p>然而，闭包的内部结构暴露给 Lisp 世界的其余部分这一事实被认为是内部实现细节。因此，我们建议不要直接检查或更改闭包对象的结构。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="13.11_建议_Emacs_Lisp_函数.html">建议_Emacs_Lisp_函数</a>, Previous: <a href="13.9_访问函数单元格内容.html">访问函数单元格内容</a>, Up: <a href="13_函数.html">函数.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>9.1 符号组件</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">9.1 符号组件</h2>
+<div class="nav-panel"><p>Next: <a href="09.2_定义符号.html">定义符号</a>, Previous: <a href="09_符号.html">符号</a>, Up: <a href="09_符号.html">符号.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>每个符号都有四个组件（或~ 单元格~ ），每个组件都引用另一个对象：
+</p>
+<div class="lisp">
+<pre class="lisp">Print name ¶
+</pre></div>
+<p>符号的名称。
+</p><div class="lisp">
+<pre class="lisp">Value ¶
+</pre></div>
+<p>符号的当前值作为变量。
+</p><div class="lisp">
+<pre class="lisp">Function ¶
+</pre></div>
+<p>符号的函数定义。它还可以包含符号、键盘映射或键盘宏。
+</p><div class="lisp">
+<pre class="lisp">Property list ¶
+</pre></div>
+<p>符号的属性列表。
+</p>
+<p>打印名称单元格始终包含一个字符串，并且无法更改。其他三个单元格中的每一个都可以设置为任何 Lisp 对象。
+</p>
+<p>打印名称单元格包含作为符号名称的字符串。由于符号在文本上由它们的名称表示，因此不要有两个具有相同名称的符号很重要。Lisp 阅读器确保了这一点：每次读取符号时，它都会在创建新符号之前查找具有指定名称的现有符号。要获取符号的名称，请使用函数符号名称（请参阅创建和内部符号）。然而，尽管每个符号只有一个唯一的打印名称，但仍然可以通过称为~ 速记~ 的不同别名来引用同一个符号（请参阅速记）。
+</p>
+<p>值单元格将符号的值作为变量保存，如果符号本身被评估为 Lisp 表达式，则可以得到该值。有关如何设置和检索值的详细信息，请参阅变量，包括本地绑定和范围规则等复杂性。大多数符号可以将任何 Lisp 对象作为值，但某些特殊符号的值无法更改；  这些包括 nil 和 t，以及名称以~ :~ 开头的任何符号（这些称为关键字）。请参阅永不改变的变量。
+</p>
+<p>函数单元保存符号的函数定义。通常，当我们真正指的是存储在 foo 的函数单元中的函数时，我们会提到~ 函数 foo~ ；  我们仅在必要时明确区分。通常，函数单元用于保存函数（请参阅函数）或宏（请参阅宏）。但是，它也可用于保存符号（请参阅符号函数间接）、键盘宏（请参阅键盘宏）、键盘映射（请参阅键盘映射）或自动加载对象（请参阅自动加载）。要获取符号函数单元格的内容，请使用函数 symbol-function（请参阅访问函数单元格内容）。
+</p>
+<p>属性列表单元格通常应该包含格式正确的属性列表。要获取符号的属性列表，请使用函数 symbol-plist。请参阅符号属性。
+</p>
+<p>函数单元格或值单元格可能为 void，这意味着该单元格不引用任何对象。（这与持有符号 void 不同，也与持有符号 nil 不同。）检查 void 的函数或值单元格会导致错误，例如~ 作为变量的符号值是 void~ 。
+</p>
+<p>因为每个符号都有单独的值和函数单元格，所以变量名称和函数名称不会冲突。例如，符号 buffer-file-name 有一个值（在当前缓冲区中被访问的文件的名称）以及一个函数定义（一个返回文件名的原始函数）：
+</p>
+<div class="lisp">
+<pre class="lisp">buffer-file-name
+     ⇒ "/gnu/elisp/symbols.texi"
+(symbol-function 'buffer-file-name)
+     ⇒ #&lt;subr buffer-file-name&gt;
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="09.2_定义符号.html">定义符号</a>, Previous: <a href="09_符号.html">符号</a>, Up: <a href="09_符号.html">符号.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

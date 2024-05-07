@@ -1,0 +1,44 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.16.5 在边缘显示</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.16.5 在边缘显示</h3>
+<div class="nav-panel"><p>Next: <a href="40.17_图像.html">图像</a>, Previous: <a href="40.16.4_其他显示规格.html">其他显示规格</a>, Up: <a href="40.16_display财产.html">display财产.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>缓冲区可以在左侧和右侧具有称为显示边距的空白区域。普通文本永远不会出现在这些区域，但您可以使用 display 属性将内容放入显示边距。目前没有办法使边缘中的文本或图像对鼠标敏感。
+</p>
+<p>在边距中显示某些内容的方法是在某些文本的 display 属性中的边距显示规范中指定它。这是一个替换显示规范，这意味着您放置的文本不会显示；  边距显示出现，但该文本没有出现。
+</p>
+<p>边距显示规范看起来像 ((margin right-margin) spec) 或 ((margin left-margin) spec)。在这里，spec 是另一个显示规范，它说明要在边距中显示什么。通常它是要显示的文本字符串或图像描述符。
+</p>
+<p>要在与某些缓冲区文本相关联的边距中显示某些内容，而不更改或阻止该文本的显示，请在文本上放置一个前字符串属性并将边距显示规范放置在前字符串的内容上。
+</p>
+<p>请注意，如果要在边距中显示的字符串未指定面，则使用与在文本区域中显示的字符串相同的规则和优先级来确定其面（请参阅显示面）。如果这导致不希望的面 <code>泄漏</code> 到边距中，请确保字符串具有为其指定的明确面。
+</p>
+<p>在显示边距可以显示任何内容之前，您必须给它们一个非零宽度。通常的方法是设置这些变量：
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: left-margin-width ¶
+</pre></div>
+<p>此变量指定左边距的宽度，以字符单元（也称为 <code>列</code> ）为单位。它在所有缓冲区中都是缓冲区本地的。值为 nil 表示没有左边缘区域。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: right-margin-width ¶
+</pre></div>
+<p>此变量指定右边距的宽度，以字符单元为单位。它在所有缓冲区中都是缓冲区本地的。值为 nil 表示没有右边缘区域。
+</p>
+<p>设置这些变量不会立即影响窗口。当窗口中显示新缓冲区时，会检查这些变量。因此，您可以通过调用 set-window-buffer 使更改生效。不要使用这些变量来尝试确定左边距或右边距的当前宽度。相反，使用函数窗口边距。
+</p>
+<p>您也可以立即设置边距宽度。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-window-margins window left &amp;optional right ¶
+</pre></div>
+<p>此函数指定窗口窗口的边距宽度，以字符单元为单位。参数 left 控制左边距，而 right 控制右边距（默认为 0）。
+</p>
+<p>如果窗口不够大，无法容纳所需宽度的边距，则窗口的边距保持不变。
+</p>
+<p>此处指定的值可以稍后通过在 window 上调用 set-window-buffer（请参阅缓冲区和 Windows）及其 keep-margins 参数 nil 或省略来覆盖。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-margins &amp;optional window ¶
+</pre></div>
+<p>此函数将窗口左右边距的宽度作为表单的一个 cons 单元格返回 (left . right)。如果两个边缘区域之一不存在，则其宽度返回为零；  如果两个边距都不存在，则函数返回 (nil)。如果 window 为 nil，则使用选定的窗口。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.17_图像.html">图像</a>, Previous: <a href="40.16.4_其他显示规格.html">其他显示规格</a>, Up: <a href="40.16_display财产.html">display财产.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

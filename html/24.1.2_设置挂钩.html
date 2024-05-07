@@ -1,0 +1,42 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.1.2 设置挂钩</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">24.1.2 设置挂钩</h3>
+<div class="nav-panel"><p>Next: <a href="24.2_主要模式.html">主要模式</a>, Previous: <a href="24.1.1_运行钩子.html">运行钩子</a>, Up: <a href="24.1_钩子.html">钩子.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>这是一个在 Lisp 交互模式下将函数添加到模式挂钩以打开自动填充模式的示例：
+</p>
+<div class="lisp">
+<pre class="lisp">(add-hook 'lisp-interaction-mode-hook 'auto-fill-mode)
+</pre></div>
+<p>挂钩变量的值应该是函数列表。您可以使用普通的 Lisp 工具来操作该列表，但模块化方式是使用下面定义的 add-hook 和 remove-hook 函数。他们注意处理一些不寻常的情况并避免出现问题。
+</p>
+<p>将 lambda 表达式函数放在钩子上是可行的，但我们建议避免这样做，因为它会导致混淆。如果您再次添加相同的 lambda 表达式，但编写方式略有不同，您将获得两个等效但不同的函数。如果您随后删除其中一个，另一个将仍然存在。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: add-hook hook function &amp;optional depth local ¶
+</pre></div>
+<p>此函数是将函数函数添加到钩子变量钩子的便捷方法。您可以将它用于异常钩子以及正常钩子。function 可以是任何可以接受适当数量的钩子参数的 Lisp 函数。例如，
+</p>
+<div class="lisp">
+<pre class="lisp">(add-hook 'text-mode-hook 'my-text-hook-function)
+</pre></div>
+<p>将 my-text-hook-function 添加到名为 text-mode-hook 的钩子中。
+</p>
+<p>如果钩子中已经存在函数（使用相等比较），则 add-hook 不会再次添加它。
+</p>
+<p>如果函数有一个非零属性permanent-local-hook，那么kill-all-local-variables（或改变主要模式）不会从钩子变量的本地值中删除它。
+</p>
+<p>对于一个普通的钩子，钩子函数应该被设计成它们的执行顺序无关紧要。任何对订单的依赖都是自找麻烦。但是，顺序是可预测的：通常，函数位于钩子列表的前面，因此它首先被执行（除非另一个 add-hook 调用）。
+</p>
+<p>在某些情况下，控制钩子上函数的相对顺序很重要。可选参数 depth 允许您指示函数应在列表中插入的位置：它应该是介于 -100 和 100 之间的数字，其中值越高，函数应该越接近列表的末尾。深度默认为 0，为了向后兼容，当深度为非零符号时，它被解释为深度 90。此外，当深度严格大于 0 时，将在相同深度的函数之后而不是之前添加函数。永远不应该使用 100（或 -100）的深度，因为我们永远无法确定没有其他函数需要在我们之前（或之后）出现。
+</p>
+<p>add-hook 可以处理 hook 为 void 或其值为单个函数的情况；  它将值设置或更改为函数列表。
+</p>
+<p>如果 local 不为零，则表示将函数添加到缓冲区本地挂钩列表而不是全局挂钩列表。这使钩子成为缓冲区本地并将 t 添加到缓冲区本地值。后者充当标志以在默认值和本地值中运行钩子函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: remove-hook hook function &amp;optional local ¶
+</pre></div>
+<p>此函数从钩子变量钩子中删除函数。它使用 equal 将函数与钩子的元素进行比较，因此它适用于符号和 lambda 表达式。
+</p>
+<p>如果 local 不为零，则表示从缓冲区本地挂钩列表中删除函数，而不是从全局挂钩列表中删除。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="24.2_主要模式.html">主要模式</a>, Previous: <a href="24.1.1_运行钩子.html">运行钩子</a>, Up: <a href="24.1_钩子.html">钩子.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

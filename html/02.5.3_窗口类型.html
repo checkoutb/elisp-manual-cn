@@ -1,0 +1,16 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>2.5.3 窗口类型</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">2.5.3 窗口类型</h3>
+<div class="nav-panel"><p>Next: <a href="02.5.4_帧类型.html">帧类型</a>, Previous: <a href="02.5.2_标记类型.html">标记类型</a>, Up: <a href="02.5_编辑类型.html">编辑类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>一个窗口描述了 Emacs 用来显示缓冲区的屏幕部分。每个活动窗口（请参阅 Emacs Windows 的基本概念）都有一个关联的缓冲区，其内容出现在该窗口中。相比之下，给定的缓冲区可能出现在一个窗口、没有窗口或多个窗口中。窗口在屏幕上被分组为框架；  每个窗口只属于一帧。请参见帧类型。
+</p>
+<p>尽管可能同时存在多个窗口，但在任何时候都会将一个窗口指定为选定窗口（请参阅选择窗口）。这是 Emacs 准备好执行命令时（通常）显示光标的窗口。选定的窗口通常会显示当前缓冲区（请参阅当前缓冲区），但不一定如此。
+</p>
+<p>Windows 没有读取语法。它们以哈希表示法打印，给出窗口编号和正在显示的缓冲区的名称。窗口编号的存在是为了唯一标识窗口，因为任何给定窗口中显示的缓冲区都可能经常更改。
+</p>
+<div class="lisp">
+<pre class="lisp">(selected-window)
+       ⇒ #&lt;window 1 on objects.texi&gt;
+</pre></div>
+<p>有关在 Windows 上工作的功能的描述，请参阅 Windows。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="02.5.4_帧类型.html">帧类型</a>, Previous: <a href="02.5.2_标记类型.html">标记类型</a>, Up: <a href="02.5_编辑类型.html">编辑类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

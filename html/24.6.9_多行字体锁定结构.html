@@ -1,0 +1,60 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>24.6.9 多行字体锁定结构</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">24.6.9 多行字体锁定结构</h3>
+<div class="nav-panel"><p>Next: <a href="24.7_代码自动缩进.html">代码自动缩进</a>, Previous: <a href="24.6.8_语法字体锁定.html">语法字体锁定</a>, Up: <a href="24.6_字体锁定模式.html">字体锁定模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>通常，font-lock-keywords 的元素不应该跨多行匹配；  这不能可靠地工作，因为字体锁定通常只扫描缓冲区的一部分，并且它可能会错过跨越扫描开始的行边界的多行构造。（扫描通常从一行的开头开始。）
+</p>
+<p>使匹配多行结构的元素正常工作有两个方面：正确识别和正确重新突出显示。第一个意味着字体锁定找到所有多行结构。第二个意味着当多行结构发生变化时，字体锁定将正确地重新突出显示所有相关文本——例如，如果以前是多行结构一部分的一些文本不再是它的一部分。这两个方面密切相关，通常让其中一个工作似乎会使另一个工作。但是，为了获得可靠的结果，您必须明确注意这两个方面。
+</p>
+<p>有三种方法可以确保正确识别多行结构：
+</p>
+<p>向 font-lock-extend-region-functions 添加一个函数，该函数执行识别并扩展扫描，以便扫描的文本永远不会在多行结构的中间开始或结束。
+类似地使用 font-lock-fontify-region-function 挂钩来扩展扫描，以便扫描的文本永远不会在多行结构的中间开始或结束。
+以某种方式在它被插入缓冲区时（或在此之后但在 font-lock 尝试突出显示它之前的任何时间）识别多行构造，并用 font-lock-multiline 标记它，这将指示 font-lock 不启动或在构造中间结束扫描。
+</p>
+<p>有几种方法可以重新突出显示多行结构：
+</p>
+<p>在构造上放置一个 font-lock-multiline 属性。如果它的任何部分被更改，这将重新突出显示整个构造。在某些情况下，您可以通过设置 font-lock-multiline 变量来自动执行此操作，请参见。
+确保设置了 jit-lock-contextually 并依赖它来完成它的工作。这只会重新突出显示实际更改之后的构造部分，并且会在短暂的延迟后执行。这仅在多行构造的各个部分的突出显示从不依赖于后续行中的文本时才有效。由于 jit-lock-contextually 是默认激活的，这可能是一个有吸引力的解决方案。
+在构造上放置一个 jit-lock-defer-multiline 属性。这仅在使用 jit-lock-contextually 时有效，并且在重新突出显示之前具有相同的延迟，但与 font-lock-multiline 一样，它也处理突出显示取决于后续行的情况。
+如果解析一个构造的语法依赖于它在一个单独的块中被解析，您可以在所讨论的构造上添加 syntax-multiline 文本属性。最常见的用途是应用于 ’FOO’ 的语法属性取决于稍后的一些文本 ’BAR’：通过将此文本属性放置在整个 ’FOO…BAR’ 上，您可以确保任何更改’BAR’ 也会导致重新计算 ’FOO’ 的语法属性。注意：为此，该模式需要将 syntax-propertize-multiline 添加到 syntax-propertize-extend-region-functions。
+</p>
+<ol>
+<li>
+24.6.9.1 字体锁定多行
+
+
+<p>确保可靠地重新突出显示多行字体锁定结构的一种方法是在它们上放置文本属性 font-lock-multiline。对于属于多行结构的文本，它应该存在且非零。
+</p>
+<p>当 Font Lock 即将突出显示文本范围时，它首先根据需要扩展范围的边界，以便它们不会落在使用 font-lock-multiline 属性标记的文本中。然后它从范围中删除任何 font-lock-multiline 属性，并突出显示它。突出显示规范（主要是 font-lock-keywords）必须每次都重新安装此属性，只要合适。
+</p>
+<p>警告：不要在大范围的文本上使用 font-lock-multiline 属性，因为这会使重新突出显示变慢。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: font-lock-multiline ¶
+</pre></div>
+<p>如果 font-lock-multiline 变量设置为 t，Font Lock 将尝试在多行结构上自动添加 font-lock-multiline 属性。然而，这不是一个通用的解决方案，因为它会稍微减慢字体锁定的速度。它可能会遗漏一些多行构造，或者使属性大于或小于必要的值。
+</p>
+<p>对于匹配器为函数的元素，该函数应确保子匹配 0 覆盖整个相关的多行结构，即使只有一小部分会突出显示。手动添加 font-lock-multiline 属性通常同样容易。
+</p>
+<p>font-lock-multiline 属性旨在确保正确的重新字体化；  它不会自动识别新的多行结构。识别它们需要字体锁定模式一次在足够大的块上运行。这在许多情况下会偶然发生，这可能会给人一种多行构造神奇地工作的印象。如果您将 font-lock-multiline 变量设置为非 nil，这种印象会更加强烈，因为从那时起，找到的那些结构的突出显示将被正确更新。但这并不可靠。
+</p>
+<p>要可靠地找到多行结构，您必须在字体锁定模式查看文本之前手动将 font-lock-multiline 属性放置在文本上，或者使用 font-lock-fontify-region-function。
+</p>
+</li><li>
+24.6.9.2 缓冲区更改后要字体化的区域
+
+
+<p>当缓冲区更改时，Font Lock 重新设置字体的区域默认是跨越更改的最小整行序列。虽然这在大多数情况下都能正常工作，但有时却不能——例如，当更改改变了前一行文本的句法含义时。
+</p>
+<p>您可以通过设置以下变量来放大（甚至缩小）要重新字体化的区域：
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: font-lock-extend-after-change-region-function ¶
+</pre></div>
+<p>这个缓冲区局部变量要么是 nil，要么是 Font Lock 模式调用以确定要扫描和字体化的区域的函数。
+</p>
+<p>该函数有三个参数，标准 beg、end 和来自 after-change-functions 的 old-len（请参阅 Change Hooks）。它应该返回要字体化的区域的开始和结束缓冲区位置（按该顺序）的 cons，或者返回 nil（这意味着以标准方式选择区域）。此功能需要保留点、匹配数据和当前限制。它返回的区域可能在一行的中间开始或结束。
+</p>
+<p>由于每次缓冲区更改后都会调用此函数，因此它应该相当快。
+</p></li></ol>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="24.7_代码自动缩进.html">代码自动缩进</a>, Previous: <a href="24.6.8_语法字体锁定.html">语法字体锁定</a>, Up: <a href="24.6_字体锁定模式.html">字体锁定模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

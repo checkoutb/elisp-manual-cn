@@ -1,0 +1,64 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>27.1.1 制作备份文件</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">27.1.1 制作备份文件</h3>
+<div class="nav-panel"><p>Next: <a href="27.1.2_重命名备份还是复制备份？.html">重命名备份还是复制备份？</a>, Previous: <a href="27.1_备份文件.html">备份文件</a>, Up: <a href="27.1_备份文件.html">备份文件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><div class="lisp">
+<pre class="lisp">Function: backup-buffer ¶
+</pre></div>
+<p>如果合适，此函数会备份当前缓冲区访问的文件。它在第一次保存缓冲区之前由 save-buffer 调用。
+</p>
+<p>如果通过重命名进行备份，则返回值是格式为 (modes extra-alist backupname) 的 cons 单元格，其中模式是原始文件的模式位，由 file-modes 返回（请参阅测试可访问性），extra -alist 是描述原始文件扩展属性的列表，由 file-extended-attributes 返回（请参阅扩展文件属性），backupname 是备份的名称。
+</p>
+<p>在所有其他情况下（即，如果通过复制进行备份或未进行备份），此函数返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: buffer-backed-up ¶
+</pre></div>
+<p>此缓冲区局部变量表示此缓冲区的文件是否已因此缓冲区而备份。如果它是非零，则备份文件已被写入。否则，下次保存文件时应备份文件（如果启用了备份）。这是一个永久的本地；  kill-all-local-variables 不会改变它。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: make-backup-files ¶
+</pre></div>
+<p>该变量决定是否制作备份文件。如果它不是 nil，那么 Emacs 会在第一次保存每个文件时创建一个备份——前提是 backup-inhibited 是 nil（见下文）。
+</p>
+<p>以下示例显示了如何仅在 Rmail 缓冲区而不是其他地方更改 make-backup-files 变量。将它设置为 nil 会阻止 Emacs 备份这些文件，这可能会节省磁盘空间。（您可以将此代码放在您的初始化文件中。）
+</p><div class="lisp">
+<pre class="lisp">(add-hook 'rmail-mode-hook
+          (lambda () (setq-local make-backup-files nil)))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Variable: backup-enable-predicate ¶
+</pre></div>
+<p>这个变量的值是一个函数，在某些情况下被调用来决定一个文件是否应该有备份文件。该函数接收一个参数，一个要考虑的绝对文件名。如果函数返回 nil，则禁用该文件的备份。否则，本节中的其他变量说明是否以及如何进行备份。
+</p>
+<p>默认值为 normal-backup-enable-predicate，它检查临时文件目录和小临时文件目录中的文件。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: backup-inhibited ¶
+</pre></div>
+<p>如果此变量不为零，则禁止备份。它记录了对访问的文件名进行备份启用谓词测试的结果。它也可以被其他机制一致地使用，这些机制根据访问的文件来禁止备份。例如，VC 将此变量设置为非零，以防止对使用版本控制系统管理的文件进行备份。
+</p>
+<p>这是一个永久的局部，所以改变主模式不会失去它的价值。主要模式不应该设置这个变量——它们应该设置 make-backup-files。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: backup-directory-alist ¶
+</pre></div>
+<p>此变量的值是文件名模式和备份目录的列表。每个元素看起来像
+</p><div class="lisp">
+<pre class="lisp">(regexp . directory)
+</pre></div>
+<p>名称与正则表达式匹配的文件的备份将在目录中进行。目录可以是相对的或绝对的。如果是绝对的，那么所有匹配的文件都备份到同一个目录下，这个目录下的文件名就是备份文件的全名，所有的目录分隔符都改成’!’  以防止冲突。如果您的文件系统截断生成的名称，这将无法正常工作。
+</p>
+<p>对于所有备份都进入一个目录的常见情况，alist 应包含一个与相应目录配对的单个元素 <code>。</code> 。
+</p>
+<p>如果此变量为 nil（默认值），或者无法匹配文件名，则在原始文件的目录中进行备份。
+</p>
+<p>在没有长名称的 MS-DOS 文件系统上，这个变量总是被忽略。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: make-backup-file-name-function ¶
+</pre></div>
+<p>该变量的值是用于制作备份文件名的函数。函数 make-backup-file-name 调用它。请参阅命名备份文件。
+</p>
+<p>这可能是缓冲区本地来为特定文件做一些特殊的事情。如果您更改它，您可能还需要更改 backup-file-name-p 和 file-name-sans-versions。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="27.1.2_重命名备份还是复制备份？.html">重命名备份还是复制备份？</a>, Previous: <a href="27.1_备份文件.html">备份文件</a>, Up: <a href="27.1_备份文件.html">备份文件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.13.1 条纹尺寸和位置</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.13.1 条纹尺寸和位置</h3>
+<div class="nav-panel"><p>Next: <a href="40.13.2_边缘指标.html">边缘指标</a>, Previous: <a href="40.13_条纹.html">条纹</a>, Up: <a href="40.13_条纹.html">条纹.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>以下缓冲区局部变量控制显示该缓冲区的窗口中边缘的位置和宽度。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: fringes-outside-margins ¶
+</pre></div>
+<p>边缘通常出现在显示边缘和窗口文本之间。如果该值为非零，它们将出现在显示边距之外。请参阅在边距中显示。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: left-fringe-width ¶
+</pre></div>
+<p>此变量，如果非零，则指定左边缘的宽度（以像素为单位）。nil 值表示使用窗口框架的左边缘宽度。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: right-fringe-width ¶
+</pre></div>
+<p>此变量，如果非零，则指定右边缘的宽度（以像素为单位）。nil 值表示使用窗口框架的右边缘宽度。
+</p>
+<p>任何没有为这些变量指定值的缓冲区都使用由左边缘和右边缘帧参数指定的值（请参阅布局参数）。
+</p>
+<p>上述变量实际上是通过函数 set-window-buffer（参见 Buffers 和 Windows）生效的，该函数将 set-window-fringes 作为子例程调用。如果您更改其中一个变量，则在显示缓冲区的现有窗口中不会更新边缘显示，除非您在每个受影响的窗口中再次调用 set-window-buffer。您还可以使用 set-window-fringes 来控制单个窗口中的边缘显示。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-window-fringes window left &amp;optional right outside-margins persistent ¶
+</pre></div>
+<p>该函数设置窗口窗口的边缘宽度。如果 window 为 nil，则使用选定的窗口。
+</p>
+<p>参数 left 指定左边缘的宽度（以像素为单位），右边缘也同样如此。任何一个的 nil 值都代表默认宽度。如果 outside-margins 不为零，则指定边缘应出现在显示边距之外。
+</p>
+<p>如果窗口不够大，无法容纳所需宽度的边缘，则窗口边缘保持不变。
+</p>
+<p>此处指定的值可以稍后通过在 window 上调用 set-window-buffer（请参阅缓冲区和 Windows）及其 keep-margins 参数 nil 或省略来覆盖。但是，如果可选的第五个参数 persistent 为非 nil 并且其他参数已成功处理，则此处指定的值将无条件地在随后的 set-window-buffer 调用中存活。这可用于永久关闭 minibuffer 窗口中的边缘，请参阅 set-window-scroll-bars 的描述以获取示例（请参阅滚动条）。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: window-fringes &amp;optional window ¶
+</pre></div>
+<p>此函数返回有关窗口窗口边缘的信息。如果 window 被省略或为零，则使用选定的窗口。该值的形式为（left-width right-width outside-margins persistent）。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.13.2_边缘指标.html">边缘指标</a>, Previous: <a href="40.13_条纹.html">条纹</a>, Up: <a href="40.13_条纹.html">条纹.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

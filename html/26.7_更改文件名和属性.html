@@ -1,0 +1,195 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>26.7 更改文件名和属性</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">26.7 更改文件名和属性</h2>
+<div class="nav-panel"><p>Next: <a href="26.8_文件和二级存储.html">文件和二级存储</a>, Previous: <a href="26.6.6_在标准位置定位文件.html">在标准位置定位文件</a>, Up: <a href="26_文件.html">文件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节中的功能重命名、复制、删除、链接和设置文件的模式（权限）。通常，如果它们无法执行其功能，它们会发出文件错误错误信号，并报告描述失败原因的系统相关错误消息。如果它们因为文件丢失而失败，它们会发出文件丢失错误的信号。
+</p>
+<p>出于性能考虑，操作系统可能会缓存这些函数所做的更改或为其设置别名，而不是立即将它们写入辅助存储。请参阅文件和辅助存储。
+</p>
+<p>在具有参数 newname 的函数中，如果此参数是目录名称，则将其视为附加了源名称的非目录部分。通常，目录名称是以 <code>/</code> 结尾的目录名称（请参阅目录名称）。例如，如果旧名称是 a/b/c，则新名称 d/e/f/ 被视为 d/e/f/c。如果 newname 不是目录名而是将文件命名为目录，则此特殊处理不适用；  例如，即使 d/e/f 恰好是一个目录，新名称 d/e/f 也会保持原样。
+</p>
+<p>在具有参数 newname 的函数中，如果名为 newname 的文件已经存在，则采取的操作取决于参数 ok-if-already-exists 的值：
+</p><div class="example">
+<pre class="example">$ ls -li fo*
+81908 -rw-rw-rw- 1 rms rms 29 Aug 18 20:32 foo
+84302 -rw-rw-rw- 1 rms rms 24 Aug 18 20:31 foo3
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Command: add-name-to-file oldname newname &amp;optional ok-if-already-exists ¶
+</pre></div>
+<p>此函数为名为 oldname 的文件提供附加名称 newname。这意味着 newname 成为 oldname 的新硬链接。
+</p>
+<p>如果 newname 是符号链接，则替换它的目录条目，而不是它指向的目录条目。如果 oldname 是符号链接，则此函数可能会或可能不会跟随链接；  它不遵循 GNU 平台上的链接。如果 oldname 是一个目录，这个函数通常会失败，尽管对于一些老式非 GNU 平台上的超级用户来说，它可以成功并创建一个非树形结构的文件系统。
+</p>
+<p>在以下示例的第一部分中，我们列出了两个文件 foo 和 foo3。
+</p>
+<div class="lisp">
+<pre class="lisp">$ ls -li fo*
+81908 -rw-rw-rw- 1 rms rms 29 Aug 18 20:32 foo
+84302 -rw-rw-rw- 1 rms rms 24 Aug 18 20:31 foo3
+</pre></div>
+<p>现在我们通过调用 add-name-to-file 创建一个硬链接，然后再次列出文件。这显示了一个文件的两个名称，foo 和 foo2。
+</p><div class="lisp">
+<pre class="lisp">
+
+(add-name-to-file "foo" "foo2")
+     ⇒ nil
+
+
+$ ls -li fo*
+81908 -rw-rw-rw- 2 rms rms 29 Aug 18 20:32 foo
+81908 -rw-rw-rw- 2 rms rms 29 Aug 18 20:32 foo2
+84302 -rw-rw-rw- 1 rms rms 24 Aug 18 20:31 foo3
+
+</pre></div>
+<p>最后，我们评估以下内容：
+</p>
+<div class="lisp">
+<pre class="lisp">(add-name-to-file "foo" "foo3" t)
+</pre></div>
+<p>并再次列出文件。现在一个文件有三个名称：foo、foo2 和 foo3。foo3 的旧内容丢失。
+</p><div class="lisp">
+<pre class="lisp">(add-name-to-file "foo1" "foo3")
+     ⇒ nil
+
+
+$ ls -li fo*
+81908 -rw-rw-rw- 3 rms rms 29 Aug 18 20:32 foo
+81908 -rw-rw-rw- 3 rms rms 29 Aug 18 20:32 foo2
+81908 -rw-rw-rw- 3 rms rms 29 Aug 18 20:32 foo3
+</pre></div>
+<p>此功能在不允许一个文件有多个名称的操作系统上没有意义。一些系统通过复制文件来实现多个名称。
+</p>
+<p>另请参阅文件属性中的 file-nlinks。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: rename-file filename newname &amp;optional ok-if-already-exists ¶
+</pre></div>
+<p>此命令将文件 filename 重命名为 newname。
+</p>
+<p>如果文件名除了文件名之外还有其他名称，它会继续使用这些名称。事实上，使用 add-name-to-file 添加名称 newname 然后删除 filename 与重命名具有相同的效果，除了暂时的中间状态和错误、目录和符号链接的处理。
+</p>
+<p>此命令不遵循符号链接。如果 filename 是符号链接，则此命令重命名符号链接，而不是它指向的文件。如果 newname 是符号链接，则替换它的目录条目，而不是它指向的目录条目。
+</p>
+<p>如果 filename 和 newname 是相同的目录条目，即如果它们引用相同的父目录并在该目录中给出相同的名称，则此命令不执行任何操作。否则，如果 filename 和 newname 命名相同的文件，则此命令在符合 POSIX 的系统上不执行任何操作，并在某些非 POSIX 系统上删除 filename。
+</p>
+<p>如果 newname 存在，那么如果 oldname 是一个目录，那么它必须是一个空目录，否则它必须是一个非目录。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: copy-file oldname newname &amp;optional ok-if-already-exists time preserve-uid-gid preserve-extended-attributes ¶
+</pre></div>
+<p>此命令将文件 oldname 复制到 newname。如果 oldname 不是常规文件，则会发出错误信号。如果 newname 命名一个目录，它会将 oldname 复制到该目录中，并保留其最终名称组件。
+</p>
+<p>此函数遵循符号链接，但它不遵循悬空符号链接来创建新名称。
+</p>
+<p>如果时间不为零，则此函数为新文件提供与旧文件相同的最后修改时间。（这仅适用于某些操作系统。）如果设置时间出错，则 copy-file 会发出 file-date-error 错误信号。在交互式调用中，前缀参数指定时间的非零值。
+</p>
+<p>如果参数 preserve-uid-gid 为 nil，我们让操作系统决定新文件的用户和组所有权（这通常设置为运行 Emacs 的用户）。如果 preserve-uid-gid 不为零，我们会尝试复制文件的用户和组所有权。这仅适用于某些操作系统，并且仅当您具有正确的权限才能这样做。
+</p>
+<p>如果可选参数 preserve-permissions 不为零，则此函数将 oldname 的文件模式（或 <code>权限</code> ）复制到 newname，以及访问控制列表和 SELinux 上下文（如果有）。请参阅有关文件的信息。
+</p>
+<p>否则，如果 newname 是现有文件，则 newname 的文件模式保持不变，如果要新建 newname，则设置为 oldname 的文件模式，并由默认文件权限屏蔽（参见下面的 set-default-file-modes）。在这两种情况下都不会复制访问控制列表或 SELinux 上下文。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: make-symbolic-link target linkname &amp;optional ok-if-already-exists ¶
+</pre></div>
+<p>此命令创建一个指向目标的符号链接，名为链接名。这就像 shell 命令 <code>ln -s 目标链接名</code> 。目标参数仅被视为字符串；  它不需要命名现有文件。如果 ok-if-already-exists 是一个整数，表示交互使用，则扩展前导 ’~’ 并去除目标字符串中的前导 ’/:’。
+</p>
+<p>如果 target 是相对文件名，则生成的符号链接将相对于包含符号链接的目录进行解释。请参阅绝对和相对文件名。
+</p>
+<p>如果 target 和 linkname 都具有远程文件名语法，并且两个远程标识相等，则符号链接指向 target 的本地文件名部分。
+</p>
+<p>此功能在不支持符号链接的系统上不可用。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: delete-file filename &amp;optional trash ¶
+</pre></div>
+<p>此命令删除文件文件名。如果文件有多个名称，它会继续以其他名称存在。如果 filename 是符号链接，则 delete-file 仅删除符号链接而不删除其目标。
+</p>
+<p>如果文件不存在或不可删除，则会发出适当类型的文件错误错误信号。（在 GNU 和其他类似 POSIX 的系统上，如果文件的目录是可写的，则该文件是可删除的。）
+</p>
+<p>如果可选参数垃圾是非零并且变量 delete-by-moving-to-trash 是非零，则此命令将文件移动到系统垃圾箱而不是删除它。请参阅 GNU Emacs 手册中的其他文件操作。当交互调用时，如果没有给出前缀参数，则垃圾为 t，否则为 nil。
+</p>
+<p>另请参阅创建、复制和删除目录中的删除目录。
+</p>
+<div class="lisp">
+<pre class="lisp">Command: set-file-modes filename mode &amp;optional flag ¶
+</pre></div>
+<p>该函数将文件名的文件模式（或权限）设置为模式。
+</p>
+<p>默认情况下，此函数遵循符号链接。但是，如果可选参数标志是符号nofollow，如果它是符号链接，则此函数不跟随文件名；  这有助于防止在其他地方无意中更改文件的模式位。在不支持更改符号链接上的模式位的平台上，当文件名是符号链接并且标志是 nofollow 时，此函数会发出错误信号。
+</p>
+<p>如果以非交互方式调用，mode 必须是整数。仅使用整数的最低 12 位；  在大多数系统上，只有最低 9 位是有意义的。您可以使用八进制数的 Lisp 构造来进入模式。例如，
+</p><div class="lisp">
+<pre class="lisp">(set-file-modes "myfile" #o644 'nofollow)
+</pre></div>
+<p>指定文件应该对其所有者可读和可写，对组成员可读，对所有其他用户可读。有关模式位规范的描述，请参阅 GNU Coreutils 手册中的文件权限。
+</p>
+<p>交互地，模式是使用 read-file-modes（见下文）从 minibuffer 中读取的，它允许用户输入一个整数或一个象征性地表示权限的字符串。
+</p>
+<p>有关返回文件权限的函数 file-modes，请参阅测试可访问性。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-default-file-modes mode ¶
+</pre></div>
+<p>该函数为 Emacs 及其子进程创建的新文件设置默认权限。使用 Emacs 创建的每个文件最初都具有这些权限，或者它们的子集（即使默认文件权限允许执行，write-region 也不会授予执行权限）。在 GNU 和其他类似 POSIX 的系统上，默认权限由 ’umask’ 值的按位补码给出，即在参数模式中设置的每个位都将在 Emacs 创建文件时使用的默认权限中重置。
+</p>
+<p>参数 mode 应该是一个指定权限的整数，类似于上面的 set-file-modes。只有最低的 9 位是有意义的。
+</p>
+<p>保存现有文件的修改版本时，默认文件权限无效；  保存文件会保留其现有权限。
+</p>
+<div class="lisp">
+<pre class="lisp">Macro: with-file-modes mode body… ¶
+</pre></div>
+<p>此宏使用临时设置为模式的新文件的默认权限评估正文表单（其值与上面的 set-file-modes 相同）。完成后，它恢复原始默认文件权限，并返回正文中最后一个表单的值。
+</p>
+<p>例如，这对于创建私有文件很有用。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: default-file-modes ¶
+</pre></div>
+<p>此函数以整数形式返回默认文件权限。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: read-file-modes &amp;optional prompt base-file ¶
+</pre></div>
+<p>该函数从 minibuffer 中读取一组文件模式位。第一个可选参数提示指定非默认提示。第二个可选参数 base-file 是文件的名称，如果用户键入的内容指定了与现有文件的权限相关的模式位，则该文件的权限是该函数返回的模式位的基础。
+</p>
+<p>如果用户输入表示一个八进制数，则此函数返回该数字。如果它是模式位的完整符号规范，如 "u=rwx"，则该函数使用 file-modes-symbolic-to-number 将其转换为等效的数值并返回结果。如果规范是相对的，如 <code>o+g</code> ，则规范所基于的权限取自基本文件的模式位。如果基本文件被省略或为零，则函数使用 0 作为基本模式位。完整的和相对的规范可以组合起来，如 "u+r,g+rx,o+r,gw"。有关文件模式规范的描述，请参阅 GNU Coreutils 手册中的文件权限。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-modes-symbolic-to-number modes &amp;optional base-modes ¶
+</pre></div>
+<p>此函数将模式中的符号文件模式规范转换为等效的整数。如果符号规范基于现有文件，则该文件的模式位取自可选参数基本模式；  如果该参数被省略或为零，则默认为 0，即根本没有访问权限。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: file-modes-number-to-symbolic modes ¶
+</pre></div>
+<p>此函数将模式中的数字文件模式规范转换为等效的符号形式。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-file-times filename &amp;optional time flag ¶
+</pre></div>
+<p>该函数将文件名的访问和修改时间设置为时间。如果时间设置成功，则返回值为 t，否则为 nil。time 默认为当前时间，并且必须是时间值（请参阅时间）。
+</p>
+<p>默认情况下，此函数遵循符号链接。但是，如果可选参数标志是符号nofollow，如果它是符号链接，则此函数不跟随文件名；  这有助于防止在其他地方无意中更改文件的时间。在不支持符号链接更改时间的平台上，当文件名是符号链接并且标志是 nofollow 时，此函数会发出错误信号。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-file-extended-attributes filename attribute-alist ¶
+</pre></div>
+<p>这个函数为文件名设置 Emacs 识别的扩展文件属性。第二个参数属性列表应该是文件扩展属性返回的相同形式的列表。如果属性设置成功，则返回值为 t，否则为 nil。请参阅扩展文件属性。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-file-selinux-context filename context ¶
+</pre></div>
+<p>此函数将文件名的 SELinux 安全上下文设置为上下文。上下文参数应该是一个列表（用户角色类型范围），其中每个元素都是一个字符串。请参阅扩展文件属性。
+</p>
+<p>如果成功设置文件名的 SELinux 上下文，则该函数返回 t。如果没有设置上下文（例如，如果 SELinux 被禁用，或者如果 Emacs 是在没有 SELinux 支持的情况下编译的），它返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-file-acl filename acl ¶
+</pre></div>
+<p>此函数将文件名的访问控制列表设置为 acl。acl 参数应该与函数 file-acl 返回的形式相同。请参阅扩展文件属性。
+</p>
+<p>如果成功设置文件名的 ACL，该函数返回 t，否则返回 nil。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="26.8_文件和二级存储.html">文件和二级存储</a>, Previous: <a href="26.6.6_在标准位置定位文件.html">在标准位置定位文件</a>, Up: <a href="26_文件.html">文件.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

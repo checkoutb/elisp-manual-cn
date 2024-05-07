@@ -1,0 +1,68 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>39.10 Sentinels：检测进程状态变化</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">39.10 Sentinels：检测进程状态变化</h2>
+<div class="nav-panel"><p>Next: <a href="39.11_退出前查询.html">退出前查询</a>, Previous: <a href="39.9.5_进程和线程.html">进程和线程</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>进程哨兵是一个函数，每当相关进程因任何原因改变状态时都会调用该函数，包括终止、停止或继续进程的信号（无论是由 Emacs 发送还是由进程自己的操作引起）。如果进程退出，也会调用进程哨兵。哨兵接收两个参数：事件发生的进程和描述事件类型的字符串。
+</p>
+<p>如果没有为进程指定哨兵函数，它将使用默认哨兵函数，该函数会在进程的缓冲区中插入一条消息，其中包含进程名称和描述事件的字符串。
+</p>
+<p>描述事件的字符串如下所示（但这不是事件字符串的详尽列表）：
+</p>
+<div class="lisp">
+<pre class="lisp">"finished\n".
+"deleted\n".
+"exited abnormally with code exitcode (core dumped)\n". The  ~core dumped~  part is optional, and only appears if the process dumped core.
+"failed with code fail-code\n".
+"signal-description (core dumped)\n". The signal-description is a system-dependent textual description of a signal, e.g., "killed" for SIGKILL. The  ~core dumped~  part is optional, and only appears if the process dumped core.
+"open from host-name\n".
+"open\n".
+"run\n".
+"connection broken by remote peer\n".
+</pre></div>
+<p>哨兵仅在 Emacs 等待时运行（例如，等待终端输入，或等待时间过去，或等待进程输出）。这避免了在其他 Lisp 程序中间的随机位置运行哨兵可能导致的计时错误。程序可以等待，以便哨兵运行，方法是调用sit-for 或sleep-for（请参阅等待经过的时间或输入）或accept-process-output（请参阅接受来自进程的输出）。Emacs 还允许在命令循环读取输入时运行哨兵。delete-process 在终止正在运行的进程时调用哨兵。
+</p>
+<p>Emacs 不会保留多个原因的队列来调用一个进程的哨兵；  它只记录当前状态和发生变化的事实。所以两次状态的变化，接二连三的来，只能召唤一次哨兵。但是，进程终止将始终只运行一次哨兵。这是因为进程状态在终止后不能再次改变。
+</p>
+<p>Emacs 在运行进程哨兵之前显式检查进程的输出。一旦哨兵由于进程终止而运行，就无法从进程中获得进一步的输出。
+</p>
+<p>将输出写入进程缓冲区的哨兵应检查缓冲区是否还活着。如果它试图插入一个死缓冲区，它会得到一个错误。如果缓冲区死了， (buffer-name (process-buffer process)) 返回 nil。
+</p>
+<p>退出通常在哨兵中被禁止——否则，在命令级别键入 <code>C-g</code> 或退出用户命令的效果将是不可预测的。如果您想允许在哨兵内部退出，请将禁止退出绑定到 nil。在大多数情况下，正确的方法是使用 with-local-quit 宏。请参阅退出。
+</p>
+<p>如果在哨兵的执行过程中发生错误，它会被自动捕获，这样它就不会停止哨兵启动时正在运行的任何程序的执行。但是，如果 debug-on-error 不为零，则不会捕获错误。这使得使用 Lisp 调试器来调试哨兵成为可能。请参阅 Lisp 调试器。
+</p>
+<p>当哨兵正在运行时，进程哨兵被临时设置为 nil，这样哨兵就不会递归运行。由于这个原因，哨兵不可能指定新的哨兵。
+</p>
+<p>请注意，Emacs 在执行哨兵时会自动保存和恢复匹配数据。请参阅匹配数据。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-process-sentinel process sentinel ¶
+</pre></div>
+<p>该函数将哨兵与进程相关联。如果 sentinel 为 nil，则进程将具有默认的 sentinel，当进程状态发生变化时，它将在进程的缓冲区中插入一条消息。
+</p>
+<p>进程哨兵的更改立即生效——如果哨兵计划运行但尚未被调用，并且您指定了新哨兵，则对哨兵的最终调用将使用新哨兵。
+</p>
+<div class="lisp">
+<pre class="lisp">(defun msg-me (process event)
+   (princ
+     (format "Process: %s had the event '%s'" process event)))
+(set-process-sentinel (get-process "shell") 'msg-me)
+     ⇒ msg-me
+
+(kill-process (get-process "shell"))
+     -| Process: #&lt;process shell&gt; had the event 'killed'
+     ⇒ #&lt;process shell&gt;
+
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Function: process-sentinel process ¶
+</pre></div>
+<p>该函数返回进程的哨兵。
+</p>
+<p>如果需要将进程状态更改传递给多个哨兵，您可以使用 add-function 将现有哨兵与新哨兵相结合。请参阅建议 Emacs Lisp 函数。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: waiting-for-user-input-p ¶
+</pre></div>
+<p>当哨兵或过滤器函数正在运行时，如果 Emacs 在调用哨兵或过滤器函数时正在等待用户的键盘输入，则此函数返回非 nil，否则返回 nil。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="39.11_退出前查询.html">退出前查询</a>, Previous: <a href="39.9.5_进程和线程.html">进程和线程</a>, Up: <a href="39_进程.html">进程.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

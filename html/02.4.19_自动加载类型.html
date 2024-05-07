@@ -1,0 +1,10 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>2.4.19 自动加载类型</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">2.4.19 自动加载类型</h3>
+<div class="nav-panel"><p>Next: <a href="02.4.20_终结器类型.html">终结器类型</a>, Previous: <a href="02.4.18_类型描述符.html">类型描述符</a>, Up: <a href="02.4_编程类型.html">编程类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>自动加载对象是一个列表，其第一个元素是符号自动加载。它存储为符号的函数定义，用作实际定义的占位符。autoload 对象表示真正的定义位于 Lisp 代码文件中，必要时应该加载该文件。它包含文件的名称，以及有关实际定义的一些其他信息。
+</p>
+<p>加载文件后，符号应该有一个不是自动加载对象的新函数定义。然后调用新定义，就好像它一开始就在那里一样。从用户的角度来看，函数调用按预期工作，使用加载文件中的函数定义。
+</p>
+<p>自动加载对象通常使用函数 autoload 创建，该函数将对象存储在符号的函数单元格中。有关详细信息，请参阅自动加载。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="02.4.20_终结器类型.html">终结器类型</a>, Previous: <a href="02.4.18_类型描述符.html">类型描述符</a>, Up: <a href="02.4_编程类型.html">编程类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

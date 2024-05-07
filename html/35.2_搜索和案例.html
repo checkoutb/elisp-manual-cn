@@ -1,0 +1,22 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>35.2 搜索和案例</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">35.2 搜索和案例</h2>
+<div class="nav-panel"><p>Next: <a href="35.3_正则表达式.html">正则表达式</a>, Previous: <a href="35.1_搜索字符串.html">搜索字符串</a>, Up: <a href="35_搜索和匹配.html">搜索和匹配.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>默认情况下，Emacs 中的搜索会忽略正在搜索的文本的大小写；  如果您指定搜索 <code>FOO</code> ，则 <code>Foo</code> 或 <code>foo</code> 也被视为匹配项。这也适用于正则表达式；  因此， <code>[aB]</code> 将匹配 <code>a</code> 或 <code>A</code> 或 <code>b</code> 或 <code>B</code> 。
+</p>
+<p>如果您不想要此功能，请将变量 case-fold-search 设置为 nil。然后所有字母必须完全匹配，包括大小写。这是一个缓冲区局部变量；  更改变量仅影响当前缓冲区。（请参阅缓冲区局部变量简介。）或者，您可以更改默认值。在 Lisp 代码中，您通常会使用 let 将 case-fold-search 绑定到所需的值。
+</p>
+<p>请注意，用户级增量搜索功能以不同方式处理大小写区别。当搜索字符串只包含小写字母时，搜索忽略大小写，但当搜索字符串包含一个或多个大写字母时，搜索变为区分大小写。但这与 Lisp 代码中使用的搜索功能无关。请参阅 GNU Emacs 手册中的增量搜索。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: case-fold-search ¶
+</pre></div>
+<p>此缓冲区局部变量确定搜索是否应忽略大小写。如果变量为 nil，它们不会忽略大小写；  否则（默认情况下）他们会忽略大小写。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: case-replace ¶
+</pre></div>
+<p>此变量确定更高级别的替换函数是否应保留大小写。如果变量为 nil，则意味着逐字使用替换文本。非零值意味着根据被替换的文本转换替换文本的大小写。
+</p>
+<p>该变量通过将其作为参数传递给函数 replace-match 来使用。请参阅替换匹配的文本。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="35.3_正则表达式.html">正则表达式</a>, Previous: <a href="35.1_搜索字符串.html">搜索字符串</a>, Up: <a href="35_搜索和匹配.html">搜索和匹配.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

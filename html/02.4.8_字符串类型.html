@@ -1,0 +1,74 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>2.4.8 字符串类型</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">2.4.8 字符串类型</h3>
+<div class="nav-panel"><p>Next: <a href="02.4.9_向量类型.html">向量类型</a>, Previous: <a href="02.4.7_数组类型.html">数组类型</a>, Up: <a href="02.4_编程类型.html">编程类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>字符串是一个字符数组。字符串在 Emacs 中有多种用途，正如在文本编辑器中所预期的那样；  例如，作为 Lisp 符号的名称，作为用户的消息，以及表示从缓冲区中提取的文本。Lisp 中的字符串是常量：对字符串的求值返回相同的字符串。
+</p>
+<p>有关对字符串进行操作的函数，请参见字符串和字符。
+</p>
+<ol>
+<li>
+2.4.8.1 字符串的语法
+
+
+<p>字符串的读取语法是双引号、任意数量的字符和另一个双引号， <code>like this</code> 。要在字符串中包含双引号，请在其前面加上反斜杠；  因此，"\"" 是一个只包含一个双引号字符的字符串。同样，您可以通过在它前面加上另一个反斜杠来包含一个反斜杠，例如： <code>this \\ is a single embedded backslash</code> 。
+</p>
+<p>换行符在字符串的读取语法中并不特殊；  如果你在双引号之间写一个新行，它就会变成字符串中的一个字符。但是转义的换行符——前面有’\’的换行符——不会成为字符串的一部分；  即，Lisp 阅读器在读取字符串时会忽略转义的换行符。转义的空格 <code>\</code> 同样被忽略。
+</p><div class="lisp">
+<pre class="lisp">"It is useful to include newlines
+in documentation strings,
+but the newline is \
+ignored if escaped."
+       ⇒ "It is useful to include newlines
+in documentation strings,
+but the newline is ignored if escaped.
+</pre></div>
+</li><li>
+2.4.8.2 字符串中的非 ASCII 字符
+
+
+<p>Emacs 字符串中的非 ASCII 字符有两种文本表示：多字节和单字节（请参阅文本表示）。粗略地说，单字节字符串存储原始字节，而多字节字符串存储人类可读的文本。单字节字符串中的每个字符都是一个字节，即其​​值介于 0 到 255 之间。相比之下，多字节字符串中的每个字符的值可能介于 0 到 4194303 之间（参见字符类型）。在这两种情况下，大于 127 的字符都是非 ASCII 字符。
+</p>
+<p>您可以按字面意思在字符串常量中包含非 ASCII 字符。如果从多字节源读取字符串常量，例如多字节缓冲区或字符串，或者将作为多字节访问的文件，则 Emacs 将每个非 ASCII 字符读取为多字节字符并自动将字符串变为多字节字符串。如果字符串常量是从单字节源读取的，那么 Emacs 会将非 ASCII 字符读取为单字节，并使字符串成为单字节。
+</p>
+<p>您可以使用转义序列将其写为字符代码，而不是按字面意思将字符写入多字节字符串。有关转义序列的详细信息，请参阅通用转义语法。
+</p>
+<p>如果您在字符串常量中使用任何 Unicode 样式的转义序列 ” 或 ’00NNNNNN’（即使是 ASCII 字符），Emacs 会自动假定它是多字节的。
+</p>
+<p>您还可以在字符串常量中使用十六进制转义序列 (”) 和八进制转义序列 (”)。但要注意：如果字符串常量包含十六进制或八进制转义序列，并且这些转义序列都指定单字节字符（即小于 256），并且字符串中没有其他文字非 ASCII 字符或 Unicode 样式的转义序列，然后 Emacs 自动假定它是一个单字节字符串。也就是说，它假定字符串中出现的所有非 ASCII 字符都是 8 位原始字节。
+</p>
+<p>在十六进制和八进制转义序列中，转义字符代码可能包含可变数量的数字，因此不是有效的十六进制或八进制数字的第一个后续字符终止转义序列。如果字符串中的下一个字符可以解释为十六进制或八进制数字，请写入 <code>\</code> （反斜杠和空格）以终止转义序列。例如，’0\’ 代表一个字符，’a’ 带有重音符号。字符串常量中的 ’\’ 就像反斜杠换行符；  它不会为字符串贡献任何字符，但它会终止任何前面的十六进制转义。
+</p>
+</li><li>
+2.4.8.3 字符串中的非打印字符
+
+
+<p>您可以在字符串常量中使用与字符常量相同的反斜杠转义序列（但不要使用以字符常量开头的问号）。例如，您可以编写一个包含非打印字符 tab 和 Ca 的字符串，它们之间有逗号和空格，例如： <code>\t, \Ca</code> 。有关字符读取语法的说明，请参阅字符类型。
+</p>
+<p>但是，并非所有可以使用反斜杠转义序列编写的字符在字符串中都有效。字符串可以包含的唯一控制字符是 ASCII 控制字符。字符串在 ASCII 控制字符中不区分大小写。
+</p>
+<p>正确地说，字符串不能包含元字符；  但是当字符串被用作键序列时，有一个特殊的约定提供了一种方法来表示字符串中 ASCII 字符的元版本。如果使用 ’-’ 语法来指示字符串常量中的元字符，这将设置字符串中字符的 2**7 位。如果字符串用于定义键或查找键，则此数字代码将转换为等效的元字符。请参阅字符类型。
+</p>
+<p>字符串不能包含具有 hyper、super 或 alt 修饰符的字符。
+</p>
+</li><li>
+2.4.8.4 字符串中的文本属性
+
+
+<p>除了字符本身之外，字符串还可以保存它所包含的字符的属性。这使得在字符串和缓冲区之间复制文本的程序无需特别努力即可复制文本的属性。请参阅文本属性，了解文本属性的含义。具有文本属性的字符串使用特殊的读取和打印语法：
+</p>
+<div class="lisp">
+<pre class="lisp">#("characters" property-data...)
+</pre></div>
+<p>其中 property-data 由零个或多个元素组成，以三个为一组，如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">beg end plist
+</pre></div>
+<p>元素 beg 和 end 是整数，它们共同指定字符串中的索引范围；  plist 是该范围的属性列表。例如，
+</p>
+<div class="lisp">
+<pre class="lisp">#("foo bar" 0 3 (face bold) 3 4 nil 4 7 (face italic))
+</pre></div>
+<p>表示文本内容为 ’foo bar’ 的字符串，其中前三个字符具有值为粗体的面属性，后三个字符具有值为斜体的面属性。（第四个字符没有文本属性，所以它的属性列表是 nil。实际上没有必要以 nil 作为属性列表来提及范围，因为任何范围内未提及的任何字符都将默认没有属性。）
+</p></li></ol>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="02.4.9_向量类型.html">向量类型</a>, Previous: <a href="02.4.7_数组类型.html">数组类型</a>, Up: <a href="02.4_编程类型.html">编程类型.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>40.16.3 空间的像素规范</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">40.16.3 空间的像素规范</h3>
+<div class="nav-panel"><p>Next: <a href="40.16.4_其他显示规格.html">其他显示规格</a>, Previous: <a href="40.16.2_指定空间.html">指定空间</a>, Up: <a href="40.16_display财产.html">display财产.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>:width、:align-to、:height 和 :ascent 属性的值可以是在重新显示期间计算的一​​种特殊表达式。评估的结果被用作像素的绝对数量。
+</p>
+<p>支持以下表达式：
+</p>
+<div class="lisp">
+<pre class="lisp">
+
+expr ::= num | (num) | unit | elem | pos | image | xwidget | form
+num  ::= integer | float | symbol
+unit ::= in | mm | cm | width | height
+
+elem ::= left-fringe | right-fringe | left-margin | right-margin
+      |  scroll-bar | text
+pos  ::= left | center | right
+form ::= (num . expr) | (op expr ...)
+op   ::= + | -
+</pre></div>
+<p>表单 num 指定默认框架字体高度或宽度的一部分。(num) 形式指定像素的绝对数量。如果 num 是符号，符号，则使用其缓冲区局部变量绑定；  该绑定可以是数字或上述形式的 cons 单元格（包括另一个 cons 单元格，其 car 是具有缓冲区本地绑定的符号）。
+</p>
+<p>in、mm 和 cm 单位分别指定每英寸、毫米和厘米的像素数。宽度和高度单位对应于当前面的默认宽度和高度。格式为 (image.props) 的图像规范（请参阅图像描述符）对应于指定图像的宽度或高度。类似地，形式为 (xwidget.props) 的 xwidget 规范代表指定 xwidget 的宽度或高度。请参阅嵌入式原生小部件。
+</p>
+<p>元素 left-fringe、right-fringe、left-margin、right-margin、scroll-bar 和 text 指定窗口相应区域的宽度。当窗口显示行号时（请参阅显示文本的大小），文本区域的宽度会减少行号显示占用的屏幕空间。
+</p>
+<p>左、中、右位置可以与 :align-to 一起使用，以指定相对于文本区域的左边缘、中心或右边缘的位置。当窗口显示行号时，左侧和中心位置会发生偏移，以考虑行号显示所占用的屏幕空间。
+</p>
+<p>上述任何窗口元素（文本除外）也可以与 :align-to 一起使用，以指定位置相对于给定区域的左边缘。一旦设置了相对位置的基本偏移量（通过其中一个符号的第一次出现），这些符号的进一步出现将被解释为指定区域的宽度。例如，要对齐到左边距的中心，请使用
+</p>
+<div class="lisp">
+<pre class="lisp">:align-to (+ left-margin (0.5 . left-margin))
+</pre></div>
+<p>如果没有为对齐设置特定的基本偏移，它总是相对于文本区域的左边缘。例如，标题行中的 ’:align-to 0’ 与文本区域中的第一个文本列对齐。当窗口显示行号时，文本被认为从用于行号显示的空间结束的地方开始。
+</p>
+<p>(num . expr) 形式的值代表 num 和 expr 的值的乘积。例如，(2 . in) 指定 2 英寸的宽度，而 (0.5 . image) 指定指定图像的一半宽度（或高度）（应由其图像规范给出）。
+</p>
+<p>(+ expr …) 形式将表达式的值相加。(- expr …) 形式否定或减去表达式的值。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="40.16.4_其他显示规格.html">其他显示规格</a>, Previous: <a href="40.16.2_指定空间.html">指定空间</a>, Up: <a href="40.16_display财产.html">display财产.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

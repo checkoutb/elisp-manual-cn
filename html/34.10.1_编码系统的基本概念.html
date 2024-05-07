@@ -1,0 +1,43 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>34.10.1 编码系统的基本概念</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">34.10.1 编码系统的基本概念</h3>
+<div class="nav-panel"><p>Next: <a href="34.10.2_编码和_IO.html">编码和_IO</a>, Previous: <a href="34.10_编码系统.html">编码系统</a>, Up: <a href="34.10_编码系统.html">编码系统.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>字符代码转换涉及在 Emacs 中使用的字符的内部表示与其他一些编码之间的转换。Emacs 支持许多不同的编码，因为它可以相互转换。例如，它可以将文本转换为拉丁语 1、拉丁语 2、拉丁语 3、拉丁语 4、拉丁语 5 和 ISO 2022 的几种变体等编码或从编码转换。在某些情况下，Emacs 支持相同字符的多种替代编码；  例如，西里尔字母（俄语）有三种编码系统：ISO、Alternativnyj 和 KOI8。
+</p>
+<p>每个编码系统都指定了一组特定的字符代码转换，但未决定的编码系统是特殊的：它没有指定选择，而是在解码或编码时根据文件或字符串的数据为每个文件或字符串进行启发式选择.  编码系统prefer-utf-8 就像未定，但它更喜欢尽可能选择utf-8。
+</p>
+<p>一般来说，编码系统不能保证往返身份：使用编码系统对字节序列进行解码，然后在同一编码系统中对生成的文本进行编码，可以产生不同的字节序列。但是一些编码系统确实保证字节序列与您最初解码的相同。这里有一些例子：
+</p>
+<p>iso-8859-1、utf-8、big5、shift<em>_jis</em>、euc-jp
+</p>
+<p>编码缓冲区文本然后解码结果也可能无法重现原始文本。例如，如果您使用不支持该字符的编码系统对字符进行编码，则结果是不可预测的，因此使用相同的编码系统对其进行解码可能会产生不同的文本。目前，Emacs 无法报告因编码不受支持的字符而导致的错误。
+</p>
+<p>行尾转换处理各种系统上用于表示文件中行尾的三种不同约定。用于 GNU 和 Unix 系统的 Unix 约定是使用换行符（也称为换行符）。在 MS-Windows 和 MS-DOS 系统上使用的 DOS 约定是在行尾使用回车符和换行符。Mac 的惯例是只使用回车。（这是 Classic Mac OS 中使用的约定。）
+</p>
+<p>诸如 latin-1 之类的基本编码系统未指定行尾转换，以根据数据进行选择。诸如 latin-1-unix、latin-1-dos 和 latin-1-mac 等变体编码系统也明确指定了行尾转换。大多数基本编码系统都有三个相应的变体，它们的名称是通过添加 <code>-unix</code> 、 <code>-dos</code> 和 <code>-mac</code> 形成的。
+</p>
+<p>编码系统原始文本的特殊之处在于它阻止了字符代码转换，并使使用该编码系统访问的缓冲区成为单字节缓冲区。由于历史原因，您可以使用此编码系统保存单字节和多字节文本。当您使用原始文本对多字节文本进行编码时，它会执行一种字符代码转换：它将八位字符转换为其单字节外部表示。raw-text 不指定行尾转换，允许像往常一样由数据确定，并且具有指定行尾转换的通常的三个变体。
+</p>
+<p>no-conversion（及其别名二进制）等价于 raw-text-unix：它指定不转换字符代码或行尾。
+</p>
+<p>编码系统 utf-8-emacs 指定数据以内部 Emacs 编码表示（请参阅文本表示）。这就像原始文本一样，没有发生代码转换，但不同之处在于结果是多字节数据。名称 emacs-internal 是 utf-8-emacs-unix 的别名（因此它不强制转换行尾，不像 utf-8-emacs 可以解码所有 3 种行尾约定） .
+</p>
+<div class="lisp">
+<pre class="lisp">Function: coding-system-get coding-system property ¶
+</pre></div>
+<p>该函数返回编码系统编码系统的指定属性。大多数编码系统属性都是出于内部目的而存在的，但您可能会发现一个有用的属性是 :mime-charset。该属性的值是 MIME 中用于该编码系统可以读写的字符编码的名称。例子：
+</p><div class="lisp">
+<pre class="lisp">(coding-system-get 'iso-latin-1 :mime-charset)
+     ⇒ iso-8859-1
+(coding-system-get 'iso-2022-cn :mime-charset)
+     ⇒ iso-2022-cn
+(coding-system-get 'cyrillic-koi8 :mime-charset)
+     ⇒ koi8-r
+</pre></div>
+<p>:mime-charset 属性的值也被定义为编码系统的别名。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: coding-system-aliases coding-system ¶
+</pre></div>
+<p>该函数返回编码系统的别名列表。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="34.10.2_编码和_IO.html">编码和_IO</a>, Previous: <a href="34.10_编码系统.html">编码系统</a>, Up: <a href="34.10_编码系统.html">编码系统.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

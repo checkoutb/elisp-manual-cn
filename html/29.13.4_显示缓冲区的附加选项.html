@@ -1,0 +1,106 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>29.13.4 显示缓冲区的附加选项</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h3 class="subsection">29.13.4 显示缓冲区的附加选项</h3>
+<div class="nav-panel"><p>Next: <a href="29.13.5_动作函数的优先级.html">动作函数的优先级</a>, Previous: <a href="29.13.3_缓冲区显示的动作列表.html">缓冲区显示的动作列表</a>, Up: <a href="29.13_在合适的窗口中显示缓冲区.html">在合适的窗口中显示缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>缓冲区显示操作的行为（请参阅选择用于显示缓冲区的窗口）可以通过以下用户选项进一步修改。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: pop-up-windows ¶
+</pre></div>
+<p>如果此变量的值为非 nil，则允许 display-buffer 拆分现有窗口以创建一个新窗口用于显示。这是默认设置。
+</p>
+<p>提供此变量仅用于向后兼容。display-buffer通过display-buffer-fallback-action中的一种特殊机制来遵守它，当该选项的值为non时调用action函数display-buffer-pop-up-window（见缓冲区显示的动作函数） -零。display-buffer-pop-up-window 本身不参考它，用户可以直接在 display-buffer-alist 等中指定。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: split-window-preferred-function ¶
+</pre></div>
+<p>该变量指定一个分割窗口的函数，以便创建一个新窗口来显示缓冲区。display-buffer-pop-up-window 操作函数使用它来实际拆分窗口。
+</p>
+<p>该值必须是一个函数，它接受一个参数，一个窗口，并返回一个新窗口（将用于显示所需的缓冲区）或 nil（这意味着拆分失败）。默认值是 split-window-sensibly，接下来会记录。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: split-window-sensibly &amp;optional window ¶
+</pre></div>
+<p>此函数尝试拆分窗口并返回新创建的窗口。如果窗口无法拆分，则返回 nil。如果 window 被省略或为零，则默认为选定的窗口。
+</p>
+<p>此函数遵循确定何时可以拆分窗口的常用规则（请参阅拆分窗口）。它首先尝试通过将新窗口放置在下方来进行拆分，除了任何其他限制外，还受到 split-height-threshold （见下文）的限制。如果失败，它会尝试通过将新窗口放在右侧进行拆分，受拆分宽度阈值限制（见下文）。如果这也失败了，并且窗口是其 <code>帧</code> ( <code>frame</code> )上的唯一窗口，则此函数再次尝试拆分并将新窗口放置在下方，而忽略拆分高度阈值。如果这也失败了，这个函数放弃并返回 nil。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: split-height-threshold ¶
+</pre></div>
+<p>此变量指定是否允许 split-window-sensibly 拆分窗口并将新窗口放置在下方。如果它是一个整数，这意味着只有当原始窗口至少有那么多行时才拆分。如果为nil，则表示不以这种方式拆分。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: split-width-threshold ¶
+</pre></div>
+<p>此变量指定是否允许 split-window-sensibly 拆分窗口，将新窗口放置在右侧。如果该值是整数，则意味着仅当原始窗口至少具有那么多列时才进行拆分。如果该值为 nil，则表示不以这种方式拆分。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: even-window-sizes ¶
+</pre></div>
+<p>如果此变量非零，则每当它重用现有窗口并且该窗口与所选窗口相邻时，都会导致显示缓冲区均匀窗口大小。
+</p>
+<p>如果其值为仅宽度，则仅当重用窗口位于所选窗口的左侧或右侧并且所选窗口比重用窗口宽时，尺寸才会均匀。如果其值为仅高度，则仅当重用窗口高于或低于所选窗口且所选窗口高于重用窗口时，尺寸才会均匀。任何其他非零值都意味着在任何这些情况下均等大小，前提是所选窗口在它们组合的意义上大于重用窗口。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: pop-up-frames ¶
+</pre></div>
+<p>如果此变量的值为非零，则意味着 display-buffer 可以通过创建新帧来显示缓冲区。默认值为无。
+</p>
+<p>非零值还意味着当 display-buffer 正在寻找已经显示缓冲区或名称的窗口时，它可以搜索任何可见或图标化的 <code>帧</code> ( <code>frame</code> )，而不仅仅是选定的 <code>帧</code> ( <code>frame</code> )。
+</p>
+<p>提供此变量主要是为了向后兼容。display-buffer 通过 display-buffer-fallback-action 中的特殊机制遵守它，如果值为非 nil，则调用操作函数 display-buffer-pop-up-frame （请参阅缓冲区显示的操作函数）。（这是在尝试拆分窗口之前完成的。） display-buffer-pop-up-frame 本身不咨询此变量，用户可以直接在 display-buffer-alist 等中指定。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: pop-up-frame-function ¶
+</pre></div>
+<p>该变量指定一个用于创建新 <code>帧</code> ( <code>frame</code> )的函数，以便创建一个用于显示缓冲区的新窗口。它由 display-buffer-pop-up-frame 动作函数使用。
+</p>
+<p>该值应该是一个不带参数并返回一个 <code>帧</code> ( <code>frame</code> )的函数，如果无法创建 <code>帧</code> ( <code>frame</code> )，则返回 nil。默认值是使用 pop-up-frame-alist 指定的参数创建 <code>帧</code> ( <code>frame</code> )的函数（见下文）。
+</p>
+<div class="lisp">
+<pre class="lisp">User Option: pop-up-frame-alist ¶
+</pre></div>
+<p>此变量保存帧参数列表（请参阅帧参数），由 pop-up-frame-function 指定的函数用于创建新帧。默认值为无。
+</p>
+<p>提供此选项只是为了向后兼容。注意，当 display-buffer-pop-up-frame 调用 pop-up-frame-function 指定的函数时，它会将所有 pop-up-frame-parameters action alist 条目的值添加到 pop-up-frame-alist以便 action alist 条目指定的值有效地覆盖 pop-up-frame-alist 的任何相应值。
+</p>
+<p>因此，用户应该在 display-buffer-alist 中设置一个 pop-up-frame-parameters action alist 条目，而不是自定义 pop-up-frame-alist。只有这样才能保证用户指定的参数值会覆盖显示缓冲区调用者指定的参数值。
+</p>
+<p>在显示缓冲区的设计中已经付出了许多努力来保持与使用旧选项的代码的兼容性，例如弹出窗口、弹出框、弹出框列表、相同窗口缓冲区名称和相同的窗口正则表达式。Lisp 程序和用户应避免使用这些选项。上面我们已经警告不要自定义 pop-up-frame-alist。在这里，我们描述了如何将剩余的选项转换为使用显示操作。
+</p>
+<div class="lisp">
+<pre class="lisp">pop-up-windows ¶
+</pre></div>
+<p>此变量默认为 t。与其将其自定义为 nil 并因此告诉 display-buffer 不该做什么，不如在 display-buffer-base-action 中列出它应该尝试的操作函数，例如：
+</p><div class="lisp">
+<pre class="lisp">(customize-set-variable
+ 'display-buffer-base-action
+ '((display-buffer-reuse-window display-buffer-same-window
+    display-buffer-in-previous-window
+    display-buffer-use-some-window)))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">pop-up-frames ¶
+</pre></div>
+<p>不要将此变量自定义为 t，而是自定义 display-buffer-base-action，例如，如下所示：
+</p>
+<div class="lisp">
+<pre class="lisp">(customize-set-variable
+ 'display-buffer-base-action
+ '((display-buffer-reuse-window display-buffer-pop-up-frame)
+   (reusable-frames . 0)))
+</pre></div>
+<div class="lisp">
+<pre class="lisp">same-window-buffer-names ¶
+</pre></div>
+<div class="lisp">
+<pre class="lisp">same-window-regexps
+</pre></div>
+<p>不是向这些选项之一添加缓冲区名称或正则表达式，而是为该缓冲区使用 display-buffer-alist 条目，指定操作函数 display-buffer-same-window。
+</p><div class="lisp">
+<pre class="lisp">(customize-set-variable
+ 'display-buffer-alist
+ (cons '("\\*foo\\*" (display-buffer-same-window))
+        display-buffer-alist))
+</pre></div>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="29.13.5_动作函数的优先级.html">动作函数的优先级</a>, Previous: <a href="29.13.3_缓冲区显示的动作列表.html">缓冲区显示的动作列表</a>, Up: <a href="29.13_在合适的窗口中显示缓冲区.html">在合适的窗口中显示缓冲区.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>

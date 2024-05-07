@@ -1,0 +1,63 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="elisp.css"><title>20.3 输入函数</title></head><body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000"><h2 class="section">20.3 输入函数</h2>
+<div class="nav-panel"><p>Next: <a href="20.4_输出流.html">输出流</a>, Previous: <a href="20.2_输入流.html">输入流</a>, Up: <a href="20_阅读和打印_Lisp_对象.html">阅读和打印_Lisp_对象.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html><hr/><p>本节介绍与阅读有关的 Lisp 函数和变量。
+</p>
+<p>在下面的函数中，stream 代表输入流（参见上一节）。如果 stream 为 nil 或省略，则默认为标准输入的值。
+</p>
+<p>如果读取遇到未终止的列表、向量或字符串，则会发出文件结束错误信号。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: read &amp;optional stream ¶
+</pre></div>
+<p>此函数从流中读取一个文本 Lisp 表达式，并将其作为 Lisp 对象返回。这是基本的 Lisp 输入功能。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: read-from-string string &amp;optional start end ¶
+</pre></div>
+<p>此函数从字符串中的文本中读取第一个文本 Lisp 表达式。它返回一个 cons 单元格，其 CAR 是该表达式，其 CDR 是一个整数，给出字符串中下一个剩余字符的位置（即第一个未读取的字符）。
+</p>
+<p>如果提供了 start，则从字符串中的索引 start 开始读取（第一个字符位于索引 0 处）。如果您指定 end，则读取将在该索引之前强制停止，就好像字符串的其余部分不存在一样。
+</p>
+<p>例如：
+</p><div class="lisp">
+<pre class="lisp">
+
+(read-from-string "(setq x 55) (setq y 5)")
+     ⇒ ((setq x 55) . 11)
+
+(read-from-string "\"A short string\"")
+     ⇒ ("A short string" . 16)
+
+
+;; Read starting at the first character.
+(read-from-string "(list 112)" 0)
+     ⇒ ((list 112) . 10)
+
+;; Read starting at the second character.
+(read-from-string "(list 112)" 1)
+     ⇒ (list . 5)
+
+;; Read starting at the seventh character,
+;;   and stopping at the ninth.
+(read-from-string "(list 112)" 6 8)
+     ⇒ (11 . 8)
+</pre></div>
+<div class="lisp">
+<pre class="lisp">Variable: standard-input ¶
+</pre></div>
+<p>此变量保存默认输入流——当流参数为 nil 时读取使用的流。默认值为 t，表示使用 minibuffer。
+</p>
+<div class="lisp">
+<pre class="lisp">Variable: read-circle ¶
+</pre></div>
+<p>如果非零，则此变量启用循环和共享结构的读取。请参阅循环对象的读取语法。它的默认值为 t。
+</p>
+<p>在批处理模式下从 Emacs 进程的标准输入/输出流读取或写入时，有时需要确保将逐字读取/写入任意二进制数据，和/或不转换换行符到 CR-执行 LF 对。此问题在 POSIX 主机上不存在，仅在 MS-Windows 和 MS-DOS 上存在。以下函数允许您控制 Emacs 进程的任何标准流的 I/O 模式。
+</p>
+<div class="lisp">
+<pre class="lisp">Function: set-binary-mode stream mode ¶
+</pre></div>
+<p>将流切换到二进制或文本 I/O 模式。如果模式为非零，则切换到二进制模式，否则切换到文本模式。stream 的值可以是标准输入、标准输出或标准错误之一。此函数会刷新流的任何未决输出数据作为副作用，并返回流的 I/O 模式的先前值。在 POSIX 主机上，它总是返回一个非零值并且除了刷新挂起的输出之外什么都不做。
+</p>
+<hr/>
+
+<div class="nav-panel"><p>Next: <a href="20.4_输出流.html">输出流</a>, Previous: <a href="20.2_输入流.html">输入流</a>, Up: <a href="20_阅读和打印_Lisp_对象.html">阅读和打印_Lisp_对象.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>
