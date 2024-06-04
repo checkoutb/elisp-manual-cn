@@ -97,7 +97,7 @@
 
 from bs4 import BeautifulSoup
 import os
-
+import re
 
 
 fdir = "texi/"       # 需要修改
@@ -388,7 +388,34 @@ def create_css():
 
 
 
+# 应该在生成页面的时候使用，但是重装过系统，不太想装 texi2html
+keyboard_js_template = '''
+<script>document.onkeydown=checkKey;function checkKey(e){{if(e.keyCode=='39'){{location={};}}else if(e.keyCode=='37'){{location={} }} }}</script>'''
+def create_keyboard_js():
+
+    # 2, 4
+    pat = re.compile(r'(.+)Next: <a href=([^>]+)>(.+)Previous: <a href=([^>]+)>(.+)')
+
+    paths = os.listdir(foutdir)
+    ans = []    # fname
+    for p in paths:
+        if p.endswith("html"):
+            lstline = ""
+            with open(foutdir + p, 'r') as f:
+                lines = f.readlines()
+                lstline = lines[-1]
+            
+            m = pat.match(lstline)
+            nxt = m.group(2)
+            prev = m.group(4)
+            kb_js = keyboard_js_template.format(nxt, prev)
+            with open(foutdir + p, 'a') as f:
+                f.write(kb_js)
+
+
+
 if __name__ == "__main__":
+        
     fileNames = get_files_meta()
     print("got" + str(len(fileNames)))
     print(fileNames)
@@ -411,4 +438,5 @@ if __name__ == "__main__":
 ##############################
     create_css()
 
-
+##############
+    create_keyboard_js()

@@ -12,3 +12,4 @@
 <p>由于钩子（多函数和单函数）是变量，它们的值可以用 setq 或临时用 let 修改。但是，从钩子中添加或删除特定函数同时保留它可能具有的任何其他函数通常很有用。对于多功能挂钩，推荐的方法是使用 add-hook 和 remove-hook（请参阅设置挂钩）。大多数正常的钩子变量最初都是无效的；  add-hook 知道如何处理这个问题。您可以使用 add-hook 全局或本地缓冲区添加挂钩。对于只包含一个函数的钩子，add-hook 是不合适的，但您可以使用 add-function（请参阅 Advising Emacs Lisp Functions）将新函数与钩子结合起来。请注意，某些单个函数挂钩可能为 nil，而 add-function 无法处理，因此您必须在调用 add-function 之前检查这一点。
 </p>
 <div class="nav-panel"><p>Next: <a href="24.1.1_运行钩子.html">运行钩子</a>, Previous: <a href="24_主要和次要模式.html">主要和次要模式</a>, Up: <a href="24_主要和次要模式.html">主要和次要模式.</a> &nbsp; [<a href="00_content.htm" title="Table of contents" rel="contents">Contents</a>]</p></div></body></html>
+<script>document.onkeydown=checkKey;function checkKey(e){if(e.keyCode=='39'){location="24.1.1_运行钩子.html";}else if(e.keyCode=='37'){location="24_主要和次要模式.html" } }</script>
